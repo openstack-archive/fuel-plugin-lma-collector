@@ -1,0 +1,6 @@
+[openstack_dashboard]
+type = "LogstreamerInput"
+log_directory = "/var/log"
+file_match = 'dashboard\.log$'
+decoder = "openstack_log_decoder"
+differentiator = [ "openstack.horizon" ]

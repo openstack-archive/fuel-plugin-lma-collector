@@ -1,0 +1,14 @@
+[rabbitmq]
+type = "LogstreamerInput"
+log_directory = "/var/log/rabbitmq"
+file_match = 'rabbit@(?P<Node>.+)\.log$'
+differentiator = ["rabbitmq.", "Node"]
+decoder = "rabbitmq_log_decoder"
+parser_type = "regexp"
+delimiter = '\n(=[^=]+====)'
+delimiter_location = "start"
+
+
+[rabbitmq_log_decoder]
+type = "SandboxDecoder"
+filename = "<%= @plugins_directory %>/decoders/rabbitmq.lua"

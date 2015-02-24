@@ -1,0 +1,12 @@
+[mysql]
+type = "LogstreamerInput"
+log_directory = "/var/log"
+file_match = 'mysqld\.log$'
+decoder = "mysql_log_decoder"
+
+[mysql_log_decoder]
+type = "SandboxDecoder"
+filename = "<%= @plugins_directory %>/decoders/mysql_log.lua"
+
+[mysql_log_decoder.config]
+syslog_pattern = '<%= @syslog_pattern%>'

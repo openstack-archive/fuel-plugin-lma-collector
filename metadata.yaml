@@ -1,0 +1,26 @@
+# Plugin name
+name: lma_collector
+# Human-readable name for your plugin
+title: The Logging, Monitoring and Alerting (LMA) collector
+# Plugin version
+version: 6.1.0
+# Description
+description: Collect logs, metrics and notifications from system and OpenStack services and forward that information to external backends such as ElasticSearch and InfluxDB.
+# Required fuel version
+fuel_version: ['6.0']
+
+# The plugin is compatible with releases in the list
+releases:
+  - os: ubuntu
+    version: 2014.2-6.0
+    mode: ['ha', 'multinode']
+    deployment_scripts_path: deployment_scripts/
+    repository_path: repositories/ubuntu
+  - os: centos
+    version: 2014.2-6.0
+    mode: ['ha', 'multinode']
+    deployment_scripts_path: deployment_scripts/
+    repository_path: repositories/centos
+
+# Version of plugin package
+package_version: '1.0.0'

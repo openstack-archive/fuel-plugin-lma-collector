@@ -1,0 +1,14 @@
+[es_encoder]
+type = "ESJsonEncoder"
+index = "%{Type}-%{2006.01.02}"
+es_index_from_timestamp = true
+type_name = "message"
+
+[es_output]
+type = "ElasticSearchOutput"
+message_matcher = "Type == 'log' || Type == 'notification'"
+encoder = "es_encoder"
+<% # Heka expects milliseconds here -%>
+flush_interval = <%= @flush_interval.to_i() * 1000 %>
+flush_count = <%= @flush_count %>
+server = "http://<%= @server %>:<%= @port %>"

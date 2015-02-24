@@ -1,0 +1,14 @@
+[system_logs]
+type = "LogstreamerInput"
+log_directory = "/var/log"
+file_match = '(?P<Service>daemon|cron|kern|auth)\.log$'
+# Logger name will be system.daemon, system.cron, ...
+differentiator = [ "system.", "Service" ]
+decoder = "system_log_decoder"
+
+[system_log_decoder]
+type = "SandboxDecoder"
+filename = "<%= @plugins_directory %>/decoders/generic_syslog.lua"
+
+[system_log_decoder.config]
+syslog_pattern = '<%= @syslog_pattern%>'

@@ -1,0 +1,26 @@
+{
+    "name": "lma_collector",
+    "version": "6.1.0",
+    "author": "Simon Pasquier <spasquier@mirantis.com>",
+    "summary": "Puppet LMA Collector Module",
+    "license": "Apache License 2.0",
+    "source": "git://git.openstack.org/cgit/stackforge/fuel-plugin-lma-collector.git",
+    "project_page": "none",
+    "issues_url": "none",
+    "operatingsystem_support": [
+        {
+            "operatingsystem": "Ubuntu",
+            "operatingsystemrelease": ["12.04", "14.04"]
+        },
+        {
+            "operatingsystem": "CentOS",
+            "operatingsystemrelease": ["6"]
+        }
+    ],
+    "description": "Puppet module for configuring the LMA collector service",
+    "dependencies": [
+        {"name": "puppetlabs/stdlib", "version_requirement": "4.x"},
+        {"name": "pdxcat/collectd", "version_requirement": "3.x"},
+        {"name": "mirantis/heka", "version_requirement": "1.x"}
+    ]
+}

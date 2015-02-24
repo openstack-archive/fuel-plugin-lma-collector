@@ -1,0 +1,18 @@
+[<%= @service %>_notification]
+type = "AMQPInput"
+url = "amqp://<%= @rabbitmq_user %>:<%= @rabbitmq_password %>@<%= @rabbitmq_host %>/"
+exchange = "<%= @service %>"
+exchange_type = "topic"
+exchange_durability = false
+exchange_auto_delete = false
+queue = "lma_collector_<%= @service %>"
+routing_key = "notifications.*"
+decoder = "<%= @service %>_notification_decoder"
+
+[<%= @service %>_notification_decoder]
+type = "SandboxDecoder"
+filename = "<%= @plugins_directory %>/decoders/notification.lua"
+
+[<%= @service %>_notification_decoder.config]
+service = "<%= @service %>"
+include_full_notification = false
