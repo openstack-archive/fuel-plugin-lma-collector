@@ -1,0 +1,6 @@
+[log_monitoring]
+type = "SandboxFilter"
+filename = "<%= @plugins_directory %>/filters/log_monitor.lua"
+preserve_data = false
+message_matcher = "Type == 'log'"
+ticker_interval = 60
