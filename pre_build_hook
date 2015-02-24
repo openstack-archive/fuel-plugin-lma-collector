@@ -1,0 +1,16 @@
+#!/bin/bash
+set -eux
+
+ROOT="$(dirname `readlink -f $0`)"
+MODULES="${ROOT}"/deployment_scripts/puppet/modules
+# The following commit is the id for the 6.0 tag
+FUEL_LIB_SHA1="b977b77b7e1fca1f38e701373601e9fe3430eaee"
+FUEL_LIB_TARBALL_URL="https://github.com/stackforge/fuel-library/tarball/${FUEL_LIB_SHA1}"
+
+# Clean-up first
+rm -rf ${MODULES}/{stdlib,openstack}/
+
+# Include dependent manifests from fuel-library
+wget -qO- "${FUEL_LIB_TARBALL_URL}" | \
+    tar -C "${MODULES}" --strip-components=3 -zxvf - \
+    stackforge-fuel-library-${FUEL_LIB_SHA1:0:7}/deployment/puppet/{stdlib,keystone,openstack}

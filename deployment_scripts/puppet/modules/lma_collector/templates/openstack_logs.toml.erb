@@ -1,0 +1,13 @@
+[openstack_services]
+type = "LogstreamerInput"
+log_directory = "/var/log"
+file_match = '(?P<Service><%= @openstack_services.join('|') %>)-all\.log$'
+differentiator = ["openstack.", "Service"]
+decoder = "openstack_log_decoder"
+# Use the <PRI> token as the delimiter because OpenStack services may log
+# messages with newlines and the configuration of the Syslog daemon usually
+# doesn't escape them.
+parser_type = "regexp"
+delimiter = "(<[0-9]+>)"
+delimiter_location = "start"
+

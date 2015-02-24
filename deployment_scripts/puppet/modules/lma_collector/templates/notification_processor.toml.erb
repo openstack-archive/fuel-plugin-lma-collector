@@ -1,0 +1,10 @@
+[instance_creation_time_processor]
+type = "SandboxFilter"
+filename = "<%= @plugins_directory %>/filters/instance_creation_time.lua"
+message_matcher = "Type == 'notification' && Fields[event_type] == 'compute.instance.create.end'"
+preserve_data = false
+
+[instance_state_processor]
+type = "SandboxFilter"
+filename = "<%= @plugins_directory %>/filters/instance_creation_state.lua"
+message_matcher = "Type == 'notification' && Fields[event_type] == 'compute.instance.update' && Fields[state] != NIL && Fields[old_state] != NIL"

@@ -1,0 +1,6 @@
+[openstack_log_decoder]
+type = "SandboxDecoder"
+filename = "<%= @plugins_directory %>/decoders/openstack_log.lua"
+
+[openstack_log_decoder.config]
+syslog_pattern = '<%= @syslog_pattern %>'
