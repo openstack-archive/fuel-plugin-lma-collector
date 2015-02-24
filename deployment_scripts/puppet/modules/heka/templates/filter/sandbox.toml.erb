@@ -1,0 +1,15 @@
+[<%= @title %>_filter]
+type = "SandboxFilter"
+filename = "<%= @filename %>"
+preserve_data = <%= @preserve_data %>
+message_matcher = "<%= @message_matcher %>"
+<% if @ticker_interval %>
+ticker_interval = <%= @ticker_interval %>
+<% end %>
+
+<% if @config.size() > 0 %>
+[<%= @title %>_filter.config]
+<%  @config.each do |k,v| %>
+    <%= @k %> = '<%= @v %>'
+<%  end %>
+<% end %>

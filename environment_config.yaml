@@ -1,0 +1,21 @@
+attributes:
+  metadata:
+    restrictions:
+        - condition: "cluster:net_provider != 'neutron'"
+          action: "hide"
+
+  # TODO(pasquier-s): validate input fields
+  fuel_environment:
+    value: ''
+    label: 'Environment name'
+    description: 'Name of the environment as reported in the collected data.'
+    weight: 10
+    type: "text"
+
+  # TODO(pasquier-s): validate input fields
+  elasticsearch_server:
+    value: ''
+    label: 'ElasticSearch server'
+    description: 'Leave empty if you''re not using ElasticSearch.'
+    weight: 30
+    type: "text"

@@ -1,0 +1,17 @@
+[<%= @title %>_logstreamer]
+type = "LogstreamerInput"
+log_directory = "<%= @log_directory %>"
+file_match = '<%= @file_match %>'
+<% if @differentiator -%>
+differentiator = <%= @differentiator %>
+<% end -%>
+decoder = "<%= @decoder %>_decoder"
+<% if @parser_type -%>
+parser_type = "<%= @parser_type%>"
+<% end -%>
+<% if @delimiter -%>
+delimiter = "<%= @delimiter %>"
+<% end -%>
+<% if @delimiter_location -%>
+delimiter_location = "<%= @delimiter_location %>"
+<% end -%>
