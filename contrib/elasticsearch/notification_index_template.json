@@ -1,0 +1,52 @@
+{
+    "mappings": {
+        "message": {
+            "properties": {
+                "Logger": {
+                    "index": "not_analyzed",
+                    "type": "string"
+                },
+                "Hostname": {
+                    "index": "not_analyzed",
+                    "type": "string"
+                },
+                "fuel_environment": {
+                    "index": "not_analyzed",
+                    "type": "string"
+                },
+                "os_region": {
+                    "index": "not_analyzed",
+                    "type": "string"
+                },
+                "os_release": {
+                    "index": "not_analyzed",
+                    "type": "string"
+                },
+                "event_type": {
+                    "index": "not_analyzed",
+                    "type": "string"
+                },
+                "instance_id": {
+                    "index": "not_analyzed",
+                    "type": "string"
+                },
+                "instance_name": {
+                    "index": "not_analyzed",
+                    "type": "string"
+                },
+                "tenant_id": {
+                    "index": "not_analyzed",
+                    "type": "string"
+                },
+                "user_id": {
+                    "index": "not_analyzed",
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "settings": {
+        "number_of_shards": 3
+    },
+    "template": "notification-*"
+}
