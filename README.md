@@ -6,7 +6,7 @@ Overview
 --------
 
 The Logging, Monitoring & Alerting (LMA) collector is a service running on each
-OpenStack node that collects logs and notifications. This data is sent to an
+OpenStack node that collects logs and notifications. Those data are sent to an
 ElasticSearch server for diagnostic, troubleshooting and alerting purposes.
 
 
@@ -48,17 +48,17 @@ To install the LMA collector plugin, follow these steps:
 1. Download the plugin from the [Fuel Plugins
    Catalog](https://software.mirantis.com/download-mirantis-openstack-fuel-plug-ins/).
 2. Copy the plugin file to the Fuel Master node.
-```
-scp lma_collector-1.0.0.fp root@<IP address>:
-```
+    ```
+    scp lma_collector-1.0.0.fp root@<IP address>:
+    ```
 3. Install the plugin using the `fuel` command line:
-```
-fuel plugins --install lma_collector-1.0.0.fp
-```
+    ```
+    fuel plugins --install lma_collector-1.0.0.fp
+    ```
 4. Verify that the plugin is installed correctly:
-```
-fuel plugins --list
-```
+    ```
+    fuel plugins --list
+    ```
 
 User Guide
 ==========
