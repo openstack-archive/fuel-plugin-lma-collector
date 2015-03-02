@@ -25,6 +25,10 @@ class lma_collector::params {
   $rabbitmq_host = false
   $rabbitmq_user = ''
   $rabbitmq_password = ''
+  $rabbitmq_exchange = ''
+  $lma_topic = 'lma_notifications'
+  $openstack_topic = 'notifications'
+  $notification_driver = 'messaging'
 
   $elasticsearch_server = false
   $elasticsearch_port = '9200'

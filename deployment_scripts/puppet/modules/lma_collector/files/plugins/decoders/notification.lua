@@ -78,7 +78,7 @@ local transform_functions = {
     volume_id = normalize_uuid,
 }
 
-local service = read_config("service") or error("'service' configuration must be specified")
+--local service = read_config("service") or error("'service' configuration must be specified")
 local include_full_notification = read_config("include_full_notification") or false
 
 function process_message ()
@@ -95,7 +95,7 @@ function process_message ()
     end
 
     msg.Fields = {}
-    msg.Logger = service
+    --msg.Logger = service
     msg.Severity = utils.label_to_severity_map[notif.priority]
     msg.Timestamp = patt.Timestamp:match(notif.timestamp)
     msg.Fields.publisher, msg.Hostname = string.match(notif.publisher_id, '([^.]+)%.([%w_-]+)')
