@@ -1,7 +1,7 @@
 # Plugin name
 name: lma_collector
 # Human-readable name for your plugin
-title: The Logging, Monitoring and Alerting (LMA) collector
+title: The Logging, Monitoring and Alerting (LMA) collector plugin
 # Plugin version
 version: 6.1.0
 # Description
