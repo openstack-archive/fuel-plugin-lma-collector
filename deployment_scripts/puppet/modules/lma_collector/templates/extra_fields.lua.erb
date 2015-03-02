@@ -16,8 +16,8 @@ setfenv(1, M) -- Remove external access to contain everything in the module
 
 -- list of fields that are added to Heka messages by the collector
 tags = {
-<% @tags.each do |k,v| -%>
-    ['<%= k.gsub("'"){"\\'"} %>'] = '<%= v.gsub("'"){"\\'"} %>',
+<% @tags.keys().sort().each do |k| -%>
+    ['<%= k.to_s().gsub("'"){"\\'"} %>'] = '<%= @tags[k].to_s().gsub("'"){"\\'"} %>',
 <% end -%>
 }
 
