@@ -24,6 +24,30 @@ local msg = {
     Fields = nil
 }
 
+-- Mapping table from event_type prefixes to notification loggers
+local logger_map = {
+    --cinder
+    volume = 'cinder',
+    -- glance
+    image = 'glance',
+    -- heat
+    orchestration = 'heat',
+    -- keystone
+    identity = 'keystone',
+    -- nova
+    compute = 'nova',
+    scheduler = 'nova',
+    keypair = 'nova',
+    -- neutron
+    floatingip = 'neutron',
+    security_group = 'neutron',
+    security_group_rule = 'neutron',
+    network = 'neutron',
+    port = 'neutron',
+    router = 'neutron',
+    subnet = 'neutron',
+}
+
 -- Mapping table between the attributes in the notification's payload and the
 -- fields in the Heka message
 local payload_fields = {
@@ -78,7 +102,6 @@ local transform_functions = {
     volume_id = normalize_uuid,
 }
 
-local service = read_config("service") or error("'service' configuration must be specified")
 local include_full_notification = read_config("include_full_notification") or false
 
 function process_message ()
@@ -95,7 +118,7 @@ function process_message ()
     end
 
     msg.Fields = {}
-    msg.Logger = service
+    msg.Logger = logger_map[string.match(notif.event_type, '([^.]+)')]
     msg.Severity = utils.label_to_severity_map[notif.priority]
     msg.Timestamp = patt.Timestamp:match(notif.timestamp)
     msg.Fields.publisher, msg.Hostname = string.match(notif.publisher_id, '([^.]+)%.([%w_-]+)')

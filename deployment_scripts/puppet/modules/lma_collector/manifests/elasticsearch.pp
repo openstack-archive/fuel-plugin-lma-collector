@@ -17,7 +17,7 @@ class lma_collector::elasticsearch (
     config_dir      => $lma_collector::params::config_dir,
     server          => $server,
     port            => $port,
-    message_matcher => "Type == 'log'",
+    message_matcher => "Type == 'log' || Type  == 'notification'",
     require         => Heka::Encoder::Es_json['elasticsearch'],
     notify          => Service[$lma_collector::params::service_name],
   }
