@@ -24,15 +24,25 @@ else {
   $rabbitmq_user = 'nova'
 }
 
+$tags = {
+  deployment_id => $fuel_settings['deployment_id'],
+  deployment_mode => $deployment_mode,
+  openstack_region => 'RegionOne',
+  openstack_release => $fuel_settings['openstack_version'],
+  openstack_roles => join($roles, ","),
+}
+if $fuel_settings['lma_collector']['environment_label'] != '' {
+  $additional_tags = {
+    environment_label => $fuel_settings['lma_collector']['environment_label'],
+  }
+}
+else {
+  $additional_tags = {}
+}
+
 class lma_common {
   class { 'lma_collector':
-    tags => {
-      fuel_environment => $fuel_settings['lma_collector']['fuel_environment'],
-      openstack_region => 'RegionOne',
-      openstack_release => $fuel_settings['openstack_version'],
-      openstack_roles => join($roles, ","),
-      deployment_mode => $deployment_mode,
-    }
+    tags => merge($tags, $additional_tags)
   }
 
   class { 'lma_collector::logs::system': }
@@ -50,14 +60,17 @@ class lma_controller {
   class { 'lma_collector::logs::pacemaker': }
 }
 
-if $fuel_settings['lma_collector']['elasticsearch_server'] != '' {
-  class { 'lma_common': }
+class { 'lma_common': }
 
-  if ($is_primary_controller or $is_controller) {
-    class { 'lma_controller': }
-  }
+if ($is_primary_controller or $is_controller) {
+  class { 'lma_controller': }
+}
 
+if $fuel_settings['lma_collector']['elasticsearch_mode'] == 'remote' {
   class { 'lma_collector::elasticsearch':
-    server => $fuel_settings['lma_collector']['elasticsearch_server']
+    server => $fuel_settings['lma_collector']['elasticsearch_address']
   }
+}
+else {
+  # TODO (spasquier): add logic for managing the local ES mode
 }
