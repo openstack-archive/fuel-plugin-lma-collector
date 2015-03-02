@@ -4,18 +4,43 @@ attributes:
         - condition: "cluster:net_provider != 'neutron'"
           action: "hide"
 
-  # TODO(pasquier-s): validate input fields
-  fuel_environment:
+  environment_label:
     value: ''
-    label: 'Environment name'
-    description: 'Name of the environment as reported in the collected data.'
+    label: 'Environment label'
+    description: 'Optional string to tag the data.'
     weight: 10
     type: "text"
 
-  # TODO(pasquier-s): validate input fields
-  elasticsearch_server:
-    value: ''
-    label: 'ElasticSearch server'
-    description: 'Leave empty if you''re not using ElasticSearch.'
+  elasticsearch_mode:
+    type: "radio"
+    weight: 20
+    value: "local"
+    label: "Logging analytics"
+    values:
+      - data: "local"
+        label: "Local node"
+      - data: "remote"
+        label: "Remote server"
+
+  elasticsearch_node_name:
+    value: 'elasticsearch'
+    label: "ElasticSearch node's name"
+    description: 'Label of the node running the ElasticSearch/Kibana plugin (it must be deployed in the same environment).'
     weight: 30
     type: "text"
+    restrictions:
+        - condition: "settings:lma_collector.elasticsearch_mode.value != 'local'"
+          action: "disable"
+
+  elasticsearch_address:
+    value: ''
+    label: 'ElasticSearch address'
+    description: 'IP address or fully qualified domain name of the ElasticSearch server.'
+    weight: 40
+    type: "text"
+    restrictions:
+        - condition: "settings:lma_collector.elasticsearch_mode.value != 'remote'"
+          action: "disable"
+    regex:
+      source: '^[a-zA-Z\d]+[_-.\da-zA-Z]*$'
+      error: "Invalid address or name"
