@@ -5,6 +5,6 @@ filename = "<%= @filename %>"
 <% if @config.size() > 0 %>
 [<%= @title %>_decoder.config]
 <%  @config.each do |k,v| %>
-    <%= k %> = '<%= v %>'
+    <%= k %> = <%= v.is_a?(String) ? "'#{v}'" : v %>
 <%  end %>
 <% end %>

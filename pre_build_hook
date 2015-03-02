@@ -1,8 +1,10 @@
 #!/bin/bash
 set -eux
+shopt -s extglob
 
 ROOT="$(dirname `readlink -f $0`)"
-MODULES="${ROOT}"/deployment_scripts/puppet/modules
+MODULES_DIR="${ROOT}"/deployment_scripts/puppet/modules
+MODULES='@(stdlib|openstack|inifile|glance|nova|heat|neutron|keystone|cinder)'
 RPM_REPO="${ROOT}"/repositories/centos/
 DEB_REPO="${ROOT}"/repositories/ubuntu/
 HEKA_VERSION="0.9.0"
@@ -11,12 +13,12 @@ FUEL_LIB_SHA1="b977b77b7e1fca1f38e701373601e9fe3430eaee"
 FUEL_LIB_TARBALL_URL="https://github.com/stackforge/fuel-library/tarball/${FUEL_LIB_SHA1}"
 
 # Clean-up first
-rm -rf ${MODULES}/{stdlib,openstack}/
+rm -rf ${MODULES_DIR}/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack,stdlib}
 
 wget -qO - https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka_${HEKA_VERSION}_amd64.deb > ${DEB_REPO}/heka_${HEKA_VERSION}_amd64.deb
 wget -qO - https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka-${HEKA_VERSION//./_}-linux-amd64.rpm > ${RPM_REPO}/heka-${HEKA_VERSION//./_}-linux-amd64.rpm
 
 # Include dependent manifests from fuel-library
 wget -qO- "${FUEL_LIB_TARBALL_URL}" | \
-    tar -C "${MODULES}" --strip-components=3 -zxvf - \
-    stackforge-fuel-library-${FUEL_LIB_SHA1:0:7}/deployment/puppet/{stdlib,keystone,openstack}
+    tar -C "${MODULES_DIR}" --strip-components=3 -zxvf - \
+    stackforge-fuel-library-${FUEL_LIB_SHA1:0:7}/deployment/puppet/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack,stdlib}
