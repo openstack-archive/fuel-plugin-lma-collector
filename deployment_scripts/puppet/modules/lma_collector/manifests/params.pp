@@ -25,6 +25,8 @@ class lma_collector::params {
   $rabbitmq_host = false
   $rabbitmq_user = ''
   $rabbitmq_password = ''
+  $rabbitmq_exchange = ''
+  $notification_topic = 'lma_notifications'
 
   $elasticsearch_server = false
   $elasticsearch_port = '9200'

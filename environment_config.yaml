@@ -44,3 +44,9 @@ attributes:
     regex:
       source: '^[a-zA-Z\d]+[_-.\da-zA-Z]*$'
       error: "Invalid address or name"
+
+  enable_notifications:
+    type: "checkbox"
+    weight: 50
+    value: false
+    label: "Collect OpenStack notifications"
