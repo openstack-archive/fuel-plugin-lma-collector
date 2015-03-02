@@ -1,28 +1,19 @@
+# TODO(spasquier): replace by Hiera when testing with 6.1
 $fuel_settings = parseyaml(file('/etc/astute.yaml'))
 
-$deployment_mode = $fuel_settings['deployment_mode']
-if $deployment_mode == 'multinode' {
-  $controller_role = 'controller'
-}
-elsif $deployment_mode =~ /^ha/ {
-  $controller_role = 'primary-controller'
-}
-else {
-  fail("'${deployment_mode} is not a supported deployment mode")
-}
+# TODO(spasquier): fail if Neutron isn't used
 
-# TODO: verify that we're running Neutron
+include lma_collector::params
+
+$deployment_mode = $fuel_settings['deployment_mode']
 
 $roles = node_roles($fuel_settings['nodes'], $fuel_settings['uid'])
-$is_primary_controller = member($roles, $controller_role)
-$is_controller = member($roles, 'controller')
-
-if $fuel_settings['rabbit']['user'] {
-  $rabbitmq_user = $fuel_settings['rabbit']['user']
-}
-else {
-  $rabbitmq_user = 'nova'
-}
+$roles_map = {}
+$roles_map['primary-controller'] = member($roles, 'primary-controller')
+$roles_map['controller'] = member($roles, 'controller')
+$roles_map['compute'] = member($roles, 'compute')
+$roles_map['cinder'] = member($roles, 'cinder')
+$roles_map['ceph-osd'] = member($roles, 'ceph-osd')
 
 $tags = {
   deployment_id => $fuel_settings['deployment_id'],
@@ -40,31 +31,68 @@ else {
   $additional_tags = {}
 }
 
-class lma_common {
-  class { 'lma_collector':
-    tags => merge($tags, $additional_tags)
-  }
-
-  class { 'lma_collector::logs::system': }
-
-  class { 'lma_collector::logs::openstack': }
-
-  class { 'lma_collector::logs::monitor': }
+$enable_notifications = $fuel_settings['lma_collector']['enable_notifications']
+if $fuel_settings['ceilometer']['enabled'] {
+  $notification_topics = [$lma_collector::params::openstack_topic, $lma_collector::params::lma_topic]
+}
+else {
+  $notification_topics = [$lma_collector::params::lma_topic]
 }
 
-class lma_controller {
+# Resources shared by all roles
+class { 'lma_collector':
+  tags => merge($tags, $additional_tags)
+}
+
+class { 'lma_collector::logs::system': }
+
+class { 'lma_collector::logs::openstack': }
+
+class { 'lma_collector::logs::monitor': }
+
+# Controller
+if ($roles_map['primary-controller'] or $roles_map['controller']) {
+  # Logs
   class { 'lma_collector::logs::mysql': }
 
   class { 'lma_collector::logs::rabbitmq': }
 
-  class { 'lma_collector::logs::pacemaker': }
+  if $deployment_mode =~ /^ha/ {
+    class { 'lma_collector::logs::pacemaker': }
+  }
+
+  # Notifications
+  if $fuel_settings['rabbit']['user'] {
+    $rabbitmq_user = $fuel_settings['rabbit']['user']
+  }
+  else {
+    $rabbitmq_user = 'nova'
+  }
+
+  if $enable_notifications {
+    class { 'lma_collector::notifications::controller':
+      host     => $fuel_settings['management_vip'],
+      user     => $rabbitmq_user,
+      password => $fuel_settings['rabbit']['password'],
+      topics   => $notification_topics,
+    }
+  }
 }
 
-class { 'lma_common': }
-
-if ($is_primary_controller or $is_controller) {
-  class { 'lma_controller': }
+# Compute
+if $roles_map['compute'] and $enable_notifications {
+  class { 'lma_collector::notifications::compute':
+    topics  => $notification_topics,
+  }
 }
+
+# Cinder
+if $roles_map['cinder'] and $enable_notifications {
+  class { 'lma_collector::notifications::cinder':
+    topics  => $notification_topics,
+  }
+}
+
 
 $elasticsearch_mode = $fuel_settings['lma_collector']['elasticsearch_mode']
 case $elasticsearch_mode {
