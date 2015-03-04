@@ -1,8 +1,8 @@
 .. _metrics:
 
-=======
-Metrics
-=======
+================
+Metric Messages
+================
 
 Metrics are extracted from several sources:
 
@@ -12,10 +12,10 @@ Metrics are extracted from several sources:
 
 * OpenStack notifications processed by the collector service.
 
-Metric message format
-=====================
+Metric Messages Format
+======================
 
-In addition to the common :ref:`message_format`, metric messages have
+In addition to the common :ref:`common_message_format`, metric messages have
 additional properties.
 
 Attributes in **bold** are always present in the messages while attributes in
