@@ -1,18 +1,18 @@
 .. _notifications:
 
-=============
-Notifications
-=============
+=====================
+Notification Messages
+=====================
 
 OpenStack services can be configured to send notifications on the message bus
 about the executing task or the state of the cloud resources [#]_. These
 notifications are received by the LMA collector service and turned into Heka
 messages.
 
-Notification message format
-===========================
+Notification Messages Format
+============================
 
-In addition to the common :ref:`message_format`, notification-based messages
+In addition to the common :ref:`common_message_format`, notification-based messages
 have additional properties.
 
 Attributes in **bold** are always present in the messages while attributes in
