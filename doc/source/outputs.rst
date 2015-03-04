@@ -1,8 +1,8 @@
 .. _outputs:
 
-=======
-Outputs
-=======
+==================
+Supported Ouptputs
+==================
 
 The LMA collector can forward part or all of the processed Heka messages to any
 kind of external system, provided that the system supports a protocol-based

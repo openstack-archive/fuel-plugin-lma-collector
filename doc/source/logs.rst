@@ -1,8 +1,8 @@
 .. _logs:
 
-====
-Logs
-====
+============
+Log Messages
+============
 
 The Heka collector service is configured to tail the following log files:
 
@@ -21,8 +21,8 @@ The Heka collector service is configured to tail the following log files:
 
 * OpenStack logs.
 
-Log message format
-==================
+Log Messages Format
+===================
 
 In addition to the common :ref:`message_format`, log-based messages have
 additional properties.

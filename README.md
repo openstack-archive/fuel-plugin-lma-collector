@@ -1,5 +1,5 @@
-Logging, Monitoring and Alerting collector Plugin for Fuel
-==========================================================
+Logging, Monitoring and Alerting (LMA) Collector Plugin for Fuel
+================================================================
 
 
 Overview
@@ -23,27 +23,24 @@ Requirements
 Limitations
 -----------
 
-The plugin is only compatible with environments using Neutron.
+The plugin is only compatible with OpenStack environments deployed with Neutron for networking.
 
 Installation Guide
 ==================
 
 
-ElasticSearch configuration
----------------------------
+Prior to installing the LMA Collector Plugin, you may want to install ElasticSearch and Kibana.
+To install ElasticSearch and Kibana automatically using Fuel, you can refer to the
+[ElasticSearch-Kibana Fuel Plugin
+](https://github.com/stackforge/fuel-plugin-elasticsearch-kibana).
 
-To install and configure ElasticSearch, you can refer to the
-[ElasticSearch/Kibana
-plugin](https://github.com/stackforge/fuel-plugin-elasticsearch-kibana) for
-Fuel.
-
-You can also install the ElasticSearch server outside of Fuel as long as it
-meets the plugin's requirements.
+You can install ElasticSearch and Kibana outside of Fuel as long as your installation 
+meets the LMA Collector plugin's requirements defined above.
 
 **LMA collector plugin** installation
 -------------------------------------
 
-To install the LMA collector plugin, follow these steps:
+To install the LMA Collector plugin, follow these steps:
 
 1. Download the plugin from the [Fuel Plugins
    Catalog](https://software.mirantis.com/download-mirantis-openstack-fuel-plug-ins/).
