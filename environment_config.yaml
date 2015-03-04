@@ -42,5 +42,5 @@ attributes:
         - condition: "settings:lma_collector.elasticsearch_mode.value != 'remote'"
           action: "disable"
     regex:
-      source: '^[a-zA-Z\d]+[_-.\da-zA-Z]*$'
+      source: '^[a-zA-Z\d][a-zA-Z\d_\-.]+$'
       error: "Invalid address or name"
