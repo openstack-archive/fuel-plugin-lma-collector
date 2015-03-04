@@ -1,23 +1,8 @@
-.. _collector_service:
+.. _common_message_format:
 
-
-=================
-Collector service
-=================
-
-The collector service leverages:
-
-* `collectd <http://www.collectd.org/>`_ for gathering system and operational :ref:`metrics` which are then
-  sent to Heka.
-
-* `Heka <http://hekad.readthedocs.org/en/latest/index.html>`_ for parsing
-  :ref:`logs`, collecting OpenStack :ref:`notifications` and receiving metrics
-  from collectd.
-
-.. _message_format:
-
-Message format
-==============
+=====================
+Common Message Format
+=====================
 
 Heka turns the incoming data into Heka messages [#]_ with a well-defined format
 which is described below.
@@ -40,7 +25,7 @@ which is described below.
 
 * **Fields**, array of Field structures (see below).
 
-Field format
+Field Format
 ============
 
 Every message (either originating from logs, metrics or notifications) is
