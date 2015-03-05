@@ -1,8 +1,8 @@
 class lma_collector::elasticsearch (
   $server = $lma_collector::params::elasticsearch_server,
   $port = $lma_collector::params::elasticsearch_port,
-) {
-  include lma_collector::params
+) inherits lma_collector::params {
+  include lma_collector::service
 
   validate_string($server)
 
@@ -10,7 +10,7 @@ class lma_collector::elasticsearch (
     config_dir              => $lma_collector::params::config_dir,
     index                   => "%{Type}-%{2006.01.02}",
     es_index_from_timestamp => true,
-    notify                  => Service[$lma_collector::params::service_name],
+    notify                  => Class['lma_collector::service'],
   }
 
   heka::output::elasticsearch { 'elasticsearch':
@@ -19,6 +19,6 @@ class lma_collector::elasticsearch (
     port            => $port,
     message_matcher => "Type == 'log' || Type  == 'notification'",
     require         => Heka::Encoder::Es_json['elasticsearch'],
-    notify          => Service[$lma_collector::params::service_name],
+    notify          => Class['lma_collector::service'],
   }
 }
