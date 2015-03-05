@@ -1,13 +1,14 @@
 class lma_collector::logs::openstack {
   include lma_collector::params
+  include lma_collector::service
 
   heka::decoder::sandbox { 'openstack':
     config_dir => $lma_collector::params::config_dir,
-    filename   => "${lma_collector::plugins_dir}/decoders/openstack_log.lua" ,
+    filename   => "${lma_collector::params::plugins_dir}/decoders/openstack_log.lua" ,
     config     => {
       syslog_pattern => $lma_collector::params::syslog_pattern
     },
-    notify     => Service[$lma_collector::params::service_name],
+    notify     => Class['lma_collector::service'],
   }
 
   # Use the <PRI> token as the delimiter because OpenStack services may log
@@ -17,7 +18,7 @@ class lma_collector::logs::openstack {
     config_dir    => $lma_collector::params::config_dir,
     delimiter     => '(<[0-9]+>)',
     delimiter_eol => false,
-    notify        => Service[$lma_collector::params::service_name],
+    notify        => Class['lma_collector::service'],
   }
 
   heka::input::logstreamer { 'openstack':
@@ -27,7 +28,7 @@ class lma_collector::logs::openstack {
     file_match     => '(?P<Service>nova|cinder|keystone|glance|heat|neutron)-all\.log$',
     differentiator => "[ 'openstack.', 'Service' ]",
     require        => [Heka::Decoder::Sandbox['openstack'], Heka::Splitter::Regex['openstack']],
-    notify         => Service[$lma_collector::params::service_name],
+    notify         => Class['lma_collector::service'],
   }
 
   heka::input::logstreamer { 'openstack_dashboard':
@@ -36,6 +37,6 @@ class lma_collector::logs::openstack {
     file_match     => 'dashboard\.log$',
     differentiator => "[ 'openstack.horizon' ]",
     require        => Heka::Decoder::Sandbox['openstack'],
-    notify         => Service[$lma_collector::params::service_name],
+    notify         => Class['lma_collector::service'],
   }
 }

@@ -19,6 +19,7 @@ class lma_collector (
   $tags = $lma_collector::params::tags,
 ) inherits lma_collector::params {
   include heka::params
+  include lma_collector::service
 
   validate_hash($tags)
 
@@ -40,21 +41,21 @@ class lma_collector (
     ensure  => directory,
     source  => 'puppet:///modules/lma_collector/plugins/common/lma_utils.lua',
     require => File[$lua_modules_dir],
-    notify => Service[$service_name],
+    notify => Class['lma_collector::service'],
   }
 
   file { "${lua_modules_dir}/patterns.lua":
     ensure  => directory,
     source  => 'puppet:///modules/lma_collector/plugins/common/patterns.lua',
     require => File[$lua_modules_dir],
-    notify => Service[$service_name],
+    notify => Class['lma_collector::service'],
   }
 
   file { "${lua_modules_dir}/extra_fields.lua":
     ensure  => present,
     content => template('lma_collector/extra_fields.lua.erb'),
     require => File[$lua_modules_dir],
-    notify => Service[$service_name],
+    notify => Class['lma_collector::service'],
   }
 
   file { $plugins_dir:
@@ -65,7 +66,7 @@ class lma_collector (
     ensure  => directory,
     source  => 'puppet:///modules/lma_collector/plugins/decoders',
     recurse => remote,
-    notify  => Service[$service_name],
+    notify  => Class['lma_collector::service'],
     require => File[$plugins_dir]
   }
 
@@ -73,7 +74,7 @@ class lma_collector (
     ensure  => directory,
     source  => 'puppet:///modules/lma_collector/plugins/filters',
     recurse => remote,
-    notify  => Service[$service_name],
+    notify  => Class['lma_collector::service'],
     require => File[$plugins_dir]
   }
 }

@@ -1,7 +1,31 @@
-- role: ['controller', 'compute', 'cinder']
+- role: '*'
   stage: post_deployment
   type: puppet
   parameters:
-    puppet_manifest: puppet/site.pp
+    puppet_manifest: puppet/manifests/base.pp
+    puppet_modules: puppet/modules
+    timeout: 600
+
+- role: ['controller']
+  stage: post_deployment
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/controller.pp
+    puppet_modules: puppet/modules
+    timeout: 600
+
+- role: [ 'compute' ]
+  stage: post_deployment
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/compute.pp
+    puppet_modules: puppet/modules
+    timeout: 600
+
+- role: ['cinder']
+  stage: post_deployment
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/cinder.pp
     puppet_modules: puppet/modules
     timeout: 600
