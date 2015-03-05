@@ -22,6 +22,5 @@ define heka::input::amqp (
     mode    => '0600',
     owner   => $heka::params::user,
     group   => $heka::params::user,
-    require => File[$config_dir],
   }
 }

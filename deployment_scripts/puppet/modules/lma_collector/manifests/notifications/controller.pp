@@ -6,6 +6,8 @@ class lma_collector::notifications::controller (
     $topics = [],
 ) inherits lma_collector::params {
 
+  include lma_collector::service
+
   validate_array($topics)
   $notification_topics = join($topics, ',')
 
@@ -16,11 +18,11 @@ class lma_collector::notifications::controller (
 
   heka::decoder::sandbox { 'notification':
     config_dir => $lma_collector::params::config_dir,
-    filename   => "${lma_collector::plugins_dir}/decoders/notification.lua" ,
+    filename   => "${lma_collector::params::plugins_dir}/decoders/notification.lua" ,
     config     => {
       include_full_notification => false
     },
-    notify     => Service[$lma_collector::params::service_name],
+    notify     => Class['lma_collector::service'],
   }
 
   heka::input::amqp { 'openstack_info':
@@ -36,7 +38,7 @@ class lma_collector::notifications::controller (
     exchange_type        => "topic",
     queue                => "${lma_collector::params::lma_topic}.info",
     routing_key          => "${lma_collector::params::lma_topic}.info",
-    notify               => Service[$lma_collector::params::service_name],
+    notify               => Class['lma_collector::service'],
   }
 
   heka::input::amqp { 'openstack_error':
@@ -52,7 +54,7 @@ class lma_collector::notifications::controller (
     exchange_type        => "topic",
     queue                => "${lma_collector::params::lma_topic}.error",
     routing_key          => "${lma_collector::params::lma_topic}.error",
-    notify               => Service[$lma_collector::params::service_name],
+    notify               => Class['lma_collector::service'],
   }
 
   heka::input::amqp { 'openstack_warn':
@@ -68,7 +70,7 @@ class lma_collector::notifications::controller (
     exchange_type        => "topic",
     queue                => "${lma_collector::params::lma_topic}.warn",
     routing_key          => "${lma_collector::params::lma_topic}.warn",
-    notify               => Service[$lma_collector::params::service_name],
+    notify               => Class['lma_collector::service'],
   }
 
   # Nova
