@@ -149,10 +149,4 @@ class heka (
       notify  => Service[$service_name],
     }
   }
-
-  service { $service_name:
-    enable  => 'true',
-    ensure  => 'running',
-    require => [File['heka_init_script'], File[$config_dir], File[$base_dir], File[$log_file]],
-  }
 }
