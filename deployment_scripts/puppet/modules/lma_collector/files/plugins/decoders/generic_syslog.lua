@@ -11,6 +11,8 @@
 -- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
+require "string"
+
 local syslog = require "syslog"
 local utils  = require 'lma_utils'
 
@@ -32,6 +34,7 @@ function process_message ()
     local log = read_message("Payload")
 
     if utils.parse_syslog_message(syslog_grammar, log, msg) then
+        msg.Logger = string.gsub(read_message('Logger'), '%.log$', '')
         inject_message(msg)
         return 0
     end
