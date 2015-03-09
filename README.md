@@ -47,14 +47,19 @@ To install the LMA Collector plugin, follow these steps:
 1. Download the plugin from the [Fuel Plugins
    Catalog](https://software.mirantis.com/download-mirantis-openstack-fuel-plug-ins/).
 2. Copy the plugin file to the Fuel Master node.
+
     ```
     scp lma_collector-1.0.0.fp root@<IP address>:
     ```
+
 3. Install the plugin using the `fuel` command line:
+
     ```
     fuel plugins --install lma_collector-1.0.0.fp
     ```
+
 4. Verify that the plugin is installed correctly:
+
     ```
     fuel plugins --list
     ```
@@ -84,12 +89,14 @@ Troubleshooting
 If you see no data in the ElasticSearch server, check the following:
 
 1. The LMA collector service is running
-```
-# On CentOS
-/etc/init.d/lma_collector status
-# On Ubuntu
-status lma_collector
-```
+
+    ```
+    # On CentOS
+    /etc/init.d/lma_collector status
+    # On Ubuntu
+    status lma_collector
+    ```
+
 2. Look for errors in the LMA collector log file (located at
    `/var/log/lma_collector.log`) on the different nodes.
 3. Nodes are able to connect to the ElasticSearch server on port 9200.
