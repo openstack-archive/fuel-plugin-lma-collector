@@ -77,4 +77,10 @@ class lma_collector (
     notify  => Class['lma_collector::service'],
     require => File[$plugins_dir]
   }
+
+  if size($lma_collector::params::additional_packages) > 0 {
+    package { $lma_collector::params::additional_packages:
+      ensure => present,
+    }
+  }
 }
