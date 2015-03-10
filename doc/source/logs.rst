@@ -8,10 +8,14 @@ The Heka collector service is configured to tail the following log files:
 
 * System logs.
 
+  * ``/var/log/syslog``
+  * ``/var/log/messages``
+  * ``/var/log/debug``
   * ``/var/log/auth.log``
   * ``/var/log/cron.log``
   * ``/var/log/daemon.log``
   * ``/var/log/kern.log``
+  * ``/var/log/pacemaker.log``
 
 * MySQL server logs (for controller nodes).
 
