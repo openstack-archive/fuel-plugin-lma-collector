@@ -30,6 +30,28 @@ class lma_collector::params {
   $openstack_topic = 'notifications'
   $notification_driver = 'messaging'
 
+  # collectd parameters
+  $collectd_port = "8325"
+  $collectd_logfile = "/var/log/collectd.log"
+  case $::osfamily {
+    'Debian': {
+      $python_module_path = '/usr/lib/collectd'
+    }
+    'RedHat': {
+      $python_module_path = '/usr/lib64/collectd'
+    }
+  }
+  $additional_packages = [ 'python-dateutil' ]
+  $mysql_username = ''
+  $mysql_password = ''
+  $rabbitmq_pid_file = '/var/run/rabbitmq/pid'
+  $openstack_user = ''
+  $openstack_password = ''
+  $openstack_tenant = ''
+  $openstack_url = "http://127.0.0.1:5000/v2.0/"
+  $openstack_client_timeout = 5
+  $nova_cpu_allocation_ratio = 8.0
+
   $elasticsearch_server = false
   $elasticsearch_port = '9200'
 }
