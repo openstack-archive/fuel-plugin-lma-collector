@@ -4,7 +4,8 @@ filename = "<%= @filename %>"
 
 <% if @config.size() > 0 %>
 [<%= @title %>_decoder.config]
-<%  @config.each do |k,v| %>
+<% @config.each do |k,v| %>
+<%   next if v.nil? or v == :undef -%>
     <%= k %> = <%= v.is_a?(String) ? "'#{v}'" : v %>
 <%  end %>
 <% end %>
