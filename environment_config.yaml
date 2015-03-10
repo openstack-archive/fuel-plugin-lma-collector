@@ -41,7 +41,7 @@ attributes:
     restrictions:
         - condition: "settings:lma_collector.elasticsearch_mode.value != 'remote'"
           action: "disable"
-    regex:
+    regex: &node_address_regex
       source: '^[a-zA-Z\d][a-zA-Z\d_\-.]+$'
       error: "Invalid address or name"
 
@@ -50,3 +50,65 @@ attributes:
     weight: 50
     value: false
     label: "Collect OpenStack notifications"
+
+  influxdb_mode:
+    type: "radio"
+    weight: 60
+    value: "disabled"
+    label: "Metric analytics"
+    values:
+      - data: "disabled"
+        label: "Disabled"
+      - data: "local"
+        label: "Local node"
+      - data: "remote"
+        label: "Remote server"
+# Hide all InfluxDB parameters for now
+# Change action from "hide" to "none" to change this
+    restrictions: &hide_control
+        - condition: true
+          action: "hide"
+
+  influxdb_node_name:
+    value: 'influxdb'
+    label: "InfluxDB node's name"
+    description: 'Label of the node running the InfluxDB/Grafana plugin that is deployed in the environment.'
+    weight: 65
+    type: "text"
+    restrictions: *hide_control
+
+  influxdb_address:
+    value: ''
+    label: 'InfluxDB address'
+    description: 'IP address or fully qualified domain name of the InfluxDB server.'
+    weight: 70
+    type: "text"
+    regex: *node_address_regex
+    restrictions: *hide_control
+
+  influxdb_database:
+    value: 'lma'
+    label: 'InfluxDB database name'
+    description: ''
+    weight: 75
+    type: "text"
+    regex: &not_empty_parameter
+      source: '\S'
+      error: "Invalid value"
+    restrictions: *hide_control
+  influxdb_user:
+    value: 'lma'
+    label: 'InfluxDB user'
+    description: ''
+    weight: 80
+    type: "text"
+    regex: *not_empty_parameter
+    restrictions: *hide_control
+  influxdb_password:
+    value: 'lmapass'
+    label: 'InfluxDB password'
+    description: ''
+    weight: 85
+    type: "password"
+    regex: *not_empty_parameter
+    restrictions: *hide_control
