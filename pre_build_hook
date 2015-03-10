@@ -1,24 +1,62 @@
 #!/bin/bash
 set -eux
-shopt -s extglob
 
 ROOT="$(dirname `readlink -f $0`)"
 MODULES_DIR="${ROOT}"/deployment_scripts/puppet/modules
-MODULES='@(stdlib|openstack|inifile|glance|nova|heat|neutron|keystone|cinder)'
 RPM_REPO="${ROOT}"/repositories/centos/
 DEB_REPO="${ROOT}"/repositories/ubuntu/
 HEKA_VERSION="0.9.0"
-# The following commit is the id for the 6.0 tag
-FUEL_LIB_SHA1="b977b77b7e1fca1f38e701373601e9fe3430eaee"
-FUEL_LIB_TARBALL_URL="https://github.com/stackforge/fuel-library/tarball/${FUEL_LIB_SHA1}"
+FUEL_LIB_VERSION="6.0"
+FUEL_LIB_TARBALL_URL="https://github.com/stackforge/fuel-library/archive/${FUEL_LIB_VERSION}.tar.gz"
+COLLECTD_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/pdxcat-collectd-3.2.0.tar.gz"
 
-# Clean-up first
-rm -rf ${MODULES_DIR}/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack,stdlib}
+function download_packages {
+    while [ $# -gt 0 ]; do
+        FILENAME=$(basename $1)
+        EXT=${FILENAME##*.}
+        case ${EXT} in
+            deb) REPO=$DEB_REPO;;
+            rpm) REPO=$RPM_REPO;;
+        esac
 
-wget -qO - https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka_${HEKA_VERSION}_amd64.deb > ${DEB_REPO}/heka_${HEKA_VERSION}_amd64.deb
-wget -qO - https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka-${HEKA_VERSION//./_}-linux-amd64.rpm > ${RPM_REPO}/heka-${HEKA_VERSION//./_}-linux-amd64.rpm
+        rm -f $REPO/$FILENAME
+        wget -qO - $1 > $REPO/$FILENAME
+        shift
+    done
+}
 
-# Include dependent manifests from fuel-library
+download_packages \
+    https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka_${HEKA_VERSION}_amd64.deb > ${DEB_REPO}/heka_${HEKA_VERSION}_amd64.deb \
+    https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka-${HEKA_VERSION//./_}-linux-amd64.rpm > ${RPM_REPO}/heka-${HEKA_VERSION//./_}-linux-amd64.rpm \
+    http://mirrors.kernel.org/ubuntu/pool/main/f/fonts-dejavu/fonts-dejavu-core_2.34-1ubuntu1_all.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/f/fontconfig/fontconfig-config_2.11.0-0ubuntu4.1_all.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/f/fontconfig/libfontconfig1_2.11.0-0ubuntu4.1_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/p/pixman/libpixman-1-0_0.30.2-2ubuntu1_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/libx/libxcb/libxcb-render0_1.10-2ubuntu1_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/libx/libxcb/libxcb-shm0_1.10-2ubuntu1_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/libx/libxrender/libxrender1_0.9.8-1_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/c/cairo/libcairo2_1.13.0~20140204-0ubuntu1.1_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/libd/libdatrie/libdatrie1_0.2.8-1_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/g/graphite2/libgraphite2-3_1.2.4-1ubuntu1_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/h/harfbuzz/libharfbuzz0b_0.9.27-1ubuntu1_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/libt/libtool/libltdl7_2.4.2-1.7ubuntu1_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/libt/libthai/libthai-data_0.1.20-3_all.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/libt/libthai/libthai0_0.1.20-3_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/f/fontconfig/fontconfig_2.11.0-0ubuntu4.1_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/p/pango1.0/libpango-1.0-0_1.36.3-1ubuntu1.1_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/p/pango1.0/libpangoft2-1.0-0_1.36.3-1ubuntu1.1_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/p/pango1.0/libpangocairo-1.0-0_1.36.3-1ubuntu1.1_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/universe/c/collectd/collectd-core_5.4.0-3ubuntu2_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/libd/libdbi/libdbi1_0.9.0-1_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/r/rrdtool/librrd4_1.4.7-2ubuntu5_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/universe/c/collectd/collectd_5.4.0-3ubuntu2_amd64.deb
+
+# Extract dependent manifests from fuel-library
+rm -rf ${MODULES_DIR}/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack,stdlib,concat}
 wget -qO- "${FUEL_LIB_TARBALL_URL}" | \
     tar -C "${MODULES_DIR}" --strip-components=3 -zxvf - \
-    stackforge-fuel-library-${FUEL_LIB_SHA1:0:7}/deployment/puppet/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack,stdlib}
+    fuel-library-${FUEL_LIB_VERSION}/deployment/puppet/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack,stdlib,concat}
+
+rm -rf ${MODULES_DIR}/collectd
+mkdir -p ${MODULES_DIR}/collectd
+wget -qO- "${COLLECTD_TARBALL_URL}" | tar -C "${MODULES_DIR}/collectd" --strip-components=1 -xz
