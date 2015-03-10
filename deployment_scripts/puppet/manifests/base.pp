@@ -33,6 +33,12 @@ class { 'lma_collector::logs::monitor':
   require => Class['lma_collector'],
 }
 
+class { 'lma_collector::collectd::base':
+}
+
+class { 'lma_collector::collectd::system':
+}
+
 $elasticsearch_mode = $fuel_settings['lma_collector']['elasticsearch_mode']
 case $elasticsearch_mode {
   'remote': {
