@@ -1,0 +1,21 @@
+<LoadPlugin "python">
+    Globals true
+</LoadPlugin>
+
+<Plugin "python">
+    ModulePath "<%= @python_module_path %>"
+
+<% @modules.sort.each do |module_name,config| -%>
+    Import "<%= module_name %>"
+<% end -%>
+
+<% @modules.sort.each do |module_name,config| -%>
+    <Module "<%= module_name %>">
+        Verbose false
+<%   config.sort.each do |key,value| -%>
+        <%= key -%> "<%= value -%>"
+<%   end -%>
+    </Module>
+<% end -%>
+</Plugin>
+
