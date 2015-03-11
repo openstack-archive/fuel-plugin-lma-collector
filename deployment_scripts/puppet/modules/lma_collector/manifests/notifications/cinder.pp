@@ -11,11 +11,11 @@ class lma_collector::notifications::cinder (
 
   cinder_config {
     'DEFAULT/notification_topics': value => join($topics, ','),
-    notify => Class['lma_collector::service'],
+    notify => Service[$::cinder::params::volume_service],
   }
   cinder_config {
     'DEFAULT/notification_driver': value => $driver,
-    notify => Class['lma_collector::service'],
+    notify => Service[$::cinder::params::volume_service],
   }
 
   service { $::cinder::params::volume_service:
