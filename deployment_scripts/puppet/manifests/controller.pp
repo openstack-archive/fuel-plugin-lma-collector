@@ -52,4 +52,10 @@ if $fuel_settings['lma_collector']['influxdb_mode'] != 'disabled' {
     keystone_url      => "http://${management_vip}:5000/v2.0",
     rabbitmq_pid_file => $lma_collector::params::rabbitmq_pid_file,
   }
+
+  class { 'lma_collector::logs::metrics': }
+
+  if $enable_notifications {
+    class { 'lma_collector::notifications::metrics': }
+  }
 }
