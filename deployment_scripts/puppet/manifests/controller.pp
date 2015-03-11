@@ -62,4 +62,10 @@ if $fuel_settings['lma_collector']['influxdb_mode'] != 'disabled' {
     username => 'nova',
     password => $fuel_settings['nova']['db_password'],
   }
+
+  class { 'lma_collector::logs::metrics': }
+
+  if $enable_notifications {
+    class { 'lma_collector::notifications::metrics': }
+  }
 }
