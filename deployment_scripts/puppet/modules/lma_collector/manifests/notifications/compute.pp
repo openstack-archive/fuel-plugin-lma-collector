@@ -10,11 +10,11 @@ class lma_collector::notifications::compute (
 
   nova_config {
     'DEFAULT/notification_topics': value => join($topics, ','),
-    notify => Class['lma_collector::service'],
+    notify => Service[$::nova::params::compute_service_name],
   }
   nova_config {
     'DEFAULT/notification_driver': value => $driver,
-    notify => Class['lma_collector::service'],
+    notify => Service[$::nova::params::compute_service_name],
   }
 
   service { $::nova::params::compute_service_name:
