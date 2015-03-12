@@ -108,6 +108,14 @@ function process_message ()
                 end
             elseif metric_source == 'rabbitmq_info' then
                 msg['Fields']['name'] = 'rabbitmq' .. sep .. sample['type_instance']
+            elseif metric_source == 'nova' then
+                msg['Fields']['name'] = 'openstack.nova' .. sep .. sample['plugin_instance'] .. sep .. sample['type_instance']
+            elseif metric_source == 'cinder' then
+                msg['Fields']['name'] = 'openstack.cinder' .. sep .. sample['plugin_instance'] .. sep .. sample['type_instance']
+            elseif metric_source == 'glance' then
+                msg['Fields']['name'] = 'openstack.glance' .. sep .. sample['type_instance']
+            elseif metric_source == 'keystone' then
+                msg['Fields']['name'] = 'openstack.keystone' .. sep .. sample['type_instance']
             else
                 msg['Fields']['name'] = metric_name
             end
