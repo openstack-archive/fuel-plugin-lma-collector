@@ -23,7 +23,47 @@ These metrics are emitted per compute node.
 * ``openstack.nova.running_instances``, the number of running instances on the node.
 * ``openstack.nova.running_tasks``, the number of tasks currently executed by the node.
 
+These metrics are retrieved from the Nova API
+
+* ``openstack.nova.servers.<state>``, the number of instances by state.
+* ``openstack.nova.services.<service>.enable``, the number of enabled Nova
+  services by service name.
+* ``openstack.nova.services.<service>.disable``, the number of disabled Nova
+  services by service name.
+
 ``<state>`` is one of 'active', 'deleted', 'error', 'paused', 'resumed', 'rescued', 'resized', 'shelved_offloaded' or 'suspended'.
+
+``<service>`` is one of service is one of 'compute', 'conductor', 'scheduler', 'cert' or 'consoleauth'.
+
+Volume
+^^^^^^
+
+These metrics are retrieved from the Cinder API
+
+* ``openstack.cinder.volumes.<state>``, the number of volumes by state.
+* ``openstack.cinder.snapshots.<state>``, the number of snapshots by state.
+* ``openstack.cinder.size.volumes.usable``, the total size of usable volumes (not in error)
+* ``openstack.cinder.size.volumes.in_error``, the total size of volumes in error
+* ``openstack.cinder.size.snapshots.usable``, the total size of usable snapshots (not in error)
+* ``openstack.cinder.size.snapshots.in_error``, the total size of snapshots in error
+
+``<state>`` is one of 'available', 'creating', 'attaching', 'in-use', 'deleting', 'backing-up', 'restoring-backup', 'error', 'error_deleting', 'error_restoring', 'error_extending'
+
+Image
+^^^^^
+
+These metrics are retrieved from the Glance API
+
+* ``openstack.glance.images.public.<state>``, the number of public images by state.
+* ``openstack.glance.images.private.<state>``, the number of private images by state.
+* ``openstack.glance.snapshots.public.<state>``, the number of public snapshot images by state.
+* ``openstack.glance.snapshots.private.<state>``, the number of private snapshot images by state.
+* ``openstack.glance.size.images.active``, the total size (in GB) of active images.
+* ``openstack.glance.size.images.other``, the total size (in GB) of images in other state.
+* ``openstack.glance.size.snapshots.active``, the total size (in GB) of active snapshots.
+* ``openstack.glance.size.snapshots.other``, the total size (in GB) of snapshots in other state.
+
+``<state>`` is one of 'queued', 'saving', 'active', 'killed', 'deleted', 'pending_delete'.
 
 API response times
 ^^^^^^^^^^^^^^^^^^

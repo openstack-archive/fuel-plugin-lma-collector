@@ -129,7 +129,10 @@ class OSClient(object):
 
 
 class CollectdPlugin(object):
-    def __init__(self, logger):
+    plugin_name = None
+    interval = None
+
+    def __init__(self, logger, plugin_name=None, interval=None):
         self.os_client = None
         self.logger = logger
         self.timeout = 5

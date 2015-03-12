@@ -33,6 +33,27 @@ class lma_collector::collectd::controller (
       'Timeout' => $lma_collector::params::openstack_client_timeout,
       'CpuAllocationRatio' => $nova_cpu_allocation_ratio,
     },
+    'openstack_nova' => {
+      'Username' => $service_user,
+      'Password' => $service_password,
+      'Tenant' => $service_tenant,
+      'KeystoneUrl' => $keystone_url,
+      'Timeout' => $lma_collector::params::openstack_client_timeout,
+    },
+    'openstack_cinder' => {
+      'Username' => $service_user,
+      'Password' => $service_password,
+      'Tenant' => $service_tenant,
+      'KeystoneUrl' => $keystone_url,
+      'Timeout' => $lma_collector::params::openstack_client_timeout,
+    },
+    'openstack_glance' => {
+      'Username' => $service_user,
+      'Password' => $service_password,
+      'Tenant' => $service_tenant,
+      'KeystoneUrl' => $keystone_url,
+      'Timeout' => $lma_collector::params::openstack_client_timeout,
+    },
   }
 
   file {"${collectd::params::plugin_conf_dir}/openstack.conf":
@@ -70,6 +91,24 @@ class lma_collector::collectd::controller (
   file { "${python_module_path}/openstack.py":
     ensure => present,
     source => 'puppet:///modules/lma_collector/collectd/openstack.py',
+    notify  => Class['lma_collector::collectd::service'],
+  }
+
+  file { "${python_module_path}/openstack_nova.py":
+    ensure => present,
+    source => 'puppet:///modules/lma_toolchain/collectd/openstack_nova.py',
+    notify  => Class['lma_collector::collectd::service'],
+  }
+
+  file { "${python_module_path}/openstack_cinder.py":
+    ensure => present,
+    source => 'puppet:///modules/lma_toolchain/collectd/openstack_cinder.py',
+    notify  => Class['lma_collector::collectd::service'],
+  }
+
+  file { "${python_module_path}/openstack_glance.py":
+    ensure => present,
+    source => 'puppet:///modules/lma_toolchain/collectd/openstack_glance.py',
     notify  => Class['lma_collector::collectd::service'],
   }
 }
