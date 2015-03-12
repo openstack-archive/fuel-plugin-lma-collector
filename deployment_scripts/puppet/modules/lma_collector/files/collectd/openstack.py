@@ -15,6 +15,7 @@
 import datetime
 import dateutil.parser
 import dateutil.tz
+import collectd
 import requests
 import simplejson as json
 
@@ -99,6 +100,7 @@ class OSClient(object):
         kwargs = {
             'url': url,
             'timeout': self.timeout,
+            'allow_redirects': True,
             'headers': {'Content-type': 'application/json'}
         }
         if token_required and not self.is_valid_token() and \
@@ -129,7 +131,10 @@ class OSClient(object):
 
 
 class CollectdPlugin(object):
-    def __init__(self, logger):
+    plugin_name = None
+    interval = None
+
+    def __init__(self, logger, plugin_name=None, interval=None):
         self.os_client = None
         self.logger = logger
         self.timeout = 5
@@ -184,3 +189,53 @@ class CollectdPlugin(object):
 
     def read_callback(self):
         raise "read_callback method needs to be overriden!"
+
+    def get_objects_details(self, project, object_name,
+                            api_version='', params='all_tenants=1'):
+        """ Return object details list
+
+            the version is not always included in url endpoint (glance)
+            use api_version param to include the version in resource url
+        """
+
+        if api_version:
+            resource = '%s/%s/detail?%s' % (api_version, object_name, params)
+        else:
+            resource = '%s/detail?%s' % (object_name, params)
+
+        # TODO(scroiset): use pagination to handle large collection
+        r = self.get(project, resource)
+        if not r:
+            self.logger.warning('Could not find %s %s' % (project,
+                                                          object_name))
+            return []
+        return r.json().get(object_name, [])
+
+    def dispatch_count_objects_group_by(self, object_name, list_object,
+                                        group_by_func=None):
+
+        """ Dispatch values of object number grouped by criteria."""
+
+        status = {}
+        for obj in list_object:
+            s = group_by_func(obj)
+            if s in status:
+                status[s] += 1
+            else:
+                status[s] = 1
+        for s, nb in status.iteritems():
+            self.dispatch_value(object_name, s, nb)
+        return status
+
+    def dispatch_value(self, plugin_instance, name, value):
+        v = collectd.Values(
+            plugin=self.plugin_name,  # metric source
+            plugin_instance=plugin_instance,
+            type='gauge',
+            type_instance=name,
+            interval=self.interval,
+            # w/a for https://github.com/collectd/collectd/issues/716
+            meta={'0': True},
+            values=[value]
+        )
+        v.dispatch()
