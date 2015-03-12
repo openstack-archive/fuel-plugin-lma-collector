@@ -7,7 +7,12 @@ version: 6.1.0
 # Description
 description: Collect logs, metrics and notifications from system and OpenStack services and forward that information to external backends such as ElasticSearch and InfluxDB.
 # Required fuel version
-fuel_version: ['6.0', '6.1']
+fuel_version: ['6.1']
+
+authors: [Mirantis Inc.]
+licenses: [Apache License Version 2.0]
+homepage: https://github.com/stackforge/fuel-plugin-lma-collector
+groups: []
 
 # The plugin is compatible with releases in the list
 releases:
@@ -33,4 +38,4 @@ releases:
     repository_path: repositories/centos
 
 # Version of plugin package
-package_version: '1.0.0'
+package_version: '2.0.0'
