@@ -9,7 +9,8 @@ ticker_interval = <%= @ticker_interval %>
 
 <% if @config.size() > 0 %>
 [<%= @title %>_filter.config]
-<%  @config.each do |k,v| %>
-    <%= @k %> = '<%= @v %>'
+<% @config.each do |k,v| %>
+<%   next if v.nil? or v == :undef -%>
+    <%= k %> = <%= v.is_a?(String) ? "'#{v}'" : v %>
 <%  end %>
 <% end %>

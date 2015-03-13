@@ -33,16 +33,49 @@ class { 'lma_collector::logs::monitor':
   require => Class['lma_collector'],
 }
 
+$influxdb_mode = $fuel_settings['lma_collector']['influxdb_mode']
+case $influxdb_mode {
+  'remote','local': {
+    if $influxdb_mode == 'remote' {
+      $influxdb_server = $fuel_settings['lma_collector']['influxdb_address']
+    }
+    else {
+      $influxdb_node_name = $fuel_settings['lma_collector']['influxdb_node_name']
+      $influxdb_nodes = filter_nodes($fuel_settings['nodes'], 'user_node_name', $influxdb_node_name)
+      if size($influxdb_nodes) < 1 {
+        fail("Could not find node '${influxdb_node_name}' in the environment")
+      }
+      $influxdb_server = $influxdb_nodes[0]['internal_address']
+    }
+
+    class { 'lma_collector::collectd::base':
+    }
+
+    class { 'lma_collector::influxdb':
+      server   => $influxdb_server,
+      database => $fuel_settings['lma_collector']['influxdb_database'],
+      user     => $fuel_settings['lma_collector']['influxdb_user'],
+      password => $fuel_settings['lma_collector']['influxdb_password'],
+    }
+  }
+  'disabled': {
+    # Nothing to do
+  }
+  default: {
+    fail("'${influxdb_mode}' mode not supported for InfluxDB")
+  }
+}
+
 $elasticsearch_mode = $fuel_settings['lma_collector']['elasticsearch_mode']
 case $elasticsearch_mode {
   'remote': {
     $es_server = $fuel_settings['lma_collector']['elasticsearch_address']
   }
   'local': {
-    $node_name = $fuel_settings['lma_collector']['elasticsearch_node_name']
-    $es_nodes = filter_nodes($fuel_settings['nodes'], 'user_node_name', $node_name)
+    $es_node_name = $fuel_settings['lma_collector']['elasticsearch_node_name']
+    $es_nodes = filter_nodes($fuel_settings['nodes'], 'user_node_name', $es_node_name)
     if size($es_nodes) < 1 {
-      fail("Could not find node '${node_name}' in the environment")
+      fail("Could not find node '${es_node_name}' in the environment")
     }
     $es_server = $es_nodes[0]['internal_address']
   }
