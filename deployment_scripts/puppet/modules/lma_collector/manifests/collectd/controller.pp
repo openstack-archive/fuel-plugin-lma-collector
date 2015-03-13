@@ -92,4 +92,7 @@ class lma_collector::collectd::controller (
 
   lma_collector::collectd::python_script { "openstack_keystone.py":
   }
+
+  class { 'collectd::plugin::memcached':
+  }
 }
