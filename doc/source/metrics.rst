@@ -84,6 +84,11 @@ RabbitMQ
 
 .. include:: metrics/rabbitmq.rst
 
+Memcached
+---------
+
+.. include:: metrics/memcached.rst
+
 OpenStack
 ---------
 
