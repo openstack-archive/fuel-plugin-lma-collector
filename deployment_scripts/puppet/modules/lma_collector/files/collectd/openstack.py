@@ -90,6 +90,7 @@ class OSClient(object):
                 'region': endpoint['region'],
                 'service_type': item['type'],
                 'url': endpoint['internalURL'],
+                'admin_url': endpoint['adminURL'],
             })
 
         self.logger.debug("Got token '%s'" % self.token)
@@ -129,6 +130,7 @@ class OSClient(object):
 
 
 class CollectdPlugin(object):
+
     def __init__(self, logger):
         self.os_client = None
         self.logger = logger
@@ -136,7 +138,14 @@ class CollectdPlugin(object):
         self.extra_config = {}
 
     def _build_url(self, service, resource):
-        url = (self.get_service(service) or {}).get('url')
+        s = (self.get_service(service) or {})
+        # the adminURL must be used to access resources with Keystone API v2
+        if service == 'keystone' and \
+                (resource in ['tenants', 'users'] or 'OS-KS' in resource):
+            url = s.get('admin_url')
+        else:
+            url = s.get('url')
+
         if url:
             if url[-1] != '/':
                 url += '/'
@@ -184,3 +193,41 @@ class CollectdPlugin(object):
 
     def read_callback(self):
         raise "read_callback method needs to be overriden!"
+
+    def get_objects_details(self, project, object_name,
+                            api_version='',
+                            params='all_tenants=1'):
+        """ Return object details list
+
+            the version is not always included in url endpoint (glance)
+            use api_version param to include the version in resource url
+        """
+
+        if api_version:
+            resource = '%s/%s/detail?%s' % (api_version, object_name, params)
+        else:
+            resource = '%s/detail?%s' % (object_name, params)
+
+        # TODO(scroiset): use pagination to handle large collection
+        r = self.get(project, resource)
+        if not r:
+            self.logger.warning('Could not find %s %s' % (project,
+                                                          object_name))
+            return []
+        return r.json().get(object_name, [])
+
+    def count_objects_group_by(self,
+                               list_object,
+                               group_by_func,
+                               count_func=None):
+
+        """ Dispatch values of object number grouped by criteria."""
+
+        status = {}
+        for obj in list_object:
+            s = group_by_func(obj)
+            if s in status:
+                status[s] += count_func(obj) if count_func else 1
+            else:
+                status[s] = count_func(obj) if count_func else 1
+        return status
