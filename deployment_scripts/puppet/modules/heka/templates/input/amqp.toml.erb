@@ -1,6 +1,6 @@
 [<%= @title %>_amqp]
 type = "AMQPInput"
-url = "amqp://<%= @user %>:<%= @password %>@<%= @host %>/"
+url = "amqp://<%= @user %>:<%= @password %>@<%= @host %>:<%= @port %>/"
 exchange = "<%= @exchange %>"
 exchange_type = "<%= @exchange_type %>"
 exchange_durability = <%= @exchange_durability %>
