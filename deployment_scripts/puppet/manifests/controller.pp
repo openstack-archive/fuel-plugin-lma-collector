@@ -41,7 +41,8 @@ if $fuel_settings['deployment_mode'] =~ /^ha/ {
 # Notifications
 if $enable_notifications {
   class { 'lma_collector::notifications::controller':
-    host     => $fuel_settings['management_vip'],
+    host     => '127.0.0.1',
+    port     => hiera('amqp_port', '5673'),
     user     => $rabbitmq_user,
     password => $fuel_settings['rabbit']['password'],
     topics   => $notification_topics,

@@ -23,6 +23,7 @@ class lma_collector::params {
 
   # Parameters for OpenStack notifications
   $rabbitmq_host = false
+  $rabbitmq_port = "5672"
   $rabbitmq_user = ''
   $rabbitmq_password = ''
   $rabbitmq_exchange = ''
