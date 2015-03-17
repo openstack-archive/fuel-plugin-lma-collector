@@ -69,4 +69,6 @@ class lma_collector::params {
   $influxdb_user = 'lma'
   $influxdb_password = 'lmapass'
   $influxdb_timeout = 5
+
+  $haproxy_socket = undef
 }
