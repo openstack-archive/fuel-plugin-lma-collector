@@ -20,7 +20,13 @@ else {
   $rabbitmq_user = 'nova'
 }
 
-if $fuel_settings['deployment_mode'] =~ /^ha/ {
+if hiera('deployment_mode') =~ /^ha_/ {
+  $ha_deployment = true
+}else{
+  $ha_deployment = false
+}
+
+if $ha_deployment {
   $rabbitmq_pid_file = '/var/run/rabbitmq/p_pid'
 }
 else {
@@ -34,7 +40,7 @@ class { 'lma_collector::logs::mysql': }
 
 class { 'lma_collector::logs::rabbitmq': }
 
-if $fuel_settings['deployment_mode'] =~ /^ha/ {
+if $ha_deployment {
   class { 'lma_collector::logs::pacemaker': }
 }
 
@@ -51,12 +57,21 @@ if $enable_notifications {
 
 # Metrics
 if $fuel_settings['lma_collector']['influxdb_mode'] != 'disabled' {
+
+  if $ha_deployment {
+    $haproxy_socket = '/var/lib/haproxy/stats'
+  }else{
+    # do not deploy HAproxy collectd plugin
+    $haproxy_socket = undef
+  }
+
   class { 'lma_collector::collectd::controller':
     service_user      => 'nova',
     service_password  => $fuel_settings['nova']['user_password'],
     service_tenant    => 'services',
     keystone_url      => "http://${management_vip}:5000/v2.0",
     rabbitmq_pid_file => $rabbitmq_pid_file,
+    haproxy_socket    => $haproxy_socket,
   }
 
   class { 'lma_collector::collectd::mysql':

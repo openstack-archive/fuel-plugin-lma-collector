@@ -1,4 +1,5 @@
 class lma_collector::collectd::controller (
+  $haproxy_socket,
   $service_user              = $lma_collector::params::openstack_user,
   $service_password          = $lma_collector::params::openstack_password,
   $service_tenant            = $lma_collector::params::openstack_tenant,
@@ -61,6 +62,12 @@ class lma_collector::collectd::controller (
     },
   }
 
+  if $haproxy_socket {
+    $modules['haproxy'] = {
+      'Socket' => $haproxy_socket
+    }
+  }
+
   file {"${collectd::params::plugin_conf_dir}/openstack.conf":
     owner   => 'root',
     group   => $collectd::params::root_group,
@@ -91,6 +98,11 @@ class lma_collector::collectd::controller (
   }
 
   lma_collector::collectd::python_script { 'openstack_keystone.py':
+  }
+
+  if $haproxy_socket {
+    lma_collector::collectd::python_script { 'haproxy.py':
+    }
   }
 
   class { 'collectd::plugin::memcached':
