@@ -118,6 +118,8 @@ function process_message ()
                 msg['Fields']['name'] = 'openstack.keystone' .. sep .. sample['type_instance']
             elseif metric_source == 'memcached' then
                 msg['Fields']['name'] = 'memcached' .. sep .. string.gsub(metric_name, 'memcached_', '')
+            elseif metric_source == 'haproxy' then
+                msg['Fields']['name'] = 'haproxy' .. sep .. sample['type_instance']
             else
                 msg['Fields']['name'] = metric_name
             end
