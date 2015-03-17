@@ -59,6 +59,9 @@ class lma_collector::collectd::controller (
       'KeystoneUrl' => $keystone_url,
       'Timeout' => $lma_collector::params::openstack_client_timeout,
     },
+    'haproxy' => {
+      'Socket' => '/var/lib/haproxy/stats',
+    },
   }
 
   file {"${collectd::params::plugin_conf_dir}/openstack.conf":
@@ -91,6 +94,9 @@ class lma_collector::collectd::controller (
   }
 
   lma_collector::collectd::python_script { "openstack_keystone.py":
+  }
+
+  lma_collector::collectd::python_script { "haproxy.py":
   }
 
   class { 'collectd::plugin::memcached':
