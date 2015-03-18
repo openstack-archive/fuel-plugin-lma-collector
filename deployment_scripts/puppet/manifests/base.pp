@@ -29,6 +29,13 @@ class { 'lma_collector::logs::system':
   require => Class['lma_collector'],
 }
 
+if (str2bool($::ovs_log_directory)){
+  # install logstreamer for open vSwitch if log directory exists
+  class { 'lma_collector::logs::ovs':
+    require => Class['lma_collector'],
+  }
+}
+
 class { 'lma_collector::logs::monitor':
   require => Class['lma_collector'],
 }
