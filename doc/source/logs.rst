@@ -25,6 +25,11 @@ The Heka collector service is configured to tail the following log files:
 
 * OpenStack logs.
 
+* Open vSwitch logs (all nodes).
+
+  * ``/var/log/openvswitch/ovsdb-server.log``
+  * ``/var/log/openvswitch/ovs-vswitchd.log``
+
 Log Messages Format
 ===================
 
