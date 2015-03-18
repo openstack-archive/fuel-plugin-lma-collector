@@ -1,6 +1,6 @@
 # == Class: lma_collector
 #
-# The lma_collector class is able to install the common componentns for running
+# The lma_collector class is able to install the common components for running
 # the Logging, Monitoring and Alerting collector service.
 #
 # === Parameters

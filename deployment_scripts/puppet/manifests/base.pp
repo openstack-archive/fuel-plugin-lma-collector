@@ -29,6 +29,10 @@ class { 'lma_collector::logs::system':
   require => Class['lma_collector'],
 }
 
+class { 'lma_collector::logs::ovs':
+  require => Class['lma_collector'],
+}
+
 class { 'lma_collector::logs::monitor':
   require => Class['lma_collector'],
 }
