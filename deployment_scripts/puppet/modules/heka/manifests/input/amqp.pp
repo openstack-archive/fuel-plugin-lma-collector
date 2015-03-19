@@ -5,6 +5,7 @@ define heka::input::amqp (
   $user,
   $password,
   $host,
+  $port,
   $exchange,
   $exchange_durability = false,
   $exchange_auto_delete = false,
