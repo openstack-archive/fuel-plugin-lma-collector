@@ -25,7 +25,7 @@ class lma_collector::logs::openstack {
     config_dir     => $lma_collector::params::config_dir,
     decoder        => 'openstack',
     splitter       => 'openstack',
-    file_match     => '(?P<Service>nova|cinder|keystone|glance|heat|neutron)-all\.log$',
+    file_match     => '(?P<Service>nova|cinder|keystone|glance|heat|neutron|murano)-all\.log$',
     differentiator => "[ 'openstack.', 'Service' ]",
     require        => [Heka::Decoder::Sandbox['openstack'], Heka::Splitter::Regex['openstack']],
     notify         => Class['lma_collector::service'],
