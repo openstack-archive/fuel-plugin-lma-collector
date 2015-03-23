@@ -1,5 +1,4 @@
 define heka::input::amqp (
-  $ensure = present,
   $config_dir,
   $decoder,
   $user,
@@ -7,12 +6,13 @@ define heka::input::amqp (
   $host,
   $port,
   $exchange,
+  $queue,
   $exchange_durability = false,
   $exchange_auto_delete = false,
   $queue_auto_delete = true,
-  $exchange_type = "topic",
-  $queue,
-  $routing_key = "*",
+  $exchange_type = 'topic',
+  $routing_key = '*',
+  $ensure = present,
 ) {
 
   include heka::params

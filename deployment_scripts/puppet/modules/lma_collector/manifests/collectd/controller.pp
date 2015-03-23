@@ -69,28 +69,28 @@ class lma_collector::collectd::controller (
     notify  => Class['lma_collector::collectd::service'],
   }
 
-  lma_collector::collectd::python_script { "rabbitmq_info.py":
+  lma_collector::collectd::python_script { 'rabbitmq_info.py':
   }
 
-  lma_collector::collectd::python_script { "check_openstack_api.py":
+  lma_collector::collectd::python_script { 'check_openstack_api.py':
   }
 
-  lma_collector::collectd::python_script { "hypervisor_stats.py":
+  lma_collector::collectd::python_script { 'hypervisor_stats.py':
   }
 
-  lma_collector::collectd::python_script { "openstack.py":
+  lma_collector::collectd::python_script { 'openstack.py':
   }
 
-  lma_collector::collectd::python_script { "openstack_nova.py":
+  lma_collector::collectd::python_script { 'openstack_nova.py':
   }
 
-  lma_collector::collectd::python_script { "openstack_cinder.py":
+  lma_collector::collectd::python_script { 'openstack_cinder.py':
   }
 
-  lma_collector::collectd::python_script { "openstack_glance.py":
+  lma_collector::collectd::python_script { 'openstack_glance.py':
   }
 
-  lma_collector::collectd::python_script { "openstack_keystone.py":
+  lma_collector::collectd::python_script { 'openstack_keystone.py':
   }
 
   class { 'collectd::plugin::memcached':

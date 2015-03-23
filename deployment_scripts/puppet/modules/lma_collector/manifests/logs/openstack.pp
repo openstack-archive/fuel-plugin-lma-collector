@@ -26,7 +26,7 @@ class lma_collector::logs::openstack {
     decoder        => 'openstack',
     splitter       => 'openstack',
     file_match     => '(?P<Service>nova|cinder|keystone|glance|heat|neutron|murano)-all\.log$',
-    differentiator => "[ 'openstack.', 'Service' ]",
+    differentiator => '[ \'openstack.\', \'Service\' ]',
     require        => [Heka::Decoder::Sandbox['openstack'], Heka::Splitter::Regex['openstack']],
     notify         => Class['lma_collector::service'],
   }
@@ -35,7 +35,7 @@ class lma_collector::logs::openstack {
     config_dir     => $lma_collector::params::config_dir,
     decoder        => 'openstack',
     file_match     => 'dashboard\.log$',
-    differentiator => "[ 'openstack.horizon' ]",
+    differentiator => '[ \'openstack.horizon\' ]',
     require        => Heka::Decoder::Sandbox['openstack'],
     notify         => Class['lma_collector::service'],
   }

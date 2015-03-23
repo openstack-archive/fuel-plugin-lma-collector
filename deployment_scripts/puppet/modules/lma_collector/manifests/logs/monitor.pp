@@ -5,7 +5,7 @@ class lma_collector::logs::monitor {
   heka::filter::sandbox { 'log_monitor':
     config_dir      => $lma_collector::params::config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/log_monitor.lua" ,
-    message_matcher => "Type == 'log'",
+    message_matcher => 'Type == \'log\'',
     ticker_interval => 60,
     notify          => Class['lma_collector::service'],
   }

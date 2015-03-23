@@ -12,7 +12,7 @@ class lma_collector::influxdb (
   heka::filter::sandbox { 'influxdb_accumulator':
     config_dir      => $lma_collector::params::config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/influxdb_accumulator.lua",
-    message_matcher => "Type == 'metric' || Type == 'heka.sandbox.metric'",
+    message_matcher => 'Type == \'metric\' || Type == \'heka.sandbox.metric\'',
     ticker_interval => 1,
     config          => {
       flush_interval => $lma_collector::params::influxdb_flush_interval,
@@ -29,7 +29,7 @@ class lma_collector::influxdb (
   heka::output::http { 'influxdb':
     config_dir      => $lma_collector::params::config_dir,
     url             => "http://${server}:${port}/db/${database}/series",
-    message_matcher => "Fields[payload_type] == 'json' && Fields[payload_name] == 'influxdb'",
+    message_matcher => 'Fields[payload_type] == \'json\' && Fields[payload_name] == \'influxdb\'',
     username        => $user,
     password        => $password,
     timeout         => $lma_collector::params::influxdb_timeout,
