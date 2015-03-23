@@ -1,7 +1,7 @@
 define heka::splitter::token (
-  $ensure = present,
   $config_dir,
   $delimiter,
+  $ensure = present,
 ) {
 
   include heka::params

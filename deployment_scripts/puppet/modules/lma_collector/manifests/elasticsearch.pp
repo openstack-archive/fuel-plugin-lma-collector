@@ -8,7 +8,7 @@ class lma_collector::elasticsearch (
 
   heka::encoder::es_json { 'elasticsearch':
     config_dir              => $lma_collector::params::config_dir,
-    index                   => "%{Type}-%{2006.01.02}",
+    index                   => '%{Type}-%{2006.01.02}',
     es_index_from_timestamp => true,
     notify                  => Class['lma_collector::service'],
   }
@@ -17,7 +17,7 @@ class lma_collector::elasticsearch (
     config_dir      => $lma_collector::params::config_dir,
     server          => $server,
     port            => $port,
-    message_matcher => "Type == 'log' || Type  == 'notification'",
+    message_matcher => 'Type == \'log\' || Type  == \'notification\'',
     require         => Heka::Encoder::Es_json['elasticsearch'],
     notify          => Class['lma_collector::service'],
   }

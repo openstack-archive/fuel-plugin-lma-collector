@@ -1,5 +1,4 @@
 define heka::output::elasticsearch (
-  $ensure = present,
   $config_dir,
   $server = undef,
   $port = undef,
@@ -9,7 +8,8 @@ define heka::output::elasticsearch (
   $flush_count = 10,
   $use_buffering = true,
   $queue_max_buffer_size = 1000000000, # 1GB
-  $queue_full_action = 'drop'
+  $queue_full_action = 'drop',
+  $ensure = present,
 ) {
 
   include heka::params
@@ -20,6 +20,5 @@ define heka::output::elasticsearch (
     mode    => '0600',
     owner   => $heka::params::user,
     group   => $heka::params::user,
- }
+  }
 }
-

@@ -1,8 +1,8 @@
 define heka::encoder::es_json (
-  $ensure = present,
   $config_dir,
   $es_index_from_timestamp = false,
   $index = undef,
+  $ensure = present,
 ) {
 
   include heka::params

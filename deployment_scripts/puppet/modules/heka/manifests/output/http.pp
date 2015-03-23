@@ -1,5 +1,4 @@
 define heka::output::http (
-  $ensure          = present,
   $config_dir,
   $url,
   $encoder         = $title,
@@ -8,6 +7,7 @@ define heka::output::http (
   $password        = undef,
   $timeout         = undef,
   $method          = 'POST',
+  $ensure          = present,
 ) {
 
   include heka::params
@@ -18,6 +18,5 @@ define heka::output::http (
     mode    => '0600',
     owner   => $heka::params::user,
     group   => $heka::params::user,
- }
+  }
 }
-
