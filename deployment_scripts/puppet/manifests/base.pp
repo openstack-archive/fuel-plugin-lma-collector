@@ -10,7 +10,7 @@ $tags = {
   deployment_mode => $fuel_settings['deployment_mode'],
   openstack_region => 'RegionOne',
   openstack_release => $fuel_settings['openstack_version'],
-  openstack_roles => join($roles, ","),
+  openstack_roles => join($roles, ','),
 }
 if $fuel_settings['lma_collector']['environment_label'] != '' {
   $additional_tags = {

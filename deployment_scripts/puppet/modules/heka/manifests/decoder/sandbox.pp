@@ -1,8 +1,8 @@
 define heka::decoder::sandbox (
-  $ensure = present,
   $config_dir,
   $filename,
   $config = {},
+  $ensure = present,
 ) {
 
   include heka::params

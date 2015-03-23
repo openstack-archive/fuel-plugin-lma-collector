@@ -5,7 +5,7 @@ class lma_collector::logs::pacemaker {
   heka::decoder::sandbox { 'pacemaker':
     config_dir => $lma_collector::params::config_dir,
     filename   => "${lma_collector::params::plugins_dir}/decoders/generic_syslog.lua" ,
-    config => {
+    config     => {
       syslog_pattern => $lma_collector::params::syslog_pattern
     },
     notify     => Class['lma_collector::service'],
@@ -26,7 +26,7 @@ class lma_collector::logs::pacemaker {
     decoder        => 'pacemaker',
     splitter       => 'pacemaker',
     file_match     => 'pacemaker\.log$',
-    differentiator => "[ 'pacemaker' ]",
+    differentiator => '[ \'pacemaker\' ]',
     require        => [Heka::Decoder::Sandbox['pacemaker'], Heka::Splitter::Regex['pacemaker']],
     notify         => Class['lma_collector::service'],
   }

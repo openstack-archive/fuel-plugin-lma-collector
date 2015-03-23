@@ -1,8 +1,8 @@
 define heka::encoder::payload (
-  $ensure          = present,
   $config_dir,
   $append_newlines = false,
   $prefix_ts       = false,
+  $ensure          = present,
 ) {
 
   include heka::params

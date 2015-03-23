@@ -6,7 +6,7 @@ class lma_collector::notifications::metrics {
   heka::filter::sandbox { 'instance_creation_time':
     config_dir      => $lma_collector::params::config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/instance_creation_time.lua",
-    message_matcher => "Type == 'notification' && Fields[event_type] == 'compute.instance.create.end'",
+    message_matcher => 'Type == \'notification\' && Fields[event_type] == \'compute.instance.create.end\'',
     notify          => Class['lma_collector::service'],
   }
 
@@ -14,7 +14,7 @@ class lma_collector::notifications::metrics {
   heka::filter::sandbox { 'instance_state':
     config_dir      => $lma_collector::params::config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/instance_state.lua",
-    message_matcher => "Type == 'notification' && Fields[event_type] == 'compute.instance.update' && Fields[state] != NIL",
+    message_matcher => 'Type == \'notification\' && Fields[event_type] == \'compute.instance.update\' && Fields[state] != NIL',
     notify          => Class['lma_collector::service'],
   }
 }

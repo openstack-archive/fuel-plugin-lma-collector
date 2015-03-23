@@ -1,9 +1,9 @@
 define heka::input::httplisten (
-  $ensure      = present,
   $config_dir,
   $decoder,
-  $address     = '127.0.0.1',
-  $port,
+  $address = '127.0.0.1',
+  $port = '80',
+  $ensure = present,
 ) {
 
   include heka::params
