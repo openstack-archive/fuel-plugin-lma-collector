@@ -13,13 +13,13 @@ class lma_collector::collectd::base {
 
   class { 'collectd::plugin::logfile':
     log_level => 'warning',
-    log_file => $lma_collector::params::collectd_logfile,
+    log_file  => $lma_collector::params::collectd_logfile,
   }
 
   class { 'collectd::plugin::write_http':
     urls => {
       "http://127.0.0.1:${port}" => {
-        'format' => 'JSON',
+        'format'   => 'JSON',
         storerates => true
       }
     }
@@ -57,7 +57,7 @@ class lma_collector::collectd::base {
   class { 'collectd::plugin::users':
   }
 
-  file { "/etc/logrotate.d/collectd":
+  file { '/etc/logrotate.d/collectd':
     ensure  => present,
     content => "${lma_collector::params::collectd_logfile} {\n  daily\n  missingok\n}"
   }

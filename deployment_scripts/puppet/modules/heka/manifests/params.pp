@@ -11,8 +11,8 @@ class heka::params {
   $dashboard_port = '4352'
 
   $config_dir = "/etc/${service_name}"
-  $share_dir = "/usr/share/heka"
-  $lua_modules_dir = "/usr/share/heka/lua_modules"
+  $share_dir = '/usr/share/heka'
+  $lua_modules_dir = '/usr/share/heka/lua_modules'
 
   # required to read the log files
   case $::osfamily {
@@ -21,6 +21,9 @@ class heka::params {
     }
     'RedHat': {
       $groups = ['adm']
+    }
+    default: {
+      fail("${::osfamily} not supported")
     }
   }
 }

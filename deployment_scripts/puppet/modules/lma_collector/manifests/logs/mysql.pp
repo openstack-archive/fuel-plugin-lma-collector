@@ -15,7 +15,7 @@ class lma_collector::logs::mysql {
     config_dir     => $lma_collector::params::config_dir,
     decoder        => 'mysql',
     file_match     => 'mysqld\.log$',
-    differentiator => "['mysql']",
+    differentiator => '[\'mysql\']',
     require        => Heka::Decoder::Sandbox['mysql'],
     notify         => Class['lma_collector::service'],
   }

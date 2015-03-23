@@ -1,11 +1,11 @@
 define heka::input::logstreamer(
-  $ensure = present,
   $config_dir,
   $decoder,
   $splitter = undef,
   $log_directory = '/var/log',
   $file_match = undef,
   $differentiator = undef,
+  $ensure = present,
 ) {
 
   include heka::params

@@ -1,8 +1,8 @@
 define heka::splitter::regex (
-  $ensure = present,
   $config_dir,
   $delimiter,
-  $delimiter_eol = undef
+  $delimiter_eol = undef,
+  $ensure = present,
 ) {
 
   include heka::params

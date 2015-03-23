@@ -19,11 +19,14 @@ class lma_collector::params {
       $run_as_root = true
       $groups = []
     }
+    default: {
+      fail("${::osfamily} not supported")
+    }
   }
 
   # Parameters for OpenStack notifications
   $rabbitmq_host = false
-  $rabbitmq_port = "5672"
+  $rabbitmq_port = '5672'
   $rabbitmq_user = ''
   $rabbitmq_password = ''
   $rabbitmq_exchange = ''
@@ -32,15 +35,18 @@ class lma_collector::params {
   $notification_driver = 'messaging'
 
   # collectd parameters
-  $collectd_port = "8325"
+  $collectd_port = '8325'
   $collectd_interval = 10
-  $collectd_logfile = "/var/log/collectd.log"
+  $collectd_logfile = '/var/log/collectd.log'
   case $::osfamily {
     'Debian': {
       $python_module_path = '/usr/lib/collectd'
     }
     'RedHat': {
       $python_module_path = '/usr/lib64/collectd'
+    }
+    default: {
+      fail("${::osfamily} not supported")
     }
   }
   $additional_packages = [ 'python-dateutil' ]
@@ -50,7 +56,7 @@ class lma_collector::params {
   $openstack_user = ''
   $openstack_password = ''
   $openstack_tenant = ''
-  $openstack_url = "http://127.0.0.1:5000/v2.0/"
+  $openstack_url = 'http://127.0.0.1:5000/v2.0/'
   $openstack_client_timeout = 5
   $nova_cpu_allocation_ratio = 8.0
 

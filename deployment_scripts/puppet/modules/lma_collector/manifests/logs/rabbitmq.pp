@@ -19,7 +19,7 @@ class lma_collector::logs::rabbitmq {
     config_dir     => $lma_collector::params::config_dir,
     decoder        => 'rabbitmq',
     splitter       => 'rabbitmq',
-    log_directory  => "/var/log/rabbitmq",
+    log_directory  => '/var/log/rabbitmq',
     file_match     => 'rabbit@(?P<Node>.+)\.log$',
     differentiator => '["rabbitmq.", "Node"]',
     require        => [Heka::Decoder::Sandbox['rabbitmq'], Heka::Splitter::Regex['rabbitmq']],

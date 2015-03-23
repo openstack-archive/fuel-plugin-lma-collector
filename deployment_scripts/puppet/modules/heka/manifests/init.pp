@@ -71,7 +71,7 @@ class heka (
   }
 
   user { $heka_user:
-    shell  => "/sbin/nologin",
+    shell  => '/sbin/nologin',
     home   => $base_dir,
     system => true,
     groups => $additional_groups,
@@ -125,6 +125,9 @@ class heka (
         notify  => Service[$service_name],
         alias   => 'heka_init_script',
       }
+    }
+    default: {
+      fail("${::osfamily} not supported")
     }
   }
 

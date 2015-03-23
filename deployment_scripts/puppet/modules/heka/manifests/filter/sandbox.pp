@@ -1,11 +1,11 @@
 define heka::filter::sandbox (
-  $ensure = present,
   $config_dir,
   $filename,
   $preserve_data = false,
   $message_matcher = 'FALSE',
   $ticker_interval = undef,
   $config = {},
+  $ensure = present,
 ) {
 
   include heka::params
@@ -20,4 +20,3 @@ define heka::filter::sandbox (
     group   => $heka::params::user,
   }
 }
-
