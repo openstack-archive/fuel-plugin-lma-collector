@@ -57,6 +57,14 @@ class lma_collector::collectd::base {
   class { 'collectd::plugin::users':
   }
 
+  class { 'collectd::plugin::apache':
+    instances => {
+      'localhost' => {
+        'url' => 'http://localhost/server-status?auto'
+      },
+    }
+  }
+
   file { '/etc/logrotate.d/collectd':
     ensure  => present,
     content => "${lma_collector::params::collectd_logfile} {\n  daily\n  missingok\n}"
