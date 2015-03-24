@@ -123,6 +123,8 @@ function process_message ()
             elseif metric_source == 'apache' then
                 metric_name = string.gsub(metric_name, 'apache_', '')
                 msg['Fields']['name'] = 'apache' .. sep .. string.gsub(metric_name, 'scoreboard', 'workers')
+            elseif metric_source == 'ceph' then
+                msg['Fields']['name'] = 'ceph' .. sep .. sample['plugin_instance'] .. sep ..  sample['type_instance']
             else
                 msg['Fields']['name'] = metric_name
             end
