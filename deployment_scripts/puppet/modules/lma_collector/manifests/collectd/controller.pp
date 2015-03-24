@@ -1,5 +1,6 @@
 class lma_collector::collectd::controller (
   $haproxy_socket            = undef,
+  $ceph_enabled              = undef,
   $service_user              = $lma_collector::params::openstack_user,
   $service_password          = $lma_collector::params::openstack_password,
   $service_tenant            = $lma_collector::params::openstack_tenant,
@@ -75,6 +76,21 @@ class lma_collector::collectd::controller (
     }
   }
 
+  if $ceph_enabled {
+    $modules['ceph_pg_mon_status'] = {
+      'Timeout' => '5',
+      'Interval' => '30',
+    }
+    $modules['ceph_pool_osd'] = {
+      'Timeout' => '5',
+      'Interval' => '60',
+    }
+    $modules['ceph_osd_stats'] = {
+      'Timeout' => '5',
+      'Interval' => '60',
+    }
+  }
+
   file {"${collectd::params::plugin_conf_dir}/openstack.conf":
     owner   => 'root',
     group   => $collectd::params::root_group,
@@ -126,4 +142,14 @@ class lma_collector::collectd::controller (
     }
   }
 
+  if $ceph_enabled {
+    lma_collector::collectd::python_script { 'base.py':
+    }
+    lma_collector::collectd::python_script { 'ceph_pool_osd.py':
+    }
+    lma_collector::collectd::python_script { 'ceph_pg_mon_status.py':
+    }
+    lma_collector::collectd::python_script { 'ceph_osd_stats.py':
+    }
+  }
 }
