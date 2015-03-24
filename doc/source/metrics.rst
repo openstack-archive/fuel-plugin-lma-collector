@@ -103,3 +103,9 @@ HAproxy
 -------
 
 .. include:: metrics/haproxy.rst
+
+
+Ceph
+----
+
+.. include:: metrics/ceph.rst
