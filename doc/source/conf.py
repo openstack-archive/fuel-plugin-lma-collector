@@ -71,6 +71,7 @@ exclude_patterns = [
     'metrics/apache.rst',
     'metrics/haproxy.rst',
     'metrics/memcached.rst',
+    'metrics/ceph.rst',
     'metrics/mysql.rst',
     'metrics/openstack.rst',
     'metrics/rabbitmq.rst',
