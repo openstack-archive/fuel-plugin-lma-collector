@@ -34,7 +34,6 @@ class lma_collector (
     run_as_root       => $lma_collector::params::run_as_root,
     additional_groups => $lma_collector::params::groups,
     hostname          => $::hostname,
-    dashboard_address => '127.0.0.1',
   }
 
   file { "${lua_modules_dir}/lma_utils.lua":
