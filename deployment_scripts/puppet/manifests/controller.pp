@@ -65,6 +65,13 @@ if $fuel_settings['lma_collector']['influxdb_mode'] != 'disabled' {
     $haproxy_socket = undef
   }
 
+  $storage_options = hiera('storage', {})
+  if $storage_options['volumes_ceph'] or $storage_options['images_ceph'] or $storage_options['objects_ceph'] or $storage_options['ephemeral_ceph']{
+    $ceph_enabled = true
+  } else {
+    $ceph_enabled = false
+  }
+
   class { 'lma_collector::collectd::controller':
     service_user      => 'nova',
     service_password  => $fuel_settings['nova']['user_password'],
@@ -72,6 +79,7 @@ if $fuel_settings['lma_collector']['influxdb_mode'] != 'disabled' {
     keystone_url      => "http://${management_vip}:5000/v2.0",
     rabbitmq_pid_file => $rabbitmq_pid_file,
     haproxy_socket    => $haproxy_socket,
+    ceph_enabled      => $ceph_enabled,
   }
 
   class { 'lma_collector::collectd::mysql':
