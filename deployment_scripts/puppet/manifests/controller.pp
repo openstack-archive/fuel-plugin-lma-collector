@@ -84,4 +84,7 @@ if $fuel_settings['lma_collector']['influxdb_mode'] != 'disabled' {
   if $enable_notifications {
     class { 'lma_collector::notifications::metrics': }
   }
+
+  # Enable Apache status module
+  class { 'lma_collector::mod_status': }
 }

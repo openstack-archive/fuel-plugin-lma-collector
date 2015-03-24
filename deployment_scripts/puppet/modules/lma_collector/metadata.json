@@ -19,6 +19,7 @@
     ],
     "description": "Puppet module for configuring the LMA collector service",
     "dependencies": [
+        {"name": "puppetlabs/apache", "version_requirement": ">= 1.4.0"},
         {"name": "puppetlabs/stdlib", "version_requirement": "4.x"},
         {"name": "pdxcat/collectd", "version_requirement": "3.x"},
         {"name": "mirantis/heka", "version_requirement": "1.x"}
