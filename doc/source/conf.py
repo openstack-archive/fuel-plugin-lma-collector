@@ -69,6 +69,7 @@ release = '1.0'
 # directories to ignore when looking for source files.
 exclude_patterns = [
     'metrics/apache.rst',
+    'metrics/ceph.rst',
     'metrics/mysql.rst',
     'metrics/openstack.rst',
     'metrics/rabbitmq.rst',

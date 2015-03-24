@@ -29,3 +29,11 @@
     puppet_manifest: puppet/manifests/cinder.pp
     puppet_modules: puppet/modules
     timeout: 600
+
+- role: ['ceph-osd']
+  stage: post_deployment
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/ceph_osd.pp
+    puppet_modules: puppet/modules
+    timeout: 600
