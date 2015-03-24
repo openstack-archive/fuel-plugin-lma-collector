@@ -107,4 +107,13 @@ class lma_collector::collectd::controller (
 
   class { 'collectd::plugin::memcached':
   }
+
+  class { 'collectd::plugin::apache':
+    instances => {
+      'localhost' => {
+        'url' => 'http://localhost/server-status?auto'
+      },
+    }
+  }
+
 }

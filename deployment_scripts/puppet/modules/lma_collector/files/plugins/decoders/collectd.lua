@@ -120,6 +120,9 @@ function process_message ()
                 msg['Fields']['name'] = 'memcached' .. sep .. string.gsub(metric_name, 'memcached_', '')
             elseif metric_source == 'haproxy' then
                 msg['Fields']['name'] = 'haproxy' .. sep .. sample['type_instance']
+            elseif metric_source == 'apache' then
+                metric_name = string.gsub(metric_name, 'apache_', '')
+                msg['Fields']['name'] = 'apache' .. sep .. string.gsub(metric_name, 'scoreboard', 'workers')
             else
                 msg['Fields']['name'] = metric_name
             end
