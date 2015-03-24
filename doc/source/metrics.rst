@@ -74,6 +74,11 @@ System
 
 .. include:: metrics/system.rst
 
+Apache
+------
+
+.. include:: metrics/apache.rst
+
 MySQL
 -----
 
