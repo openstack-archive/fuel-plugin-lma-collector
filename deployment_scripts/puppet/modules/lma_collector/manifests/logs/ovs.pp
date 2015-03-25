@@ -13,7 +13,7 @@ class lma_collector::logs::ovs {
     decoder        => 'ovs',
     log_directory  => '/var/log/openvswitch',
     file_match     => '(?P<Service>ovs\-vswitchd|ovsdb\-server)\.log$',
-    differentiator => "[ 'Service' ]",
+    differentiator => '[  \'Service\' ]',
     require        => Heka::Decoder::Sandbox['ovs'],
     notify         => Class['lma_collector::service'],
   }
