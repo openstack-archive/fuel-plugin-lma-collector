@@ -1,4 +1,4 @@
-.. _HAproxy_metrics:
+.. _haproxy_metrics:
 
 Server
 ^^^^^^

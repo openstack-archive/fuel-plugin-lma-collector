@@ -89,6 +89,11 @@ RabbitMQ
 
 .. include:: metrics/rabbitmq.rst
 
+HAProxy
+-------
+
+.. include:: metrics/haproxy.rst
+
 Memcached
 ---------
 
@@ -98,8 +103,3 @@ OpenStack
 ---------
 
 .. include:: metrics/openstack.rst
-
-HAproxy
--------
-
-.. include:: metrics/haproxy.rst
