@@ -35,6 +35,17 @@ These metrics are retrieved from the Nova API.
 
 ``<service>`` is one of service is one of 'compute', 'conductor', 'scheduler', 'cert' or 'consoleauth'.
 
+Identity
+^^^^^^^^
+
+These metrics are retrieved from the Keystone API.
+
+* ``openstack.keystone.roles``, the total number of roles.
+* ``openstack.keystone.tenants.<state>``, the number of tenants by state.
+* ``openstack.keystone.users.<state>``, the number of users by state.
+
+``state`` is one of 'disabled' or 'enabled'.
+
 Volume
 ^^^^^^
 
