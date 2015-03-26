@@ -1,5 +1,5 @@
 class lma_collector::collectd::controller (
-  $haproxy_socket,
+  $haproxy_socket            = undef,
   $service_user              = $lma_collector::params::openstack_user,
   $service_password          = $lma_collector::params::openstack_password,
   $service_tenant            = $lma_collector::params::openstack_tenant,
@@ -60,6 +60,13 @@ class lma_collector::collectd::controller (
       'KeystoneUrl' => $keystone_url,
       'Timeout' => $lma_collector::params::openstack_client_timeout,
     },
+    'openstack_neutron' => {
+      'Username' => $service_user,
+      'Password' => $service_password,
+      'Tenant' => $service_tenant,
+      'KeystoneUrl' => $keystone_url,
+      'Timeout' => $lma_collector::params::openstack_client_timeout,
+    },
   }
 
   if $haproxy_socket {
@@ -98,6 +105,9 @@ class lma_collector::collectd::controller (
   }
 
   lma_collector::collectd::python_script { 'openstack_keystone.py':
+  }
+
+  lma_collector::collectd::python_script { 'openstack_neutron.py':
   }
 
   if $haproxy_socket {
