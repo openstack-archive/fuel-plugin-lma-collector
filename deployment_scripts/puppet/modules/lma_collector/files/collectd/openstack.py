@@ -194,27 +194,42 @@ class CollectdPlugin(object):
     def read_callback(self):
         raise "read_callback method needs to be overriden!"
 
-    def get_objects_details(self, project, object_name,
-                            api_version='',
-                            params='all_tenants=1'):
-        """ Return object details list
+    def get_objects(self, project, object_name, api_version='',
+                    params='all_tenants=1'):
+        """ Return a list of OpenStack objects
 
-            the version is not always included in url endpoint (glance)
-            use api_version param to include the version in resource url
+            See get_objects_details()
         """
+        return self._get_objects(project, object_name, api_version, params,
+                                 False)
 
+    def get_objects_details(self, project, object_name, api_version='',
+                            params='all_tenants=1'):
+        """ Return a list of details about OpenStack objects
+
+            The API version is not always included in the URL endpoint
+            registered in Keystone (eg Glance). In this case, use the
+            api_version parameter to specify which version should be used.
+        """
+        return self._get_objects(project, object_name, api_version, params,
+                                 True)
+
+    def _get_objects(self, project, object_name, api_version, params, detail):
         if api_version:
-            resource = '%s/%s/detail?%s' % (api_version, object_name, params)
+            resource = '%s/%s' % (api_version, object_name)
         else:
-            resource = '%s/detail?%s' % (object_name, params)
-
+            resource = '%s' % (object_name)
+        if detail:
+            resource = '%s/detail' % (resource)
+        if params:
+            resource = '%s?%s' % (resource, params)
         # TODO(scroiset): use pagination to handle large collection
         r = self.get(project, resource)
-        if not r:
+        if not r or object_name not in r.json():
             self.logger.warning('Could not find %s %s' % (project,
                                                           object_name))
             return []
-        return r.json().get(object_name, [])
+        return r.json().get(object_name)
 
     def count_objects_group_by(self,
                                list_object,
