@@ -38,6 +38,12 @@ These metrics are retrieved from the Nova API.
 Volume
 ^^^^^^
 
+These metrics are emitted per volume node.
+
+* ``openstack.cinder.volume_creation_time``, the time (in seconds) it took to create a new volume.
+
+.. note:: When using Ceph as the backend storage for volumes, the ``hostname`` value is always set to ``rbd``.
+
 These metrics are retrieved from the Cinder API.
 
 * ``openstack.cinder.volumes.<state>``, the number of volumes by state.
