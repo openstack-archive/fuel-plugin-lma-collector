@@ -12,7 +12,7 @@ Compute
 
 These metrics are emitted per compute node.
 
-* ``openstack.nova.instance_creation_time``, the time (in seconds) it took to launch a new instance.
+* ``openstack.nova.instance_creation_time``, the time (in milliseconds) it took to launch a new instance.
 * ``openstack.nova.instance_state.<state>``, the number of instances which entered this state (always 1).
 * ``openstack.nova.free_disk``, the amount of disk space (in GB) available for new instances.
 * ``openstack.nova.used_disk``, the amount of disk space (in GB) used by the instances.
@@ -37,6 +37,10 @@ These metrics are retrieved from the Nova API.
 
 Volume
 ^^^^^^
+
+These metrics are emitted per volume node.
+
+* ``openstack.cinder.volume_creation_time``, the time (in milliseconds) it took to create a new volume.
 
 These metrics are retrieved from the Cinder API.
 

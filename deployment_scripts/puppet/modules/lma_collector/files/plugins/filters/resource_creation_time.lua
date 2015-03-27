@@ -21,7 +21,17 @@ local msg = {
     Severity = 6,
 }
 
+local event_type_to_name = {
+    ["compute.instance.create.end"] = "openstack.nova.instance_creation_time",
+    ["volume.create.end"] = "openstack.cinder.volume_creation_time",
+}
+
 function process_message ()
+    local metric_name = event_type_to_name[read_message("Fields[event_type]")]
+    if not metric_name then
+        return -1
+    end
+
     local created_at = read_message("Fields[created_at]") or ''
     local launched_at = read_message("Fields[launched_at]") or ''
 
@@ -29,12 +39,12 @@ function process_message ()
     launched_at = patt.Timestamp:match(launched_at)
     if created_at == nil or launched_at == nil or created_at == 0 or launched_at == 0 or created_at > launched_at then
         return -1
-   end
+    end
 
     msg.Timestamp = read_message("Timestamp")
     msg.Fields = {
         source = read_message('Logger'),
-        name = "openstack.nova.instance_creation_time",
+        name = metric_name,
         -- preserve the original hostname in the Fields attribute because
         -- sandboxed filters cannot override the Hostname attribute
         hostname = read_message("Fields[hostname]"),
