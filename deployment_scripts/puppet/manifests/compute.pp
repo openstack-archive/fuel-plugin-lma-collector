@@ -13,6 +13,8 @@ else {
 
 class { 'lma_collector::logs::openstack': }
 
+class { 'lma_collector::logs::libvirt': }
+
 if $enable_notifications {
   class { 'lma_collector::notifications::compute':
     topics  => $notification_topics,
