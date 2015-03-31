@@ -29,6 +29,8 @@ Handlers
 The **mysql_handler.** metrics report how many times per second each handler has been executed.
 
 * ``mysql_handler.commit``, the number of internal COMMIT statements.
+* ``mysql_handler.delete``, the number of internal DELETE statements.
+* ``mysql_handler.external_lock``, the number of external lock.
 * ``mysql_handler.read_first``, the number of times the first entry in an index was read.
 * ``mysql_handler.read_key``, the number of requests to read a row based on a key.
 * ``mysql_handler.read_next``, the number of requests to read the next row in key order.
