@@ -60,7 +60,13 @@ METRIC_TYPES = {
   'scur': ('session_current', 'gauge'),
   'wredis': ('redistributed', 'gauge'),
   'wretr': ('retries', 'gauge'),
+  'status': ('status', 'gauge'),
   'Uptime_sec': ('uptime', 'gauge')
+}
+
+BACKEND_STATUS_MAP = {
+    'DOWN': 0,
+    'UP': 1,
 }
 
 METRIC_AGGREGATED = ['bin', 'bout', 'qcur','scur','eresp',
@@ -144,6 +150,8 @@ def get_stats():
     for key,val in statdict.items():
       metricname = METRIC_DELIM.join([ statdict['svname'].lower(), statdict['pxname'].lower(), key ])
       try:
+        if key == 'status' and statdict['svname'].lower() == 'backend':
+          val = BACKEND_STATUS_MAP[val]
         stats[metricname] = int(val)
         if key in METRIC_AGGREGATED:
           agg_metricname = METRIC_DELIM.join([statdict['svname'].lower(), key])
