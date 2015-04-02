@@ -100,8 +100,11 @@ These metrics are retrieved from the Neutron API.
 * ``openstack.neutron.floatingips``, the total number of floating IP addresses.
 
 ``<agent_type>`` is one of 'dhcp', 'l3', 'metadata' or 'open_vswitch'.
+
 ``<agent_state>`` is one of 'up', 'down' or 'disabled'.
+
 ``<state>`` is one of 'active', 'build', 'down' or 'error'.
+
 ``<owner>`` is one of 'compute', 'dhcp', 'floatingip', 'floatingip_agent_gateway', 'router_interface', 'router_gateway', 'router_ha_interface', 'router_interface_distributed' or 'router_centralized_snat'.
 
 API response times
@@ -110,5 +113,7 @@ API response times
 * ``openstack.<service>.http.<HTTP method>.<HTTP status>``, the time (in second) it took to serve the HTTP request.
 
 ``<service>`` is one of 'cinder', 'glance', 'heat' 'keystone', 'neutron' or 'nova'.
+
 ``<HTTP method>`` is the HTTP method name, eg 'GET', 'POST' and so on.
+
 ``<HTTP status>`` is a 3-digit string representing the HTTP response code, eg '200', '404' and so on.

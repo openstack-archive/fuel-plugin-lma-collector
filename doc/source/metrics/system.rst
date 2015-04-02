@@ -92,4 +92,4 @@ Swap
 Users
 ^^^^^
 
-* ``users.users``, the number of users currently logged-in.
+* ``users``, the number of users currently logged-in.

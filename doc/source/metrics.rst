@@ -104,11 +104,6 @@ OpenStack
 
 .. include:: metrics/openstack.rst
 
-HAproxy
--------
-
-.. include:: metrics/haproxy.rst
-
 
 Ceph
 ----
