@@ -49,7 +49,7 @@ class CinderStatsPlugin(openstack.CollectdPlugin):
                                             group_by_func=groupby,
                                             count_func=count_size_bytes)
         for n, size in sizes.iteritems():
-            self.dispatch_value('volume_size', n, size)
+            self.dispatch_value('volumes_size', n, size)
 
         snaps_details = self.get_objects_details('cinder', 'snapshots')
         status_snaps = self.count_objects_group_by(snaps_details,
