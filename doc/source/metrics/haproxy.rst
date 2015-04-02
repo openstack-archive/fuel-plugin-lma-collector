@@ -42,6 +42,7 @@ Metrics per backends:
 * ``haproxy.backend.<backend>.denied_requests``, number of denied requests.
 * ``haproxy.backend.<backend>.denied_responses``, number of denied responses.
 * ``haproxy.backend.<backend>.downtime``, total downtime in second.
+* ``haproxy.backend.<backend>.status``, the backend status where values ``0`` and ``1`` represent respectively ``DOWN`` and ``UP``.
 * ``haproxy.backend.<backend>.error_connection``, number of error connections.
 * ``haproxy.backend.<backend>.error_responses``, number of error responses.
 * ``haproxy.backend.<backend>.queue_current``, number of requests in queue.
