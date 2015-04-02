@@ -95,4 +95,9 @@ if $fuel_settings['lma_collector']['influxdb_mode'] != 'disabled' {
 
   # Enable Apache status module
   class { 'lma_collector::mod_status': }
+
+  # Enable service heartbeat metrics
+  class { 'lma_collector::metrics::service_heartbeat':
+    services => ['mysql', 'rabbitmq', 'haproxy', 'memcached', 'apache']
+  }
 }

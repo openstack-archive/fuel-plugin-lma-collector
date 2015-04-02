@@ -1,5 +1,11 @@
 .. _mysql_metrics:
 
+Service
+^^^^^^^
+
+* ``mysql``, the status of the MySQL service, 1 if it is responsive, 0
+  otherwise.
+
 Commands
 ^^^^^^^^
 

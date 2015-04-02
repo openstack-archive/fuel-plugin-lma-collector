@@ -60,6 +60,8 @@ class lma_collector::params {
   $openstack_client_timeout = 5
   $nova_cpu_allocation_ratio = 8.0
 
+  $heartbeat_timeout = 30
+
   $elasticsearch_server = false
   $elasticsearch_port = '9200'
 
