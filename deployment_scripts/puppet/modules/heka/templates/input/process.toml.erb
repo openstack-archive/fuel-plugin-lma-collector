@@ -1,0 +1,15 @@
+[<%= @title %>_process]
+type="ProcessInput"
+ticker_interval = <%= @interval %>
+decoder = "<%= @decoder %>_decoder"
+<% if @splitter %>
+splitter = "<%= @splitter %>_splitter"
+<% else %>
+splitter = "NullSplitter"
+<% end %>
+
+[<%= @title %>_process.command.0]
+  bin = "<%= @command %>"
+  <% if @arguments %>
+  args = [<%= @arguments%>]
+  <% end %>
