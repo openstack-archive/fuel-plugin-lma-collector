@@ -26,10 +26,12 @@ These metrics are emitted per compute node.
 These metrics are retrieved from the Nova API.
 
 * ``openstack.nova.instances.<state>``, the number of instances by state.
-* ``openstack.nova.services.<service>.enabled``, the number of enabled Nova
-  services by service name.
 * ``openstack.nova.services.<service>.disabled``, the number of disabled Nova
   services by service name.
+* ``openstack.nova.services.<service>.up``, the number of up Nova services by
+  service name.
+* ``openstack.nova.services.<service>.down``, the number of down Nova services
+  by service name.
 
 ``<state>`` is one of 'active', 'deleted', 'error', 'paused', 'resumed', 'rescued', 'resized', 'shelved_offloaded' or 'suspended'.
 
