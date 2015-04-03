@@ -21,8 +21,21 @@ else {
   $additional_tags = {}
 }
 
+if hiera('deployment_mode') =~ /^ha_/ {
+  $ha_deployment = true
+}else{
+  $ha_deployment = false
+}
+
+if $ha_deployment {
+  $additional_groups = ['haclient']
+} else {
+  $additional_groups = []
+}
+
 class { 'lma_collector':
-  tags => merge($tags, $additional_tags)
+  tags   => merge($tags, $additional_tags),
+  groups => $additional_groups,
 }
 
 class { 'lma_collector::logs::system':
