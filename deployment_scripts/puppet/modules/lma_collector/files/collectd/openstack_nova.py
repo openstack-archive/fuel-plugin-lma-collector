@@ -40,11 +40,16 @@ class NovaStatsPlugin(openstack.CollectdPlugin):
         services = {}
         for s in r.json().get('services'):
             if s['binary'] not in services:
-                services[s['binary']] = {'enabled': 0, 'disabled': 0}
-            if s['status'] == 'enabled':
-                services[s['binary']]['enabled'] += 1
-            else:
+                services[s['binary']] = {
+                    'disabled': 0,
+                    'up': 0, 'down': 0
+                }
+            if s['status'] != 'enabled':
                 services[s['binary']]['disabled'] += 1
+            elif s['state'] == 'up':
+                services[s['binary']]['up'] += 1
+            else:
+                services[s['binary']]['down'] += 1
         return services
 
     def read_callback(self):
