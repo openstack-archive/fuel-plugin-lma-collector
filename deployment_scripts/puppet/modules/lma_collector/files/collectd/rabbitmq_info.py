@@ -74,7 +74,7 @@ def get_stats():
         list_connections = subprocess.Popen([RABBITMQCTL_BIN, '-q', 'list_connections'],
                                             shell=False,
                                             stdout=subprocess.PIPE)
-        stats['connections'] = len(list_connections.communicate()[0].split())
+        stats['connections'] = len(list_connections.communicate()[0].split('\n'))
     except:
         logger('err', '%s: Failed to get the number of connections' % RABBITMQCTL_BIN)
         return None
@@ -83,7 +83,7 @@ def get_stats():
         list_exchanges = subprocess.Popen([RABBITMQCTL_BIN, '-q', 'list_exchanges'],
                                           shell=False,
                                           stdout=subprocess.PIPE)
-        stats['exchanges'] = len(list_exchanges.communicate()[0].split())
+        stats['exchanges'] = len(list_exchanges.communicate()[0].split('\n'))
     except:
         logger('err', '%s: Failed to get the number of exchanges' % RABBITMQCTL_BIN)
         return None
