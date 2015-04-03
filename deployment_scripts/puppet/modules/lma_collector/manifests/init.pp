@@ -17,6 +17,7 @@
 #
 class lma_collector (
   $tags = $lma_collector::params::tags,
+  $groups = [],
 ) inherits lma_collector::params {
   include heka::params
   include lma_collector::service
@@ -32,7 +33,7 @@ class lma_collector (
     service_name      => $service_name,
     config_dir        => $config_dir,
     run_as_root       => $lma_collector::params::run_as_root,
-    additional_groups => $lma_collector::params::groups,
+    additional_groups => union($lma_collector::params::groups, $groups),
     hostname          => $::hostname,
   }
 
