@@ -109,3 +109,8 @@ Ceph
 ----
 
 .. include:: metrics/ceph.rst
+
+Pacemaker
+---------
+
+.. include:: metrics/pacemaker.rst
