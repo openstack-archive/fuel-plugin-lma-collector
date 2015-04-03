@@ -76,6 +76,7 @@ exclude_patterns = [
     'metrics/openstack.rst',
     'metrics/rabbitmq.rst',
     'metrics/system.rst',
+    'metrics/pacemaker.rst',
 ]
 
 # The reST default role (used for this markup: `text`) to use for all
