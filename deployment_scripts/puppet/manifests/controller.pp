@@ -101,4 +101,9 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
   class { 'lma_collector::metrics::service_heartbeat':
     services => ['mysql', 'rabbitmq', 'haproxy', 'memcached', 'apache']
   }
+
+  # Enable pacemaker resource location metrics
+  if $ha_deployment {
+    class { 'lma_collector::metrics::pacemaker_resources': }
+  }
 }
