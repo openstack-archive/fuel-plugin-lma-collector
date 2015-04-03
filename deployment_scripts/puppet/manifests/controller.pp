@@ -95,4 +95,9 @@ if $fuel_settings['lma_collector']['influxdb_mode'] != 'disabled' {
 
   # Enable Apache status module
   class { 'lma_collector::mod_status': }
+
+  # Enable pacemaker resource location metrics
+  if $ha_deployment {
+    class { 'lma_collector::metrics::pacemaker_resources': }
+  }
 }
