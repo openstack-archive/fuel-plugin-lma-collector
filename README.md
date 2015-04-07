@@ -49,13 +49,13 @@ To install the LMA Collector plugin, follow these steps:
 2. Copy the plugin file to the Fuel Master node.
 
     ```
-    scp lma_collector-1.0-1.0.0-0.noarch.rpm root@<Fuel Master node IP address>:
+    scp lma_collector-0.7-0.7.0-0.noarch.rpm root@<Fuel Master node IP address>:
     ```
 
 3. Install the plugin using the `fuel` command line:
 
     ```
-    fuel plugins --install lma_collector-1.0-1.0.0-0.noarch.rpm
+    fuel plugins --install lma_collector-0.7-0.7.0-0.noarch.rpm
     ```
 
 4. Verify that the plugin is installed correctly:
@@ -115,9 +115,9 @@ None
 Release Notes
 -------------
 
-**1.0.0**
+**0.7.0**
 
-* Initial release of the plugin.
+* Initial release of the plugin. This is a beta version.
 
 
 Contributors
