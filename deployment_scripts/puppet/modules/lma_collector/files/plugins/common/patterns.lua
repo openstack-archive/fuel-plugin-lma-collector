@@ -23,6 +23,12 @@ function format_uuid(t)
     return table.concat(t, '-')
 end
 
+function anywhere (patt)
+  return l.P {
+    patt + 1 * l.V(1)
+  }
+end
+
 sp = l.space
 colon = l.P":"
 dash = l.P"-"

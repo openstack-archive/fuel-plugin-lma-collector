@@ -53,8 +53,23 @@ Attributes in **bold** are always present in the messages while attributes in
 
   * *syslogfacility* (number), the Syslog facility for Syslog-based messages.
 
-  * *request_id* (string), the UUID of the OpenStack request.
-    applies.
+  * *http_method* (string), the HTTP method (for instance 'GET').
+
+  * *http_client_ip_address* (string), the IP address of the client that
+    originated the HTTP request.
+
+  * *http_response_size* (number), the size of the HTTP response (in bytes).
+
+  * *http_response_time* (number), the HTTP response time (in seconds).
+
+  * *http_status* (string), the HTTP response status.
+
+  * *http_url* (string), the requested HTTP URL.
+
+  * *http_version* (string), the HTTP version (eg '1.1).
+
+  * *request_id* (string), the UUID of the OpenStack request to which the
+    message applies.
 
   * *tenant_id* (string), the UUID of the OpenStack tenant to which the message
     applies.
