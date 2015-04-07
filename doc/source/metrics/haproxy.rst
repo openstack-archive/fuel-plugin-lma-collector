@@ -3,11 +3,13 @@
 Server
 ^^^^^^
 
+* ``haproxy.status``, the status of the HAProxy service, 1 if it is responsive,
+  0 otherwise.
 * ``haproxy.connections``, number of current connections.
 * ``haproxy.ssl_connections``, number of current SSL connections.
 * ``haproxy.run_queue``, number of connections waiting in the queue.
 * ``haproxy.tasks``, number of tasks.
-* ``haproxy.uptime``, HAproxy server uptime in seconds.
+* ``haproxy.uptime``, HAProxy server uptime in seconds.
 
 Frontends
 ^^^^^^^^^
