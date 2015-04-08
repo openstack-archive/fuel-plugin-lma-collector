@@ -81,6 +81,7 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     rabbitmq_pid_file => $rabbitmq_pid_file,
     haproxy_socket    => $haproxy_socket,
     ceph_enabled      => $ceph_enabled,
+    nova_db_password  => $nova['db_password']
   }
 
   class { 'lma_collector::collectd::mysql':
