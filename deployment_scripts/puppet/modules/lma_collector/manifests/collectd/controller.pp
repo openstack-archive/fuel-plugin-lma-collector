@@ -7,6 +7,10 @@ class lma_collector::collectd::controller (
   $keystone_url              = $lma_collector::params::keystone_url,
   $nova_cpu_allocation_ratio = $lma_collector::params::nova_cpu_allocation_ratio,
   $rabbitmq_pid_file         = $lma_collector::params::rabbitmq_pid_file,
+  $nova_db_hostname          = 'localhost',
+  $nova_db_name              = 'nova',
+  $nova_db_user              = 'nova',
+  $nova_db_password          = false,
 ) inherits lma_collector::params {
   include collectd::params
   include lma_collector::collectd::service
@@ -40,6 +44,11 @@ class lma_collector::collectd::controller (
       'KeystoneUrl' => $keystone_url,
       'Timeout' => $lma_collector::params::openstack_client_timeout,
     },
+
+    'openstack_nova_services' => {
+      'Connection' => "mysql://${nova_db_user}:${nova_db_password}@$nova_db_hostname/${nova_db_name}",
+    },
+
     'openstack_cinder' => {
       'Username' => $service_user,
       'Password' => $service_password,
@@ -108,7 +117,16 @@ class lma_collector::collectd::controller (
   lma_collector::collectd::python_script { 'openstack.py':
   }
 
+  lma_collector::collectd::python_script { 'base.py':
+  }
+
+  lma_collector::collectd::python_script { 'dbbase.py':
+  }
+
   lma_collector::collectd::python_script { 'openstack_nova.py':
+  }
+
+  lma_collector::collectd::python_script { 'openstack_nova_services.py':
   }
 
   lma_collector::collectd::python_script { 'openstack_cinder.py':
@@ -140,8 +158,6 @@ class lma_collector::collectd::controller (
   }
 
   if $ceph_enabled {
-    lma_collector::collectd::python_script { 'base.py':
-    }
     lma_collector::collectd::python_script { 'ceph_pool_osd.py':
     }
     lma_collector::collectd::python_script { 'ceph_pg_mon_status.py':
