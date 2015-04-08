@@ -44,11 +44,7 @@ local severity  = l.Cg(patt.SeverityLabel, "SeverityLabel")
 local message   = l.Cg(patt.Message, "Message")
 
 -- Horizon logs have no colon after the severity level
-local openstack_grammar_5_0 = l.Ct(severity * colon^-1 * sp * message)
-local openstack_grammar_5_1 = l.Ct(timestamp * sp * pid * sp * severity * colon^-1 * sp * message)
-local openstack_grammar     = openstack_grammar_5_0 + openstack_grammar_5_1
-
-local neutron_grammar = l.Ct(timestamp * sp * pid * sp * severity * sp * l.Cg(patt.programname, "programname") * sp * message)
+local openstack_grammar = l.Ct(timestamp * sp * pid * sp * severity * colon^-1 * sp * message)
 
 -- the RequestId string is enclosed between square brackets and it may be
 -- prefixed by other stuff like the Python module name.
@@ -91,21 +87,6 @@ function process_message ()
             if m.Timestamp then msg.Timestamp = m.Timestamp end
             msg.Payload = m.Message
             msg.Fields.severity_label = m.SeverityLabel
-        end
-    else
-        -- parse with the Neutron grammar
-        m = neutron_grammar:match(log)
-        if m then
-            msg.Timestamp = m.Timestamp
-            msg.Pid = m.Pid
-            msg.Payload = m.Message
-            msg.Severity = utils.label_to_severity_map[m.SeverityLabel] or 5
-
-            msg.Fields = {}
-            msg.Fields.severity_label = m.SeverityLabel
-            msg.Fields.programname = m.programname
-        else
-            return -1
         end
     end
 
