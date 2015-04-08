@@ -1,4 +1,7 @@
 <%= @log_file %> {
     daily
     missingok
+    # Heka cannot be told to close its log file and re-open it so we need to
+    # use the copytruncate option
+    copytruncate
 }
