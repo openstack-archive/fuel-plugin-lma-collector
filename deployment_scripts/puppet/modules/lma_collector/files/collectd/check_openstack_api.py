@@ -48,8 +48,8 @@ class APICheckPlugin(openstack.CollectdPlugin):
         catalog = self.service_catalog
         for service in catalog:
             if service['name'] not in self.RESOURCE_MAP:
-                self.logger.warning("Don't know how to check service '%s'" %
-                                    service['name'])
+                self.logger.notice("Don't know how to check service '%s'" %
+                                   service['name'])
                 status = self.UNKNOWN
             else:
                 r = self.get(service['name'],
