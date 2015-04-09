@@ -48,19 +48,21 @@ class DBBase(base.Base):
     def queries_to_metrics(self, queries_map):
         """ map SQL queries results to metrics.
 
-        queries_map: a list query dict with following keys:
-         'name': uniq name of the query
-         'query': the SQL query string
-         'value': the name of the column used for metrics value
-         'value_func': a function to normalize the value
+        queries_map: a list of query dict with following keys:
+         'name': uniq name of the query.
+         'query': the SQL query string.
+         'value': the name of the column used for metrics value.
+         'value_func': a function to normalize the value for all entries.
          'map_to_metric: a dict to map column to metric name
-                         {<column-name> : <metric-name-with-placeholder-%s>}
-         'rename_func': a function to rename the metric name
+                         {<column-name> : <metric-name-with-placeholder-%s>}.
+         'rename_func': a function to rename metric names, apply to all metrics.
 
         Optionals keys:
-            invert: a list of query name to create missing metrics for
-                    the current query
-            invert_value: the default value to use when inverting
+         'value_map_func': a dict {name: function} to normalize values per <column-name> entry,
+                           take precedence over 'value_func'.
+         'invert': a list of query name to create missing metrics for
+                   the current query.
+         'invert_value': the default value to use when inverting.
         """
 
         metrics = {}
@@ -79,7 +81,13 @@ class DBBase(base.Base):
                         else:
                             metric = q['map_to_metric'][key] % r[key]
 
-                        metrics[metric] = q['value_func'](r[q['value']])
+                        if 'value_map_func' in q and r[key] in q['value_map_func']:
+                            metrics[metric] = q['value_map_func'][r[key]](r[q['value']])
+                        elif q['value_func']:
+                            metrics[metric] = q['value_func'](r[q['value']])
+                        else:
+                            metrics[metric] = r[q['value']]
+
                 cache[n] = rows
         except sqlalchemy.exc.SQLAlchemyError as e:
             self.logger.error(str(e))

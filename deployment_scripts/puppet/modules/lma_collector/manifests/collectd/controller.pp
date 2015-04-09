@@ -91,6 +91,9 @@ class lma_collector::collectd::controller (
     'openstack_neutron_services' => {
       'Connection' => "mysql://${neutron_db_user}:${neutron_db_password}@$neutron_db_hostname/${neutron_db_name}",
     },
+    'mysql_status' => {
+      'Connection' => "mysql://${nova_db_user}:${nova_db_password}@$nova_db_hostname/${nova_db_name}",
+    },
   }
 
   if $haproxy_socket {
@@ -159,6 +162,9 @@ class lma_collector::collectd::controller (
   }
 
   lma_collector::collectd::python_script { 'openstack_neutron.py':
+  }
+
+  lma_collector::collectd::python_script { 'mysql_status.py':
   }
 
   if $haproxy_socket {
