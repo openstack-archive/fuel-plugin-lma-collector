@@ -117,7 +117,12 @@ function process_message ()
             elseif metric_source == 'keystone' then
                 msg['Fields']['name'] = 'openstack.keystone' .. sep .. sample['type_instance']
             elseif metric_source == 'neutron' then
-                msg['Fields']['name'] = 'openstack.neutron' .. sep .. sample['type_instance']
+                if sample['plugin_instance'] ~= nill then
+                    neutron_metric = sample['plugin_instance'] .. sep .. sample['type_instance']
+                else
+                    neutron_metric = sample['type_instance']
+                end
+                msg['Fields']['name'] = 'openstack.neutron' .. sep .. neutron_metric
             elseif metric_source == 'memcached' then
                 msg['Fields']['name'] = 'memcached' .. sep .. string.gsub(metric_name, 'memcached_', '')
             elseif metric_source == 'haproxy' then

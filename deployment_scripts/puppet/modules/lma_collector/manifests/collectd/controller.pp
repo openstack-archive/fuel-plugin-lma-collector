@@ -15,6 +15,10 @@ class lma_collector::collectd::controller (
   $cinder_db_name            = 'cinder',
   $cinder_db_user            = 'cinder',
   $cinder_db_password        = false,
+  $neutron_db_hostname        = 'localhost',
+  $neutron_db_name            = 'neutron',
+  $neutron_db_user            = 'neutron',
+  $neutron_db_password        = false,
 ) inherits lma_collector::params {
   include collectd::params
   include lma_collector::collectd::service
@@ -84,6 +88,9 @@ class lma_collector::collectd::controller (
       'KeystoneUrl' => $keystone_url,
       'Timeout' => $lma_collector::params::openstack_client_timeout,
     },
+    'openstack_neutron_services' => {
+      'Connection' => "mysql://${neutron_db_user}:${neutron_db_password}@$neutron_db_hostname/${neutron_db_name}",
+    },
   }
 
   if $haproxy_socket {
@@ -137,6 +144,9 @@ class lma_collector::collectd::controller (
   }
 
   lma_collector::collectd::python_script { 'openstack_cinder_services.py':
+  }
+
+  lma_collector::collectd::python_script { 'openstack_neutron_services.py':
   }
 
   lma_collector::collectd::python_script { 'openstack_cinder.py':

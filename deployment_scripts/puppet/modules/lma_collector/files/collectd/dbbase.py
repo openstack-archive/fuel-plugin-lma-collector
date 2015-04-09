@@ -37,7 +37,10 @@ class DBBase(base.Base):
                 continue
             for r in cache[invert]:
                 for key in q['map_to_metric']:
-                    metric = q['map_to_metric'][key] % r[key]
+                    if 'rename_func' in q:
+                        metric = q['map_to_metric'][key] % q['rename_func'][key](r[key])
+                    else:
+                        metric = q['map_to_metric'][key] % r[key]
                     if metric not in metrics:
                         metrics[metric] = q['invert_value']
         return metrics
@@ -52,6 +55,7 @@ class DBBase(base.Base):
          'value_func': a function to normalize the value
          'map_to_metric: a dict to map column to metric name
                          {<column-name> : <metric-name-with-placeholder-%s>}
+         'rename_func': a function to rename the metric name
 
         Optionals keys:
             invert: a list of query name to create missing metrics for
@@ -70,7 +74,11 @@ class DBBase(base.Base):
                 rows = result.fetchall()
                 for r in rows:
                     for key in q['map_to_metric']:
-                        metric = q['map_to_metric'][key] % r[key]
+                        if 'rename_func' in q:
+                            metric = q['map_to_metric'][key] % q['rename_func'][key](r[key])
+                        else:
+                            metric = q['map_to_metric'][key] % r[key]
+
                         metrics[metric] = q['value_func'](r[q['value']])
                 cache[n] = rows
         except sqlalchemy.exc.SQLAlchemyError as e:
