@@ -170,6 +170,10 @@ class CollectdPlugin(object):
 
     @property
     def service_catalog(self):
+        if not self.os_client.service_catalog:
+            # In case the service catalog is empty (eg Keystone was down when
+            # collectd started), we should try to get a new token
+            self.os_client.get_token()
         return self.os_client.service_catalog
 
     def get_service(self, service_name):
