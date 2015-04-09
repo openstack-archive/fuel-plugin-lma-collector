@@ -11,6 +11,10 @@ class lma_collector::collectd::controller (
   $nova_db_name              = 'nova',
   $nova_db_user              = 'nova',
   $nova_db_password          = false,
+  $cinder_db_hostname        = 'localhost',
+  $cinder_db_name            = 'cinder',
+  $cinder_db_user            = 'cinder',
+  $cinder_db_password        = false,
 ) inherits lma_collector::params {
   include collectd::params
   include lma_collector::collectd::service
@@ -55,6 +59,9 @@ class lma_collector::collectd::controller (
       'Tenant' => $service_tenant,
       'KeystoneUrl' => $keystone_url,
       'Timeout' => $lma_collector::params::openstack_client_timeout,
+    },
+    'openstack_cinder_services' => {
+      'Connection' => "mysql://${cinder_db_user}:${cinder_db_password}@$cinder_db_hostname/${cinder_db_name}",
     },
     'openstack_glance' => {
       'Username' => $service_user,
@@ -127,6 +134,9 @@ class lma_collector::collectd::controller (
   }
 
   lma_collector::collectd::python_script { 'openstack_nova_services.py':
+  }
+
+  lma_collector::collectd::python_script { 'openstack_cinder_services.py':
   }
 
   lma_collector::collectd::python_script { 'openstack_cinder.py':

@@ -5,6 +5,7 @@ $lma_collector  = hiera('lma_collector')
 $management_vip = hiera('management_vip')
 $nova           = hiera('nova')
 $rabbit         = hiera('rabbit')
+$cinder         = hiera('cinder')
 
 $enable_notifications = $lma_collector['enable_notifications']
 if $ceilometer['enabled'] {
@@ -74,14 +75,15 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
   }
 
   class { 'lma_collector::collectd::controller':
-    service_user      => 'nova',
-    service_password  => $nova['user_password'],
-    service_tenant    => 'services',
-    keystone_url      => "http://${management_vip}:5000/v2.0",
-    rabbitmq_pid_file => $rabbitmq_pid_file,
-    haproxy_socket    => $haproxy_socket,
-    ceph_enabled      => $ceph_enabled,
-    nova_db_password  => $nova['db_password']
+    service_user        => 'nova',
+    service_password    => $nova['user_password'],
+    service_tenant      => 'services',
+    keystone_url        => "http://${management_vip}:5000/v2.0",
+    rabbitmq_pid_file   => $rabbitmq_pid_file,
+    haproxy_socket      => $haproxy_socket,
+    ceph_enabled        => $ceph_enabled,
+    nova_db_password    => $nova['db_password'],
+    cinder_db_password  => $cinder['db_password'],
   }
 
   class { 'lma_collector::collectd::mysql':
