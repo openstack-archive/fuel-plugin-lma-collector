@@ -1,0 +1,40 @@
+<Plugin dbi>
+  <Query "down">
+    Statement "select concat_ws('.', 'services', replace(s1.binary, 'nova-', ''), 'down') as metric, count(s2.id) as value from services s1 left outer join services s2 on s1.id = s2.id and s1.disabled=0 and s1.deleted=0 and timestampdiff(SECOND,s1.updated_at,utc_timestamp())><%= @downtime %> group by s1.binary;"
+    MinVersion 50000
+    <Result>
+      Type "gauge"
+      InstancesFrom "metric"
+      ValuesFrom "value"
+    </Result>
+  </Query>
+  <Query "up">
+    Statement "select concat_ws('.', 'services', replace(s1.binary, 'nova-', ''), 'up') as metric, count(s2.id) as value from services s1 left outer join services s2 on s1.id = s2.id and s1.disabled=0 and s1.deleted=0 and timestampdiff(SECOND,s1.updated_at,utc_timestamp())<=<%= @downtime %> group by s1.binary;"
+    MinVersion 50000
+    <Result>
+      Type "gauge"
+      InstancesFrom "metric"
+      ValuesFrom "value"
+    </Result>
+  </Query>
+  <Query "disabled">
+    Statement "select concat_ws('.', 'services', replace(s1.binary, 'nova-', ''), 'disabled') as metric, count(s2.id) as value from services s1 left outer join services s2 on s1.id = s2.id and s2.disabled = 1 and s1.deleted=0 group by s1.binary;"
+    MinVersion 50000
+    <Result>
+      Type "gauge"
+      InstancesFrom "metric"
+      ValuesFrom "value"
+    </Result>
+  </Query>
+  <Database "services_<%= @service%>">
+    Driver "mysql"
+    DriverOption "host" "<%= @hostname %>"
+    DriverOption "username" "<%= @username %>"
+    DriverOption "password" "<%= @password %>"
+    DriverOption "dbname" "<%= @dbname %>"
+    SelectDB "<%= @dbname %>"
+    Query "disabled"
+    Query "up"
+    Query "down"
+  </Database>
+</Plugin>
