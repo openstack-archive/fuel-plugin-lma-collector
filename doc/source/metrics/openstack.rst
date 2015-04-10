@@ -68,6 +68,16 @@ These metrics are retrieved from the Cinder API.
 
 ``<state>`` is one of 'available', 'creating', 'attaching', 'in-use', 'deleting', 'backing-up', 'restoring-backup', 'error', 'error_deleting', 'error_restoring', 'error_extending'.
 
+These metrics are retrieved from the Cinder database.
+
+* ``openstack.cinder.services.<service>.<service_state>``, the total number of Cinder
+    services by state.
+
+``<service>`` is one of service is one of 'volume', 'backup', 'scheduler'.
+
+``<service_state>`` is one of 'up', 'down' or 'disabled'.
+
+
 Image
 ^^^^^
 
