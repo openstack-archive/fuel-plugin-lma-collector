@@ -29,8 +29,6 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
         number of ports broken down by owner and status
         number of routers broken down by status
         number of floating IP addresses broken down by free/associated
-        number of agents broken down by agent name and status
-        number of agents broken down by status
     """
 
     def config_callback(self, config):
@@ -59,23 +57,6 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
             else:
                 status = 'free'
             return "floatingips.%s" % status
-
-        def agent_status(x):
-            if not x.get('admin_state_up', False):
-                return 'disabled'
-            elif not x.get('alive', False):
-                return 'down'
-            else:
-                return 'up'
-
-        def groupby_agent_and_status(x):
-            # agent_type is like 'L3 agent', 'Open vSwitch agent', ...
-            agent = x.get('agent_type', 'unknown').lower()
-            agent = agent.replace(' agent', '').replace(' ', '_')
-            return "agents.%s.%s" % (agent, agent_status(x))
-
-        def groupby_agent(x):
-            return "agents.%s" % (agent_status(x))
 
         # Networks
         networks = self.get_objects('neutron', 'networks', api_version='v2.0')
@@ -113,20 +94,6 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
         for s, nb in status.iteritems():
             self.dispatch_value(s, nb)
         self.dispatch_value('floatingips', len(floatingips))
-
-        # Agents
-        agents = self.get_objects('neutron', 'agents',
-                                  api_version='v2.0')
-        status = self.count_objects_group_by(agents,
-                                             group_by_func=groupby_agent)
-        for s, nb in status.iteritems():
-            self.dispatch_value(s, nb)
-        status = self.count_objects_group_by(
-            agents,
-            group_by_func=groupby_agent_and_status)
-        for s, nb in status.iteritems():
-            self.dispatch_value(s, nb)
-        self.dispatch_value('agents', len(agents))
 
     def dispatch_value(self, name, value):
         v = collectd.Values(
