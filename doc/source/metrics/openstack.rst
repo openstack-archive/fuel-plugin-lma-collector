@@ -73,6 +73,20 @@ These metrics are retrieved from the Cinder API.
 
 ``<state>`` is one of 'available', 'creating', 'attaching', 'in-use', 'deleting', 'backing-up', 'restoring-backup', 'error', 'error_deleting', 'error_restoring', 'error_extending'.
 
+These metrics are retrieved from the Cinder database.
+
+* ``openstack.cinder.services.<service>.<service_state>``, the total number of Cinder
+    services by state.
+
+``<service>`` is one of service is one of 'volume', 'backup', 'scheduler'.
+
+``<service_state>`` is one of 'up', 'down' or 'disabled'.
+
+.. note:: A service is declared 'down' if heartbeat is not observered since
+         ``downtime_factor * report_interval`` seconds,
+         with ``report_interval=60`` and ``downtime_factor=2`` per default.
+         The ``report_interval`` must match the corresponding configuration in ``cinder.conf``.
+
 Image
 ^^^^^
 
