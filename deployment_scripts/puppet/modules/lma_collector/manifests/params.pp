@@ -41,9 +41,11 @@ class lma_collector::params {
   case $::osfamily {
     'Debian': {
       $python_module_path = '/usr/lib/collectd'
+      $collectd_dbi_package = 'libdbd-mysql'
     }
     'RedHat': {
       $python_module_path = '/usr/lib64/collectd'
+      $collectd_dbi_package = 'libdbi-dbd-mysql'
     }
     default: {
       fail("${::osfamily} not supported")
