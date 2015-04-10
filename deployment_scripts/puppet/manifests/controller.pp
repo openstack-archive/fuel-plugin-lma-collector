@@ -4,6 +4,7 @@ $ceilometer     = hiera('ceilometer')
 $lma_collector  = hiera('lma_collector')
 $management_vip = hiera('management_vip')
 $nova           = hiera('nova')
+$cinder         = hiera('cinder')
 $rabbit         = hiera('rabbit')
 
 $enable_notifications = $lma_collector['enable_notifications']
@@ -93,6 +94,12 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     dbname          => 'nova',
     password        => $nova['db_password'],
     report_interval => hiera('nova_report_interval'),
+  }
+
+  lma_collector::collectd::dbi_services { 'cinder':
+    username => 'cinder',
+    dbname   => 'cinder',
+    password => $cinder['db_password'],
   }
 
   class { 'lma_collector::logs::metrics': }
