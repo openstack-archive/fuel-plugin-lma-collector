@@ -63,7 +63,7 @@ class Base(object):
         v = collectd.Values(
             plugin=self.plugin,
             type=_type,
-            plugin_instance='cluster-%s' % self.cluster,
+            plugin_instance=self.plugin_instance,
             type_instance=metric,
             values=[value],
             # w/a for https://github.com/collectd/collectd/issues/716
@@ -127,3 +127,4 @@ class CephBase(Base, Execute):
         for node in conf.children:
             if node.key == "Cluster":
                 self.cluster = node.values[0]
+        self.plugin_instance = 'cluster-%s' % self.cluster
