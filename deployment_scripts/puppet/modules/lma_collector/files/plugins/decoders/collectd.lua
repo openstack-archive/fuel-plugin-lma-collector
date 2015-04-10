@@ -129,6 +129,8 @@ function process_message ()
                 msg['Fields']['name'] = 'ceph' .. sep .. sample['plugin_instance'] .. sep ..  sample['type_instance']
             elseif metric_source ==  'dbi' and sample['plugin_instance'] == 'services_nova' then
                 msg['Fields']['name'] = 'openstack.nova' .. sep ..  sample['type_instance']
+            elseif metric_source ==  'dbi' and sample['plugin_instance'] == 'services_cinder' then
+                msg['Fields']['name'] = 'openstack.cinder' .. sep ..  sample['type_instance']
             else
                 msg['Fields']['name'] = metric_name
             end
