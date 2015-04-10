@@ -25,27 +25,10 @@ class NovaStatsPlugin(openstack.CollectdPlugin):
     """ Class to report the statistics on Nova service.
 
         number of instances broken down by state
-        number of services by state enabled or disabled
     """
 
     def config_callback(self, config):
         super(NovaStatsPlugin, self).config_callback(config)
-
-    def _count_services_by_state(self):
-        r = self.get('nova', 'os-services')
-        if not r:
-            self.logger.warning("Could not get services statistics")
-            return {}
-
-        services = {}
-        for s in r.json().get('services'):
-            if s['binary'] not in services:
-                services[s['binary']] = {'enabled': 0, 'disabled': 0}
-            if s['status'] == 'enabled':
-                services[s['binary']]['enabled'] += 1
-            else:
-                services[s['binary']]['disabled'] += 1
-        return services
 
     def read_callback(self):
         servers_details = self.get_objects_details('nova', 'servers')
@@ -56,12 +39,6 @@ class NovaStatsPlugin(openstack.CollectdPlugin):
                                              group_by_func=groupby)
         for s, nb in status.iteritems():
             self.dispatch_value('instances', s, nb)
-
-        services = self._count_services_by_state()
-        for service_name, states in services.iteritems():
-            for s in states.keys():
-                self.dispatch_value('services.' + service_name,
-                                    s, services[service_name][s])
 
     def dispatch_value(self, plugin_instance, name, value):
         v = collectd.Values(
