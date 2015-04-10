@@ -108,8 +108,6 @@ Network
 
 These metrics are retrieved from the Neutron API.
 
-* ``openstack.neutron.agents.<agent_type>.<agent_state>``, the total number of Neutron agents by agent type and state.
-* ``openstack.neutron.agents.<agent_state>``, the total number of Neutron agents by state.
 * ``openstack.neutron.agents``, the total number of Neutron agents.
 * ``openstack.neutron.networks.<state>``, the number of virtual networks by state.
 * ``openstack.neutron.networks``, the total number of virtual networks.
@@ -122,13 +120,18 @@ These metrics are retrieved from the Neutron API.
 * ``openstack.neutron.floatingips.associated``, the number of floating IP addresses which are associated.
 * ``openstack.neutron.floatingips``, the total number of floating IP addresses.
 
-``<agent_type>`` is one of 'dhcp', 'l3', 'metadata' or 'open_vswitch'.
-
-``<agent_state>`` is one of 'up', 'down' or 'disabled'.
-
 ``<state>`` is one of 'active', 'build', 'down' or 'error'.
 
 ``<owner>`` is one of 'compute', 'dhcp', 'floatingip', 'floatingip_agent_gateway', 'router_interface', 'router_gateway', 'router_ha_interface', 'router_interface_distributed' or 'router_centralized_snat'.
+
+These metrics are retrieved from the Neutron database.
+
+* ``openstack.neutron.agents.<agent_type>.<agent_state>``, the total number of Neutron agents by agent type and state.
+
+``<agent_type>`` is one of 'dhcp', 'l3', 'metadata' or 'openvswitch'.
+
+``<agent_state>`` is one of 'up', 'down' or 'disabled'.
+
 
 API response times
 ^^^^^^^^^^^^^^^^^^
