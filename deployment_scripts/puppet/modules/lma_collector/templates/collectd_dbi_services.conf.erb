@@ -1,8 +1,8 @@
 <LoadPlugin "dbi">
 </LoadPlugin>
-
   <Plugin dbi>
-    <Query "down">
+<% if @type == 'services' %>
+    <Query "services_down">
       Statement "select concat_ws('.', 'services', s1.binary, 'down') as metric, count(s2.id) as value from services s1 left outer join services s2 on s1.id = s2.id and s1.disabled=0 and s1.deleted=0 and timestampdiff(SECOND,s1.updated_at,utc_timestamp())>60 group by s1.binary;"
       MinVersion 50000
       <Result>
@@ -11,7 +11,7 @@
         ValuesFrom "value"
       </Result>
     </Query>
-    <Query "up">
+    <Query "services_up">
       Statement "select concat_ws('.', 'services', s1.binary, 'up') as metric, count(s2.id) as value from services s1 left outer join services s2 on s1.id = s2.id and s1.disabled=0 and s1.deleted=0 and timestampdiff(SECOND,s1.updated_at,utc_timestamp())<60 group by s1.binary;"
       MinVersion 50000
       <Result>
@@ -20,7 +20,7 @@
         ValuesFrom "value"
       </Result>
     </Query>
-    <Query "disabled">
+    <Query "services_disabled">
       Statement "select concat_ws('.', 'services', s1.binary, 'disabled') as metric, count(s2.id) as value from services s1 left outer join services s2 on s1.id = s2.id and s2.disabled = 1 and s1.deleted=0 group by s1.binary;"
       MinVersion 50000
       <Result>
@@ -29,15 +29,45 @@
         ValuesFrom "value"
       </Result>
     </Query>
-    <Database "services_<%= @service%>">
+<% end %>
+<% if @type == 'agents' %>
+    <Query "agents_down">
+      Statement "select concat_ws('.', 'agents', replace(replace(a1.binary, '-agent', ''), 'neutron-', ''), 'down') as metric, count(a2.id) as value from agents a1 left outer join agents a2 on a1.id = a2.id and a1.admin_state_up=1 and timestampdiff(SECOND,a1.heartbeat_timestamp,utc_timestamp())>60  group by a1.binary;"
+      MinVersion 50000
+      <Result>
+        Type "gauge"
+        InstancesFrom "metric"
+        ValuesFrom "value"
+      </Result>
+    </Query>
+    <Query "agents_up">
+      Statement "select concat_ws('.', 'agents', replace(replace(a1.binary, '-agent', ''), 'neutron-', ''), 'up') as metric, count(a2.id) as value from agents a1 left outer join agents a2 on a1.id = a2.id and a1.admin_state_up=1 and timestampdiff(SECOND,a1.heartbeat_timestamp,utc_timestamp())<60  group by a1.binary;"
+      MinVersion 50000
+      <Result>
+        Type "gauge"
+        InstancesFrom "metric"
+        ValuesFrom "value"
+      </Result>
+    </Query>
+    <Query "agents_disabled">
+      Statement "select concat_ws('.', 'agents', replace(replace(a1.binary, '-agent', ''), 'neutron-', ''), 'disabled') as metric, count(a2.id) as value from agents a1 left outer join agents a2 on a1.id = a2.id and a1.admin_state_up=0 group by a1.binary;"
+      MinVersion 50000
+      <Result>
+        Type "gauge"
+        InstancesFrom "metric"
+        ValuesFrom "value"
+      </Result>
+    </Query>
+<% end %>
+    <Database "<%= @type%>_<%= @service%>">
       Driver "mysql"
       DriverOption "host" "<%= @hostname %>"
       DriverOption "username" "<%= @username %>"
       DriverOption "password" "<%= @password %>"
       DriverOption "dbname" "<%= @dbname %>"
       SelectDB "<%= @dbname %>"
-      Query "disabled"
-      Query "up"
-      Query "down"
+      Query "<%= @type %>_disabled"
+      Query "<%= @type %>_up"
+      Query "<%= @type %>_down"
     </Database>
   </Plugin>
