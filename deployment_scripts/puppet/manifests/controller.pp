@@ -6,6 +6,7 @@ $management_vip = hiera('management_vip')
 $nova           = hiera('nova')
 $cinder         = hiera('cinder')
 $rabbit         = hiera('rabbit')
+$neutron        = hiera('quantum_settings')
 
 $enable_notifications = $lma_collector['enable_notifications']
 if $ceilometer['enabled'] {
@@ -102,6 +103,11 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     password => $cinder['db_password'],
   }
 
+  lma_collector::collectd::dbi_services { 'neutron':
+    username => 'neutron',
+    dbname   => 'neutron',
+    password => $neutron['database']['passwd'],
+  }
   class { 'lma_collector::logs::metrics': }
 
   if $enable_notifications {
