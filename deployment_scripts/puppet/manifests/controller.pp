@@ -88,6 +88,13 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     password => $nova['db_password'],
   }
 
+  lma_collector::collectd::dbi_services { 'nova':
+    username        => 'nova',
+    dbname          => 'nova',
+    password        => $nova['db_password'],
+    report_interval => hiera('nova_report_interval'),
+  }
+
   class { 'lma_collector::logs::metrics': }
 
   if $enable_notifications {
