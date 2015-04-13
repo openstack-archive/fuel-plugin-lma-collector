@@ -79,6 +79,8 @@ function process_message ()
                 else
                     msg['Fields']['name'] = 'processes' .. sep .. sample['type']
                 end
+            elseif metric_source ==  'dbi' and sample['plugin_instance'] == 'mysql_status' then
+                msg['Fields']['name'] = 'mysql' .. sep .. sample['type_instance']
             elseif metric_source == 'mysql' then
                 if sample['type'] == 'threads' then
                     msg['Fields']['name'] = 'mysql_' .. metric_name
