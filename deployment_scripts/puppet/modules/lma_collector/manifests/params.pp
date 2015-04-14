@@ -78,4 +78,7 @@ class lma_collector::params {
 
   $pacemaker_resources_script = '/usr/local/bin/pacemaker_locate_resources.sh'
   $pacemaker_resources_interval = '60'
+
+  $wait_for_rabbitmq = '/usr/local/bin/wait_for_rabbitmq'
+  $wait_delay        = '30'
 }
