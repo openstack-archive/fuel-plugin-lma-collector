@@ -1,56 +1,75 @@
-===========================================
-Welcome to the LMA Collector Documentation!
-===========================================
+===============================================================
+Welcome to the Mirantis OpenStack LMA Toolchain Documentation !
+===============================================================
 
-The Logging, Monitoring and Alerting (LMA) Collector, that we will refer hereafter as the LMA Collector or just the Collector,
-is a **Fuel plugin** which gathers raw operational data from a variety of sources including log messages,
-`collectd <https://collectd.org/>`_, and the `OpenStack notifications <https://wiki.openstack.org/wiki/SystemUsageData>`_
-to be sent to external systems that will take action on them.
+Introduction
+============
 
-Overview
-=========
+The Mirantis OpenStack LMA (Logging, Monitoring and Alerting) Toolchain is comprised
+of a collection of open-source tools to help you monitor and diagnose problems in your
+OpenStack cloud. These tools are packaged and delivered as `Fuel plugins
+<https://wiki.openstack.org/wiki/Fuel/Plugins>`_ you can install from the graphic user
+interface starting with Mirantis OpenStack version 6.1.
 
-The goal of the LMA Collector is to capture all **raw operational data** that we think are relevant to **increase the operational visibility**
-of your OpenStack cloud.
+From a high level view, the LMA Toolchain includes:
 
-To achieve that goal, the raw operational data are parsed and sanitised to be turned into an internal
-`Heka <https://github.com/mozilla-services/heka>`_ message representation that can
-be further processed and routed to external systems that will take action on them.
-Examples of external systems handled by the LMA Collector out-of-the-box include:
+* The LMA Collector (or just the Collector) which gathers all operational data that we
+  think are relevant to increase the **operational visibility** of your OpenStack
+  infrastructure. Those data are collected from a variety of sources including the log messages,
+  `collectd <https://collectd.org/>`_, and the `OpenStack notifications bus <https://wiki.openstack.org/wiki/SystemUsageData>`_
+* Pluggable external systems we call **satellite clusters** which can take action on the
+  received data from the Collector.
 
-* `ElasticSearch <http://www.elasticsearch.org/>`_, a powerful open source search server based on Lucene and analytics
-  engine that makes data like log messages and notifications easy to explore and correlate.
-* `InfluxDB <http://influxdb.com/>`_, an open-source and distributed time-series database to store system metrics.
+The Collector is best described as a **pluggable message processing and routing pipeline**.
+Its core components are :
 
-By combining the Collector with ElasticSearch and `Kibana <http://www.elasticsearch.org/overview/kibana/>`_,
-the LMA Toolchain provides an end-to-end solution that delivers real-time insights about all events in your OpenStack cloud.
-This can very useful to detect errors and search for their root cause.
+* Collectd that is bundled with a collection of monitoring plugins. Many of them are purpose-built
+  for OpenStack.
+* `Heka <https://github.com/mozilla-services/heka>`_ which is the cornerstone component
+  of the Collector.
+* A collection of Heka plugins written in Lua to decode, process and encode the data to be sent
+  to external systems.
 
-Likewise, combining the Collector with InfluxDB and its `Grafana’s <http://grafana.org/>`_ metrics analytics front-end,
-allows you to identify service failures, troubleshoot performance bottlenecks and plan the capacity needed to meet changing demands
-for your OpenStack cloud.
+The primary function of the Collector is to transform the acquired raw
+operational data into an internal message representation that is based on the
+`Heka message structure <http://hekad.readthedocs.org/en/v0.9.1/message/index.html>`_.
+that can be further exploited to, for example, detect anomalies or create
+new metric messages.
 
-The LMA Collector can be viewed as a **pluggable processing and routing pipeline** for operational data.
-Its core constituants are :
+The satellite clusters delivered as part of the LMA Toolchain starting with Mirantis OpenStack 6.1 include:
 
-* Collectd that is provided with a large collection of service checks and system stats plugins
-* Heka is an open-source stream processing software written in Go developed by Mozilla.
-  Heka is the cornerstone component of the LMA Collector. 
-* A collection of Heka plugins written in Lua to turn the raw operational data into structured
-  messages that can be further analyzed and routed by other Heka plugins. 
+* `ElasticSearch <http://www.elasticsearch.org/>`_, a powerful open source search server based
+  on Lucene and analytics engine that makes data like log messages and notifications easy to explore and analyse.
+* `InfluxDB <http://influxdb.com/>`_, an open-source and distributed time-series database to store and search metrics.
 
-Lastly, the LMA Collector is designed to be both insightful and adaptable to your own specific environment.
+By combining ElasticSearch with `Kibana <http://www.elasticsearch.org/overview/kibana/>`_,
+the LMA Toolchain provides an effective way to search and correlate all service-affecting events
+that occurred in the system for root cause analysis.
 
-For example, thanks to Heka's extensibility, it is quite easy to plug an external monitoring system like Nagios into the LMA Collector.
-This is simply done through enabling the Nagios output plugin and define the appropriate
-`message matcher <https://hekad.readthedocs.org/en/v0.9.0/message_matcher.html#message-matcher>`_ criteria
-for the category of messages you want to send out to Nagios. You should obviously not do that through hacking the
-configuration of the nodes running production but through modifying and reapplying the Puppet manifests that shipped with the Fuel plugin. 
-We also encourage you to read the Heka `documentation <https://hekad.readthedocs.org/en/v0.9.0/index.html>`_ to get familiar with the technology.
+Likewise, by combining InfluxDB with `Grafana <http://grafana.org/>`_, the LMA Toolchain
+brings you insightful metrics analytics to visualise how OpenStack behaves over time.
+This includes metrics for the OpenStack services status and a variety of resource usage
+and performance indicators. The ability to visualise time-series over a period of time that
+can vary from 5 minutes to the last 30 days helps anticipating failure conditions and plan
+capacity ahead of time to cope with a changing demand.
 
-The rest of this documents is organised in several chapters that will take you through a description of the internal message
-format used for each category of operational data that are handled by the Collector.
+Furthermore, the LMA Toolchain has been designed with the dual objective to be both insightful and adaptive.
 
+It is, for example, quite possible (without any code change) to integrate the Collector
+with an external monitoring application like Nagios. This could simply be done through enabling
+the Nagios output plugin of Heka for a subset of messages matching the
+`message matcher <https://hekad.readthedocs.org/en/v0.9.0/message_matcher.html#message-matcher>`_
+syntax of the output plugin. You should probably not modify the configuration of the LMA
+Collector manually but apply any configuration change to the Puppet manifests that are shipped
+with the LMA Collector plugin for Fuel. Many other integration combinations are possible thanks
+to the extreme flexibility of Heka.  
+
+We recommend you to read the Heka `documentation <https://hekad.readthedocs.org/en/v0.9.0/index.html>`_
+to become more familiar with that technology.
+
+The rest of this documents is organised in several chapters that will take you through a
+description of the internal message structure for the categories of operational data
+that are handled by the LMA Toolchain.
 
 Table of Contents
 =================

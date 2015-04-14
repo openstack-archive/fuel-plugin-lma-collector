@@ -67,7 +67,7 @@ attributes:
 # Change action from "hide" to "none" to change this
     restrictions: &hide_control
         - condition: true
-          action: "hide"
+          action: "none"
 
   influxdb_node_name:
     value: 'influxdb'
