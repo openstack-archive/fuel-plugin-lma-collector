@@ -47,6 +47,8 @@ metric_type = {
     DERIVE = "derive",
 }
 
+local default_severity = 7
+
 -- Parse a Syslog-based payload and update the Heka message
 -- Return true if successful, false otherwise
 function parse_syslog_message(grammar, payload, msg)
@@ -76,6 +78,7 @@ function parse_syslog_message(grammar, payload, msg)
     else
         msg.Severity = fields.syslogseverity or fields["syslogseverity-text"]
             or fields.syslogpriority or fields["syslogpriority-text"]
+            or default_severity
         fields.syslogseverity = nil
         fields["syslogseverity-text"] = nil
         fields.syslogpriority = nil

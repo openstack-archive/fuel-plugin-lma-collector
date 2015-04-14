@@ -27,13 +27,21 @@ local msg = {
 }
 
 local syslog_pattern = read_config("syslog_pattern") or error("syslog_pattern configuration must be specified")
-
 local syslog_grammar = syslog.build_rsyslog_grammar(syslog_pattern)
+
+-- This grammar is intended for log messages that are generated before RSYSLOG
+-- is fully configured
+local fallback_syslog_pattern = read_config("fallback_syslog_pattern")
+local fallback_syslog_grammar
+if fallback_syslog_pattern then
+    fallback_syslog_grammar = syslog.build_rsyslog_grammar(fallback_syslog_pattern)
+end
 
 function process_message ()
     local log = read_message("Payload")
 
-    if utils.parse_syslog_message(syslog_grammar, log, msg) then
+    if utils.parse_syslog_message(syslog_grammar, log, msg) or
+       (fallback_syslog_grammar and utils.parse_syslog_message(fallback_syslog_grammar, log, msg)) then
         msg.Logger = string.gsub(read_message('Logger'), '%.log$', '')
         inject_message(msg)
         return 0
