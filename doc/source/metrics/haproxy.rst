@@ -56,6 +56,8 @@ Metrics per backends:
 * ``haproxy.backend.<backend>.response_5xx``, number of HTTP responses with 5xx code.
 * ``haproxy.backend.<backend>.response_other``, number of HTTP responses with other code.
 * ``haproxy.backend.<backend>.retries``, number of times a connection to a server was retried.
+* ``haproxy.backend.<backend>.servers.down``, number of servers which are down.
+* ``haproxy.backend.<backend>.servers.up``, number of servers which are up.
 * ``haproxy.backend.<backend>.session_current``, number of current sessions.
 * ``haproxy.backend.<backend>.session_total``, cumulative number of sessions.
 * ``haproxy.backend.bytes_in``, total number of bytes received by all backends.
