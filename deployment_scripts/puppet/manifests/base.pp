@@ -25,9 +25,30 @@ if hiera('deployment_mode') =~ /^ha_/ and hiera('role') =~ /controller/{
   $additional_groups = []
 }
 
+if hiera('role') =~ /controller/ {
+  $pre_script        = '/usr/local/bin/wait_for_rabbitmq'
+  # Params used by the script.
+  $rabbit            = hiera('rabbit')
+  $rabbitmq_user     = 'nova'
+  $rabbitmq_password = $rabbit['password']
+  $wait_delay        = 30
+
+  file { $pre_script:
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    content => template('lma_collector/wait_for_rabbitmq.erb'),
+    before  => Class['lma_collector']
+  }
+} else {
+  $pre_script = undef
+}
+
 class { 'lma_collector':
-  tags   => merge($tags, $additional_tags),
-  groups => $additional_groups,
+  tags       => merge($tags, $additional_tags),
+  groups     => $additional_groups,
+  pre_script => $pre_script,
 }
 
 class { 'lma_collector::logs::system':

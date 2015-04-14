@@ -18,6 +18,7 @@
 class lma_collector (
   $tags = $lma_collector::params::tags,
   $groups = [],
+  $pre_script = undef,
 ) inherits lma_collector::params {
   include heka::params
   include lma_collector::service
@@ -35,6 +36,7 @@ class lma_collector (
     run_as_root       => $lma_collector::params::run_as_root,
     additional_groups => union($lma_collector::params::groups, $groups),
     hostname          => $::hostname,
+    pre_script        => $pre_script,
   }
 
   file { "${lua_modules_dir}/lma_utils.lua":

@@ -14,6 +14,8 @@ class heka::params {
   $share_dir = '/usr/share/heka'
   $lua_modules_dir = '/usr/share/heka/lua_modules'
 
+  $wrapper = '/usr/local/bin/hekad_wrapper'
+
   # required to read the log files
   case $::osfamily {
     'Debian': {
