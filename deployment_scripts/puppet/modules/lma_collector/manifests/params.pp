@@ -41,9 +41,11 @@ class lma_collector::params {
   case $::osfamily {
     'Debian': {
       $python_module_path = '/usr/lib/collectd'
+      $collectd_dbi_package = 'libdbd-mysql'
     }
     'RedHat': {
       $python_module_path = '/usr/lib64/collectd'
+      $collectd_dbi_package = 'libdbi-dbd-mysql'
     }
     default: {
       fail("${::osfamily} not supported")
@@ -61,6 +63,8 @@ class lma_collector::params {
   $nova_cpu_allocation_ratio = 8.0
 
   $heartbeat_timeout = 30
+  $worker_report_interval = 60
+  $worker_downtime_factor = 2
 
   $elasticsearch_server = false
   $elasticsearch_port = '9200'
