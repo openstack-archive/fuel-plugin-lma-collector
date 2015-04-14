@@ -66,7 +66,7 @@ Metrics per backends:
 * ``haproxy.backend.session_current``, total number of current sessions for all backends.
 * ``haproxy.backend.error_responses``, total number of error responses for all backends.
 
-where frontend and backend are one of:
+Where frontend and backend are one of:
 
 * cinder-api
 * glance-api
@@ -75,12 +75,12 @@ where frontend and backend are one of:
 * heat-api-cfn
 * heat-api-cloudwatch
 * horizon
-* keystone-1
-* keystone-2
+* keystone-1 (Keystone public API)
+* keystone-2 (Keystone admin API)
 * mysqld
 * neutron
-* nova-api-1
-* nova-api-2
+* nova-api-1 (Nova EC2 API)
+* nova-api-2 (Nova OpenStack API)
 * nova-metadata-api
 * nova-novncproxy
 * sahara
