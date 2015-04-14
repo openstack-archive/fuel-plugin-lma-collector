@@ -68,11 +68,13 @@ class heka (
   $maxprocs = $heka::params::maxprocs,
   $dashboard_address = $heka::params::dashboard_address,
   $dashboard_port = $heka::params::dashboard_port,
+  $pre_script = undef,
 ) inherits heka::params {
 
-  $heka_user = $heka::params::user
-  $base_dir = "/var/cache/${service_name}"
-  $log_file = "/var/log/${service_name}.log"
+  $heka_user     = $heka::params::user
+  $hekad_wrapper = "/usr/local/bin/${service_name}_wrapper"
+  $base_dir      = "/var/cache/${service_name}"
+  $log_file      = "/var/log/${service_name}.log"
 
   package { $heka::params::package_name:
     ensure => present,
@@ -121,6 +123,14 @@ class heka (
     content => template('heka/logrotate.conf.erb'),
   }
 
+  file { $hekad_wrapper:
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    content => template('heka/hekad_wrapper.erb'),
+  }
+
   case $::osfamily {
     'Debian': {
       file {"/etc/init/${service_name}.conf":
@@ -128,6 +138,7 @@ class heka (
         content => template('heka/hekad.upstart.conf.erb'),
         notify  => Service[$service_name],
         alias   => 'heka_init_script',
+        require => File[$hekad_wrapper],
       }
     }
 
@@ -138,6 +149,7 @@ class heka (
         mode    => '0755',
         notify  => Service[$service_name],
         alias   => 'heka_init_script',
+        require => File[$hekad_wrapper],
       }
     }
     default: {
