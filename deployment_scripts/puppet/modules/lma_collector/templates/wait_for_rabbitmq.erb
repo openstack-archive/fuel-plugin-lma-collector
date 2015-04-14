@@ -1,0 +1,17 @@
+#!/bin/sh
+
+RABBITMQCTL=$(which rabbitmqctl 2>/dev/null)
+
+# We must wait that rabbitmq is started before running.
+# We can not rely on /var/run/rabbitmq/p_pid because it only means that
+# beam is running.
+# In practice rabbitmqctl is only present on controller nodes so just skip
+# the waiting loop if we don't find it.
+
+if [ ! -z $RABBITMQCTL ]; then
+    while ! $RABBITMQCTL cluster_status >/dev/null 2>&1
+    do
+        echo "$(date +"%Y/%m/%d %H:%M:%S") Waiting for RabbitMQ availability..."
+        sleep <%= @wait_delay %>
+    done
+fi
