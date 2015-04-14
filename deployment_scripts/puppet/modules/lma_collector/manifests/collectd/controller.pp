@@ -91,7 +91,7 @@ class lma_collector::collectd::controller (
   file {"${collectd::params::plugin_conf_dir}/openstack.conf":
     owner   => 'root',
     group   => $collectd::params::root_group,
-    mode    => '0644',
+    mode    => '0640',
     content => template('lma_collector/collectd_python.conf.erb'),
     notify  => Class['lma_collector::collectd::service'],
   }
