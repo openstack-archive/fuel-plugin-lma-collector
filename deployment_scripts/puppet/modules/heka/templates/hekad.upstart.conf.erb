@@ -9,6 +9,26 @@ respawn
 
 <% unless @run_as_root -%>
 pre-start script
+    # We must wait that rabbitmq is started before running.
+    # We can not rely on /var/run/rabbitmq/p_pid because it only means that
+    # beam is running.
+
+    # Don't exit if command failed. Instead catch it and log the error.
+    set +e
+    RABBITMQCTL=$(which rabbitmqctl 2>/dev/null)
+    set -e
+
+    if [ -z $RABBITMQCTL ]; then
+        echo "$(date +"%Y/%m/%d %H:%M:%S") ERROR: rabbitmqctl not found"
+        exit 1
+    fi
+
+    while ! $RABBITMQCTL cluster_status >/dev/null 2>&1
+    do
+        echo "$(date +"%Y/%m/%d %H:%M:%S") Waiting for RabbitMQ availability..."
+        sleep 60
+    done
+
     touch <%= @log_file %>
     chown <%= @heka_user %>:<%= @heka_user %> <%= @log_file %>
 end script
