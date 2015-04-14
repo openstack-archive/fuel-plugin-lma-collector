@@ -54,6 +54,7 @@ class heka (
   $maxprocs = $heka::params::maxprocs,
   $dashboard_address = $heka::params::dashboard_address,
   $dashboard_port = $heka::params::dashboard_port,
+  $wait_for_rabbitmq = $heka::params::wait_for_rabbitmq,
 ) inherits heka::params {
 
   $heka_user = $heka::params::user

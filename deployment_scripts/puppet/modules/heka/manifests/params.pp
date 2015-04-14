@@ -14,6 +14,8 @@ class heka::params {
   $share_dir = '/usr/share/heka'
   $lua_modules_dir = '/usr/share/heka/lua_modules'
 
+  $wait_for_rabbitmq = '30'
+
   # required to read the log files
   case $::osfamily {
     'Debian': {
