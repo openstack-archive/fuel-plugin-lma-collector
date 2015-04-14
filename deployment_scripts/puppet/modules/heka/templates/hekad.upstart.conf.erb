@@ -9,6 +9,15 @@ respawn
 
 <% unless @run_as_root -%>
 pre-start script
+    # We must wait that rabbitmq is started before running.
+    # We can not rely on /var/run/rabbitmq/p_pid because it only means that
+    # beam is running.
+    while ! /usr/sbin/rabbitmqctl cluster_status >/dev/null 2>&1
+    do
+        echo "rabbitmq cluster is not available... wait 60 seconds"
+        sleep 60
+    done
+
     touch <%= @log_file %>
     chown <%= @heka_user %>:<%= @heka_user %> <%= @log_file %>
 end script
