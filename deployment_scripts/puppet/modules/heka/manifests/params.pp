@@ -13,6 +13,9 @@ class heka::params {
   $config_dir = "/etc/${service_name}"
   $share_dir = '/usr/share/heka'
   $lua_modules_dir = '/usr/share/heka/lua_modules'
+  $wrapper = '/usr/local/bin/hekad_wrapper'
+
+  $wait_for_rabbitmq = '30'
 
   # required to read the log files
   case $::osfamily {

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+HEKAD="/usr/bin/hekad"
+
+<% if @pre_script -%>
+<%= @pre_script %>
+<% end -%>
+<%= @run_as_root ? "" : "sudo -u #{ @heka_user }" %> $HEKAD -config=<%= @config_dir %> 2>><%= @log_file %>
