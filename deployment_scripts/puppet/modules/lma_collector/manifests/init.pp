@@ -28,6 +28,10 @@ class lma_collector (
   $config_dir = $lma_collector::params::config_dir
   $plugins_dir = $lma_collector::params::plugins_dir
   $lua_modules_dir = $heka::params::lua_modules_dir
+  $wait_for_rabbitmq = $lma_collector::params::wait_for_rabbitmq
+  $wait_delay = $lma_collector::params::wait_delay
+  $rabbitmq_user = $lma_collector::params::rabbitmq_user
+  $rabbitmq_password = $lma_collector::params::rabbitmq_password
 
   class { 'heka':
     service_name      => $service_name,
@@ -35,6 +39,16 @@ class lma_collector (
     run_as_root       => $lma_collector::params::run_as_root,
     additional_groups => union($lma_collector::params::groups, $groups),
     hostname          => $::hostname,
+    pre_script        => $wait_for_rabbitmq,
+    require           => File[$wait_for_rabbitmq],
+  }
+
+  file { $wait_for_rabbitmq:
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    content => template('lma_collector/wait_for_rabbitmq.erb'),
   }
 
   file { "${lua_modules_dir}/lma_utils.lua":

@@ -13,7 +13,7 @@ if [ -f /etc/rc.d/init.d/functions ]; then
     . /etc/rc.d/init.d/functions
 fi
 
-exec="/usr/bin/hekad"
+exec="<%= @hekad_wrapper %>"
 prog="<%= @service_name %>"
 pidfile=/var/run/${prog}.pid
 
@@ -31,7 +31,7 @@ start() {
     chown <%= @heka_user %>:<%= @heka_user %> <%= @log_file %>
 <% end -%>
     echo -n $"Starting $prog: "
-    daemonize -p $pidfile -e <%= @log_file %> <%= @run_as_root ? "" : "-u #{ @heka_user }" %> -l $lockfile $exec -config=<%= @config_dir %>
+    daemonize -p $pidfile -e <%= @log_file %> <%= @run_as_root ? "" : "-u #{ @heka_user }" %> -l $lockfile $exec
     retval=$?
     [ $retval -eq 0 ] && success || failure
     echo
@@ -41,8 +41,9 @@ start() {
 
 stop() {
     echo -n $"Stopping $prog: "
-    killproc -p $pidfile $prog
+    pkill -P $(cat $pidfile)
     retval=$?
+    rm -f $pidfile
     echo
     [ $retval -eq 0 ] && rm -f $lockfile
     return $retval
