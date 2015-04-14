@@ -61,13 +61,19 @@ METRIC_TYPES = {
   'wredis': ('redistributed', 'gauge'),
   'wretr': ('retries', 'gauge'),
   'status': ('status', 'gauge'),
-  'Uptime_sec': ('uptime', 'gauge')
+  'Uptime_sec': ('uptime', 'gauge'),
+  'up': ('up', 'gauge'),
+  'down': ('down', 'gauge'),
 }
 
-BACKEND_STATUS_MAP = {
+STATUS_MAP = {
     'DOWN': 0,
     'UP': 1,
 }
+
+FRONTEND_TYPE = 0
+BACKEND_TYPE = 1
+BACKEND_SERVER_TYPE = 2
 
 METRIC_AGGREGATED = ['bin', 'bout', 'qcur','scur','eresp',
                      'hrsp_1xx','hrsp_2xx', 'hrsp_3xx', 'hrsp_4xx', 'hrsp_5xx',
@@ -77,7 +83,7 @@ METRIC_AGGREGATED = ['bin', 'bout', 'qcur','scur','eresp',
 METRIC_DELIM = '.' # for the frontend/backend stats
 
 DEFAULT_SOCKET = '/var/lib/haproxy/stats'
-DEFAULT_PROXY_MONITORS = [ 'server', 'frontend', 'backend' ]
+DEFAULT_PROXY_MONITORS = [ 'server', 'frontend', 'backend', 'backend_server' ]
 VERBOSE_LOGGING = False
 PROXY_MONITORS = []
 
@@ -143,16 +149,33 @@ def get_stats():
         pass
 
   for statdict in server_stats:
-    if not (statdict['svname'].lower() in PROXY_MONITORS or statdict['pxname'].lower() in PROXY_MONITORS):
+    if not (statdict['svname'].lower() in PROXY_MONITORS or
+            statdict['pxname'].lower() in PROXY_MONITORS or
+            ('backend_server' in PROXY_MONITORS and
+             statdict['type'] == BACKEND_SERVER_TYPE)):
       continue
+
     if statdict['pxname'] in PROXY_IGNORE:
       continue
-    for key,val in statdict.items():
-      metricname = METRIC_DELIM.join([ statdict['svname'].lower(), statdict['pxname'].lower(), key ])
+
+    for key, val in statdict.items():
+      if statdict['type'] == BACKEND_SERVER_TYPE:
+        # Count the number of servers per backend and per status
+        if key == 'status':
+          for status_val in STATUS_MAP.keys():
+            # Initialize all possible metric keys to zero
+            metricname = METRIC_DELIM.join(['backend', statdict['pxname'].lower(), 'servers', status_val])
+            if metricname not in stats:
+              stats[metricname] = 0
+            if val == status_val:
+              stats[metricname] += 1
+        continue
+
+      metricname = METRIC_DELIM.join([statdict['svname'].lower(), statdict['pxname'].lower(), key])
       try:
-        if key == 'status' and statdict['svname'].lower() == 'backend':
-          if val in BACKEND_STATUS_MAP:
-            val = BACKEND_STATUS_MAP[val]
+        if key == 'status' and statdict['type'] == BACKEND_TYPE:
+          if val in STATUS_MAP:
+            val = STATUS_MAP[val]
           else:
             continue
         stats[metricname] = int(val)
