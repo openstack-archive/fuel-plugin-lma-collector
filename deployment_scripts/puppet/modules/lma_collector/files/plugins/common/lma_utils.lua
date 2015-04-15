@@ -47,6 +47,20 @@ metric_type = {
     DERIVE = "derive",
 }
 
+service_status_map = {
+    OK = 0,
+    DEGRADED = 1,
+    DOWN = 2,
+    UNKNOWN = 3,
+}
+
+service_status_to_label_map = {
+    [0] = 'OK',
+    [1] = 'DEGRADED',
+    [2] = 'DOWN',
+    [4] = 'UNKNOWN',
+}
+
 -- Parse a Syslog-based payload and update the Heka message
 -- Return true if successful, false otherwise
 function parse_syslog_message(grammar, payload, msg)
