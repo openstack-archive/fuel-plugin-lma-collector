@@ -49,6 +49,49 @@ metric_type = {
 
 local default_severity = 7
 
+service_status_map = {
+    OK = 0,
+    DEGRADED = 1,
+    DOWN = 2,
+    UNKNOWN = 3,
+}
+
+service_status_to_label_map = {
+    [0] = 'OK',
+    [1] = 'DEGRADED',
+    [2] = 'DOWN',
+    [3] = 'UNKNOWN',
+}
+
+check_api_to_status_map = {
+    [0] = 2, -- DOWN
+    [1] = 0, -- UP
+    [2] = 3, -- UNKNOWN
+}
+
+state_map = {
+    UP = 'up',
+    DOWN = 'down',
+    DISABLED = 'disabled',
+}
+
+function add_metric(datapoints, name, points)
+    datapoints[#datapoints+1] = {
+        name = name,
+        columns = {"time", "value" },
+        points = {points}
+    }
+end
+
+function add_event(all_events, time, name, title, events)
+    all_events[#all_events+1] = {
+        time=time,
+        name=name,
+        title=title,
+        events=events,
+    }
+end
+
 -- Parse a Syslog-based payload and update the Heka message
 -- Return true if successful, false otherwise
 function parse_syslog_message(grammar, payload, msg)
