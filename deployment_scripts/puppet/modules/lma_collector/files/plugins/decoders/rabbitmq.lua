@@ -34,7 +34,9 @@ local msg = {
 --   Blabla
 --
 local message   = l.Cg(patt.Message / utils.chomp, "Message")
-local severity  = l.Cg(patt.SeverityLabel, "SeverityLabel")
+-- The token before 'REPORT' isn't standardized so it can be a valid severity
+-- level as 'INFO' or 'ERROR' but also 'CRASH' or 'SUPERVISOR'.
+local severity  = l.Cg(l.R"AZ"^1, "SeverityLabel")
 local day = l.R"13" * l.R"09" + l.R"19"
 local datetime = l.Cg(day, "day") * patt.dash * dt.date_mabbr * patt.dash * dt.date_fullyear *
                  "::" * dt.rfc3339_partial_time
@@ -52,10 +54,16 @@ function process_message ()
 
     msg.Timestamp = m.Timestamp
     msg.Payload = m.Message
-    msg.Severity = utils.label_to_severity_map[m.SeverityLabel] or 5
+    if utils.label_to_severity_map[m.SeverityLabel] then
+        msg.Severity = utils.label_to_severity_map[m.SeverityLabel]
+    elseif m.SeverityLabel == 'CRASH' then
+        msg.Severity = 2 -- CRITICAL
+    else
+        msg.Severity = 5 -- NOTICE
+    end
 
     msg.Fields = {}
-    msg.Fields.severity_label = m.SeverityLabel
+    msg.Fields.severity_label = utils.severity_to_label_map[msg.Severity]
     msg.Fields.programname = 'rabbitmq'
     utils.inject_tags(msg)
 
