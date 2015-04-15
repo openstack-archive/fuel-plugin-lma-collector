@@ -2,6 +2,7 @@
 
 Service checks
 ^^^^^^^^^^^^^^
+.. _service_checks:
 
 * ``openstack.<service>.check_api``, the service's API status, 1 if it is responsive, 0 otherwise.
 
@@ -31,6 +32,8 @@ These metrics are retrieved from the Nova API.
 
 These metrics are retrieved from the Nova database.
 
+.. _compute-service-state-metrics:
+
 * ``openstack.nova.services.<service>.<service_state>``, the total number of Nova
   services by state.
 
@@ -38,6 +41,15 @@ These metrics are retrieved from the Nova database.
 
 ``<service_state>`` is one of 'up', 'down' or 'disabled'.
 
+The following status metrics are computed from other metrics including: :ref:`service checks <service_checks>`,
+:ref:`HAproxy servers <haproxy_backend_metric>` and :ref:`service states <compute-service-state-metrics>`.
+
+Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
+
+* ``openstack.nova.services.<service>.status``, status of Nova services computed from ``openstack.nova.services.<service>.<service_state>``.
+* ``openstack.nova.api.<backend>.status``, status of the API services located behind the HAProxy load-balancer,
+  computed from ``haproxy.backend.nova-*.servers.(up|down)``.
+* ``openstack.nova.status``, the general status of the Nova service which is computed using the previous metrics and the ``openstack.nova.check_api`` metric.
 
 Identity
 ^^^^^^^^
@@ -49,6 +61,14 @@ These metrics are retrieved from the Keystone API.
 * ``openstack.keystone.users.<state>``, the number of users by state.
 
 ``<state>`` is one of 'disabled' or 'enabled'.
+
+The following status metrics are computed from other metrics: :ref:`service checks <service_checks>` and
+:ref:`HAproxy servers <haproxy_backend_metric>`.
+
+Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
+
+* ``openstack.keystone.api.<backend>.status``, status of the API services located behind the HAProxy load-balancer, computed from ``haproxy.backend.keystone-*.servers.(up|down)``.
+* ``openstack.keystone.status``, the general status of the Keystone service which is computed using the previous metric and the ``openstack.keystone.check_api`` metric.
 
 Volume
 ^^^^^^
@@ -70,6 +90,8 @@ These metrics are retrieved from the Cinder API.
 
 These metrics are retrieved from the Cinder database.
 
+.. _volume-service-state-metrics:
+
 * ``openstack.cinder.services.<service>.<service_state>``, the total number of Cinder
   services by state.
 
@@ -77,6 +99,15 @@ These metrics are retrieved from the Cinder database.
 
 ``<service_state>`` is one of 'up', 'down' or 'disabled'.
 
+The following status metrics are computed from other metrics including: :ref:`service checks <service_checks>`,
+:ref:`HAproxy servers <haproxy_backend_metric>` and :ref:`service states <volume-service-state-metrics>`.
+
+Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
+
+* ``openstack.cinder.services.<service>.status``, status of Cinder services computed from ``openstack.cinder.services.<service>.<service_state>``.
+* ``openstack.cinder.api.<backend>.status``, status of the API services located behind the HAProxy load-balancer,
+  computed from ``haproxy.backend.cinder-api.servers.(up|down)``.
+* ``openstack.cinder.status``, the general status of the Cinder service which is computed using the previous metrics and the ``openstack.cinder.check_api`` metric.
 
 Image
 ^^^^^
@@ -93,6 +124,15 @@ These metrics are retrieved from the Glance API.
 * ``openstack.glance.snapshots_size.private.<state>``, the total size (in bytes) of private snapshots by state.
 
 ``<state>`` is one of 'queued', 'saving', 'active', 'killed', 'deleted', 'pending_delete'.
+
+The following status metrics are computed from other metrics including: :ref:`service checks <service_checks>` and
+:ref:`HAproxy servers <haproxy_backend_metric>`.
+
+Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
+
+* ``openstack.glance.api.<backend>.status``, status of the API services located behind the HAProxy load-balancer,
+  computed from ``haproxy.backend.glance-*.servers.(up|down)``.
+* ``openstack.glance.status``, the general status of the Glance service which is computed using the previous metric and the ``openstack.glance.check_api`` metric.
 
 Network
 ^^^^^^^
@@ -117,12 +157,23 @@ These metrics are retrieved from the Neutron API.
 
 These metrics are retrieved from the Neutron database.
 
+.. _network-agent-state-metrics:
+
 * ``openstack.neutron.agents.<agent_type>.<agent_state>``, the total number of Neutron agents by agent type and state.
 
 ``<agent_type>`` is one of 'dhcp', 'l3', 'metadata' or 'openvswitch'.
 
 ``<agent_state>`` is one of 'up', 'down' or 'disabled'.
 
+The following status metrics are computed from other metrics including: :ref:`service checks <service_checks>`,
+:ref:`HAproxy servers <haproxy_backend_metric>` and :ref:`agent states <network-agent-state-metrics>`.
+
+Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
+
+* ``openstack.neutron.agents.<agent_type>.status``, status of Neutron services computed from metric ``openstack.neutron.agents.<agent_type>.<agent_state>``.
+* ``openstack.neutron.api.neutron.status``, status f the API services located behind the HAProxy load-balancer,
+  computed from ``haproxy.backend.neutron.servers.(up|down)``.
+* ``openstack.neutron.status``, the general status of the Neutron service which is computed using the previous metrics and the ``openstack.neutron.check_api`` metric.
 
 API response times
 ^^^^^^^^^^^^^^^^^^
