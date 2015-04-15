@@ -63,6 +63,7 @@ class lma_collector::params {
   $nova_cpu_allocation_ratio = 8.0
 
   $heartbeat_timeout = 30
+  $service_status_timeout = 60
   $worker_report_interval = 60
   $worker_downtime_factor = 2
 
