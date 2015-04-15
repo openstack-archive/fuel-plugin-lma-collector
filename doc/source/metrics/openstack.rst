@@ -38,6 +38,12 @@ These metrics are retrieved from the Nova database.
 
 ``<service_state>`` is one of 'up', 'down' or 'disabled'.
 
+The following status metrics are computed from other metrics: 'service checks', 'haproxy servers' and 'service state'.
+Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
+
+* ``openstack.nova.services.<service>.status``, status of Nova services derivated from metric ``openstack.nova.services.<service>.<service_state>``.
+* ``openstack.nova.api.<backend>.status``, status of haproxy loadbalancer in front of API, derivated from metric ``haproxy.backend.<backend>.servers.*``.
+* ``openstack.nova.status``, global status of the Nova service depending on previous metrics and metric ``openstack.nova.check_api``
 
 Identity
 ^^^^^^^^
@@ -49,6 +55,12 @@ These metrics are retrieved from the Keystone API.
 * ``openstack.keystone.users.<state>``, the number of users by state.
 
 ``<state>`` is one of 'disabled' or 'enabled'.
+
+The following status metrics are computed from other metrics: 'service checks', 'haproxy servers'
+Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
+
+* ``openstack.nova.api.<backend>.status``, status of haproxy loadbalancer in front of API, derivated from metric ``haproxy.backend.keystone(1|2).servers.*``.
+* ``openstack.keystone.status``, global status of the Keystone service depending on previous metrics and metric ``openstack.keystone.check_api``
 
 Volume
 ^^^^^^
@@ -77,6 +89,12 @@ These metrics are retrieved from the Cinder database.
 
 ``<service_state>`` is one of 'up', 'down' or 'disabled'.
 
+The following status metrics are computed from other metrics: 'service checks', 'haproxy servers' and 'service state'.
+Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
+
+* ``openstack.cinder.services.<service>.status``, status of Nova services derivated from metric ``openstack.cinder.services.<service>.<service_state>``.
+* ``openstack.cinder.api.<backend>.status``, status of haproxy loadbalancer in front of API, derivated from metric ``haproxy.backend.cinder-api.servers.*``.
+* ``openstack.cinder.status``, global status of the Cinder service depending on previous metrics and metric ``openstack.cinder.check_api``
 
 Image
 ^^^^^
@@ -93,6 +111,12 @@ These metrics are retrieved from the Glance API.
 * ``openstack.glance.snapshots_size.private.<state>``, the total size (in bytes) of private snapshots by state.
 
 ``<state>`` is one of 'queued', 'saving', 'active', 'killed', 'deleted', 'pending_delete'.
+
+The following status metrics are computed from other metrics: 'service checks' and 'haproxy servers'.
+Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
+
+* ``openstack.glance.api.<backend>.status``, status of haproxy loadbalancer in front of API, derivated from metric ``haproxy.backend.glance-(api|registry).servers.*``.
+* ``openstack.glance.status``, global status of the Cinder service depending on previous metrics and metric ``openstack.glance.check_api``
 
 Network
 ^^^^^^^
@@ -123,6 +147,12 @@ These metrics are retrieved from the Neutron database.
 
 ``<agent_state>`` is one of 'up', 'down' or 'disabled'.
 
+The following status metrics are computed from other metrics: 'service checks', 'haproxy servers' and 'agent states'.
+Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
+
+* ``openstack.neutron.agents.<agent_type>.status``, status of Nova services derivated from metric ``openstack.neutron.agents.<agent_type>.<agent_state>``.
+* ``openstack.neutron.api.neutron.status``, status of haproxy loadbalancer in front of API, derivated from metric ``haproxy.backend.neutron.servers.*``.
+* ``openstack.neutron.status``, global status of the Neutron service depending on previous metrics and metric ``openstack.neutron.check_api``.
 
 API response times
 ^^^^^^^^^^^^^^^^^^
