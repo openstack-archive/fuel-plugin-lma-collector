@@ -33,5 +33,7 @@ class lma_collector::notifications::cinder (
   }
 
   service { $::cinder::params::volume_service:
+    hasstatus  => true,
+    hasrestart => true,
   }
 }

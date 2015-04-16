@@ -30,12 +30,24 @@ class lma_collector::collectd::base {
     log_file  => $lma_collector::params::collectd_logfile,
   }
 
-  class { 'collectd::plugin::write_http':
-    urls => {
-      "http://127.0.0.1:${port}" => {
-        'format'   => 'JSON',
-        storerates => true
-      }
+  $urls = {
+    "http://127.0.0.1:${port}" => {
+      'format'   => 'JSON',
+      storerates => true
+    }
+  }
+  if $::osfamily == 'RedHat' {
+    # collectd Puppet manifest is broken for RedHat derivatives as it tries to
+    # install the collectd-write_http package which doesn't exist (for CentOS
+    # at least)
+    collectd::plugin {'write_http':
+      ensure  => present,
+      content => template('collectd/plugin/write_http.conf.erb'),
+    }
+  }
+  else {
+    class { 'collectd::plugin::write_http':
+      urls => $urls,
     }
   }
 
