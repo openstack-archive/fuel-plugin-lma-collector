@@ -52,6 +52,7 @@ class lma_collector::params {
     }
   }
   $additional_packages = [ 'python-dateutil' ]
+  $mysql_database = ''
   $mysql_username = ''
   $mysql_password = ''
   $rabbitmq_pid_file = '/var/run/rabbitmq/pid'
