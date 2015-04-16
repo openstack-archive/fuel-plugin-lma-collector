@@ -63,11 +63,6 @@ attributes:
         label: "Local node"
       - data: "remote"
         label: "Remote server"
-# Hide all InfluxDB parameters for now
-# Change action from "hide" to "none" to change this
-    restrictions: &hide_control
-        - condition: true
-          action: "hide"
 
   influxdb_node_name:
     value: 'influxdb'
@@ -75,7 +70,9 @@ attributes:
     description: 'Label of the node running the InfluxDB/Grafana plugin that is deployed in the environment.'
     weight: 65
     type: "text"
-    restrictions: *hide_control
+    restrictions:
+        - condition: "settings:lma_collector.influxdb_mode.value != 'local'"
+          action: "disable"
 
   influxdb_address:
     value: ''
@@ -84,7 +81,9 @@ attributes:
     weight: 70
     type: "text"
     regex: *node_address_regex
-    restrictions: *hide_control
+    restrictions:
+        - condition: "settings:lma_collector.influxdb_mode.value != 'remote'"
+          action: "disable"
 
   influxdb_database:
     value: 'lma'
@@ -95,7 +94,9 @@ attributes:
     regex: &not_empty_parameter
       source: '\S'
       error: "Invalid value"
-    restrictions: *hide_control
+    restrictions: &disable_influxdb_control
+        - condition: "settings:lma_collector.influxdb_mode.value == 'disabled'"
+          action: "disable"
   influxdb_user:
     value: 'lma'
     label: 'InfluxDB user'
@@ -103,7 +104,7 @@ attributes:
     weight: 80
     type: "text"
     regex: *not_empty_parameter
-    restrictions: *hide_control
+    restrictions: *disable_influxdb_control
   influxdb_password:
     value: 'lmapass'
     label: 'InfluxDB password'
@@ -111,4 +112,4 @@ attributes:
     weight: 85
     type: "password"
     regex: *not_empty_parameter
-    restrictions: *hide_control
+    restrictions: *disable_influxdb_control
