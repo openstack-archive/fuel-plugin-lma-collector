@@ -24,7 +24,7 @@ attributes:
 
   elasticsearch_node_name:
     value: 'elasticsearch'
-    label: "ElasticSearch node's name"
+    label: "ElasticSearch node name"
     description: 'Label of the node running the ElasticSearch/Kibana plugin that is deployed in the environment.'
     weight: 30
     type: "text"
@@ -71,7 +71,7 @@ attributes:
 
   influxdb_node_name:
     value: 'influxdb'
-    label: "InfluxDB node's name"
+    label: "InfluxDB node name"
     description: 'Label of the node running the InfluxDB/Grafana plugin that is deployed in the environment.'
     weight: 65
     type: "text"
