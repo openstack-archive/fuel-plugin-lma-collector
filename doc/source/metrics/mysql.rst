@@ -79,3 +79,33 @@ The **mysql_threads.created** metric is reported as a per-second rate.
 * ``mysql_threads.connected``, the number of currently open connections.
 * ``mysql_threads.running``, the number of threads that are not sleeping.
 * ``mysql_threads.created``, the number of threads created per second to handle connections.
+
+Cluster
+^^^^^^^
+
+These metrics are collected with statement 'SHOW STATUS'. see `Percona documentation`_
+for further details.
+
+* ``mysql.cluster.size``, current number of nodes in the cluster.
+* ``mysql.cluster.status``, ``1`` when the node is 'Primary', ``2`` if 'Non-Primary' and ``3`` if 'Disconnected'.
+* ``mysql.cluster.connected``, ``1`` when the node is connected to the cluster, ``0`` otherwise.
+* ``mysql.cluster.ready``, ``1`` when the node is ready to accept queries, ``0`` otherwise.
+* ``mysql.cluster.local_commits``, number of writesets commited on the node.
+* ``mysql.cluster.received_bytes``, total size in bytes of writesets received from other nodes.
+* ``mysql.cluster.received``, total number of writesets received from other nodes.
+* ``mysql.cluster.replicated_bytes`` total size in bytes of writesets sent to other nodes.
+* ``mysql.cluster.replicated``, total number of writesets sent to other nodes.
+* ``mysql.cluster.local_cert_failures``, number of writesets that failed the certification test.
+* ``mysql.cluster.local_send_queue``, the number of writesets waiting to be sent.
+* ``mysql.cluster.local_recv_queue``, the number of writesets waiting to be applied.
+
+.. _Percona documentation: http://www.percona.com/doc/percona-xtradb-cluster/5.6/wsrep-status-index.html
+
+Slow Queries
+^^^^^^^^^^^^
+
+This metric is collected with statement 'SHOW STATUS where Variable_name = 'Slow_queries'.
+
+* ``mysql.slow_queries``, number of queries that have taken more than X seconds,
+  depending of the MySQL configuration parameter 'long_query_time' (10s per default)
+
