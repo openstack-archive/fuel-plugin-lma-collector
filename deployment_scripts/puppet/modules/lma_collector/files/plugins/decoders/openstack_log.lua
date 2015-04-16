@@ -88,6 +88,8 @@ function process_message ()
             msg.Payload = m.Message
             msg.Fields.severity_label = m.SeverityLabel
         end
+    else
+        return -1
     end
 
     m = request_grammar:match(msg.Payload)
