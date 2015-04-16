@@ -86,6 +86,7 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
   }
 
   class { 'lma_collector::collectd::mysql':
+    database => 'nova',
     username => 'nova',
     password => $nova['db_password'],
   }
