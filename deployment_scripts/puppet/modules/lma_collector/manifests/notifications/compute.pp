@@ -18,5 +18,7 @@ class lma_collector::notifications::compute (
   }
 
   service { $::nova::params::compute_service_name:
+    hasstatus  => true,
+    hasrestart => true,
   }
 }
