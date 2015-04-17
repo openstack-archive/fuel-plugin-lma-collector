@@ -14,7 +14,9 @@
 # limitations under the License.
 
 import json
+import signal
 import subprocess
+import sys
 import time
 import traceback
 
@@ -22,7 +24,7 @@ import collectd
 
 
 class Base(object):
-    """ Base class for python plugin.
+    """ Base class for writing Python plugins.
     """
 
     def __init__(self, *args, **kwargs):
@@ -44,13 +46,30 @@ class Base(object):
         try:
             metrics = self.get_metrics()
         except Exception as e:
-            self.logger.error('Failed to get metrics: %s: %s' %
-                              (e, traceback.format_exc()))
-        else:
+            self.logger.error('%s: Failed to get metrics: %s: %s' %
+                              (self.plugin, e, traceback.format_exc()))
+            return
+
+        if metrics:
             self.dispatch(metrics)
+        else:
+            self.logger.warning('%s: Empty metrics' % self.plugin)
 
     def get_metrics(self):
-        raise NotImplemented("Must be subclassed!")
+        """
+        Retrieves the metrics from the system.
+
+        This class must be implemented by the subclass.
+
+        Returns:
+            A dict object where the key is the metric name and the value is the
+            value of the metric (either a number or a dict contating the value
+            of the metric as a number + the metric's type). For example:
+
+            {'foo.bar': 123,
+             'fred': {'value': '123', 'type': 'derive'}}
+        """
+        raise NotImplemented("Must be implemented by the subclass!")
 
     def dispatch(self, metrics):
         for metric, data in metrics.iteritems():
@@ -71,10 +90,27 @@ class Base(object):
         )
         v.dispatch()
 
-
-class Execute(object):
-
     def execute(self, cmd, shell=True, cwd=None):
+        """
+        Executes a program with arguments.
+
+        Args:
+            cmd: a list of program arguments where the first item is the
+            program name.
+            shell: whether to use the shell as the program to execute (default=
+            True).
+            cwd: the directory to change to before running the program
+            (default=None).
+
+        Returns:
+            A tuple containing the standard output and error strings if the
+            program execution has been successful.
+
+            ("foobar\n", "")
+
+            None if the command couldn't be executed or returned a non-zero
+            status code
+        """
         start_time = time.time()
         try:
             proc = subprocess.Popen(
@@ -85,6 +121,7 @@ class Execute(object):
                 stderr=subprocess.PIPE
             )
             (stdout, stderr) = proc.communicate()
+            stdout = stdout.rstrip('\n')
         except Exception as e:
             self.logger.error("Cannot execute command '%s': %s : %s" %
                               (cmd, str(e), traceback.format_exc()))
@@ -99,22 +136,46 @@ class Execute(object):
         elapsedtime = time.time() - start_time
 
         if self.debug:
-            self.logger.info("Command '%s' return %s in %0.3fs" %
+            self.logger.info("Command '%s' returned %s in %0.3fs" %
                              (cmd, returncode, elapsedtime))
 
         if not stdout and self.debug:
-            self.logger.info("Command '%s' return nothing!")
+            self.logger.info("Command '%s' returned no output!")
 
         return (stdout, stderr)
 
     def execute_to_json(self, *args, **kwargs):
+        """
+        Executes a program and decodes the output as a JSON string.
+
+        See execute().
+
+        Returns:
+            A Python object or None if the execution of the program failed.
+        """
         outputs = self.execute(*args, **kwargs)
         if outputs:
             return json.loads(outputs[0])
         return None
 
+    @staticmethod
+    def restore_sigchld():
+        """
+        Restores the SIGCHLD handler for Python <= v2.6.
 
-class CephBase(Base, Execute):
+        This should be provided to collectd as the init callback by plugins
+        that execute external programs.
+
+        Note that it will BREAK the exec plugin!!!
+
+        See https://github.com/deniszh/collectd-iostat-python/issues/2 for
+        details.
+        """
+        if sys.version_info[0] == 2 and sys.version_info[1] <= 6:
+            signal.signal(signal.SIGCHLD, signal.SIG_DFL)
+
+
+class CephBase(Base):
 
     def __init__(self, *args, **kwargs):
         super(CephBase, self).__init__(*args, **kwargs)
