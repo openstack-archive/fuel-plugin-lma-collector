@@ -24,7 +24,7 @@ RE_OSD_ID = re.compile(".*?osd\.(\d+)\.asok$")
 
 
 class CephOSDPerfPlugin(base.CephBase):
-    """ Collect all performance counters of all OSD daemons running on the host.
+    """ Collect performance counters of all OSD daemons running on the host.
     """
 
     def __init__(self, *args, **kwargs):
@@ -72,6 +72,10 @@ class CephOSDPerfPlugin(base.CephBase):
 plugin = CephOSDPerfPlugin()
 
 
+def init_callback():
+    plugin.restore_sigchld()
+
+
 def config_callback(conf):
     plugin.config_callback(conf)
 
@@ -79,5 +83,6 @@ def config_callback(conf):
 def read_callback():
     plugin.read_callback()
 
+collectd.register_init(init_callback)
 collectd.register_config(config_callback)
 collectd.register_read(read_callback, INTERVAL)
