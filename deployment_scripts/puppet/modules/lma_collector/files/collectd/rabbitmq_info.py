@@ -20,9 +20,8 @@
 
 import collectd
 import re
-import signal
-import subprocess
-import sys
+
+import base
 
 
 NAME = 'rabbitmq_info'
@@ -34,189 +33,150 @@ PMAP_BIN = '/usr/bin/pmap'
 PID_FILE = "/var/run/rabbitmq/pid"
 # Override in config by specifying 'Vhost'.
 VHOST = "/"
-# Override in config by specifying 'Verbose'.
-VERBOSE_LOGGING = False
 
 # Used to find disk nodes and running nodes.
 CLUSTER_STATUS = re.compile('.*disc,\[([^\]]+)\].*running_nodes,\[([^\]]+)\]',
                             re.S)
 
 
-def restore_sigchld():
-    """
-    Restore SIGCHLD handler for python <= v2.6
-    It will BREAK the exec plugin!!!
-    See https://github.com/deniszh/collectd-iostat-python/issues/2 for details
-    """
-    if sys.version_info[0] == 2 and sys.version_info[1] <= 6:
-        signal.signal(signal.SIGCHLD, signal.SIG_DFL)
+class RabbitMqPlugin(base.Base):
 
+    def __init__(self, *args, **kwargs):
+        super(RabbitMqPlugin, self).__init__(*args, **kwargs)
+        self.plugin = NAME
+        self.rabbitmqctl_bin = RABBITMQCTL_BIN
+        self.pidfile = PID_FILE
+        self.pmap_bin = PMAP_BIN
+        self.vhost = VHOST
 
-# Obtain the interesting statistical info
-def get_stats():
-    stats = {}
-    stats['messages'] = 0
-    stats['memory'] = 0
-    stats['consumers'] = 0
-    stats['queues'] = 0
-    stats['pmap_mapped'] = 0
-    stats['pmap_used'] = 0
-    stats['pmap_shared'] = 0
+    def config_callback(self, conf):
+        super(RabbitMqPlugin, self).config_callback(conf)
 
-    # call rabbitmqctl to get cluster status
-    try:
-        p = subprocess.Popen([RABBITMQCTL_BIN, '-q', 'cluster_status'],
-                             shell=False, stdout=subprocess.PIPE,
-                             stderr=subprocess.STDOUT)
-    except:
-        logger('err', '%s: Failed to get status' % RABBITMQCTL_BIN)
-        return None
+        for node in conf.children:
+            if node.key == 'RmqcBin':
+                self.rabbitmqctl_bin = node.values[0]
+            elif node.key == 'PmapBin':
+                self.pmap_bin = node.values[0]
+            elif node.key == 'PidFile':
+                self.pidfile = node.values[0]
+            elif node.key == 'Vhost':
+                self.vhost = node.values[0]
+            else:
+                self.logger.warning('Unknown config key: %s' % node.key)
 
-    # TODO: Need to be modified in case we are using RAM nodes.
-    status = CLUSTER_STATUS.findall(p.communicate()[0])
-    if len(status) == 0:
-        logger('err', '%s: Failed to parse (%s)' % (RABBITMQCTL_BIN, status))
-    else:
-        stats['total_nodes'] = len(status[0][0].split(","))
-        stats['running_nodes'] = len(status[0][1].split(","))
+    def get_metrics(self):
+        stats = {}
+        stats['messages'] = 0
+        stats['memory'] = 0
+        stats['consumers'] = 0
+        stats['queues'] = 0
+        stats['pmap_mapped'] = 0
+        stats['pmap_used'] = 0
+        stats['pmap_shared'] = 0
 
-    try:
-        list_connections = subprocess.Popen([RABBITMQCTL_BIN, '-q', 'list_connections'],
-                                            shell=False,
-                                            stdout=subprocess.PIPE)
-        stats['connections'] = len(list_connections.communicate()[0].split('\n'))
-    except:
-        logger('err', '%s: Failed to get the number of connections' % RABBITMQCTL_BIN)
-        return None
+        out, err = self.execute([self.rabbitmqctl_bin, '-q', 'cluster_status'],
+                                shell=False)
+        if not out:
+            self.logger.error('%s: Failed to get the cluster status' %
+                              self.rabbitmqctl_bin)
+            return
 
-    try:
-        list_exchanges = subprocess.Popen([RABBITMQCTL_BIN, '-q', 'list_exchanges'],
-                                          shell=False,
-                                          stdout=subprocess.PIPE)
-        stats['exchanges'] = len(list_exchanges.communicate()[0].split('\n'))
-    except:
-        logger('err', '%s: Failed to get the number of exchanges' % RABBITMQCTL_BIN)
-        return None
-
-    # call rabbitmqctl
-    try:
-        p = subprocess.Popen([RABBITMQCTL_BIN, '-q', '-p', VHOST, 'list_queues',
-                              'name', 'messages', 'memory', 'consumers'],
-                             shell=False,
-                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    except:
-        logger('err', '%s: Failed to get the list of queues' % RABBITMQCTL_BIN)
-        return None
-
-    for line in p.stdout.readlines():
-        ctl_stats = line.split()
-        try:
-            ctl_stats[1] = int(ctl_stats[1])
-            ctl_stats[2] = int(ctl_stats[2])
-            ctl_stats[3] = int(ctl_stats[3])
-        except:
-            continue
-        queue_name = ctl_stats[0]
-        stats['queues'] += 1
-        stats['messages'] += ctl_stats[1]
-        stats['memory'] += ctl_stats[2]
-        stats['consumers'] += ctl_stats[3]
-        stats['%s.messages' % queue_name] = ctl_stats[1]
-        stats['%s.memory' % queue_name] = ctl_stats[2]
-        stats['%s.consumers' % queue_name] = ctl_stats[3]
-
-    if not stats['memory'] > 0:
-        logger('warn', '%s reports 0 memory usage. This is probably incorrect.'
-               % RABBITMQCTL_BIN)
-
-    # get the pid of rabbitmq
-    try:
-        with open(PID_FILE, 'r') as f:
-            pid = f.read().strip()
-    except:
-        logger('err', 'Unable to read %s' % PID_FILE)
-        return None
-
-    # use pmap to get proper memory stats
-    try:
-        p = subprocess.Popen([PMAP_BIN, '-d', pid], shell=False,
-                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    except:
-        logger('err', 'Failed to run %s' % PMAP_BIN)
-        return None
-
-    line = p.stdout.readlines()[-1].strip()
-    if re.match('mapped', line):
-        m = re.match(r"\D+(\d+)\D+(\d+)\D+(\d+)", line)
-        stats['pmap_mapped'] = int(m.group(1))
-        stats['pmap_used'] = int(m.group(2))
-        stats['pmap_shared'] = int(m.group(3))
-    else:
-        logger('warn', '%s returned something strange.' % PMAP_BIN)
-        return None
-
-    # Verbose output
-    logger('verb', '[rmqctl] Messages: %i, Memory: %i, Consumers: %i' %
-           (stats['messages'], stats['memory'], stats['consumers']))
-    logger('verb', '[pmap] Mapped: %i, Used: %i, Shared: %i' %
-           (stats['pmap_mapped'], stats['pmap_used'], stats['pmap_shared']))
-
-    return stats
-
-
-# Config data from collectd
-def configure_callback(conf):
-    global RABBITMQCTL_BIN, PMAP_BIN, PID_FILE, VERBOSE_LOGGING, VHOST
-    for node in conf.children:
-        if node.key == 'RmqcBin':
-            RABBITMQCTL_BIN = node.values[0]
-        elif node.key == 'PmapBin':
-            PMAP_BIN = node.values[0]
-        elif node.key == 'PidFile':
-            PID_FILE = node.values[0]
-        elif node.key == 'Verbose':
-            VERBOSE_LOGGING = bool(node.values[0])
-        elif node.key == 'Vhost':
-            VHOST = node.values[0]
+        # TODO: Need to be modified in case we are using RAM nodes.
+        status = CLUSTER_STATUS.findall(out)
+        if len(status) == 0:
+            self.logger.error('%s: Failed to parse (%s)' %
+                              (self.rabbitmqctl_bin, out))
         else:
-            logger('warn', 'Unknown config key: %s' % node.key)
+            stats['total_nodes'] = len(status[0][0].split(","))
+            stats['running_nodes'] = len(status[0][1].split(","))
+
+        out, err = self.execute([self.rabbitmqctl_bin, '-q',
+                                 'list_connections'], shell=False)
+        if not out:
+            self.logger.error('%s: Failed to get the number of connections' %
+                              self.rabbitmqctl_bin)
+            return
+        stats['connections'] = len(out.split('\n'))
+
+        out, err = self.execute([self.rabbitmqctl_bin, '-q', 'list_exchanges'],
+                                shell=False)
+        if not out:
+            self.logger.error('%s: Failed to get the number of exchanges' %
+                              self.rabbitmqctl_bin)
+            return
+        stats['exchanges'] = len(out.split('\n'))
+
+        out, err = self.execute([self.rabbitmqctl_bin, '-q', '-p', self.vhost,
+                                 'list_queues', 'name', 'messages', 'memory',
+                                 'consumers'], shell=False)
+        if not out:
+            self.logger.error('%s: Failed to get the list of queues' %
+                              self.rabbitmqctl_bin)
+            return
+
+        for line in out.split('\n'):
+            ctl_stats = line.split()
+            try:
+                ctl_stats[1] = int(ctl_stats[1])
+                ctl_stats[2] = int(ctl_stats[2])
+                ctl_stats[3] = int(ctl_stats[3])
+            except:
+                continue
+            queue_name = ctl_stats[0]
+            stats['queues'] += 1
+            stats['messages'] += ctl_stats[1]
+            stats['memory'] += ctl_stats[2]
+            stats['consumers'] += ctl_stats[3]
+            stats['%s.messages' % queue_name] = ctl_stats[1]
+            stats['%s.memory' % queue_name] = ctl_stats[2]
+            stats['%s.consumers' % queue_name] = ctl_stats[3]
+
+        if not stats['memory'] > 0:
+            self.logger.warning(
+                '%s reports 0 memory usage. This is probably incorrect.' %
+                self.rabbitmqctl_bin)
+
+        # get the PID of the RabbitMQ process
+        try:
+            with open(self.pidfile, 'r') as f:
+                pid = f.read().strip()
+        except:
+            self.logger.error('Unable to read %s' % self.pidfile)
+            return
+
+        # use pmap to get proper memory stats
+        out, err = self.execute([self.pmap_bin, '-d', pid], shell=False)
+        if not out:
+            self.logger.error('Failed to run %s' % self.pmap_bin)
+            return
+
+        out = out.split('\n')[-1]
+        if re.match('mapped', out):
+            m = re.match(r"\D+(\d+)\D+(\d+)\D+(\d+)", out)
+            stats['pmap_mapped'] = int(m.group(1))
+            stats['pmap_used'] = int(m.group(2))
+            stats['pmap_shared'] = int(m.group(3))
+        else:
+            self.logger.warning('%s returned something strange.' %
+                                self.pmap_bin)
+
+        return stats
 
 
-# Send info to collectd
+plugin = RabbitMqPlugin()
+
+
+def init_callback():
+    plugin.restore_sigchld()
+
+
+def config_callback(conf):
+    plugin.config_callback(conf)
+
+
 def read_callback():
-    logger('verb', 'read_callback')
-    info = get_stats()
+    plugin.read_callback()
 
-    if not info:
-        logger('err', 'No information received - very bad.')
-        return
-
-    logger('verb', 'About to trigger the dispatch..')
-
-    # send values
-    for key in info:
-        logger('verb', 'Dispatching %s : %i' % (key, info[key]))
-        val = collectd.Values(plugin=NAME)
-        val.type = 'gauge'
-        val.type_instance = key
-        val.values = [int(info[key])]
-        # w/a for https://github.com/collectd/collectd/issues/716
-        val.meta = {'0': True}
-        val.dispatch()
-
-
-# Send log messages (via collectd)
-def logger(t, msg):
-    if t == 'err':
-        collectd.error('%s: %s' % (NAME, msg))
-    if t == 'warn':
-        collectd.warning('%s: %s' % (NAME, msg))
-    elif t == 'verb' and VERBOSE_LOGGING is True:
-        collectd.info('%s: %s' % (NAME, msg))
-
-
-# Runtime
-collectd.register_init(restore_sigchld)
-collectd.register_config(configure_callback)
-collectd.warning('Initialising rabbitmq_info')
+collectd.register_init(init_callback)
+collectd.register_config(config_callback)
 collectd.register_read(read_callback)
