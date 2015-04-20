@@ -35,6 +35,18 @@ class lma_collector::influxdb (
     notify          => Class['lma_collector::service'],
   }
 
+  heka::filter::sandbox { 'influxdb_annotation':
+    config_dir      => $lma_collector::params::config_dir,
+    filename        => "${lma_collector::params::plugins_dir}/filters/influxdb_annotation.lua",
+    message_matcher => 'Fields[payload_type] == \'json\' && Fields[payload_name] == \'event\'',
+    ticker_interval => 1,
+    config          => {
+      flush_interval => $lma_collector::params::influxdb_flush_interval,
+      flush_count    => $lma_collector::params::influxdb_flush_count,
+    },
+    notify          => Class['lma_collector::service'],
+  }
+
   heka::encoder::payload { 'influxdb':
     config_dir => $lma_collector::params::config_dir,
     notify     => Class['lma_collector::service'],
