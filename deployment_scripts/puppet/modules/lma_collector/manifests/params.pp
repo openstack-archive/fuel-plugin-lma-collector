@@ -76,6 +76,8 @@ class lma_collector::params {
   $influxdb_user = 'lma'
   $influxdb_password = 'lmapass'
   $influxdb_timeout = 5
+  $influxdb_flush_interval = 5
+  $influxdb_flush_count = 100
 
   $pacemaker_resources_script = '/usr/local/bin/pacemaker_locate_resources.sh'
   $pacemaker_resources_interval = '60'
