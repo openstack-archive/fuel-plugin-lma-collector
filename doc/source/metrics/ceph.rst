@@ -71,6 +71,8 @@ OSD Performance
 All the following metrics are retrieved per OSD daemon from the corresponding
 socket ``/var/run/ceph/ceph-osd.<ID>.asok`` by issuing the command ``perf dump``.
 
+.. note:: These metrics are not collected if ceph-osd is deployed on controller node.
+
 See `OSD performance counters`_ for further details.
 
 * ``osd-<id>.osd.recovery_ops``, number of recovery operations in progress.
