@@ -3,7 +3,7 @@
 Service
 ^^^^^^^
 
-* ``mysql``, the status of the MySQL service, 1 if it is responsive, 0
+* ``mysql``, the status of the MySQL service, 0 if it is responsive, 2
   otherwise.
 
 Commands

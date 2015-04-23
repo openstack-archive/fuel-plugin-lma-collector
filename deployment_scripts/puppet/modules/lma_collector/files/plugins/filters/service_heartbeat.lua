@@ -14,8 +14,9 @@
 require 'cjson'
 require 'string'
 require 'math'
+local utils = require 'lma_utils'
 
-local timeout = read_config("timeout") or 30
+localtimeout = read_config("timeout") or 30
 
 services = {}
 local floor = math.floor
@@ -30,7 +31,7 @@ function process_message ()
     if service then
         service.last_seen = ts
     else
-        service = {last_seen = ts, status = 1, host = hostname, name = service_name}
+        service = {last_seen = ts, status = utils.service_status_map.OK, host = hostname, name = service_name}
         services[key] = service
     end
     return 0
@@ -42,9 +43,9 @@ function timer_event(ns)
 
     for k, service in pairs(services) do
         if current_time - service.last_seen > timeout * 1000 then
-            service.status = 0
+            service.status = utils.service_status_map.DOWN
         else
-            service.status = 1
+            service.status = utils.service_status_map.OK
         end
         datapoints[#datapoints+1] = {
             name = string.format('%s.%s.status', service.host, service.name),

@@ -3,8 +3,8 @@
 Service
 ^^^^^^^
 
-* ``rabbitmq.status``, the status of the RabbitMQ service, 1 if it is
-  responsive, 0 otherwise.
+* ``rabbitmq.status``, the status of the RabbitMQ service, 0 if it is
+  responsive, 2 otherwise.
 
 Cluster
 ^^^^^^^
