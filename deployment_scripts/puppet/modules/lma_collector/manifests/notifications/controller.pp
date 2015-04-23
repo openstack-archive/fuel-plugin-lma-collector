@@ -104,6 +104,8 @@ class lma_collector::notifications::controller (
   }
 
   service { [$::nova::params::api_service_name, $::nova::params::conductor_service_name, $::nova::params::scheduler_service_name]:
+    hasstatus  => true,
+    hasrestart => true,
   }
 
   # Cinder
@@ -119,6 +121,8 @@ class lma_collector::notifications::controller (
   }
 
   service { [$::cinder::params::api_service, $::cinder::params::scheduler_service]:
+    hasstatus  => true,
+    hasrestart => true,
   }
 
   # Keystone
@@ -134,6 +138,8 @@ class lma_collector::notifications::controller (
   }
 
   service { $::keystone::params::service_name:
+    hasstatus  => true,
+    hasrestart => true,
   }
 
   # Neutron
@@ -149,6 +155,8 @@ class lma_collector::notifications::controller (
   }
 
   service { $::neutron::params::server_service:
+    hasstatus  => true,
+    hasrestart => true,
   }
 
   # Glance
@@ -183,6 +191,8 @@ class lma_collector::notifications::controller (
   }
 
   service { [$::glance::params::api_service_name, $::glance::params::registry_service_name]:
+    hasstatus  => true,
+    hasrestart => true,
   }
 
   # Heat
@@ -198,5 +208,7 @@ class lma_collector::notifications::controller (
   }
 
   service { [$::heat::params::api_service_name, $::heat::params::engine_service_name]:
+    hasstatus  => true,
+    hasrestart => true,
   }
 }

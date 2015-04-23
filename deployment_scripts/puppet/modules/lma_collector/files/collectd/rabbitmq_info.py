@@ -19,8 +19,10 @@
 # limitations under the License.
 
 import collectd
-import subprocess
 import re
+import signal
+import subprocess
+import sys
 
 
 NAME = 'rabbitmq_info'
@@ -28,8 +30,6 @@ NAME = 'rabbitmq_info'
 RABBITMQCTL_BIN = '/usr/sbin/rabbitmqctl'
 # Override in config by specifying 'PmapBin'
 PMAP_BIN = '/usr/bin/pmap'
-# Override in config by specifying 'PidofBin'.
-PIDOF_BIN = '/bin/pidof'
 # Override in config by specifying 'PidFile.
 PID_FILE = "/var/run/rabbitmq/pid"
 # Override in config by specifying 'Vhost'.
@@ -40,6 +40,16 @@ VERBOSE_LOGGING = False
 # Used to find disk nodes and running nodes.
 CLUSTER_STATUS = re.compile('.*disc,\[([^\]]+)\].*running_nodes,\[([^\]]+)\]',
                             re.S)
+
+
+def restore_sigchld():
+    """
+    Restore SIGCHLD handler for python <= v2.6
+    It will BREAK the exec plugin!!!
+    See https://github.com/deniszh/collectd-iostat-python/issues/2 for details
+    """
+    if sys.version_info[0] == 2 and sys.version_info[1] <= 6:
+        signal.signal(signal.SIGCHLD, signal.SIG_DFL)
 
 
 # Obtain the interesting statistical info
@@ -206,6 +216,7 @@ def logger(t, msg):
 
 
 # Runtime
+collectd.register_init(restore_sigchld)
 collectd.register_config(configure_callback)
 collectd.warning('Initialising rabbitmq_info')
 collectd.register_read(read_callback)
