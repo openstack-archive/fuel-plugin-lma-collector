@@ -1,11 +1,11 @@
 # Description
 
-Scripts and tools for running an ElasticSearch server to be used with the LMA
+Scripts and tools for running an Elasticsearch server to be used with the LMA
 collector.
 
 # Requirements
 
-To run ElasticSearch, the host should have at least 1GB of free RAM. You also
+To run Elasticsearch, the host should have at least 1GB of free RAM. You also
 need sufficient free disk space for storing the data. The exact amount of disk
 depends highly on your environment and retention policy but 20GB is probably a
 sane minimum.
@@ -37,7 +37,7 @@ Supported environment variables for configuration:
 
 # Testing
 
-You can check that ElasticSearch is working using `curl`:
+You can check that Elasticsearch is working using `curl`:
 
 ```
 curl http://$HOST:9200/

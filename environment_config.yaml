@@ -24,8 +24,8 @@ attributes:
 
   elasticsearch_node_name:
     value: 'elasticsearch'
-    label: "ElasticSearch node name"
-    description: 'Label of the node running the ElasticSearch/Kibana plugin that is deployed in the environment.'
+    label: "Elasticsearch node name"
+    description: 'Label of the node running the Elasticsearch/Kibana plugin that is deployed in the environment.'
     weight: 30
     type: "text"
     restrictions:
@@ -34,8 +34,8 @@ attributes:
 
   elasticsearch_address:
     value: ''
-    label: 'ElasticSearch address'
-    description: 'IP address or fully qualified domain name of the ElasticSearch server.'
+    label: 'Elasticsearch address'
+    description: 'IP address or fully qualified domain name of the Elasticsearch server.'
     weight: 40
     type: "text"
     restrictions:

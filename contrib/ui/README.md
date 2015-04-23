@@ -21,7 +21,7 @@ the default parameters:
 * ``GRAFANA_ENABLED``, whether or not to enable the Grafana dashboard (default:
   "yes").
 
-* ``ES_HOST``, the address of the ElasticSearch server (default: same host).
+* ``ES_HOST``, the address of the Elasticsearch server (default: same host).
 
 * ``INFLUXDB_HOST``, the address of the InfluxDB server (default: same host).
 
@@ -48,5 +48,5 @@ The dashboards are available at the following URLs:
 ## Troubleshooting
 
 If the dashboards fail to display the data or are unresponsive, run the
-``docker logs lma_ui`` command and check that the ElasticSearch and InfluxDB
+``docker logs lma_ui`` command and check that the Elasticsearch and InfluxDB
 servers are reachable from the machine running the web browser.

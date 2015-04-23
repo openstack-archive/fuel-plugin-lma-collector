@@ -12,7 +12,7 @@ https://blueprints.launchpad.net/fuel/+spec/lma-collector-plugin
 
 The LMA (Logging, Monitoring & Alerting) collector is a service running on each
 OpenStack node that collects metrics, logs and notifications. This data can be
-sent to ElasticSearch [#]_ and/or InfluxDB [#]_ backends for diagnostic,
+sent to Elasticsearch [#]_ and/or InfluxDB [#]_ backends for diagnostic,
 troubleshooting and alerting purposes.
 
 Problem description
@@ -23,7 +23,7 @@ monitoring, diagnosing and troubleshooting the deployed OpenStack environments.
 
 The LMA collector aims at addressing the following use cases:
 
-* Send logs and notifications to ElasticSearch so operators can more easily
+* Send logs and notifications to Elasticsearch so operators can more easily
   troubleshoot issues.
 
 * Send metrics to InfluxDB so operators can monitor and diagnose the usage
@@ -113,7 +113,7 @@ Heka is written in Go).
 Other deployer impact
 ---------------------
 
-The deployer will have to run an ElasticSearch cluster and/or an InfluxDB
+The deployer will have to run an Elasticsearch cluster and/or an InfluxDB
 cluster to store the collected data. Eventually, these requirements will be
 addressed by additional Fuel plugins once the custom role feature [#]_ gets
 available.
@@ -161,7 +161,7 @@ Testing
 
 * Test the plugin by deploying environments with all Fuel deployment modes.
 
-* Create integration tests with ElasticSearch and InfluxDB backends.
+* Create integration tests with Elasticsearch and InfluxDB backends.
 
 Documentation Impact
 ====================

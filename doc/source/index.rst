@@ -38,11 +38,11 @@ new metric messages.
 
 The satellite clusters delivered as part of the LMA Toolchain starting with Mirantis OpenStack 6.1 include:
 
-* `ElasticSearch <http://www.elasticsearch.org/>`_, a powerful open source search server based
+* `Elasticsearch <http://www.elasticsearch.org/>`_, a powerful open source search server based
   on Lucene and analytics engine that makes data like log messages and notifications easy to explore and analyse.
 * `InfluxDB <http://influxdb.com/>`_, an open-source and distributed time-series database to store and search metrics.
 
-By combining ElasticSearch with `Kibana <http://www.elasticsearch.org/overview/kibana/>`_,
+By combining Elasticsearch with `Kibana <http://www.elasticsearch.org/overview/kibana/>`_,
 the LMA Toolchain provides an effective way to search and correlate all service-affecting events
 that occurred in the system for root cause analysis.
 

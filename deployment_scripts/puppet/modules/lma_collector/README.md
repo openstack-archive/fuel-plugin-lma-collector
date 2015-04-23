@@ -10,7 +10,7 @@ Usage
 -----
 
 To deploy the LMA collector service on a host and forward collected data to
-ElasticSearch and/or InfluxDB servers.
+Elasticsearch and/or InfluxDB servers.
 
 ```puppet
 # Configure the common components of the collector service
@@ -24,7 +24,7 @@ class {'lma_collector':
 class { 'lma_collector::system_logs':
 }
 
-# Send data to ElasticSearch
+# Send data to Elasticsearch
 class { 'lma_collector::elasticsearch':
   server => '10.20.0.2'
 }

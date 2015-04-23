@@ -12,11 +12,11 @@ The supported backends are described hereunder.
 
 .. _elasticsearch_output:
 
-ElasticSearch
+Elasticsearch
 =============
 
 The LMA collector is able to send :ref:`logs` and :ref:`notifications` to
-`ElasticSearch <http://elasticsearch.org/>`_.
+`Elasticsearch <http://elasticsearch.org/>`_.
 
 There is one index per day and per type of message:
 

@@ -5,7 +5,7 @@ title: The Logging, Monitoring and Alerting (LMA) Collector Plugin
 # Plugin version
 version: 0.7.0
 # Description
-description: Collect logs, metrics and notifications from system and OpenStack services and forward that information to external backends such as ElasticSearch and InfluxDB.
+description: Collect logs, metrics and notifications from system and OpenStack services and forward that information to external backends such as Elasticsearch and InfluxDB.
 # Required fuel version
 fuel_version: ['6.1']
 

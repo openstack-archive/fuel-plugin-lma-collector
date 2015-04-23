@@ -30,7 +30,7 @@ if [[ ${KIBANA_ENABLED} == "yes" ]]; then
     ES_HOST=${ES_HOST:-\"+window.location.hostname+\"}
     ES_PORT=9200
     ES_URL="http://${ES_HOST}:${ES_PORT}"
-    echo "ElasticSearch URL is ${ES_URL}"
+    echo "Elasticsearch URL is ${ES_URL}"
 
     cat <<EOF > /usr/share/nginx/html/kibana/config.js
 define(['settings'],

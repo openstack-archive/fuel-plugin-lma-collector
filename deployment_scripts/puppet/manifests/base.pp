@@ -127,7 +127,7 @@ case $elasticsearch_mode {
     $es_server = $es_nodes[0]['internal_address']
   }
   default: {
-    fail("'${elasticsearch_mode}' mode not supported for ElasticSearch")
+    fail("'${elasticsearch_mode}' mode not supported for Elasticsearch")
   }
 }
 

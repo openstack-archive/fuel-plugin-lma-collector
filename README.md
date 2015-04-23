@@ -7,7 +7,7 @@ Overview
 
 The Logging, Monitoring & Alerting (LMA) collector is a service running on each
 OpenStack node that collects logs and notifications. Those data are sent to an
-ElasticSearch server for diagnostic, troubleshooting and alerting purposes.
+Elasticsearch server for diagnostic, troubleshooting and alerting purposes.
 
 
 Requirements
@@ -17,7 +17,7 @@ Requirements
 | Requirement                    | Version/Comment                                               |
 | ------------------------------ | ------------------------------------------------------------- |
 | Mirantis OpenStack compatility | 6.1 or higher                                                 |
-| A running ElasticSearch server | 1.4 or higher, the RESTful API must be enabled over port 9200 |
+| A running Elasticsearch server | 1.4 or higher, the RESTful API must be enabled over port 9200 |
 
 
 Limitations
@@ -31,12 +31,12 @@ Installation Guide
 
 
 Prior to installing the LMA Collector Plugin, you may want to install
-ElasticSearch and Kibana.
-To install ElasticSearch and Kibana automatically using Fuel, you can refer to the
-[ElasticSearch-Kibana Fuel Plugin
+Elasticsearch and Kibana.
+To install Elasticsearch and Kibana automatically using Fuel, you can refer to the
+[Elasticsearch-Kibana Fuel Plugin
 ](https://github.com/stackforge/fuel-plugin-elasticsearch-kibana).
 
-You can install ElasticSearch and Kibana outside of Fuel as long as
+You can install Elasticsearch and Kibana outside of Fuel as long as
 your installation meets the LMA Collector plugin's requirements defined above.
 
 **LMA collector plugin** installation
@@ -84,14 +84,14 @@ the required fields.
 Exploring the data
 ------------------
 
-Refer to the [ElasticSearch/Kibana
+Refer to the [Elasticsearch/Kibana
 plugin](https://github.com/stackforge/fuel-plugin-elasticsearch-kibana) for
 exploring and visualizing the collected data.
 
 Troubleshooting
 ---------------
 
-If you see no data in the ElasticSearch server, check the following:
+If you see no data in the Elasticsearch server, check the following:
 
 1. The LMA collector service is running
 
@@ -104,7 +104,7 @@ If you see no data in the ElasticSearch server, check the following:
 
 2. Look for errors in the LMA collector log file (located at
    `/var/log/lma_collector.log`) on the different nodes.
-3. Nodes are able to connect to the ElasticSearch server on port 9200.
+3. Nodes are able to connect to the Elasticsearch server on port 9200.
 
 
 Known issues

@@ -19,7 +19,7 @@
 # It performs the following operations:
 # * Build the LMA collector plugin.
 # * Install the LMA collector plugin.
-# * Deploy an ElasticSearch container
+# * Deploy an Elasticsearch container
 # * Deploy an InfluxDB container
 # * Deploy a container for running the LMA dashboards.
 #
@@ -125,10 +125,10 @@ if ! (cd ${CURRENT_DIR}/../doc && make html); then
     info  "Couldn't build the documentation."
 fi
 
-info "Starting the ElasticSearch container..."
+info "Starting the Elasticsearch container..."
 mkdir -p $ES_DIR
 if ! (cd ${CURRENT_DIR}/elasticsearch && ES_MEMORY=$ES_MEMORY ES_DATA=$ES_DIR ES_LISTEN_ADDRESS=$PRIMARY_IP_ADDRESS ./run_container.sh); then
-    fail "Failed to start the ElasticSearch container."
+    fail "Failed to start the Elasticsearch container."
 fi
 
 info "Starting the InfluxDB container..."
