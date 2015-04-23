@@ -18,6 +18,7 @@ Requirements
 | ------------------------------ | ------------------------------------------------------------- |
 | Mirantis OpenStack compatility | 6.1 or higher                                                 |
 | A running Elasticsearch server | 1.4 or higher, the RESTful API must be enabled over port 9200 |
+| A running InfluxDB server      | 0.8.8  the RESTful API must be enabled over port 8086         |
 
 
 Limitations
@@ -30,14 +31,22 @@ Installation Guide
 ==================
 
 
-Prior to installing the LMA Collector Plugin, you may want to install
-Elasticsearch and Kibana.
-To install Elasticsearch and Kibana automatically using Fuel, you can refer to the
+Prior to installing the LMA Collector Plugin, you may want to install its
+dependencies:
+
+* Elasticsearch and Kibana
+* InfluxDB and Grafana
+
+To install them automatically using Fuel, you can refer to the
 [Elasticsearch-Kibana Fuel Plugin
 ](https://github.com/stackforge/fuel-plugin-elasticsearch-kibana).
+and [InfluxDB-Grafana Fuel Plugin
+](https://github.com/stackforge/fuel-plugin-influxdb-grafana)
 
-You can install Elasticsearch and Kibana outside of Fuel as long as
-your installation meets the LMA Collector plugin's requirements defined above.
+You can install Elasticsearch/Kibana and InfluxDB/Grafana outside of Fuel as
+long as your installation meets the LMA Collector plugin's requirements defined
+above.
+
 
 **LMA collector plugin** installation
 -------------------------------------
@@ -86,7 +95,10 @@ Exploring the data
 
 Refer to the [Elasticsearch/Kibana
 plugin](https://github.com/stackforge/fuel-plugin-elasticsearch-kibana) for
-exploring and visualizing the collected data.
+exploring and visualizing the collected logs and notifications and refer to the 
+[InfluxDB-Grafana Fuel Plugin
+](https://github.com/stackforge/fuel-plugin-influxdb-grafana) for monitoring
+your cloud.
 
 Troubleshooting
 ---------------
@@ -104,7 +116,8 @@ If you see no data in the Elasticsearch server, check the following:
 
 2. Look for errors in the LMA collector log file (located at
    `/var/log/lma_collector.log`) on the different nodes.
-3. Nodes are able to connect to the Elasticsearch server on port 9200.
+3. Nodes are able to connect to Elasticsearch/InfluxDB servers on their
+respective ports.
 
 
 Known issues
