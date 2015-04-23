@@ -110,6 +110,9 @@ class lma_collector::collectd::controller (
     notify  => Class['lma_collector::collectd::service'],
   }
 
+  lma_collector::collectd::python_script { 'base.py':
+  }
+
   lma_collector::collectd::python_script { 'rabbitmq_info.py':
   }
 
@@ -154,8 +157,6 @@ class lma_collector::collectd::controller (
   }
 
   if $ceph_enabled {
-    lma_collector::collectd::python_script { 'base.py':
-    }
     lma_collector::collectd::python_script { 'ceph_pool_osd.py':
     }
     lma_collector::collectd::python_script { 'ceph_pg_mon_status.py':
