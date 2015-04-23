@@ -36,6 +36,7 @@ Metrics per frontend:
 
 Backends
 ^^^^^^^^
+.. _haproxy_backend_metric:
 
 Metrics per backends:
 

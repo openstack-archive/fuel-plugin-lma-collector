@@ -80,6 +80,14 @@ class lma_collector::params {
   $nova_cpu_allocation_ratio = 8.0
 
   $heartbeat_timeout = 30
+  $service_status_timeout = 65
+  $service_status_payload_name = 'service_status'
+  $service_status_metrics_regexp = [
+      '^openstack.(nova|cinder|neutron).(services|agents).*(up|down|disabled)$',
+      '^haproxy.backend.*.servers.(down|up)$',
+      '^pacemaker.resource.vip__public.active$',
+      '^openstack.*check_api$'
+      ]
   $worker_report_interval = 60
   $worker_downtime_factor = 2
 
