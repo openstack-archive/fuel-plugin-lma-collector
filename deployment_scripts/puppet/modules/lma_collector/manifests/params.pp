@@ -78,6 +78,7 @@ class lma_collector::params {
   $openstack_url = 'http://127.0.0.1:5000/v2.0/'
   $openstack_client_timeout = 5
   $nova_cpu_allocation_ratio = 8.0
+  $memcached_host = '127.0.0.1'
 
   $heartbeat_timeout = 30
   $service_status_timeout = 65

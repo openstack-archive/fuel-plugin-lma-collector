@@ -21,6 +21,7 @@ class lma_collector::collectd::controller (
   $keystone_url              = $lma_collector::params::keystone_url,
   $nova_cpu_allocation_ratio = $lma_collector::params::nova_cpu_allocation_ratio,
   $rabbitmq_pid_file         = $lma_collector::params::rabbitmq_pid_file,
+  $memcached_host            = $lma_collector::params::memcached_host,
 ) inherits lma_collector::params {
   include collectd::params
   include lma_collector::collectd::service
@@ -146,6 +147,7 @@ class lma_collector::collectd::controller (
   }
 
   class { 'collectd::plugin::memcached':
+    host => $memcached_host,
   }
 
   class { 'collectd::plugin::apache':

@@ -97,6 +97,7 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     rabbitmq_pid_file => $rabbitmq_pid_file,
     haproxy_socket    => $haproxy_socket,
     ceph_enabled      => $ceph_enabled,
+    memcached_host    => hiera('internal_address'),
   }
 
   class { 'lma_collector::collectd::mysql':
