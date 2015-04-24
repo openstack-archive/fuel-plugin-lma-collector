@@ -21,7 +21,7 @@
 #  <node>: the hostname of the node where the resource is located (ie node-1)
 #  <active>: either '0' or '1' if <node> matches the local hostname
 
-host=$(hostname -s)
+host=$(hostname)
 
 for rsr in vip__public vip__management vip__public_vrouter vip__management_vrouter; do
   node=$(/usr/sbin/crm_resource --locate --quiet --resource  $rsr 2>/dev/null)
