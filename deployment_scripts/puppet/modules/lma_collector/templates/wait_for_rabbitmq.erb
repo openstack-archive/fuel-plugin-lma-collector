@@ -8,7 +8,7 @@ RABBITMQADMIN="/usr/local/bin/rabbitmqadmin"
 # In practice rabbitmqadmin is only present on controller nodes so just skip
 # the waiting loop if we don't find it.
 
-if [ ! -x $RABBITMQADMIN ]; then
+if [ -x $RABBITMQADMIN ]; then
 while ! $RABBITMQADMIN -u <%= @rabbitmq_user %> -p <%= @rabbitmq_password %>  show overview >/dev/null 2>&1
     do
         echo "$(date +"%Y/%m/%d %H:%M:%S") Waiting for RabbitMQ availability..."
