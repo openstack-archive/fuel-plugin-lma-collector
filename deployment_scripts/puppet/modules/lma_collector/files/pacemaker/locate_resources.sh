@@ -21,10 +21,10 @@
 #  <node>: the hostname of the node where the resource is located (ie node-1)
 #  <active>: either '0' or '1' if <node> matches the local hostname
 
-host=$(hostname -s)
+host=$(hostname -s|cut -f 1 -d .)
 
 for rsr in vip__public vip__management vip__public_vrouter vip__management_vrouter; do
-  node=$(/usr/sbin/crm_resource --locate --quiet --resource  $rsr 2>/dev/null)
+  node=$(/usr/sbin/crm_resource --locate --quiet --resource  $rsr|cut -f 1 -d . 2>/dev/null)
   if [ $? -eq 0 ]; then
     if [[ x"$host" = x"$node" ]]; then
         iam=1
