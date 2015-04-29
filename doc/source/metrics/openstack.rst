@@ -15,14 +15,18 @@ These metrics are emitted per compute node.
 
 * ``openstack.nova.instance_creation_time``, the time (in seconds) it took to launch a new instance.
 * ``openstack.nova.instance_state.<state>``, the number of instances which entered this state (always 1).
-* ``openstack.nova.free_disk``, the amount of disk space (in GB) available for new instances.
-* ``openstack.nova.used_disk``, the amount of disk space (in GB) used by the instances.
-* ``openstack.nova.free_ram``, the amount of memory (in MB) available for new instances.
-* ``openstack.nova.used_ram``, the amount of memory (in MB) used by the instances.
-* ``openstack.nova.free_vcpus``, the number of virtual CPU available for new instances.
-* ``openstack.nova.used_vcpus``, the number of virtual CPU used by the instances.
-* ``openstack.nova.running_instances``, the number of running instances on the node.
-* ``openstack.nova.running_tasks``, the number of tasks currently executed by the node.
+
+These metrics are retrieved from the Nova API and represent the aggregated
+values across all compute nodes.
+
+* ``openstack.nova.total_free_disk``, the total amount of disk space (in GB) available for new instances.
+* ``openstack.nova.total_used_disk``, the total amount of disk space (in GB) used by the instances.
+* ``openstack.nova.total_free_ram``, the total amount of memory (in MB) available for new instances.
+* ``openstack.nova.total_used_ram``, the total amount of memory (in MB) used by the instances.
+* ``openstack.nova.total_free_vcpus``, the total number of virtual CPU available for new instances.
+* ``openstack.nova.total_used_vcpus``, the total number of virtual CPU used by the instances.
+* ``openstack.nova.total_running_instances``, the total number of running instances.
+* ``openstack.nova.total_running_tasks``, the total number of tasks currently executed.
 
 These metrics are retrieved from the Nova API.
 
