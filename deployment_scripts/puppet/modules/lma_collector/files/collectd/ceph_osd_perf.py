@@ -32,7 +32,7 @@ class CephOSDPerfPlugin(base.CephBase):
         self.socket_glob = None
 
     def config_callback(self, conf):
-        super(CephOSDPerfPlugin, self).__init__(conf)
+        super(CephOSDPerfPlugin, self).config_callback(conf)
         for node in conf.children:
             if node.key == "AdminSocket":
                 self.socket_glob = node.values[0]
