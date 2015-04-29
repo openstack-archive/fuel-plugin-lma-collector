@@ -25,7 +25,7 @@ local msg = {
 }
 
 local word = (l.R("az", "AZ", "09") + l.P"." + l.P"_" + l.P"-")^1
-local grammar = l.Ct(l.Cg(word, 'resource') * " " * l.Cg(word, 'node') * " " * l.Cg(l.xdigit, 'active'))
+local grammar = l.Ct(l.Cg(word, 'resource') * " " * l.Cg(l.xdigit, 'active'))
 
 function process_message ()
     local data = read_message("Payload")
@@ -40,10 +40,6 @@ function process_message ()
     msg.Fields.type = utils.metric_type['GAUGE']
     msg.Fields.hostname = read_message('Hostname')
     utils.inject_tags(msg)
-
-    msg.Fields.name = string.format('pacemaker.resource.%s.active_node', m.resource)
-    msg.Fields.value = m.node
-    inject_message(msg)
 
     msg.Fields.name= string.format('pacemaker.resource.%s.active', m.resource)
     msg.Fields.value = tonumber(m.active)

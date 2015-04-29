@@ -14,11 +14,10 @@
 # limitations under the License.
 
 # produce the following output for all VIP resources:
-# <resource-name> <node> <active>
+# <resource-name> <active>
 #
 # where:
 #  <resource-name>: name of the resource (ie vip__public)
-#  <node>: the hostname of the node where the resource is located (ie node-1)
 #  <active>: either '0' or '1' if <node> matches the local hostname
 
 host=$(hostname -s|cut -f 1 -d .)
@@ -31,7 +30,7 @@ for rsr in vip__public vip__management vip__public_vrouter vip__management_vrout
     else
         iam=0
     fi
-    echo $rsr $node $iam
+    echo $rsr $iam
   fi
 done
 exit 0
