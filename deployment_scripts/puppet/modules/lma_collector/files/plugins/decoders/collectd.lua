@@ -96,9 +96,7 @@ function process_message ()
                 end
             elseif metric_source == 'hypervisor_stats' then
                 -- OpenStack hypervisor metrics
-                -- 'plugin_instance' = <hostname>
                 -- 'type_instance' = <metric name> which can end by _MB or _GB
-                msg['Fields']['hostname'] = sample['plugin_instance']
                 msg['Fields']['name'] = 'openstack' .. sep .. 'nova' .. sep
                 local name, unit
                 name, unit = string.match(sample['type_instance'], '^(.+)_(.B)$')
