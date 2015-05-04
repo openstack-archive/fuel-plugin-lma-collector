@@ -17,46 +17,48 @@
 # We don't use apache::mod_status because it requires to include the apache
 # base class. And by doing this we overwrite horizon configuration.
 
-class lma_collector::mod_status {
+class lma_collector::mod_status (
+  $allow_from = $lma_collector::params::apache_allow_from,
+) inherits lma_collector::params {
 
   include apache::params
   include apache::service
 
-  case $::osfamily {
-    'redhat': {
-      $status_conf = '/etc/httpd/conf.d/status.conf'
-      $status_load = '/etc/httpd/conf.d/status.load'
+  validate_array($allow_from)
 
-      file { $status_load:
-        source => 'puppet:///modules/lma_collector/apache/status.load'
-      }
+  $lib_path    = $::apache::params::lib_path
+  $status_conf = "${::apache::params::mod_dir}/status.conf"
+  $status_load = "${::apache::params::mod_dir}/status.load"
 
-      file { $status_conf:
-        source  => 'puppet:///modules/lma_collector/apache/status.conf',
-        require => File[$status_load],
-        notify  => Class['apache::service'],
-      }
+  if $::osfamily == 'debian' {
+    $status_conf_link = "${::apache::params::mod_enable_dir}/status.conf"
+    $status_load_link = "${::apache::params::mod_enable_dir}/status.load"
+
+    file { $status_conf_link:
+      ensure  => link,
+      target  => $status_conf,
+      require => File[$status_conf],
     }
 
-    'debian': {
-      $status_conf = '/etc/apache2/mods-enabled/status.conf'
-      $status_load = '/etc/apache2/mods-enabled/status.load'
-
-      file { $status_conf:
-        ensure => link,
-        target => '/etc/apache2/mods-available/status.conf',
-      }
-
-      file { $status_load:
-        ensure  => link,
-        target  => '/etc/apache2/mods-available/status.load',
-        require => File[$status_conf],
-        notify  => Class['apache::service'],
-      }
-    }
-
-    default : {
-      notify {"Cannot enable apache status module on ${::operatingsystem}": }
+    file { $status_load_link:
+      ensure  => link,
+      target  => $status_load,
+      require => File[$status_load],
+      notify  => Class['apache::service'],
     }
   }
+
+  # Template uses $allow_from, $lib_path
+  file { $status_conf:
+    ensure  => file,
+    content => template('lma_collector/apache/status.conf.erb'),
+    require => File[$status_load],
+    notify  => Class['apache::service'],
+  }
+
+  file { $status_load:
+    ensure  => file,
+    content => template('lma_collector/apache/status.load.erb'),
+  }
+
 }
