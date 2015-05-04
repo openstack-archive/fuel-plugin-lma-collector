@@ -22,6 +22,7 @@ class lma_collector::collectd::controller (
   $nova_cpu_allocation_ratio = $lma_collector::params::nova_cpu_allocation_ratio,
   $rabbitmq_pid_file         = $lma_collector::params::rabbitmq_pid_file,
   $memcached_host            = $lma_collector::params::memcached_host,
+  $apache_mod_status_address = $lma_collector::params::mod_status_address,
 ) inherits lma_collector::params {
   include collectd::params
   include lma_collector::collectd::service
@@ -153,7 +154,7 @@ class lma_collector::collectd::controller (
   class { 'collectd::plugin::apache':
     instances => {
       'localhost' => {
-        'url' => 'http://localhost/server-status?auto'
+        'url' => "http://${apache_mod_status_address}/server-status?auto"
       },
     }
   }
