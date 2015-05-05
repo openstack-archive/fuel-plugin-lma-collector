@@ -17,6 +17,8 @@ require 'math'
 local floor = math.floor
 local utils  = require 'lma_utils'
 
+_PRESERVATION_VERSION = 1
+-- global scope variables for state map preservation between restarts
 services = {}
 vip_active_at = 0
 

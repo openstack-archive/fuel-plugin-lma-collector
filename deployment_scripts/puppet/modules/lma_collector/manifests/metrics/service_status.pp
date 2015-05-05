@@ -14,6 +14,7 @@ class lma_collector::metrics::service_status (
       filename              => "${lma_collector::params::plugins_dir}/filters/service_accumulator_states.lua",
       message_matcher       => inline_template('<%= @metrics_regexp.collect{|x| "Fields[name] =~ /%s/" % x}.join(" || ") %>'),
       ticker_interval       => 10,
+      preserve_data         => true,
       config                => {
         inject_payload_name => $payload_name,
       },
@@ -24,6 +25,7 @@ class lma_collector::metrics::service_status (
       config_dir      => $lma_collector::params::config_dir,
       filename        => "${lma_collector::params::plugins_dir}/filters/service_status.lua",
       message_matcher => "Fields[payload_type] == 'json' && Fields[payload_name] == '${payload_name}'",
+      preserve_data   => true,
       ticker_interval => 1,
       config          => {
         timeout => $timeout,

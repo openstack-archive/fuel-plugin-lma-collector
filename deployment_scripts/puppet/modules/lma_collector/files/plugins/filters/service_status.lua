@@ -18,7 +18,8 @@ local floor = math.floor
 local max = math.max
 local utils  = require 'lma_utils'
 
--- global scope variables
+_PRESERVATION_VERSION = 1
+-- global scope variables for status preservation between restarts
 service_status = {}
 
 -- local scope variables
@@ -28,7 +29,7 @@ local datapoints = {}
 local all_events = {}
 
 function process_message ()
-    ok, data = pcall(cjson.decode, read_message("Payload"))
+    local ok, data = pcall(cjson.decode, read_message("Payload"))
     if not ok then
         return -1
     end
@@ -164,7 +165,7 @@ function compute_status(events, not_up_status, current_time, elts_name, name, se
 
     -- elements clearly down
     for worker_name, worker in pairs(zero_up) do
-        prev = get_previous_status(name, elts_name, worker_name)
+        local prev = get_previous_status(name, elts_name, worker_name)
         local DOWN = utils.service_status_map.DOWN
         set_status(name, elts_name, worker_name, DOWN)
         if prev and prev ~= DOWN then
@@ -185,7 +186,7 @@ function compute_status(events, not_up_status, current_time, elts_name, name, se
     end
     -- elements down or degraded
     for worker_name, worker in pairs(down_elts) do
-        prev = get_previous_status(name, elts_name, worker_name)
+        local prev = get_previous_status(name, elts_name, worker_name)
         local new_status
         if one_up[worker_name] then
             new_status = utils.service_status_map.DEGRADED
@@ -213,7 +214,7 @@ function compute_status(events, not_up_status, current_time, elts_name, name, se
     -- elements ok
     for worker_name, worker in pairs(one_up) do
         if not zero_up[worker_name] and not down_elts[worker_name] then
-            prev = get_previous_status(name, elts_name, worker_name)
+            local prev = get_previous_status(name, elts_name, worker_name)
             local OK = utils.service_status_map.OK
             set_status(name, elts_name, worker_name, OK)
             if prev and prev ~= utils.service_status_map.OK then
