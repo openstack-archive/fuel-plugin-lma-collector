@@ -124,11 +124,14 @@ function compute_status(events, not_up_status, current_time, elts_name, name, se
     local total_elements = {}
 
     for worker, worker_data in pairs(service) do
+        if not total_elements[worker] then
+            total_elements[worker] = 0
+        end
+        if not up_elements[worker] then
+            up_elements[worker] = 0
+        end
         for state, data in pairs(worker_data) do
             if not expired(current_time, data.last_seen) then
-                if not total_elements[worker] then
-                    total_elements[worker] = 0
-                end
                 total_elements[worker] = total_elements[worker] + data.value
                 if state == utils.state_map.DOWN and data.value > 0 then
                     down_elts[worker] = data
