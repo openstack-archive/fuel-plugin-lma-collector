@@ -16,20 +16,21 @@
 set -e
 
 function docker_pull_image {
-    if [[ "$( docker images -q ${1})" == "" ]]; then
-        docker pull ${1}
+    if [[ $(docker images -q "${1}") == "" ]]; then
+        docker pull "${1}"
     fi
 }
 
 function docker_get_id {
-    echo $(docker inspect --format="{{ .Id }}" ${1} 2>/dev/null)
+    docker inspect --format="{{ .Id }}" "${1}" 2>/dev/null
 }
 
 function docker_is_running {
-    local IS_RUNNING=$(docker inspect --format="{{ .State.Running }}" ${1} 2>/dev/null)
+    local IS_RUNNING
+    IS_RUNNING=$(docker inspect --format="{{ .State.Running }}" "${1}" 2>/dev/null)
     [[ "${IS_RUNNING}" == "true" ]]
 }
 
 function docker_shorten_id {
-    echo ${1} | cut -c 1-12
+    echo "${1}" | cut -c 1-12
 }

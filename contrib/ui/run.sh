@@ -23,8 +23,8 @@ function convert_yes_no {
     fi
 }
 
-KIBANA_ENABLED=$(convert_yes_no ${KIBANA_ENABLED:-yes})
-GRAFANA_ENABLED=$(convert_yes_no ${GRAFANA_ENABLED:-yes})
+KIBANA_ENABLED=$(convert_yes_no "${KIBANA_ENABLED:-yes}")
+GRAFANA_ENABLED=$(convert_yes_no "${GRAFANA_ENABLED:-yes}")
 
 if [[ ${KIBANA_ENABLED} == "yes" ]]; then
     ES_HOST=${ES_HOST:-\"+window.location.hostname+\"}
