@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eux
 
-ROOT="$(dirname `readlink -f $0`)"
+ROOT="$(dirname "$(readlink -f "$0")")"
 MODULES_DIR="${ROOT}"/deployment_scripts/puppet/modules
 RPM_REPO="${ROOT}"/repositories/centos/
 DEB_REPO="${ROOT}"/repositories/ubuntu/
@@ -13,22 +13,22 @@ APACHE_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppetlabs-apache-1
 
 function download_packages {
     while [ $# -gt 0 ]; do
-        FILENAME=$(basename $1)
+        FILENAME=$(basename "$1")
         EXT=${FILENAME##*.}
         case ${EXT} in
             deb) REPO=$DEB_REPO;;
             rpm) REPO=$RPM_REPO;;
         esac
 
-        rm -f $REPO/$FILENAME
-        wget -qO - $1 > $REPO/$FILENAME
+        rm -f "$REPO"/"$FILENAME"
+        wget -qO - "$1" > "$REPO"/"$FILENAME"
         shift
     done
 }
 
 download_packages \
-    https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka_${HEKA_VERSION}_amd64.deb > ${DEB_REPO}/heka_${HEKA_VERSION}_amd64.deb \
-    https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka-${HEKA_VERSION//./_}-linux-amd64.rpm > ${RPM_REPO}/heka-${HEKA_VERSION//./_}-linux-amd64.rpm \
+    https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka_${HEKA_VERSION}_amd64.deb > "${DEB_REPO}"/heka_${HEKA_VERSION}_amd64.deb \
+    https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka-${HEKA_VERSION//./_}-linux-amd64.rpm > "${RPM_REPO}"/heka-${HEKA_VERSION//./_}-linux-amd64.rpm \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fonts-dejavu/fonts-dejavu-core_2.34-1ubuntu1_all.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fontconfig/fontconfig-config_2.11.0-0ubuntu4.1_all.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fontconfig/libfontconfig1_2.11.0-0ubuntu4.1_amd64.deb \
@@ -62,17 +62,17 @@ download_packages \
 
 
 # Extract dependent manifests from fuel-library
-rm -rf ${MODULES_DIR}/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack,stdlib,concat}
+rm -rf "${MODULES_DIR:?}"/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack,stdlib,concat}
 wget -qO- "${FUEL_LIB_TARBALL_URL}" | \
     tar -C "${MODULES_DIR}" --strip-components=3 -zxvf - \
     fuel-library-${FUEL_LIB_VERSION}/deployment/puppet/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack,stdlib,concat}
 
-rm -rf ${MODULES_DIR}/collectd
-mkdir -p ${MODULES_DIR}/collectd
+rm -rf "${MODULES_DIR}"/collectd
+mkdir -p "${MODULES_DIR}"/collectd
 wget -qO- "${COLLECTD_TARBALL_URL}" | tar -C "${MODULES_DIR}/collectd" --strip-components=1 -xz
 
 # Apache is not available in Fuel 6.0. It will be available in 6.1. So until the switch to 6.1
 # we download it from puppetlabs.
-rm -rf ${MODULES_DIR}/apache
-mkdir -p ${MODULES_DIR}/apache
+rm -rf "${MODULES_DIR}"/apache
+mkdir -p "${MODULES_DIR}"/apache
 wget -qO- "${APACHE_TARBALL_URL}" | tar -C "${MODULES_DIR}/apache" --strip-components=1 -xz

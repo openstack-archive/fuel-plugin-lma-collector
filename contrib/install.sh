@@ -28,12 +28,12 @@
 set -e
 
 function fail {
-    echo $1
+    echo "$1"
     exit 1
 }
 
 function info {
-    echo $1
+    echo "$1"
 }
 
 # Run pre-installation checks
@@ -70,7 +70,7 @@ else:
     sys.exit(1)
 EOF
 
-CURRENT_DIR=$(dirname $(readlink -f $0))
+CURRENT_DIR=$(dirname "$(readlink -f "$0")")
 
 UI_PORT=8081
 PRIMARY_IP_ADDRESS=$(hostname --ip-address)
@@ -89,15 +89,15 @@ if [[ $FREE_MEM -lt $MIN_MEM ]]; then
 fi
 
 # Don't eat up all the free memory unless it is absolutely necessary
-if [[ $FREE_MEM -gt $(( 2 * $MIN_MEM )) ]]; then
-    FREE_MEM=$(( $FREE_MEM - $MIN_MEM ))
+if [[ $FREE_MEM -gt $(( 2 * "$MIN_MEM" )) ]]; then
+    FREE_MEM=$(( "$FREE_MEM" - "$MIN_MEM" ))
 fi
 
 # There is no point of allocating more than 32GB of RAM to the JVM
 if [[ $FREE_MEM -gt $MAX_MEM ]]; then
     FREE_MEM=$MAX_MEM
 fi
-ES_MEMORY=$(( $FREE_MEM / 1024 ))
+ES_MEMORY=$(( "$FREE_MEM" / 1024 ))
 
 info "Starting the installation of the LMA collector plugin..."
 
@@ -110,34 +110,34 @@ yum install -y createrepo rpm dpkg-devel
 
 info "Building the Fuel plugin..."
 rm -f ../lma_collector*fp
-if ! (cd ${CURRENT_DIR}/.. && fuel-plugin-builder --build ./); then
+if ! (cd "${CURRENT_DIR}/.." && fuel-plugin-builder --build ./); then
     fail "Failed to build the Fuel plugin."
 fi
 
 info "Installing the Fuel plugin..."
-if ! (cd ${CURRENT_DIR}/.. && fuel plugins --force --install lma_collector*.fp); then
+if ! (cd "${CURRENT_DIR}/.." && fuel plugins --force --install lma_collector*.fp); then
     fail "Failed to install the Fuel plugin."
 fi
 
 info "Building the documentation"
 pip install Sphinx
-if ! (cd ${CURRENT_DIR}/../doc && make html); then
+if ! (cd "${CURRENT_DIR}/../doc" && make html); then
     info  "Couldn't build the documentation."
 fi
 
 info "Starting the Elasticsearch container..."
 mkdir -p $ES_DIR
-if ! (cd ${CURRENT_DIR}/elasticsearch && ES_MEMORY=$ES_MEMORY ES_DATA=$ES_DIR ES_LISTEN_ADDRESS=$PRIMARY_IP_ADDRESS ./run_container.sh); then
+if ! (cd "${CURRENT_DIR}/elasticsearch" && ES_MEMORY=$ES_MEMORY ES_DATA=$ES_DIR ES_LISTEN_ADDRESS=$PRIMARY_IP_ADDRESS ./run_container.sh); then
     fail "Failed to start the Elasticsearch container."
 fi
 
 info "Starting the InfluxDB container..."
-if ! (cd ${CURRENT_DIR}/influxdb && LISTEN_ADDRESS=$PRIMARY_IP_ADDRESS ./run_container.sh); then
+if ! (cd "${CURRENT_DIR}/influxdb" && LISTEN_ADDRESS=$PRIMARY_IP_ADDRESS ./run_container.sh); then
     fail "Failed to start the InfluxDB container."
 fi
 
 info "Starting the LMA UI container..."
-if ! (cd ${CURRENT_DIR}/ui && docker build -t lma_ui . && docker run -d -p ${UI_PORT}:80 --name lma_ui lma_ui); then
+if ! (cd "${CURRENT_DIR}/ui" && docker build -t lma_ui . && docker run -d -p ${UI_PORT}:80 --name lma_ui lma_ui); then
     fail "Failed to start the LMA UI container."
 fi
 info "Kibana dashboard available at http://${PRIMARY_IP_ADDRESS}:${UI_PORT}/kibana/"

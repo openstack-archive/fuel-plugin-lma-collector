@@ -22,8 +22,8 @@
 
 set -e
 
-CURRENT_DIR=$(dirname $(readlink -f $0))
-[[ -f ${CURRENT_DIR}/../common/functions.sh ]] && . ${CURRENT_DIR}/../common/functions.sh
+CURRENT_DIR=$(dirname "$(readlink -f "$0")")
+[[ -f ${CURRENT_DIR}/../common/functions.sh ]] && . "${CURRENT_DIR}/../common/functions.sh"
 
 DOCKER_NAME=elasticsearch
 DOCKER_IMAGE="dockerfile/elasticsearch"
@@ -46,7 +46,7 @@ if [[ "$(docker_get_id $DOCKER_NAME)" != "" ]]; then
 fi
 
 if [[ ! -d $ES_DATA ]]; then
-    mkdir $ES_DATA
+    mkdir "$ES_DATA"
 elif [[ -f ${ES_DATA}/elasticsearch.yml ]]; then
     echo "Warning: ${ES_DATA}/elasticsearch.yaml already exists."
 fi
@@ -64,17 +64,17 @@ EOF
 
 docker_pull_image ${DOCKER_IMAGE}
 
-DOCKER_ID=$(timeout $RUN_TIMEOUT docker run -d -e ES_HEAP_SIZE=${ES_MEMORY}g -p ${ES_LISTEN_ADDRESS}:${ES_HTTP_PORT}:9200 -p ${ES_LISTEN_ADDRESS}:${ES_TRANSPORT_PORT}:9300 --name ${DOCKER_NAME} -v $ES_DATA:/data ${DOCKER_IMAGE} /elasticsearch/bin/elasticsearch -Des.config=/data/elasticsearch.yml)
-SHORT_ID=$(docker_shorten_id $DOCKER_ID)
+DOCKER_ID=$(timeout $RUN_TIMEOUT docker run -d -e ES_HEAP_SIZE="${ES_MEMORY}g" -p "${ES_LISTEN_ADDRESS}:${ES_HTTP_PORT}:9200" -p "${ES_LISTEN_ADDRESS}:${ES_TRANSPORT_PORT}:9300" --name "${DOCKER_NAME}" -v "$ES_DATA:/data" ${DOCKER_IMAGE} /elasticsearch/bin/elasticsearch -Des.config=/data/elasticsearch.yml)
+SHORT_ID=$(docker_shorten_id "$DOCKER_ID")
 
 echo -n "Waiting for Elasticsearch to start"
-while ! curl http://${ES_LISTEN_ADDRESS}:${ES_HTTP_PORT} 1>/dev/null 2>&1; do
+while ! curl "http://${ES_LISTEN_ADDRESS}:${ES_HTTP_PORT}" 1>/dev/null 2>&1; do
     echo -n '.'
-    IS_RUNNING=$(docker inspect --format="{{ .State.Running }}" ${DOCKER_ID})
+    IS_RUNNING=$(docker inspect --format="{{ .State.Running }}" "${DOCKER_ID}")
     if [[ "${IS_RUNNING}" == "false" ]]; then
         echo ''
         echo "Container '${DOCKER_NAME}/${SHORT_ID}' failed to start!"
-        docker logs $DOCKER_ID
+        docker logs "$DOCKER_ID"
         exit 1
     fi
     sleep 1
@@ -84,8 +84,8 @@ echo
 echo "Container '${DOCKER_NAME}/${SHORT_ID}' started successfully"
 
 # Configure template for 'log-*' and 'notification-*' indices
-curl -s -XDELETE ${ES_URL}/_template/log 1>/dev/null
-curl -s -XPUT -d @log_index_template.json ${ES_URL}/_template/log 1>/dev/null
-curl -s -XPUT -d @notification_index_template.json ${ES_URL}/_template/notification 1>/dev/null
+curl -s -XDELETE "${ES_URL}/_template/log" 1>/dev/null
+curl -s -XPUT -d @log_index_template.json "${ES_URL}/_template/log" 1>/dev/null
+curl -s -XPUT -d @notification_index_template.json "${ES_URL}/_template/notification" 1>/dev/null
 
 echo "Elasticsearch API avaiable at ${ES_URL}"
