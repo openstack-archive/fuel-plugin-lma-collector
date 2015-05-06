@@ -144,3 +144,21 @@ Contributors
 * Guillaume Thouvenin <gthouvenin@mirantis.com>
 * Simon Pasquier <spasquier@mirantis.com>
 * Swann Croiset <scroiset@mirantis.com>
+
+
+Contributions Welcomed
+----------------------
+
+If you would like to contribute to the development of this Fuel plugin you must
+follow the workflow documented at:
+
+   [OpenStack development workflow](http://docs.openstack.org/infra/manual/developers.html#development-workflow)
+
+Bugs should be filed on Launchpad (not GitHub) with tag ``lma``:
+
+   [Launchpad fuel-plugns project](https://bugs.launchpad.net/fuel-plugins)
+
+Patch reviews take place here:
+
+   [LMA reviews](https://review.openstack.org/#/q/status:open+project:stackforge/fuel-plugin-lma-collector,n,z)
+
