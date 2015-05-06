@@ -16,6 +16,7 @@
 
 $lma_collector = hiera('lma_collector')
 $roles         = node_roles(hiera('nodes'), hiera('uid'))
+$is_controller = member($roles, 'controller') or member($roles, 'primary-controller')
 
 $tags = {
   deployment_id => hiera('deployment_id'),
@@ -33,13 +34,13 @@ else {
   $additional_tags = {}
 }
 
-if hiera('deployment_mode') =~ /^ha_/ and hiera('role') =~ /controller/{
+if hiera('deployment_mode') =~ /^ha_/ and $is_controller {
   $additional_groups = ['haclient']
 }else{
   $additional_groups = []
 }
 
-if hiera('role') =~ /controller/ and $lma_collector['enable_notifications'] {
+if $is_controller and $lma_collector['enable_notifications'] {
   $pre_script        = '/usr/local/bin/wait_for_rabbitmq'
   # Params used by the script.
   $rabbit            = hiera('rabbit')
