@@ -27,7 +27,7 @@ class OSClient(object):
     EXPIRATION_TOKEN_DELTA = datetime.timedelta(0, 30)
 
     def __init__(self, username, password, tenant, keystone_url, timeout,
-                 logger):
+                 logger, max_retries):
         self.logger = logger
         self.username = username
         self.password = password
@@ -38,6 +38,14 @@ class OSClient(object):
         self.timeout = timeout
         self.token = None
         self.valid_until = None
+
+        # Note: prior to urllib3 v1.9, retries are made on failed connections
+        # but not on timeout and backoff time is not supported.
+        # (at this time we ship requests 2.2.1 and urllib3 1.6.1 or 1.7.1)
+        self.session = requests.Session()
+        self.session.mount('http://', requests.adapters.HTTPAdapter(max_retries=max_retries))
+        self.session.mount('https://', requests.adapters.HTTPAdapter(max_retries=max_retries))
+
         self.get_token()
 
     def is_valid_token(self):
@@ -63,7 +71,7 @@ class OSClient(object):
             }
         )
         self.logger.info("Trying to get token from '%s'" % self.keystone_url)
-        r = self.make_request(requests.post,
+        r = self.make_request('post',
                               '%s/tokens' % self.keystone_url, data=data,
                               token_required=False)
         if not r:
@@ -96,7 +104,7 @@ class OSClient(object):
         self.logger.debug("Got token '%s'" % self.token)
         return self.token
 
-    def make_request(self, func, url, data=None, token_required=True):
+    def make_request(self, verb, url, data=None, token_required=True):
         kwargs = {
             'url': url,
             'timeout': self.timeout,
@@ -111,6 +119,8 @@ class OSClient(object):
 
         if data is not None:
             kwargs['data'] = data
+
+        func = getattr(self.session, verb.lower())
 
         try:
             r = func(**kwargs)
@@ -135,6 +145,7 @@ class CollectdPlugin(object):
         self.os_client = None
         self.logger = logger
         self.timeout = 5
+        self.max_retries = 3
         self.extra_config = {}
 
     def _build_url(self, service, resource):
@@ -159,7 +170,7 @@ class CollectdPlugin(object):
         if not url:
             return
         self.logger.info("GET '%s'" % url)
-        return self.os_client.make_request(requests.get, url)
+        return self.os_client.make_request('get', url)
 
     @property
     def service_catalog(self):
@@ -177,6 +188,8 @@ class CollectdPlugin(object):
         for node in config.children:
             if node.key == 'Timeout':
                 self.timeout = int(node.values[0])
+            elif node.key == 'MaxRetries':
+                self.max_retries = int(node.values[0])
             elif node.key == 'Username':
                 username = node.values[0]
             elif node.key == 'Password':
@@ -186,7 +199,8 @@ class CollectdPlugin(object):
             elif node.key == 'KeystoneUrl':
                 keystone_url = node.values[0]
         self.os_client = OSClient(username, password, tenant_name,
-                                  keystone_url, self.timeout, self.logger)
+                                  keystone_url, self.timeout, self.logger,
+                                  self.max_retries)
 
     def read_callback(self):
         raise "read_callback method needs to be overriden!"
