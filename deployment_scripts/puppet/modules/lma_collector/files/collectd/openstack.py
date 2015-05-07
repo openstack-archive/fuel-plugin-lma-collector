@@ -230,13 +230,6 @@ class CollectdPlugin(object):
                                            token_required=token_required,
                                            raise_on_timeout=raise_on_timeout)
 
-    def post(self, service, resource, data):
-        url = self._build_url(service, resource)
-        if not url:
-            return
-        self.logger.info("POST '%s'" % url)
-        return self.os_client.make_request(self.session.post, url, data)
-
     @property
     def service_catalog(self):
         if not self.os_client.service_catalog:
