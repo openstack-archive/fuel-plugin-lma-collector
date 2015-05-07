@@ -17,6 +17,7 @@ import dateutil.parser
 import dateutil.tz
 import requests
 import simplejson as json
+from urlparse import urlparse
 
 
 class OSClient(object):
@@ -114,7 +115,6 @@ class OSClient(object):
 
         try:
             r = func(**kwargs)
-            r.json()
         except Exception as e:
             self.logger.error("Got exception for '%s': '%s'" %
                               (kwargs['url'], e))
@@ -160,12 +160,35 @@ class CollectdPlugin(object):
             self.logger.error("Service '%s' not found in catalog" % service)
         return url
 
-    def get(self, service, resource):
-        url = self._build_url(service, resource)
+    def _get_base_url(self, service, resource):
+        s = (self.get_service(service) or {})
+        endpoint = s.get('url')
+        if not endpoint:
+            self.logger.error("Service '%s' not found in catalog" % service)
+        url = urlparse(endpoint)
+        u = '%s://%s' % (url.scheme, url.netloc)
+        if resource != '/':
+            u = '%s/%s' % (u, resource)
+        return u
+
+    def get_from_base_url(self, service, resource, token_required=True):
+        return self._get(service, resource, from_base_url=True,
+                         token_required=token_required)
+
+    def get(self, service, resource, token_required=True):
+        return self._get(service, resource, token_required=token_required)
+
+    def _get(self, service, resource, from_base_url=False,
+             token_required=True):
+        if from_base_url:
+            url = self._get_base_url(service, resource)
+        else:
+            url = self._build_url(service, resource)
         if not url:
             return
         self.logger.info("GET '%s'" % url)
-        return self.os_client.make_request(self.session.get, url)
+        return self.os_client.make_request(self.session.get, url,
+                                           token_required=token_required)
 
     def post(self, service, resource, data):
         url = self._build_url(service, resource)

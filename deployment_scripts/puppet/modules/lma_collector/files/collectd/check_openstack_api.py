@@ -28,15 +28,20 @@ class APICheckPlugin(openstack.CollectdPlugin):
     FAIL = 1
     UNKNOWN = 2
 
-    # TODO(pasquier-s): add heat-cfn, nova_ec2, cinderv2, ceilometer, murano,
-    # sahara
+    # TODO: nova_ec2, sahara
+    # NOTE: we don't explicitly check keystone since we already obtain a token
+    # to retrieve catalog
     RESOURCE_MAP = {
-        'cinder': 'volumes',
-        'glance': 'v1/images',
-        'heat': 'stacks',
-        'keystone': 'tenants',
-        'neutron': 'v2.0/networks',
-        'nova': 'flavors',
+        'cinder': '/',    # 300 Multiple Choices
+        'cinderv2': '/',  # 300 Multiple Choices
+        'heat': '/',      # 300 Multiple Choices
+        'heat-cfn': '/',  # 300 Multiple Choices
+        'glance': '/',
+        'neutron': '/',
+        'nova': '/',
+        'ceilometer': 'v2/capabilities',
+        'swift': 'healthcheck',
+        'swift_s3': 'healthcheck',
     }
 
     def check_api(self):
@@ -46,15 +51,23 @@ class APICheckPlugin(openstack.CollectdPlugin):
             FAIL or UNKNOWN) and 'region' keys.
         """
         catalog = self.service_catalog
+        keystone_region = None
         for service in catalog:
             if service['name'] not in self.RESOURCE_MAP:
-                self.logger.notice("Don't know how to check service '%s'" %
-                                   service['name'])
+                if service['name'] == 'keystone':
+                    keystone_region = service['region']
+                else:
+                    self.logger.notice("Skip check service '%s'" %
+                                       service['name'])
                 status = self.UNKNOWN
             else:
-                r = self.get(service['name'],
-                             self.RESOURCE_MAP[service['name']])
-                if not r or r.status_code < 200 or r.status_code > 299:
+                r = self.get_from_base_url(service['name'],
+                                           self.RESOURCE_MAP[service['name']],
+                                           token_required=False)
+
+                # Note: status code "300 Multiple Choices" is considered as
+                # valid for these checks.
+                if not r or r.status_code < 200 or r.status_code > 300:
                     status = self.FAIL
                 else:
                     status = self.OK
@@ -64,6 +77,18 @@ class APICheckPlugin(openstack.CollectdPlugin):
                 'status': status,
                 'region': service['region']
             }
+
+        keystone_status = {
+            'service': 'keystone',
+            'region': keystone_region,
+        }
+
+        if catalog:
+            keystone_status['status'] = self.OK
+        else:
+            keystone_status['status'] = self.FAIL
+
+        yield keystone_status
 
     def read_callback(self):
         for item in self.check_api():
