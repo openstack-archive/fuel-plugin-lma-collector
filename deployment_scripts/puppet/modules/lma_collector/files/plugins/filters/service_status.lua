@@ -61,6 +61,8 @@ function process_message ()
                 events[#events+1] = string.format("check api %s -> %s",
                                       utils.service_status_to_label_map[prev_check_api_status],
                                       utils.service_status_to_label_map[check_api_status])
+            elseif check_api_status == utils.service_status_map.DOWN then
+                not_up_status[#not_up_status+1] = string.format("check api status DOWN")
             end
         end
         haproxy_server_status = compute_status(events, not_up_status, ts, 'haproxy', service_name, service.haproxy)
