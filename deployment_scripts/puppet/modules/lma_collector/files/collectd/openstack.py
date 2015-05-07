@@ -27,18 +27,20 @@ class OSClient(object):
     EXPIRATION_TOKEN_DELTA = datetime.timedelta(0, 30)
 
     def __init__(self, username, password, tenant, keystone_url, timeout,
-                 logger):
+                 logger, session):
         self.logger = logger
         self.username = username
         self.password = password
         self.tenant_name = tenant
         self.keystone_url = keystone_url
+        self.session = session
         self.service_catalog = []
         self.tenant_id = None
         self.timeout = timeout
         self.token = None
         self.valid_until = None
         self.get_token()
+
 
     def is_valid_token(self):
         now = datetime.datetime.now(tz=dateutil.tz.tzutc())
@@ -63,7 +65,7 @@ class OSClient(object):
             }
         )
         self.logger.info("Trying to get token from '%s'" % self.keystone_url)
-        r = self.make_request(requests.post,
+        r = self.make_request(self.session.post,
                               '%s/tokens' % self.keystone_url, data=data,
                               token_required=False)
         if not r:
@@ -137,6 +139,12 @@ class CollectdPlugin(object):
         self.timeout = 5
         self.extra_config = {}
 
+        # Note: retries are made on failed connections but not on timeout with
+        # requests 2.2.1 / urllib3 1.6.1 (supported with urllib 3 1.9)
+        self.session = requests.Session()
+        self.session.mount('http://', requests.adapters.HTTPAdapter(max_retries=3))
+        self.session.mount('https://', requests.adapters.HTTPAdapter(max_retries=3))
+
     def _build_url(self, service, resource):
         s = (self.get_service(service) or {})
         # the adminURL must be used to access resources with Keystone API v2
@@ -159,7 +167,7 @@ class CollectdPlugin(object):
         if not url:
             return
         self.logger.info("GET '%s'" % url)
-        return self.os_client.make_request(requests.get, url)
+        return self.os_client.make_request(self.session.get, url)
 
     @property
     def service_catalog(self):
@@ -186,7 +194,8 @@ class CollectdPlugin(object):
             elif node.key == 'KeystoneUrl':
                 keystone_url = node.values[0]
         self.os_client = OSClient(username, password, tenant_name,
-                                  keystone_url, self.timeout, self.logger)
+                                  keystone_url, self.timeout, self.logger,
+                                  self.session)
 
     def read_callback(self):
         raise "read_callback method needs to be overriden!"
