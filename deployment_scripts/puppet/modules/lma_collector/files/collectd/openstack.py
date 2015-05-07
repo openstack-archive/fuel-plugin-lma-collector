@@ -137,6 +137,12 @@ class CollectdPlugin(object):
         self.timeout = 5
         self.extra_config = {}
 
+        # Note: retries are made on failed connections but not on timeout with
+        # requests 2.2.1 / urllib3 1.6.1 (supported with urllib 3 1.9)
+        self.session = requests.Session()
+        self.session.mount('http://', requests.adapters.HTTPAdapter(max_retries=3))
+        self.session.mount('https://', requests.adapters.HTTPAdapter(max_retries=3))
+
     def _build_url(self, service, resource):
         s = (self.get_service(service) or {})
         # the adminURL must be used to access resources with Keystone API v2
@@ -159,14 +165,14 @@ class CollectdPlugin(object):
         if not url:
             return
         self.logger.info("GET '%s'" % url)
-        return self.os_client.make_request(requests.get, url)
+        return self.os_client.make_request(self.session.get, url)
 
     def post(self, service, resource, data):
         url = self._build_url(service, resource)
         if not url:
             return
         self.logger.info("POST '%s'" % url)
-        return self.os_client.make_request(requests.post, url, data)
+        return self.os_client.make_request(self.session.post, url, data)
 
     @property
     def service_catalog(self):
