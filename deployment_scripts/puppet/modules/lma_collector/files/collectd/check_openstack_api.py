@@ -17,6 +17,8 @@
 import collectd
 import openstack
 
+from urlparse import urlparse
+
 PLUGIN_NAME = 'check_openstack_api'
 INTERVAL = 60
 
@@ -24,20 +26,32 @@ INTERVAL = 60
 class APICheckPlugin(openstack.CollectdPlugin):
     """ Class to check the status of OpenStack API services.
     """
-    OK = 0
-    FAIL = 1
+    FAIL = 0
+    OK = 1
     UNKNOWN = 2
 
-    # TODO(pasquier-s): add heat-cfn, nova_ec2, cinderv2, ceilometer, murano,
-    # sahara
-    RESOURCE_MAP = {
-        'cinder': 'volumes',
-        'glance': 'v1/images',
-        'heat': 'stacks',
-        'keystone': 'tenants',
-        'neutron': 'v2.0/networks',
-        'nova': 'flavors',
+    # TODO: nova_ec2, sahara
+    CHECK_MAP = {
+        'keystone': {'path': '/', 'expect': 300},  # 300 Multiple Choices
+        'cinder': {'path': '/', 'expect': 300},    # 300 Multiple Choices
+        'cinderv2': {'path': '/', 'expect': 300},  # 300 Multiple Choices
+        'heat': {'path': '/', 'expect': 300},      # 300 Multiple Choices
+        'heat-cfn': {'path': '/', 'expect': 300},  # 300 Multiple Choices
+        'glance': {'path': '/', 'expect': 200},
+        'neutron': {'path': '/', 'expect': 200},
+        'nova': {'path': '/', 'expect': 200},
+        # Ceilometer requires authentication for all path
+        'ceilometer': {'path': 'v2/capabilities', 'expect': 200, 'auth': True},
+        'swift': {'path': 'healthcheck', 'expect': 200},
+        'swift_s3': {'path': 'healthcheck', 'expect': 200},
     }
+
+    def _service_url(self, endpoint, path):
+        url = urlparse(endpoint)
+        u = '%s://%s' % (url.scheme, url.netloc)
+        if path != '/':
+            u = '%s/%s' % (u, path)
+        return u
 
     def check_api(self):
         """ Check the status of all the API services.
@@ -47,42 +61,43 @@ class APICheckPlugin(openstack.CollectdPlugin):
         """
         catalog = self.service_catalog
         for service in catalog:
-            if service['name'] not in self.RESOURCE_MAP:
-                self.logger.notice("Don't know how to check service '%s'" %
-                                   service['name'])
+            name = service['name']
+            if name not in self.CHECK_MAP:
+                self.logger.notice("Skip check for service '%s'" % name)
                 status = self.UNKNOWN
             else:
-                r = self.get(service['name'],
-                             self.RESOURCE_MAP[service['name']])
-                if not r or r.status_code < 200 or r.status_code > 299:
+                check = self.CHECK_MAP[name]
+                url = self._service_url(service['url'], check['path'])
+                r = self.raw_get(url, token_required=check.get('auth', False))
+
+                if not r or r.status_code != check['expect']:
+                    self.logger.notice("Service %s check failed" % name)
                     status = self.FAIL
                 else:
                     status = self.OK
 
             yield {
-                'service': service['name'],
+                'service': name,
                 'status': status,
                 'region': service['region']
             }
 
     def read_callback(self):
         for item in self.check_api():
+            if item['status'] == self.UNKNOWN:
+                # skip if status is UNKNOWN
+                continue
+
             value = collectd.Values(
                 plugin=PLUGIN_NAME,
                 plugin_instance=item['service'],
                 type='gauge',
                 type_instance=item['region'],
                 interval=INTERVAL,
+                values=[item['status']],
                 # w/a for https://github.com/collectd/collectd/issues/716
                 meta={'0': True}
             )
-            if item['status'] == self.OK:
-                value.values = [1]
-            elif item['status'] == self.FAIL:
-                value.values = [0]
-            else:
-                # skip if status is UNKNOWN
-                continue
             value.dispatch()
 
 
