@@ -18,6 +18,40 @@ import dateutil.tz
 import requests
 import simplejson as json
 
+from functools import wraps
+import time
+
+MAX_RETRIES = 3
+MAX_BACKOFF = 60
+BACKOFF_FACTOR = 5
+
+
+def retry_backoff(func):
+    """A decorator to perform retries when an exeception occurs.
+
+    The BACKOFF_FACTOR is apply between retries to calculate sleep time.
+    If the backoff factor is 5 then 'wrapper' will sleep for 5s, 10s, 20s
+    between attempts. The sleep time is always lower or equal to MAX_BACKOFF.
+    The loop exit when MAX_RETRIES is exceeded or when the call finally succeed.
+    """
+    def get_backoff_time(errors):
+        backoff_time = BACKOFF_FACTOR * (2 ** (errors - 1))
+        return min(MAX_BACKOFF, backoff_time)
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        errors_observed = 0
+        wait = 0
+        while errors_observed < MAX_RETRIES:
+            try:
+                if wait > 0:
+                    time.sleep(wait)
+                return func(*args, **kwargs)
+            except:
+                errors_observed += 1
+                wait = get_backoff_time(errors_observed)
+    return wrapper
+
 
 class OSClient(object):
     """ Base class for querying the OpenStack API endpoints.
@@ -50,6 +84,7 @@ class OSClient(object):
         self.token = None
         self.valid_until = None
 
+    @retry_backoff
     def get_token(self):
         self.clear_token()
         data = json.dumps({
@@ -67,7 +102,8 @@ class OSClient(object):
         self.logger.info("Trying to get token from '%s'" % self.keystone_url)
         r = self.make_request(self.session.post,
                               '%s/tokens' % self.keystone_url, data=data,
-                              token_required=False)
+                              token_required=False,
+                              raise_on_timeout=True)
         if not r:
             self.logger.error("Cannot get a valid token from %s" %
                               self.keystone_url)
@@ -98,7 +134,8 @@ class OSClient(object):
         self.logger.debug("Got token '%s'" % self.token)
         return self.token
 
-    def make_request(self, func, url, data=None, token_required=True):
+    def make_request(self, func, url, data=None, token_required=True,
+                     raise_on_timeout=False):
         kwargs = {
             'url': url,
             'timeout': self.timeout,
@@ -116,7 +153,12 @@ class OSClient(object):
 
         try:
             r = func(**kwargs)
-            r.json()
+        except requests.exceptions.Timeout as to:
+            self.logger.error("Got Timeout for '%s': '%s'" %
+                              (kwargs['url'], to))
+            if raise_on_timeout:
+               raise to
+            return
         except Exception as e:
             self.logger.error("Got exception for '%s': '%s'" %
                               (kwargs['url'], e))
@@ -162,12 +204,20 @@ class CollectdPlugin(object):
             self.logger.error("Service '%s' not found in catalog" % service)
         return url
 
+    @retry_backoff
+    def raw_get(self, url, token_required=False):
+        return self.os_client.make_request(self.session.get, url,
+                                           token_required=token_required,
+                                           raise_on_timeout=True)
+
+    @retry_backoff
     def get(self, service, resource):
         url = self._build_url(service, resource)
         if not url:
             return
         self.logger.info("GET '%s'" % url)
-        return self.os_client.make_request(self.session.get, url)
+        return self.os_client.make_request(self.session.get, url,
+                                           raise_on_timeout=True)
 
     @property
     def service_catalog(self):
@@ -182,9 +232,20 @@ class CollectdPlugin(object):
                     if x['name'] == service_name), None)
 
     def config_callback(self, config):
+        global MAX_BACKOFF
+        global MAX_RETRIES
+        global BACKOFF_FACTOR
+
+        backoff_factor = None
         for node in config.children:
             if node.key == 'Timeout':
-                self.timeout = int(node.values[0])
+                self.timeout = float(node.values[0])
+            if node.key == 'MaxBackoff':
+                MAX_BACKOFF = float(node.values[0])
+            if node.key == 'MaxRetries':
+                MAX_RETRIES = float(node.values[0])
+            if node.key == 'BackoffFactor':
+                backoff_factor = float(node.values[0])
             elif node.key == 'Username':
                 username = node.values[0]
             elif node.key == 'Password':
@@ -193,6 +254,11 @@ class CollectdPlugin(object):
                 tenant_name = node.values[0]
             elif node.key == 'KeystoneUrl':
                 keystone_url = node.values[0]
+
+        # use the timeout as a backoff factor per default
+        if not backoff_factor and self.timeout:
+            BACKOFF_FACTOR = self.timeout
+
         self.os_client = OSClient(username, password, tenant_name,
                                   keystone_url, self.timeout, self.logger,
                                   self.session)
