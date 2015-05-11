@@ -17,6 +17,8 @@
 import collectd
 import openstack
 
+from urlparse import urlparse
+
 PLUGIN_NAME = 'check_openstack_api'
 INTERVAL = 60
 
@@ -28,16 +30,27 @@ class APICheckPlugin(openstack.CollectdPlugin):
     FAIL = 1
     UNKNOWN = 2
 
-    # TODO(pasquier-s): add heat-cfn, nova_ec2, cinderv2, ceilometer, murano,
-    # sahara
-    RESOURCE_MAP = {
-        'cinder': 'volumes',
-        'glance': 'v1/images',
-        'heat': 'stacks',
-        'keystone': 'tenants',
-        'neutron': 'v2.0/networks',
-        'nova': 'flavors',
+    # TODO: nova_ec2, sahara
+    CHECK_MAP = {
+        'keystone': {'resource': '/', 'expect': 300},  # 300 Multiple Choices
+        'cinder': {'resource': '/', 'expect': 300},    # 300 Multiple Choices
+        'cinderv2': {'resource': '/', 'expect': 300},  # 300 Multiple Choices
+        'heat': {'resource': '/', 'expect': 300},      # 300 Multiple Choices
+        'heat-cfn': {'resource': '/', 'expect': 300},  # 300 Multiple Choices
+        'glance': {'resource': '/', 'expect': 200},
+        'neutron': {'resource': '/', 'expect': 200},
+        'nova': {'resource': '/', 'expect': 200},
+        'ceilometer': {'resource': 'v2/capabilities', 'expect': 200, 'auth': True},
+        'swift': {'resource': 'healthcheck', 'expect': 200},
+        'swift_s3': {'resource': 'healthcheck', 'expect': 200},
     }
+
+    def _service_url(self, endpoint, resource):
+        url = urlparse(endpoint)
+        u = '%s://%s' % (url.scheme, url.netloc)
+        if resource != '/':
+            u = '%s/%s' % (u, resource)
+        return u
 
     def check_api(self):
         """ Check the status of all the API services.
@@ -47,20 +60,24 @@ class APICheckPlugin(openstack.CollectdPlugin):
         """
         catalog = self.service_catalog
         for service in catalog:
-            if service['name'] not in self.RESOURCE_MAP:
-                self.logger.notice("Don't know how to check service '%s'" %
-                                   service['name'])
+            name = service['name']
+            if name not in self.CHECK_MAP:
+                self.logger.notice("Skip check service '%s'" % name)
                 status = self.UNKNOWN
             else:
-                r = self.get(service['name'],
-                             self.RESOURCE_MAP[service['name']])
-                if not r or r.status_code < 200 or r.status_code > 299:
+                url = self._service_url(service['url'],
+                                        self.CHECK_MAP[name]['resource'])
+                r = self.raw_get(
+                    url, token_required=self.CHECK_MAP[name].get('auth', False)
+                )
+
+                if not r or r.status_code != self.CHECK_MAP[name]['expect']:
                     status = self.FAIL
                 else:
                     status = self.OK
 
             yield {
-                'service': service['name'],
+                'service': name,
                 'status': status,
                 'region': service['region']
             }
