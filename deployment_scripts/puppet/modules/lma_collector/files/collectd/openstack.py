@@ -113,7 +113,7 @@ class OSClient(object):
            not self.get_token():
             self.logger.error("Aborting request, no valid token")
             return
-        else:
+        elif token_required:
             kwargs['headers']['X-Auth-Token'] = self.token
 
         if data is not None:
@@ -162,6 +162,10 @@ class CollectdPlugin(object):
         else:
             self.logger.error("Service '%s' not found in catalog" % service)
         return url
+
+    def raw_get(self, url, token_required=False):
+        return self.os_client.make_request(self.session.get, url,
+                                           token_required=token_required)
 
     def get(self, service, resource):
         url = self._build_url(service, resource)
