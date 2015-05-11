@@ -17,6 +17,8 @@
 import collectd
 import openstack
 
+from urlparse import urlparse
+
 PLUGIN_NAME = 'check_openstack_api'
 INTERVAL = 60
 
@@ -28,16 +30,31 @@ class APICheckPlugin(openstack.CollectdPlugin):
     FAIL = 1
     UNKNOWN = 2
 
-    # TODO(pasquier-s): add heat-cfn, nova_ec2, cinderv2, ceilometer, murano,
-    # sahara
+    # TODO: nova_ec2, sahara
     RESOURCE_MAP = {
-        'cinder': 'volumes',
-        'glance': 'v1/images',
-        'heat': 'stacks',
-        'keystone': 'tenants',
-        'neutron': 'v2.0/networks',
-        'nova': 'flavors',
+        'keystone': '/',  # 300 Multiple Choices
+        'cinder': '/',    # 300 Multiple Choices
+        'cinderv2': '/',  # 300 Multiple Choices
+        'heat': '/',      # 300 Multiple Choices
+        'heat-cfn': '/',  # 300 Multiple Choices
+        'glance': '/',
+        'neutron': '/',
+        'nova': '/',
+        'ceilometer': 'v2/capabilities',
+        'swift': 'healthcheck',
+        'swift_s3': 'healthcheck',
     }
+
+    def _service_url(self, service, resource):
+        s = (self.get_service(service) or {})
+        endpoint = s.get('url')
+        if not endpoint:
+            self.logger.error("Service '%s' not found in catalog" % service)
+        url = urlparse(endpoint)
+        u = '%s://%s' % (url.scheme, url.netloc)
+        if resource != '/':
+            u = '%s/%s' % (u, resource)
+        return u
 
     def check_api(self):
         """ Check the status of all the API services.
@@ -48,13 +65,16 @@ class APICheckPlugin(openstack.CollectdPlugin):
         catalog = self.service_catalog
         for service in catalog:
             if service['name'] not in self.RESOURCE_MAP:
-                self.logger.notice("Don't know how to check service '%s'" %
-                                   service['name'])
+                self.logger.notice("Skip check service '%s'" % service['name'])
                 status = self.UNKNOWN
             else:
-                r = self.get(service['name'],
-                             self.RESOURCE_MAP[service['name']])
-                if not r or r.status_code < 200 or r.status_code > 299:
+                url = self._service_url(service['name'],
+                                   self.RESOURCE_MAP[service['name']])
+                r = self.raw_get(url)
+
+                # Note: status code "300 Multiple Choices" is considered as
+                # valid for these checks.
+                if not r or (r.status_code != 200 and r.status_code != 300):
                     status = self.FAIL
                 else:
                     status = self.OK

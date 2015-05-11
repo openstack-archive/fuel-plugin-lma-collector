@@ -6,7 +6,19 @@ Service checks
 
 * ``openstack.<service>.check_api``, the service's API status, 1 if it is responsive, 0 otherwise.
 
-``<service>`` is one of 'cinder', 'glance', 'heat' 'keystone', 'neutron' or 'nova'.
+``<service>`` is one of the following services with their respective resource checks:
+* 'nova': '/'
+* 'cinder': '/'
+* 'cinderv2': '/'
+* 'glance': '/'
+* 'heat': '/'
+* 'keystone': '/'
+* 'neutron': '/'
+* 'ceilometer': '/v2/capabilities'
+* 'swift': '/healthcheck'
+* 'swift_s3': '/healthcheck'
+
+.. note:: All checks are performed without authentication
 
 Compute
 ^^^^^^^
