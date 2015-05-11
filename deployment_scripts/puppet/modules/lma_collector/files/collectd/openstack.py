@@ -161,13 +161,6 @@ class CollectdPlugin(object):
         self.logger.info("GET '%s'" % url)
         return self.os_client.make_request(requests.get, url)
 
-    def post(self, service, resource, data):
-        url = self._build_url(service, resource)
-        if not url:
-            return
-        self.logger.info("POST '%s'" % url)
-        return self.os_client.make_request(requests.post, url, data)
-
     @property
     def service_catalog(self):
         if not self.os_client.service_catalog:
