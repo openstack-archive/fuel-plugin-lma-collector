@@ -45,12 +45,13 @@ class lma_collector (
   $lua_modules_dir = $heka::params::lua_modules_dir
 
   class { 'heka':
-    service_name      => $service_name,
-    config_dir        => $config_dir,
-    run_as_root       => $lma_collector::params::run_as_root,
-    additional_groups => union($lma_collector::params::groups, $groups),
-    hostname          => $::hostname,
-    pre_script        => $pre_script,
+    service_name        => $service_name,
+    config_dir          => $config_dir,
+    run_as_root         => $lma_collector::params::run_as_root,
+    additional_groups   => union($lma_collector::params::groups, $groups),
+    hostname            => $::hostname,
+    pre_script          => $pre_script,
+    internal_statistics => true,
   }
 
   file { "${lua_modules_dir}/lma_utils.lua":
