@@ -44,6 +44,10 @@
 # [*dashboard_port*]
 #   The listening port for the Heka dashboard (default: 4352).
 #
+# [*internal_statistics*]
+#   Whether or not to dump Heka internal statistics to stdout at a regular
+#   interval (currently every hour).
+#
 # === Examples
 #
 #  class { 'heka':
@@ -69,6 +73,7 @@ class heka (
   $dashboard_address = $heka::params::dashboard_address,
   $dashboard_port = $heka::params::dashboard_port,
   $pre_script = undef,
+  $internal_statistics = $heka::params::internal_statistics,
 ) inherits heka::params {
 
   $heka_user     = $heka::params::user
@@ -176,6 +181,17 @@ class heka (
       group   => $heka_user,
       require => File[$config_dir],
       notify  => Service[$service_name],
+    }
+  }
+
+  if $internal_statistics {
+    cron { 'heka-internal-statistics':
+      ensure   => present,
+      command  => '/usr/bin/killall -SIGUSR1 hekad',
+      minute   => '0',
+      hour     => '*',
+      month    => '*',
+      monthday => '*',
     }
   }
 }

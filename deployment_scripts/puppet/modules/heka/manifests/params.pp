@@ -23,6 +23,7 @@ class heka::params {
   $maxprocs = $::processorcount
   $dashboard_address = undef
   $dashboard_port = '4352'
+  $internal_statistics = false
 
   $config_dir = "/etc/${service_name}"
   $share_dir = '/usr/share/heka'
