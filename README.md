@@ -137,6 +137,29 @@ Release Notes
 
 * Initial release of the plugin. This is a beta version.
 
+Development
+===========
+
+The *OpenStack Development Mailing List* is the preferred way to communicate,
+emails should be sent to `openstack-dev@lists.openstack.org` with the subject
+prefixed by `[fuel][plugins][lma]`.
+
+Reporting Bugs
+--------------
+
+Bugs should be filled on the [Launchpad fuel-plugins project](
+https://bugs.launchpad.net/fuel-plugins) (not GitHub) with the tag `lma`.
+
+Contributing
+------------
+
+If you would like to contribute to the development of this Fuel plugin you must
+follow the [OpenStack development workflow](
+http://docs.openstack.org/infra/manual/developers.html#development-workflow).
+
+Patch reviews take place on the [OpenStack gerrit](
+https://review.openstack.org/#/q/status:open+project:stackforge/fuel-plugin-lma-collector,n,z)
+system.
 
 Contributors
 ------------
