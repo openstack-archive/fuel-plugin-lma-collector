@@ -62,7 +62,7 @@ function process_message ()
     elseif string.find(metric_name, '^haproxy%.backend') then
         top_entry = 'haproxy'
         group_name = 'api'
-        item_name = string.match(metric_name, '^haproxy%.backend%.([^._]+)%.servers')
+        item_name = string.match(metric_name, '^haproxy%.backend%.([^.]+)%.servers')
         name = string.match(item_name, '^([^-]+)')
     end
     if not name then
