@@ -66,7 +66,9 @@ function process_message ()
                 not_up_status[#not_up_status+1] = string.format("API status DOWN")
             end
         end
-        haproxy_server_status = compute_status(events, not_up_status, ts, 'haproxy', service_name, service.haproxy)
+        if service.haproxy then
+            haproxy_server_status = compute_status(events, not_up_status, ts, 'haproxy', service_name, service.haproxy)
+        end
         general_status = max(worker_status, check_api_status, haproxy_server_status)
         -- global service status
         utils.add_metric(datapoints,
