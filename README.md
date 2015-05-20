@@ -43,9 +43,9 @@ dependencies:
 
 To install them automatically using Fuel, you can refer to the
 [Elasticsearch-Kibana Fuel Plugin
-](https://github.com/stackforge/fuel-plugin-elasticsearch-kibana).
+](https://github.com/stackforge/fuel-plugin-elasticsearch-kibana)
 and [InfluxDB-Grafana Fuel Plugin
-](https://github.com/stackforge/fuel-plugin-influxdb-grafana)
+](https://github.com/stackforge/fuel-plugin-influxdb-grafana).
 
 You can install Elasticsearch/Kibana and InfluxDB/Grafana outside of Fuel as
 long as your installation meets the LMA Collector plugin's requirements defined
