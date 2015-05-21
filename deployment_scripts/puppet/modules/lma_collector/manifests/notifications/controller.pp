@@ -198,16 +198,27 @@ class lma_collector::notifications::controller (
   # Heat
   include heat::params
 
+  # Note: since the heat-engine process is managed by pacemaker, traditional
+  # status/restart scripts don't work (hijacked by a pcs resource not
+  # used in lma module).
+  # We leverage the oslo-config capacity to reload its configuration by handling
+  # the signal SIGUSR1.
+  $reload_heat_engine_config_rsrc = 'reload-heat-engine-config-with-SIGUSR1'
+  exec { $reload_heat_engine_config_rsrc:
+    command => '/usr/bin/pkill -10 heat-engine',
+    refreshonly => true,
+  }
+
   heat_config {
     'DEFAULT/notification_topics': value => $notification_topics,
-    notify => Service[$::heat::params::api_service_name, $::heat::params::engine_service_name],
+    notify => [Service[$::heat::params::api_service_name], Exec[$reload_heat_engine_config_rsrc]],
   }
   heat_config {
     'DEFAULT/notification_driver': value => $driver,
-    notify => Service[$::heat::params::api_service_name, $::heat::params::engine_service_name],
+    notify => [Service[$::heat::params::api_service_name], Exec[$reload_heat_engine_config_rsrc]],
   }
 
-  service { [$::heat::params::api_service_name, $::heat::params::engine_service_name]:
+  service { [$::heat::params::api_service_name]:
     hasstatus  => true,
     hasrestart => true,
   }
