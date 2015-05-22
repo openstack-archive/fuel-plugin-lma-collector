@@ -86,6 +86,9 @@ case $influxdb_mode {
   'remote','local': {
     if $influxdb_mode == 'remote' {
       $influxdb_server = $lma_collector['influxdb_address']
+      $influxdb_database = $lma_collector['influxdb_database']
+      $influxdb_user = $lma_collector['influxdb_user']
+      $influxdb_password = $lma_collector['influxdb_password']
     }
     else {
       $influxdb_node_name = $lma_collector['influxdb_node_name']
@@ -93,7 +96,17 @@ case $influxdb_mode {
       if size($influxdb_nodes) < 1 {
         fail("Could not find node '${influxdb_node_name}' in the environment")
       }
+      $influxdb_grafana = hiera('influxdb_grafana', false)
+      if ! $influxdb_grafana {
+        fail('Could not get the InfluxDB parameters. The InfluxDB-Grafana plugin is probably not installed.')
+      }
+      elsif ! $influxdb_grafana['metadata']['enabled'] {
+        fail('Could not get the InfluxDB parameters. The InfluxDB-Grafana plugin is probably not enabled for this environment.')
+      }
       $influxdb_server = $influxdb_nodes[0]['internal_address']
+      $influxdb_database = $influxdb_grafana['influxdb_dbname']
+      $influxdb_user = $influxdb_grafana['influxdb_username']
+      $influxdb_password = $influxdb_grafana['influxdb_userpass']
     }
 
     class { 'lma_collector::collectd::base':
@@ -101,9 +114,9 @@ case $influxdb_mode {
 
     class { 'lma_collector::influxdb':
       server   => $influxdb_server,
-      database => $lma_collector['influxdb_database'],
-      user     => $lma_collector['influxdb_user'],
-      password => $lma_collector['influxdb_password'],
+      database => $influxdb_database,
+      user     => $influxdb_user,
+      password => $influxdb_password,
     }
   }
   'disabled': {
@@ -133,6 +146,6 @@ case $elasticsearch_mode {
 }
 
 class { 'lma_collector::elasticsearch':
-  server => $es_server,
+  server  => $es_server,
   require => Class['lma_collector'],
 }

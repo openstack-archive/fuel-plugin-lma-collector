@@ -94,8 +94,8 @@ attributes:
     regex: &not_empty_parameter
       source: '\S'
       error: "Invalid value"
-    restrictions: &disable_influxdb_control
-        - condition: "settings:lma_collector.influxdb_mode.value == 'disabled'"
+    restrictions: &disable_influxdb_parameters
+        - condition: "settings:lma_collector.influxdb_mode.value != 'remote'"
           action: "disable"
   influxdb_user:
     value: 'lma'
@@ -104,7 +104,7 @@ attributes:
     weight: 80
     type: "text"
     regex: *not_empty_parameter
-    restrictions: *disable_influxdb_control
+    restrictions: *disable_influxdb_parameters
   influxdb_password:
     value: 'lmapass'
     label: 'InfluxDB password'
@@ -112,4 +112,4 @@ attributes:
     weight: 85
     type: "password"
     regex: *not_empty_parameter
-    restrictions: *disable_influxdb_control
+    restrictions: *disable_influxdb_parameters
