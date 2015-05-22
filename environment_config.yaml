@@ -15,12 +15,18 @@ attributes:
     type: "radio"
     weight: 20
     value: "local"
-    label: "Logging analytics"
+    label: "Events analytics (logs and notifications)"
     values:
+      - data: "disabled"
+        label: "Disabled"
       - data: "local"
         label: "Local node"
       - data: "remote"
         label: "Remote server"
+    restrictions: &all_disabled_msg
+      - condition: "settings:lma_collector.elasticsearch_mode.value == 'disabled' and settings:lma_collector.influxdb_mode.value == 'disabled'"
+        action: "none"
+        message: "Please enable Event analytics or Metrics analytics or both"
 
   elasticsearch_node_name:
     value: 'elasticsearch'
@@ -45,17 +51,11 @@ attributes:
       source: '^[a-zA-Z\d][a-zA-Z\d_\-.]+$'
       error: "Invalid address or name"
 
-  enable_notifications:
-    type: "checkbox"
-    weight: 50
-    value: false
-    label: "Collect OpenStack notifications"
-
   influxdb_mode:
     type: "radio"
     weight: 60
-    value: "disabled"
-    label: "Metric analytics"
+    value: "local"
+    label: "Metrics analytics"
     values:
       - data: "disabled"
         label: "Disabled"
@@ -63,6 +63,7 @@ attributes:
         label: "Local node"
       - data: "remote"
         label: "Remote server"
+    restrictions: *all_disabled_msg
 
   influxdb_node_name:
     value: 'influxdb'
@@ -97,6 +98,7 @@ attributes:
     restrictions: &disable_influxdb_parameters
         - condition: "settings:lma_collector.influxdb_mode.value != 'remote'"
           action: "disable"
+
   influxdb_user:
     value: 'lma'
     label: 'InfluxDB user'
