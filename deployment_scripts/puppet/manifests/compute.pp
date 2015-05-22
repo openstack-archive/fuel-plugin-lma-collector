@@ -17,20 +17,24 @@ include lma_collector::params
 $ceilometer    = hiera('ceilometer')
 $lma_collector = hiera('lma_collector')
 
-$enable_notifications = $lma_collector['enable_notifications']
-if $ceilometer['enabled'] {
-  $notification_topics = [$lma_collector::params::openstack_topic, $lma_collector::params::lma_topic]
-}
-else {
-  $notification_topics = [$lma_collector::params::lma_topic]
-}
-
-class { 'lma_collector::logs::openstack': }
-
-class { 'lma_collector::logs::libvirt': }
-
-if $enable_notifications {
-  class { 'lma_collector::notifications::compute':
-    topics  => $notification_topics,
+if $lma_collector['elasticsearch_mode'] != 'disabled' {
+  $enable_notifications = $lma_collector['enable_notifications']
+  if $ceilometer['enabled'] {
+    $notification_topics = [$lma_collector::params::openstack_topic, $lma_collector::params::lma_topic]
   }
+  else {
+    $notification_topics = [$lma_collector::params::lma_topic]
+  }
+
+  class { 'lma_collector::logs::openstack': }
+
+  class { 'lma_collector::logs::libvirt': }
+
+  if $enable_notifications {
+    class { 'lma_collector::notifications::compute':
+      topics  => $notification_topics,
+    }
+  }
+}else{
+  notice('Logging analytics disabled')
 }

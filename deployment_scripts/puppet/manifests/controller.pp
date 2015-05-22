@@ -51,25 +51,29 @@ else {
 }
 
 # Logs
-class { 'lma_collector::logs::openstack': }
+if $lma_collector['elasticsearch_mode'] != 'disabled' {
+  class { 'lma_collector::logs::openstack': }
 
-class { 'lma_collector::logs::mysql': }
+  class { 'lma_collector::logs::mysql': }
 
-class { 'lma_collector::logs::rabbitmq': }
+  class { 'lma_collector::logs::rabbitmq': }
 
-if $ha_deployment {
-  class { 'lma_collector::logs::pacemaker': }
-}
-
-# Notifications
-if $enable_notifications {
-  class { 'lma_collector::notifications::controller':
-    host     => '127.0.0.1',
-    port     => hiera('amqp_port', '5673'),
-    user     => $rabbitmq_user,
-    password => $rabbit['password'],
-    topics   => $notification_topics,
+  if $ha_deployment {
+    class { 'lma_collector::logs::pacemaker': }
   }
+
+  # Notifications
+  if $enable_notifications {
+    class { 'lma_collector::notifications::controller':
+      host     => '127.0.0.1',
+      port     => hiera('amqp_port', '5673'),
+      user     => $rabbitmq_user,
+      password => $rabbit['password'],
+      topics   => $notification_topics,
+    }
+  }
+}else{
+  notice('Logging analytics disabled')
 }
 
 # Metrics

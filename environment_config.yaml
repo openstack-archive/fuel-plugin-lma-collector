@@ -17,10 +17,16 @@ attributes:
     value: "local"
     label: "Logging analytics"
     values:
+      - data: "disabled"
+        label: "Disabled"
       - data: "local"
         label: "Local node"
       - data: "remote"
         label: "Remote server"
+    restrictions: &all_disabled_msg
+      - condition: "settings:lma_collector.elasticsearch_mode.value == 'disabled' and settings:lma_collector.influxdb_mode.value == 'disabled'"
+        action: "none"
+        message: "Please enable Log analytics or Metric analytics or both"
 
   elasticsearch_node_name:
     value: 'elasticsearch'
@@ -50,6 +56,9 @@ attributes:
     weight: 50
     value: false
     label: "Collect OpenStack notifications"
+    restrictions:
+        - condition: "settings:lma_collector.elasticsearch_mode.value == 'disabled'"
+          action: "disable"
 
   influxdb_mode:
     type: "radio"
@@ -63,6 +72,7 @@ attributes:
         label: "Local node"
       - data: "remote"
         label: "Remote server"
+    restrictions: *all_disabled_msg
 
   influxdb_node_name:
     value: 'influxdb'
