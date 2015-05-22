@@ -15,8 +15,10 @@ attributes:
     type: "radio"
     weight: 20
     value: "local"
-    label: "Logging analytics"
+    label: "Events analytics (logs and notifications)"
     values:
+      - data: "disabled"
+        label: "Disabled"
       - data: "local"
         label: "Local node"
       - data: "remote"
@@ -45,17 +47,11 @@ attributes:
       source: '^[a-zA-Z\d][a-zA-Z\d_\-.]+$'
       error: "Invalid address or name"
 
-  enable_notifications:
-    type: "checkbox"
-    weight: 50
-    value: false
-    label: "Collect OpenStack notifications"
-
   influxdb_mode:
     type: "radio"
     weight: 60
-    value: "disabled"
-    label: "Metric analytics"
+    value: "local"
+    label: "Metrics analytics"
     values:
       - data: "disabled"
         label: "Disabled"
@@ -97,6 +93,7 @@ attributes:
     restrictions: &disable_influxdb_parameters
         - condition: "settings:lma_collector.influxdb_mode.value != 'remote'"
           action: "disable"
+
   influxdb_user:
     value: 'lma'
     label: 'InfluxDB user'
