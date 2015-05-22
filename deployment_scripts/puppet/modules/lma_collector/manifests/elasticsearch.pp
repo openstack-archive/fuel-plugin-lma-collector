@@ -15,6 +15,7 @@
 class lma_collector::elasticsearch (
   $server = $lma_collector::params::elasticsearch_server,
   $port = $lma_collector::params::elasticsearch_port,
+  $index_notification = $lma_collector::params::index_notification,
 ) inherits lma_collector::params {
   include lma_collector::service
 
@@ -27,11 +28,17 @@ class lma_collector::elasticsearch (
     notify                  => Class['lma_collector::service'],
   }
 
+  if $index_notification{
+    $msg_matcher = 'Type == \'log\' || Type  == \'notification\''
+  }else{
+    $msg_matcher = 'Type == \'log\''
+  }
+
   heka::output::elasticsearch { 'elasticsearch':
     config_dir      => $lma_collector::params::config_dir,
     server          => $server,
     port            => $port,
-    message_matcher => 'Type == \'log\' || Type  == \'notification\'',
+    message_matcher => $msg_matcher,
     require         => Heka::Encoder::Es_json['elasticsearch'],
     notify          => Class['lma_collector::service'],
   }

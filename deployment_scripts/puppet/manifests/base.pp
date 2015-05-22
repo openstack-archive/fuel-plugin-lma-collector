@@ -40,7 +40,29 @@ if hiera('deployment_mode') =~ /^ha_/ and $is_controller {
   $additional_groups = []
 }
 
-if $is_controller and $lma_collector['enable_notifications'] {
+$elasticsearch_mode = $lma_collector['elasticsearch_mode']
+
+case $elasticsearch_mode {
+  'remote': {
+    $es_server = $lma_collector['elasticsearch_address']
+  }
+  'local': {
+    $es_node_name = $lma_collector['elasticsearch_node_name']
+    $es_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $es_node_name)
+    if size($es_nodes) < 1 {
+      fail("Could not find node '${es_node_name}' in the environment")
+    }
+    $es_server = $es_nodes[0]['internal_address']
+  }
+  'disabled': {
+    # Nothing to do
+  }
+  default: {
+    fail("'${elasticsearch_mode}' mode not supported for Elasticsearch")
+  }
+}
+
+if $is_controller{
   $pre_script        = '/usr/local/bin/wait_for_rabbitmq'
   # Params used by the script.
   $rabbit            = hiera('rabbit')
@@ -66,19 +88,28 @@ class { 'lma_collector':
   pre_script => $pre_script,
 }
 
-class { 'lma_collector::logs::system':
-  require => Class['lma_collector'],
-}
-
-if (str2bool($::ovs_log_directory)){
-  # install logstreamer for open vSwitch if log directory exists
-  class { 'lma_collector::logs::ovs':
+if $elasticsearch_mode != 'disabled' {
+  class { 'lma_collector::logs::system':
     require => Class['lma_collector'],
   }
-}
 
-class { 'lma_collector::logs::monitor':
-  require => Class['lma_collector'],
+  if (str2bool($::ovs_log_directory)){
+    # install logstreamer for open vSwitch if log directory exists
+    class { 'lma_collector::logs::ovs':
+      require => Class['lma_collector'],
+    }
+  }
+
+  class { 'lma_collector::logs::monitor':
+    require => Class['lma_collector'],
+  }
+
+  class { 'lma_collector::elasticsearch':
+    server  => $es_server,
+    require => Class['lma_collector'],
+    index_notification = $lma_collector['enable_notifications'],
+  }
+
 }
 
 $influxdb_mode = $lma_collector['influxdb_mode']
@@ -125,27 +156,4 @@ case $influxdb_mode {
   default: {
     fail("'${influxdb_mode}' mode not supported for InfluxDB")
   }
-}
-
-$elasticsearch_mode = $lma_collector['elasticsearch_mode']
-case $elasticsearch_mode {
-  'remote': {
-    $es_server = $lma_collector['elasticsearch_address']
-  }
-  'local': {
-    $es_node_name = $lma_collector['elasticsearch_node_name']
-    $es_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $es_node_name)
-    if size($es_nodes) < 1 {
-      fail("Could not find node '${es_node_name}' in the environment")
-    }
-    $es_server = $es_nodes[0]['internal_address']
-  }
-  default: {
-    fail("'${elasticsearch_mode}' mode not supported for Elasticsearch")
-  }
-}
-
-class { 'lma_collector::elasticsearch':
-  server  => $es_server,
-  require => Class['lma_collector'],
 }

@@ -16,13 +16,15 @@ include lma_collector::params
 
 $ceilometer     = hiera('ceilometer')
 $lma_collector  = hiera('lma_collector')
-$management_vip = hiera('management_vip')
-$nova           = hiera('nova')
-$cinder         = hiera('cinder')
 $rabbit         = hiera('rabbit')
-$neutron        = hiera('quantum_settings')
-
 $enable_notifications = $lma_collector['enable_notifications']
+
+if hiera('deployment_mode') =~ /^ha_/ {
+  $ha_deployment = true
+}else{
+  $ha_deployment = false
+}
+
 if $ceilometer['enabled'] {
   $notification_topics = [$lma_collector::params::openstack_topic, $lma_collector::params::lma_topic]
 }
@@ -37,43 +39,45 @@ else {
   $rabbitmq_user = 'nova'
 }
 
-if hiera('deployment_mode') =~ /^ha_/ {
-  $ha_deployment = true
-}else{
-  $ha_deployment = false
+# OpenStack notifcations are always useful for indexation and metrics collection
+class { 'lma_collector::notifications::controller':
+  host     => '127.0.0.1',
+  port     => hiera('amqp_port', '5673'),
+  user     => $rabbitmq_user,
+  password => $rabbit['password'],
+  topics   => $notification_topics,
 }
 
-if $ha_deployment {
-  $rabbitmq_pid_file = '/var/run/rabbitmq/p_pid'
-}
-else {
-  $rabbitmq_pid_file = '/var/run/rabbitmq/pid'
-}
-
-# Logs
+# OpenStack logs are always useful for indexation and metrics collection
 class { 'lma_collector::logs::openstack': }
 
-class { 'lma_collector::logs::mysql': }
+# Logs
+if $lma_collector['elasticsearch_mode'] != 'disabled' {
 
-class { 'lma_collector::logs::rabbitmq': }
+  class { 'lma_collector::logs::mysql': }
 
-if $ha_deployment {
-  class { 'lma_collector::logs::pacemaker': }
-}
+  class { 'lma_collector::logs::rabbitmq': }
 
-# Notifications
-if $enable_notifications {
-  class { 'lma_collector::notifications::controller':
-    host     => '127.0.0.1',
-    port     => hiera('amqp_port', '5673'),
-    user     => $rabbitmq_user,
-    password => $rabbit['password'],
-    topics   => $notification_topics,
+  if $ha_deployment {
+    class { 'lma_collector::logs::pacemaker': }
   }
+
 }
 
 # Metrics
 if $lma_collector['influxdb_mode'] != 'disabled' {
+
+  $nova           = hiera('nova')
+  $neutron        = hiera('quantum_settings')
+  $cinder         = hiera('cinder')
+  $management_vip = hiera('management_vip')
+
+  if $ha_deployment {
+    $rabbitmq_pid_file = '/var/run/rabbitmq/p_pid'
+  }
+  else {
+    $rabbitmq_pid_file = '/var/run/rabbitmq/pid'
+  }
 
   if $ha_deployment {
     $haproxy_socket = '/var/lib/haproxy/stats'
@@ -145,9 +149,8 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
 
   class { 'lma_collector::logs::metrics': }
 
-  if $enable_notifications {
-    class { 'lma_collector::notifications::metrics': }
-  }
+  # Notification are always collected, lets extract metrics from there
+  class { 'lma_collector::notifications::metrics': }
 
   # Enable Apache status module
   class { 'lma_collector::mod_status': }

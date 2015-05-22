@@ -94,6 +94,7 @@ class lma_collector::params {
 
   $elasticsearch_server = false
   $elasticsearch_port = '9200'
+  $index_notification = true
 
   $influxdb_server = false
   $influxdb_port = '8086'
