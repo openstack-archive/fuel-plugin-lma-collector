@@ -21,6 +21,7 @@ class heka::params {
 
   $hostname = undef
   $maxprocs = $::processorcount
+  $max_message_size = undef
   $dashboard_address = undef
   $dashboard_port = '4352'
   $internal_statistics = false

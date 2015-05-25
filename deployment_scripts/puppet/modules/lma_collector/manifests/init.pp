@@ -52,6 +52,7 @@ class lma_collector (
     hostname            => $::hostname,
     pre_script          => $pre_script,
     internal_statistics => true,
+    max_message_size    => $lma_collector::params::hekad_max_message_size,
   }
 
   file { "${lua_modules_dir}/lma_utils.lua":
