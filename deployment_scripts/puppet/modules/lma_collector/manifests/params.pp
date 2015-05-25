@@ -43,6 +43,11 @@ class lma_collector::params {
   # this is required by elasticsearch buffered output.
   $hekad_max_message_size = 161792
 
+  # The maximum number of CPU used by Heka,
+  # use by default one CPU per 12 CPU available.
+  # Set to 1 to have no limit
+  $hekad_maxprocs_per_unit = 1
+
   # Parameters for OpenStack notifications
   $rabbitmq_host = false
   $rabbitmq_port = '5672'
