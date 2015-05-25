@@ -39,6 +39,11 @@ class lma_collector::params {
       fail("${::osfamily} not supported")
     }
   }
+  # The maximum size of 158Kb was observed during a load test with 50 nodes,
+  # this is required by elasticsearch buffered output.
+  # Lets configure 192Kb by default.
+  # see https://github.com/mozilla-services/heka/issues/1389
+  $hekad_max_message_size = 192*1024
 
   # Parameters for OpenStack notifications
   $rabbitmq_host = false
