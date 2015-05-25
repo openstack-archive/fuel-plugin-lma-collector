@@ -39,6 +39,9 @@ class lma_collector::params {
       fail("${::osfamily} not supported")
     }
   }
+  # The size 158Kb was observed during a load test with 50 nodes,
+  # this is required by elasticsearch buffered output.
+  $hekad_max_message_size = 161792
 
   # Parameters for OpenStack notifications
   $rabbitmq_host = false

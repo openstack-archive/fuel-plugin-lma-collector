@@ -70,6 +70,7 @@ class heka (
   $additional_groups = $heka::params::additional_groups,
   $hostname = $heka::params::hostname,
   $maxprocs = $heka::params::maxprocs,
+  $max_message_size = $heka::params::max_message_size,
   $dashboard_address = $heka::params::dashboard_address,
   $dashboard_port = $heka::params::dashboard_port,
   $pre_script = undef,
