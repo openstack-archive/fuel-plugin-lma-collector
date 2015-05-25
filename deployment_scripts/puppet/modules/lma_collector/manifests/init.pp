@@ -42,7 +42,10 @@ class lma_collector (
   $service_name = $lma_collector::params::service_name
   $config_dir = $lma_collector::params::config_dir
   $plugins_dir = $lma_collector::params::plugins_dir
+  $maxprocs_per_unit = $lma_collector::params::hekad_maxprocs_per_unit
   $lua_modules_dir = $heka::params::lua_modules_dir
+
+  $maxprocs = inline_template("<%= if(cpu=(@processorcount.to_i / @maxprocs_per_unit.to_i).floor).zero? then 1 else cpu end%>")
 
   class { 'heka':
     service_name        => $service_name,
@@ -50,9 +53,8 @@ class lma_collector (
     run_as_root         => $lma_collector::params::run_as_root,
     additional_groups   => union($lma_collector::params::groups, $groups),
     hostname            => $::hostname,
-    pre_script          => $pre_script,
-    internal_statistics => true,
-    max_message_size    => $lma_collector::params::hekad_max_message_size
+    max_message_size    => $lma_collector::params::hekad_max_message_size,
+    maxprocs            => $maxprocs,
   }
 
   file { "${lua_modules_dir}/lma_utils.lua":
