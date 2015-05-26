@@ -71,21 +71,21 @@ Where frontend and backend are one of:
 
 * cinder-api
 * glance-api
-* glance-registry
+* glance-registry-api
 * heat-api
-* heat-api-cfn
-* heat-api-cloudwatch
-* horizon
-* keystone-1 (Keystone public API)
-* keystone-2 (Keystone admin API)
-* mysqld
-* neutron
-* nova-api-1 (Nova EC2 API)
-* nova-api-2 (Nova OpenStack API)
+* heat-cfn-api
+* heat-cloudwatch-api
+* horizon-web
+* keystone-public-api
+* keystone-admin-api
+* mysqld-tcp
+* murano-api
+* neutron-api
+* nova-api
+* nova-ec2-api
 * nova-metadata-api
-* nova-novncproxy
-* sahara
-* murano
+* nova-novncproxy-websocket
+* sahara-api
 * stats
-* swift
+* swift-api
 
