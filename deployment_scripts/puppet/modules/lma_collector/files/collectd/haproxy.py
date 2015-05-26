@@ -1,6 +1,7 @@
 # haproxy-collectd-plugin - haproxy.py
 #
-# Author: Michael Leinartas
+# Original Author: Michael Leinartas
+# Substantial additions by Mirantis
 # Description: This is a collectd plugin which runs under the Python plugin to
 # collect metrics from haproxy.
 # Plugin structure and logging func taken from https://github.com/phrawzty/rabbitmq-collectd-plugin
@@ -31,6 +32,7 @@ import collectd
 import socket
 import csv
 
+NAMES_MAPPING = {}
 NAME = 'haproxy'
 RECV_SIZE = 1024
 METRIC_TYPES = {
@@ -158,11 +160,18 @@ def get_stats():
     if statdict['pxname'] in PROXY_IGNORE:
       continue
 
+    pxname = statdict['pxname']
+    # Translate to meaningful names
+    if pxname in NAMES_MAPPING:
+        pxname = NAMES_MAPPING.get(pxname)
+    else:
+      logger('warn', 'Meaningful name unknown for "%s"' % pxname)
+
     if statdict['type'] == BACKEND_SERVER_TYPE:
       # Count the number of servers per backend and per status
       for status_val in STATUS_MAP.keys():
         # Initialize all possible metric keys to zero
-        metricname = METRIC_DELIM.join(['backend', statdict['pxname'].lower(), 'servers', status_val.lower()])
+        metricname = METRIC_DELIM.join(['backend', pxname, 'servers', status_val.lower()])
         if metricname not in stats:
           stats[metricname] = 0
         if statdict['status'] == status_val:
@@ -170,7 +179,7 @@ def get_stats():
       continue
 
     for key, val in statdict.items():
-      metricname = METRIC_DELIM.join([statdict['svname'].lower(), statdict['pxname'].lower(), key])
+      metricname = METRIC_DELIM.join([statdict['svname'].lower(), pxname, key])
       try:
         if key == 'status' and statdict['type'] == BACKEND_TYPE:
           if val in STATUS_MAP:
@@ -203,6 +212,8 @@ def configure_callback(conf):
       HAPROXY_SOCKET = node.values[0]
     elif node.key == "Verbose":
       VERBOSE_LOGGING = bool(node.values[0])
+    elif node.key == "Mapping":
+        NAMES_MAPPING[node.values[0]] = node.values[1]
     else:
       logger('warn', 'Unknown config key: %s' % node.key)
 

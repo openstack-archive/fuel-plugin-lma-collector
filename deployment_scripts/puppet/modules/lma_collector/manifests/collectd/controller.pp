@@ -88,7 +88,8 @@ class lma_collector::collectd::controller (
 
   if $haproxy_socket {
     $modules['haproxy'] = {
-      'Socket' => $haproxy_socket
+      'Socket' => $haproxy_socket,
+      'Mapping' => $lma_collector::params::haproxy_names_mapping,
     }
   }
 
