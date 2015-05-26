@@ -88,7 +88,9 @@ class lma_collector::collectd::controller (
 
   if $haproxy_socket {
     $modules['haproxy'] = {
-      'Socket' => $haproxy_socket
+      'Socket' => $haproxy_socket,
+      # Ignore internal proxy
+      'ProxyIgnore' => 'Stats'
     }
   }
 
