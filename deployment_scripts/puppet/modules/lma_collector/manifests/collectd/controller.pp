@@ -145,6 +145,15 @@ class lma_collector::collectd::controller (
   if $haproxy_socket {
     lma_collector::collectd::python_script { 'haproxy.py':
     }
+
+    $meaningful_names = $lma_collector::params::haproxy_meaningful_names_map
+    file {"${lma_collector::params::python_module_path}/haproxy_meaningful_names.py":
+      owner   => 'root',
+      group   => $collectd::params::root_group,
+      mode    => '0640',
+      content => template('lma_collector/haproxy_meaningful_names.py.erb'),
+      notify  => Class['lma_collector::collectd::service'],
+    }
   }
 
   class { 'collectd::plugin::memcached':
