@@ -86,6 +86,5 @@ Where frontend and backend are one of:
 * nova-metadata-api
 * nova-novncproxy-websocket
 * sahara-api
-* stats
 * swift-api
 
