@@ -1,6 +1,6 @@
 #!/bin/sh
 
-RABBITMQADMIN="/usr/local/bin/rabbitmqadmin"
+RABBITMQCTL=$(which rabbitmqctl)
 
 # We must wait that rabbitmq is started before running.
 # We can not rely on /var/run/rabbitmq/p_pid because it only means that
@@ -8,10 +8,13 @@ RABBITMQADMIN="/usr/local/bin/rabbitmqadmin"
 # In practice rabbitmqadmin is only present on controller nodes so just skip
 # the waiting loop if we don't find it.
 
-if [ -x $RABBITMQADMIN ]; then
-while ! $RABBITMQADMIN -u <%= @rabbitmq_user %> -p <%= @rabbitmq_password %>  show overview >/dev/null 2>&1
+if [ -n $RABBITMQCTL ] && [ -x $RABBITMQCTL ]
+then
+    while ! $RABBITMQCTL status >/dev/null 2>&1
     do
         echo "$(date +"%Y/%m/%d %H:%M:%S") Waiting for RabbitMQ availability..."
         sleep <%= @wait_delay %>
     done
+else
+    echo "wait_for_rabbitmq: rabbitmqctl not found"
 fi

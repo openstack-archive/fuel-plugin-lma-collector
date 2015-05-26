@@ -6,4 +6,4 @@ HEKAD="/usr/bin/hekad"
 <%= @pre_script %>
 <% end -%>
 
-$HEKAD -config=<%= @config_dir %>
+<%= @run_as_root ? "" : "sudo -u #{ @heka_user }" %> $HEKAD -config=<%= @config_dir %>

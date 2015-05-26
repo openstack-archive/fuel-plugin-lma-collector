@@ -31,7 +31,7 @@ start() {
     chown <%= @heka_user %>:<%= @heka_user %> <%= @log_file %>
 <% end -%>
     echo -n $"Starting $prog: "
-    daemonize -p $pidfile -e <%= @log_file %> <%= @run_as_root ? "" : "-u #{ @heka_user }" %> -l $lockfile $exec
+    daemonize -p $pidfile -e <%= @log_file %> -l $lockfile $exec
     retval=$?
     [ $retval -eq 0 ] && success || failure
     echo

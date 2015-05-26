@@ -14,4 +14,4 @@ pre-start script
 end script
 <% end -%>
 
-exec <%= @run_as_root ? "" : "sudo -u #{ @heka_user }" %> <%= @hekad_wrapper %> 2>><%= @log_file %>
+exec <%= @hekad_wrapper %> 2>><%= @log_file %>
