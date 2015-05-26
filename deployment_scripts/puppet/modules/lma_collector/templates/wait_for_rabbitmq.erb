@@ -1,17 +1,50 @@
-#!/bin/sh
+#!/usr/bin/env python
 
-RABBITMQADMIN="/usr/local/bin/rabbitmqadmin"
+from kombu import Connection
+from kombu import Exchange
+from kombu import Queue
+import socket
+from sys import exc_info
+from time import gmtime
+from time import sleep
+from time import strftime
 
-# We must wait that rabbitmq is started before running.
-# We can not rely on /var/run/rabbitmq/p_pid because it only means that
-# beam is running.
-# In practice rabbitmqadmin is only present on controller nodes so just skip
-# the waiting loop if we don't find it.
+def print_message(msg):
+    print("{0} wait_for_rabbitmq: {1}".format(strftime("%Y/%m/%d %H:%M:%S", gmtime()), msg))
 
-if [ -x $RABBITMQADMIN ]; then
-while ! $RABBITMQADMIN -u <%= @rabbitmq_user %> -p <%= @rabbitmq_password %>  show overview >/dev/null 2>&1
-    do
-        echo "$(date +"%Y/%m/%d %H:%M:%S") Waiting for RabbitMQ availability..."
-        sleep <%= @wait_delay %>
-    done
-fi
+def errback(exc, interval):
+    print_message("{0}, retry in {1} seconds".format(exc, interval))
+
+# First we need to check the connection
+with Connection('amqp://<%= @rabbitmq_user %>:<%= @rabbitmq_password %>@localhost:<%= @rabbitmq_port %>//') as conn:
+
+    conn.ensure_connection(errback, interval_start=<%= @wait_delay %>, interval_step=0)
+
+    # Now we need to check that we can post a message
+    PAYLOAD="CheckRabbitAvailability"
+    QUEUE_NAME=PAYLOAD
+    EXCHANGE_NAME=PAYLOAD
+
+    with conn.SimpleQueue(QUEUE_NAME) as queue:
+        while True:
+            try:
+                queue.put(PAYLOAD)
+                message = queue.get(timeout=<%= @wait_delay %>)
+                message.ack()
+                print_message("Test message posted")
+            except socket.timeout:
+                print_message("got timeout error, retry")
+            except:
+                print_message("{0}. {1}".format(exc_info()[0], exc_info()[1]))
+                sleep(<%= @wait_delay %>)
+            else:
+                break
+
+    # Finally, delete the queue and the exchange
+    current_channel = conn.channel()
+
+    bound_queue = Queue(QUEUE_NAME, channel=current_channel)
+    bound_queue.delete()
+
+    bound_exchange = Exchange(EXCHANGE_NAME, channel=current_channel)
+    bound_exchange.delete()
