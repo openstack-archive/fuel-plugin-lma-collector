@@ -18,7 +18,7 @@ local floor = math.floor
 local max = math.max
 local utils  = require 'lma_utils'
 
-_PRESERVATION_VERSION = 1
+_PRESERVATION_VERSION = 2
 -- variables with global scope are preserved between restarts
 service_status = {}
 
@@ -48,26 +48,14 @@ function process_message ()
         if not service_status[service_name] then service_status[service_name] = {} end
 
         if service.workers then
-            worker_status = compute_status(events, not_up_status, ts, 'workers', service_name, service.workers)
+            worker_status = compute_status(events, not_up_status, ts, 'workers', service_name, service.workers, true)
         end
 
-        if service.check_api and service.check_api.value then
-            check_api_status = utils.check_api_to_status_map[service.check_api.value]
-            local prev_check_api_status = utils.service_status_map.UNKNOWN
-            if service_status[service_name].check_api then
-                prev_check_api_status = service_status[service_name].check_api
-            end
-            service_status[service_name].check_api = check_api_status
-            if prev_check_api_status and prev_check_api_status ~= check_api_status then
-                events[#events+1] = string.format("endpoint %s -> %s",
-                                      utils.service_status_to_label_map[prev_check_api_status],
-                                      utils.service_status_to_label_map[check_api_status])
-            elseif check_api_status == utils.service_status_map.DOWN then
-                not_up_status[#not_up_status+1] = string.format("API status DOWN")
-            end
+        if service.check_api then
+            check_api_status = compute_status(events, not_up_status, ts, 'check_api', service_name, service.check_api, false)
         end
         if service.haproxy then
-            haproxy_server_status = compute_status(events, not_up_status, ts, 'haproxy', service_name, service.haproxy)
+            haproxy_server_status = compute_status(events, not_up_status, ts, 'haproxy', service_name, service.haproxy, true)
         end
         general_status = max(worker_status, check_api_status, haproxy_server_status)
         -- global service status
@@ -116,7 +104,7 @@ function set_status(service_name, top_entry, name, status)
      service_status[service_name][top_entry][name] = status
 end
 
-function compute_status(events, not_up_status, current_time, elts_name, name, service)
+function compute_status(events, not_up_status, current_time, elts_name, name, service, display_num)
     local down_elts = {}
     local down_elts_count = 0
     local zero_up = {}
@@ -171,20 +159,28 @@ function compute_status(events, not_up_status, current_time, elts_name, name, se
     for worker_name, worker in pairs(zero_up) do
         local prev = get_previous_status(name, elts_name, worker_name)
         local DOWN = utils.service_status_map.DOWN
+        local event_detail
         set_status(name, elts_name, worker_name, DOWN)
+        if display_num then
+            event_detail = string.format("(%s/%s UP)", up_elements[worker_name],
+                                                       total_elements[worker_name])
+        else
+            event_detail = ""
+        end
+
         if prev and prev ~= DOWN then
-            events[#events+1] = string.format("%s %s %s -> %s (%s/%s UP)", worker_name,
+            events[#events+1] = string.format("%s %s %s -> %s %s", worker_name,
                                               worker.group_name,
                                               utils.service_status_to_label_map[prev],
                                               utils.service_status_to_label_map[DOWN],
-                                              up_elements[worker_name], total_elements[worker_name])
+                                              event_detail)
 
         else
-            not_up_status[#not_up_status+1] = string.format("%s %s %s (%s/%s UP)",
+            not_up_status[#not_up_status+1] = string.format("%s %s %s %s",
                                               worker_name,
                                               worker.group_name,
                                               utils.service_status_to_label_map[DOWN],
-                                              up_elements[worker_name], total_elements[worker_name])
+                                              event_detail)
         end
         utils.add_metric(datapoints, string.format('%s.openstack.%s.%s.%s.status',
                     hostname, name, worker.group_name, worker_name),
@@ -194,6 +190,7 @@ function compute_status(events, not_up_status, current_time, elts_name, name, se
     for worker_name, worker in pairs(down_elts) do
         local prev = get_previous_status(name, elts_name, worker_name)
         local new_status
+        local event_detail
         if one_up[worker_name] then
             new_status = utils.service_status_map.DEGRADED
         else
@@ -205,17 +202,23 @@ function compute_status(events, not_up_status, current_time, elts_name, name, se
                          hostname, name, worker.group_name, worker_name),
                          {current_time, new_status})
 
+        if display_num then
+            event_detail = string.format("(%s/%s UP)", up_elements[worker_name],
+                                                       total_elements[worker_name])
+        else
+            event_detail = ""
+        end
         if prev ~= new_status then
-           events[#events+1] = string.format("%s %s %s -> %s (%s/%s UP)", worker_name,
+           events[#events+1] = string.format("%s %s %s -> %s %s", worker_name,
                                              worker.group_name,
                                              utils.service_status_to_label_map[prev],
                                              utils.service_status_to_label_map[new_status],
-                                             up_elements[worker_name], total_elements[worker_name])
+                                             event_detail)
         elseif not zero_up[worker_name] then
-           not_up_status[#not_up_status+1] = string.format("%s %s %s (%s/%s UP)", worker_name,
+           not_up_status[#not_up_status+1] = string.format("%s %s %s %s", worker_name,
                                              worker.group_name,
                                              utils.service_status_to_label_map[new_status],
-                                             up_elements[worker_name], total_elements[worker_name])
+                                             event_detail)
         end
     end
 
