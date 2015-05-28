@@ -11,6 +11,65 @@
 -- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
+
+-- The filter accumulates data into a table and emits regularly a message with
+-- a payload like this:
+-- { ...
+-- "nova":{
+--     "check_api":{
+--         "nova":{
+--             "down":{
+--                 "value":0,
+--                 "group_name":"endpoint",
+--                 "last_seen":1433252000524
+--             },
+--             "up":{
+--                 "value":1,
+--                 "group_name":"endpoint",
+--                 "last_seen":1433252000524
+--             }
+--         },
+--         ...
+--     },
+--     "workers":{
+--         "scheduler":{
+--             "down":{
+--                 "value":0,
+--                 "group_name":"services",
+--                 "last_seen":1433251999229
+--             },
+--             "disabled":{
+--                 "value":1,
+--                 "group_name":"services",
+--                 "last_seen":1433251999226
+--             },
+--             "up":{
+--                 "value":2,
+--                 "group_name":"services",
+--                 "last_seen":1433251999227
+--             }
+--         },
+--         ...
+--     },
+--     "haproxy":{
+--         "nova-api":{
+--             "down":{
+--                 "value":0,
+--                 "group_name":"pool",
+--                 "last_seen":1433252000957
+--             },
+--             "up":{
+--                 "value":3,
+--                 "group_name":"pool",
+--                 "last_seen":1433252000954
+--             }
+--         }
+--     }
+--         ...
+-- },
+-- ..
+-- }
+
 require 'cjson'
 require 'string'
 require 'math'
@@ -55,8 +114,20 @@ function process_message ()
         name, group_name, item_name = string.match(metric_name, '^openstack%.([^._]+)%.([^._]+)%.([^._]+)')
         top_entry = 'workers'
         if not item_name then
-            name = string.match(metric_name, '^openstack%.([^.]+)%.check.api$')
+            -- A service can have several API checks, by convention the service name
+            -- is written down "<name>-<item>" or just "<name>".
+            item_name = string.match(metric_name, '^openstack%.([^.]+)%.check_api$')
+            name, _ = string.match(item_name, '^([^-]+)\-(.*)')
+            if not name then
+                name = item_name
+            end
+
             top_entry = 'check_api'
+            group_name = 'endpoint'
+            -- retrieve the current state
+            state = utils.check_api_status_to_state_map[value]
+            -- and always override value to 1
+            value = 1
         end
 
     elseif string.find(metric_name, '^haproxy%.backend') then
@@ -65,24 +136,33 @@ function process_message ()
         item_name = string.match(metric_name, '^haproxy%.backend%.([^.]+)%.servers')
         name = string.match(item_name, '^([^-]+)')
     end
-    if not name then
+    if not name or not item_name then
       return -1
     end
 
     -- table initialization for the first time we see a service
     if not services[name] then services[name] = {} end
     if not services[name][top_entry] then services[name][top_entry] = {} end
+    if not services[name][top_entry][item_name] then services[name][top_entry][item_name] = {} end
 
-    local service = services[name]
-    local item = {last_seen=ts, value=value}
-    if item_name then
-        if not service[top_entry][item_name] then
-            service[top_entry][item_name] = {}
+    local service = services[name][top_entry][item_name]
+    service[state] = {last_seen=ts, value=value, group_name=group_name}
+
+    -- In the logic to treat check_api results like others, group by up/down
+    -- and reset the counterpart w/ value=0
+    if top_entry == 'check_api' then
+        local invert_state
+        if state == utils.state_map.UP then
+            invert_state = utils.state_map.DOWN
+        elseif state == utils.state_map.DOWN then
+            invert_state = utils.state_map.UP
         end
-        item.group_name = group_name
-        service[top_entry][item_name][state] = item
-    else
-        service[top_entry] = item
+        if invert_state then
+            if not service[invert_state] then
+                service[invert_state] = {}
+            end
+            service[invert_state] = {last_seen=ts, value=0, group_name=group_name}
+        end
     end
     return 0
 end
