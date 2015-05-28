@@ -50,16 +50,30 @@ metric_type = {
 local default_severity = 7
 
 service_status_map = {
-    OK = 0,
+    UP = 0,
     DEGRADED = 1,
     DOWN = 2,
     UNKNOWN = 3,
 }
 
 service_status_to_label_map = {
-    [0] = 'OK',
+    [0] = 'UP',
     [1] = 'DEGRADED',
     [2] = 'DOWN',
+    [3] = 'UNKNOWN',
+}
+
+general_service_status_map = {
+    OKAY = 0,
+    WARN = 1,
+    FAIL = 2,
+    UNKNOWN = 3,
+}
+
+general_service_status_to_label_map = {
+    [0] = 'OKAY',
+    [1] = 'WARN',
+    [2] = 'FAIL',
     [3] = 'UNKNOWN',
 }
 
