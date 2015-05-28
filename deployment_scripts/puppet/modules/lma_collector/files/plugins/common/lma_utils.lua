@@ -83,10 +83,17 @@ check_api_to_status_map = {
     [2] = 3, -- UNKNOWN
 }
 
+check_api_status_to_state_map = {
+    [0] = 'down',
+    [1] = 'up',
+    [2] = 'unknown',
+}
+
 state_map = {
     UP = 'up',
     DOWN = 'down',
     DISABLED = 'disabled',
+    UNKNOWN = 'unknown'
 }
 
 function add_metric(datapoints, name, points)
