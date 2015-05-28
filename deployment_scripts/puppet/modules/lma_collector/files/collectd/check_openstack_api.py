@@ -37,13 +37,13 @@ class APICheckPlugin(openstack.CollectdPlugin):
         'heat-cfn': {'path': '/', 'expect': 300},  # 300 Multiple Choices
         'glance': {'path': '/', 'expect': 300},    # 300 Multiple Choices
         'cinder': {'path': '/', 'expect': 200},
-        'cinderv2': {'path': '/', 'expect': 200},
+        'cinderv2': {'path': '/', 'expect': 200, 'map': 'cinder-v2'},
         'neutron': {'path': '/', 'expect': 200},
         'nova': {'path': '/', 'expect': 200},
         # Ceilometer requires authentication for all paths
         'ceilometer': {'path': 'v2/capabilities', 'expect': 200, 'auth': True},
         'swift': {'path': 'healthcheck', 'expect': 200},
-        'swift_s3': {'path': 'healthcheck', 'expect': 200},
+        'swift_s3': {'path': 'healthcheck', 'expect': 200, 'map': 'swift-s3'},
     }
 
     def _service_url(self, endpoint, path):
@@ -84,7 +84,7 @@ class APICheckPlugin(openstack.CollectdPlugin):
                     status = self.OK
 
             yield {
-                'service': name,
+                'service': check.get('map', name),
                 'status': status,
                 'region': service['region']
             }
