@@ -173,14 +173,16 @@ function compute_status(events, not_up_status, current_time, elts_name, name, se
         local DOWN = utils.service_status_map.DOWN
         set_status(name, elts_name, worker_name, DOWN)
         if prev and prev ~= DOWN then
-            events[#events+1] = string.format("%s status %s -> %s (%s/%s UP)", worker_name,
+            events[#events+1] = string.format("%s %s %s -> %s (%s/%s UP)", worker_name,
+                                              worker.group_name,
                                               utils.service_status_to_label_map[prev],
                                               utils.service_status_to_label_map[DOWN],
                                               up_elements[worker_name], total_elements[worker_name])
 
         else
-            not_up_status[#not_up_status+1] = string.format("%s status %s (%s/%s UP)",
+            not_up_status[#not_up_status+1] = string.format("%s %s %s (%s/%s UP)",
                                               worker_name,
+                                              worker.group_name,
                                               utils.service_status_to_label_map[DOWN],
                                               up_elements[worker_name], total_elements[worker_name])
         end
@@ -204,12 +206,14 @@ function compute_status(events, not_up_status, current_time, elts_name, name, se
                          {current_time, new_status})
 
         if prev ~= new_status then
-           events[#events+1] = string.format("%s status %s -> %s (%s/%s UP)", worker_name,
+           events[#events+1] = string.format("%s %s %s -> %s (%s/%s UP)", worker_name,
+                                             worker.group_name,
                                              utils.service_status_to_label_map[prev],
                                              utils.service_status_to_label_map[new_status],
                                              up_elements[worker_name], total_elements[worker_name])
         elseif not zero_up[worker_name] then
-           not_up_status[#not_up_status+1] = string.format("%s status %s (%s/%s UP)", worker_name,
+           not_up_status[#not_up_status+1] = string.format("%s %s %s (%s/%s UP)", worker_name,
+                                             worker.group_name,
                                              utils.service_status_to_label_map[new_status],
                                              up_elements[worker_name], total_elements[worker_name])
         end
@@ -222,7 +226,8 @@ function compute_status(events, not_up_status, current_time, elts_name, name, se
             local UP = utils.service_status_map.UP
             set_status(name, elts_name, worker_name, UP)
             if prev and prev ~= utils.service_status_map.UP then
-               events[#events+1] = string.format("%s status %s -> %s", worker_name,
+               events[#events+1] = string.format("%s %s %s -> %s", worker_name,
+                                                 worker.group_name,
                                                  utils.service_status_to_label_map[prev],
                                                  utils.service_status_to_label_map[UP])
             end
