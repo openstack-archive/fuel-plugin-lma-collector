@@ -10,14 +10,14 @@ Service checks
 
 * 'nova': '/'
 * 'cinder': '/'
-* 'cinderv2': '/'
+* 'cinder-v2': '/'
 * 'glance': '/'
 * 'heat': '/'
 * 'keystone': '/'
 * 'neutron': '/'
 * 'ceilometer': '/v2/capabilities'
 * 'swift': '/healthcheck'
-* 'swift_s3': '/healthcheck'
+* 'swift-s3': '/healthcheck'
 
 .. note:: All checks are performed without authentication except for Ceilometer.
 
