@@ -23,6 +23,11 @@ attributes:
         label: "Local node"
       - data: "remote"
         label: "Remote server"
+    restrictions: &all_disabled_msg
+      - condition: "settings:lma_collector.elasticsearch_mode.value == 'disabled' and settings:lma_collector.influxdb_mode.value == 'disabled'"
+        action: "none"
+        message: "Please enable Events or Metrics analytics or both"
+
 
   elasticsearch_node_name:
     value: 'elasticsearch'
@@ -59,6 +64,7 @@ attributes:
         label: "Local node"
       - data: "remote"
         label: "Remote server"
+    restrictions: *all_disabled_msg
 
   influxdb_node_name:
     value: 'influxdb'
