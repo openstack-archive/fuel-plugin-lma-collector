@@ -107,4 +107,27 @@ class lma_collector::params {
 
   $apache_status_host = '127.0.0.1'
   $apache_allow_from  = ['127.0.0.1','::1']
+
+  $haproxy_names_mapping = {
+    'cinder-api'          => 'cinder-api',
+    'glance-api'          => 'glance-api',
+    'glance-registry'     => 'glance-registry-api',
+    'heat-api'            => 'heat-api',
+    # Heat APIs are inverted within MOS 6.1
+    # see bug https://bugs.launchpad.net/fuel/+bug/1459752
+    'heat-api-cfn'        => 'heat-cloudwatch-api',
+    'heat-api-cloudwatch' => 'heat-cfn-api',
+    'horizon'             => 'horizon-web',
+    'keystone-1'          => 'keystone-public-api',
+    'keystone-2'          => 'keystone-admin-api',
+    'murano'              => 'murano-api',
+    'mysqld'              => 'mysqld-tcp',
+    'neutron'             => 'neutron-api',
+    'nova-api-1'          => 'nova-api',
+    'nova-api-2'          => 'nova-ec2-api',
+    'nova-novncproxy'     => 'nova-novncproxy-websocket',
+    'nova-metadata-api'   => 'nova-metadata-api',
+    'sahara'              => 'sahara-api',
+    'swift'               => 'swift-api',
+  }
 }

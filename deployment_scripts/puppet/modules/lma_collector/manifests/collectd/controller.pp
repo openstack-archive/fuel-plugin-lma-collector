@@ -14,6 +14,7 @@
 #
 class lma_collector::collectd::controller (
   $haproxy_socket            = undef,
+  $haproxy_names_mapping     = $lma_collector::params::haproxy_names_mapping,
   $ceph_enabled              = undef,
   $service_user              = $lma_collector::params::openstack_user,
   $service_password          = $lma_collector::params::openstack_password,
@@ -88,7 +89,8 @@ class lma_collector::collectd::controller (
 
   if $haproxy_socket {
     $modules['haproxy'] = {
-      'Socket' => $haproxy_socket
+      'Socket' => $haproxy_socket,
+      'Mapping' => $haproxy_names_mapping,
     }
   }
 

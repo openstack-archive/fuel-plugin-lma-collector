@@ -12,7 +12,13 @@
 <% @modules.sort.each do |module_name,config| -%>
     <Module "<%= module_name %>">
 <%   config.sort.each do |key,value| -%>
-        <%= key -%> "<%= value -%>"
+        <%- if value.is_a?(Hash) -%>
+            <%- value.sort.each do |original,new| -%>
+           <%= key -%> "<%= original -%>" "<%= new -%>"
+            <%- end -%>
+        <%- else -%>
+           <%= key -%> "<%= value -%>"
+        <%- end -%>
 <%   end -%>
     </Module>
 <% end -%>
