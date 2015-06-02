@@ -1,3 +1,11 @@
+- role: ['primary-controller']
+  stage: post_deployment
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/check_environment_configuration.pp
+    puppet_modules: puppet/modules
+    timeout: 300
+
 - role: '*'
   stage: post_deployment
   type: puppet
