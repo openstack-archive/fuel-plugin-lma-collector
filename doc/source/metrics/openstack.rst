@@ -21,6 +21,8 @@ Service checks
 
 .. note:: All checks are performed without authentication except for Ceilometer.
 
+* ``openstack.<service>.endpoint.status``, :ref:`endpoint status <service_status>`.
+
 Compute
 ^^^^^^^
 
@@ -64,8 +66,9 @@ The following status metrics are computed from other metrics including: :ref:`se
 Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
 
 * ``openstack.nova.services.<service>.status``, status of Nova services computed from ``openstack.nova.services.<service>.<service_state>``.
-* ``openstack.nova.api.<backend>.status``, status of the API services located behind the HAProxy load-balancer,
+* ``openstack.nova.pool.<backend>.status``, status of the API services located behind the HAProxy load-balancer,
   computed from ``haproxy.backend.nova-*.servers.(up|down)``.
+
 * ``openstack.nova.status``, the general status of the Nova service which is computed using the previous metrics and the ``openstack.nova.check_api`` metric.
 
 Identity
@@ -84,7 +87,7 @@ The following status metrics are computed from other metrics: :ref:`service chec
 
 Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
 
-* ``openstack.keystone.api.<backend>.status``, status of the API services located behind the HAProxy load-balancer, computed from ``haproxy.backend.keystone-*.servers.(up|down)``.
+* ``openstack.keystone.pool.<backend>.status``, status of the API services located behind the HAProxy load-balancer, computed from ``haproxy.backend.keystone-*.servers.(up|down)``.
 * ``openstack.keystone.status``, the general status of the Keystone service which is computed using the previous metric and the ``openstack.keystone.check_api`` metric.
 
 Volume
@@ -122,7 +125,7 @@ The following status metrics are computed from other metrics including: :ref:`se
 Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
 
 * ``openstack.cinder.services.<service>.status``, status of Cinder services computed from ``openstack.cinder.services.<service>.<service_state>``.
-* ``openstack.cinder.api.<backend>.status``, status of the API services located behind the HAProxy load-balancer,
+* ``openstack.cinder.pool.<backend>.status``, status of the API services located behind the HAProxy load-balancer,
   computed from ``haproxy.backend.cinder-api.servers.(up|down)``.
 * ``openstack.cinder.status``, the general status of the Cinder service which is computed using the previous metrics and the ``openstack.cinder.check_api`` metric.
 
@@ -147,7 +150,7 @@ The following status metrics are computed from other metrics including: :ref:`se
 
 Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
 
-* ``openstack.glance.api.<backend>.status``, status of the API services located behind the HAProxy load-balancer,
+* ``openstack.glance.pool.<backend>.status``, status of the API services located behind the HAProxy load-balancer,
   computed from ``haproxy.backend.glance-*.servers.(up|down)``.
 * ``openstack.glance.status``, the general status of the Glance service which is computed using the previous metric and the ``openstack.glance.check_api`` metric.
 
@@ -188,7 +191,7 @@ The following status metrics are computed from other metrics including: :ref:`se
 Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
 
 * ``openstack.neutron.agents.<agent_type>.status``, status of Neutron services computed from metric ``openstack.neutron.agents.<agent_type>.<agent_state>``.
-* ``openstack.neutron.api.neutron.status``, status f the API services located behind the HAProxy load-balancer,
+* ``openstack.neutron.pool.neutron.status``, status f the API services located behind the HAProxy load-balancer,
   computed from ``haproxy.backend.neutron.servers.(up|down)``.
 * ``openstack.neutron.status``, the general status of the Neutron service which is computed using the previous metrics and the ``openstack.neutron.check_api`` metric.
 
@@ -202,3 +205,41 @@ API response times
 ``<HTTP method>`` is the HTTP method name, eg 'GET', 'POST' and so on.
 
 ``<HTTP status>`` is a 3-digit string representing the HTTP response code, eg '200', '404' and so on.
+
+
+Service status
+^^^^^^^^^^^^^^
+.. _service_status:
+
+A **general status** is computed for each OpenStack service:
+
+* ``openstack.<service>.status``, the general status of the service.
+
+Where the value is one of:
+
+* 0, OKAY
+* 1, WARN
+* 2, FAIL
+* 3, UNKNOWN
+
+The **general status** is based on the following **underlying status**:
+
+``openstack.<service>.endpoint.status``, based on related :ref:`service checks  <service_checks>` (``openstack.<service>.check_api``)
+
+``openstack.<service>.pool.status``, base on related status pool of :ref:`HAproxy servers <haproxy_backend_metric>` (``haproxy.backend.<backend>.status``).
+
+Where the value is one of 
+
+* 0, OK
+* 1, DEGRADED
+* 2, DOWN
+* 3, UNKNOWN
+
+Furhtermore, general status for *compute*, *volume* and *network* are also based respectively on these underlying status:
+
+* ``openstack.nova.services.<service>.status``, status of Nova services computed from ``openstack.nova.services.<service>.<service_state>``,
+  see :ref:`Nova service states <compute-service-state-metrics>`.
+* ``openstack.cinder.services.<service>.status``, status of Nova services computed from ``openstack.cinder.services.<service>.<service_state>``,
+  see :ref:`Cinder service states <volume-service-state-metrics>`.
+* ``openstack.neutron.agents.<agent_type>.status``, status of Neutron agents computed from ``openstack.neutron.agents.<agent_type>.<agent_state>``,
+  see :ref:`Neutron agent states <network-agent-state-metrics>`.
