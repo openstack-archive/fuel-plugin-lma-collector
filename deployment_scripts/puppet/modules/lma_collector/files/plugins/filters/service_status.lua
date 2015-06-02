@@ -20,7 +20,7 @@ local utils  = require 'lma_utils'
 
 _PRESERVATION_VERSION = 1
 -- variables with global scope are preserved between restarts
-service_status = {}
+all_service_status = {}
 
 -- local scope variables
 local timeout = read_config("timeout") or 60
@@ -41,11 +41,11 @@ function process_message ()
         local worker_status = -1
         local check_api_status = -1
         local haproxy_server_status = -1
-        local general_status
+        local global_status
         local events = {}
         local not_up_status = {}
 
-        if not service_status[service_name] then service_status[service_name] = {} end
+        if not all_service_status[service_name] then all_service_status[service_name] = {} end
 
         if service.workers then
             worker_status = compute_status(events, not_up_status, ts, 'workers', service_name, service.workers)
@@ -54,12 +54,12 @@ function process_message ()
         if service.check_api and service.check_api.value then
             check_api_status = utils.check_api_to_status_map[service.check_api.value]
             local prev_check_api_status = utils.service_status_map.UNKNOWN
-            if service_status[service_name].check_api then
-                prev_check_api_status = service_status[service_name].check_api
+            if all_service_status[service_name].check_api then
+                prev_check_api_status = all_service_status[service_name].check_api
             end
-            service_status[service_name].check_api = check_api_status
+            all_service_status[service_name].check_api = check_api_status
             if prev_check_api_status and prev_check_api_status ~= check_api_status then
-                events[#events+1] = string.format("check api %s -> %s",
+                events[#events+1] = string.format("endpoint %s -> %s",
                                       utils.service_status_to_label_map[prev_check_api_status],
                                       utils.service_status_to_label_map[check_api_status])
             elseif check_api_status == utils.service_status_map.DOWN then
@@ -69,23 +69,23 @@ function process_message ()
         if service.haproxy then
             haproxy_server_status = compute_status(events, not_up_status, ts, 'haproxy', service_name, service.haproxy)
         end
-        general_status = max(worker_status, check_api_status, haproxy_server_status)
+        global_status = max(worker_status, check_api_status, haproxy_server_status)
         -- global service status
         utils.add_metric(datapoints,
                     string.format('%s.openstack.%s.status', hostname, service_name),
-                    {ts, general_status})
+                    {ts, global_status})
 
         -- only emit event if the public vip is active
         if not expired(ts, data.vip_active_at) then
             local event_title
-            local prev = service_status[service_name].general_status or utils.service_status_map.UNKNOWN
-            if prev and prev ~= general_status then
+            local prev = all_service_status[service_name].global_status or utils.global_status_map.UNKNOWN
+            if prev and prev ~= global_status then
                 event_title = string.format("General status %s -> %s",
-                                      utils.service_status_to_label_map[prev],
-                                      utils.service_status_to_label_map[general_status])
+                                      utils.global_status_to_label_map[prev],
+                                      utils.global_status_to_label_map[global_status])
             elseif #events > 0 then
                 event_title = string.format("General status remains %s",
-                                      utils.service_status_to_label_map[general_status])
+                                      utils.global_status_to_label_map[global_status])
             end
             if event_title then
                 -- append not UP status elements
@@ -94,26 +94,26 @@ function process_message ()
             end
         end
 
-        service_status[service_name].general_status = general_status
+        all_service_status[service_name].global_status = global_status
     end
     return 0
 end
 
 function get_previous_status(service_name, top_entry, name)
-    if not service_status[service_name] then
-         service_status[service_name] = {}
+    if not all_service_status[service_name] then
+         all_service_status[service_name] = {}
     end
-    if not service_status[service_name][top_entry] then
-         service_status[service_name][top_entry] = {}
+    if not all_service_status[service_name][top_entry] then
+         all_service_status[service_name][top_entry] = {}
     end
-    if not service_status[service_name][top_entry][name] then
-         service_status[service_name][top_entry][name] = utils.service_status_map.UNKNOWN
+    if not all_service_status[service_name][top_entry][name] then
+         all_service_status[service_name][top_entry][name] = utils.service_status_map.UNKNOWN
     end
-    return service_status[service_name][top_entry][name]
+    return all_service_status[service_name][top_entry][name]
 end
 
 function set_status(service_name, top_entry, name, status)
-     service_status[service_name][top_entry][name] = status
+     all_service_status[service_name][top_entry][name] = status
 end
 
 function compute_status(events, not_up_status, current_time, elts_name, name, service)
@@ -124,7 +124,7 @@ function compute_status(events, not_up_status, current_time, elts_name, name, se
     local one_up = {}
     local one_disabled = {}
     local one_disabled_count = 0
-    local general_status = utils.service_status_map.UNKNOWN
+    local service_status = utils.service_status_map.UNKNOWN
     local up_elements = {}
     local total_elements = {}
 
@@ -160,11 +160,11 @@ function compute_status(events, not_up_status, current_time, elts_name, name, se
     end
     -- general element status
     if zero_up_count > 0 then
-       general_status = utils.service_status_map.DOWN
+       service_status = utils.service_status_map.DOWN
     elseif down_elts_count > 0 then
-       general_status = utils.service_status_map.DEGRADED
+       service_status = utils.service_status_map.DEGRADED
     elseif down_elts_count == 0 then
-       general_status = utils.service_status_map.OK
+       service_status = utils.service_status_map.UP
     end
 
     -- elements clearly down
@@ -215,23 +215,23 @@ function compute_status(events, not_up_status, current_time, elts_name, name, se
         end
     end
 
-    -- elements ok
+    -- elements up
     for worker_name, worker in pairs(one_up) do
         if not zero_up[worker_name] and not down_elts[worker_name] then
             local prev = get_previous_status(name, elts_name, worker_name)
-            local OK = utils.service_status_map.OK
-            set_status(name, elts_name, worker_name, OK)
-            if prev and prev ~= utils.service_status_map.OK then
+            local UP = utils.service_status_map.UP
+            set_status(name, elts_name, worker_name, UP)
+            if prev and prev ~= utils.service_status_map.UP then
                events[#events+1] = string.format("%s status %s -> %s", worker_name,
                                                  utils.service_status_to_label_map[prev],
-                                                 utils.service_status_to_label_map[OK])
+                                                 utils.service_status_to_label_map[UP])
             end
             utils.add_metric(datapoints, string.format("%s.openstack.%s.%s.%s.status",
                         hostname, name, worker.group_name, worker_name),
-                        {current_time, utils.service_status_map.OK})
+                        {current_time, utils.service_status_map.UP})
         end
     end
-    return general_status
+    return service_status
 end
 
 function expired(current_time, last_time)
