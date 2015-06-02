@@ -4,9 +4,10 @@ Service checks
 ^^^^^^^^^^^^^^
 .. _service_checks:
 
-* ``openstack.<service>.check_api``, the service's API status, 1 if it is responsive, 0 otherwise.
+* ``openstack.<api>.check_api``, the service's API status, 1 if it is responsive, 0 otherwise.
+* ``openstack.<service>.endpoint.<api>.status``, see :ref:`service status <service_status>`.
 
-``<service>`` is one of the following services with their respective resource checks:
+``<api>`` is one of the following services with their respective resource checks:
 
 * 'nova': '/'
 * 'cinder': '/'
@@ -58,15 +59,12 @@ These metrics are retrieved from the Nova database.
 
 ``<service_state>`` is one of 'up', 'down' or 'disabled'.
 
-The following status metrics are computed from other metrics including: :ref:`service checks <service_checks>`,
-:ref:`HAproxy servers <haproxy_backend_metric>` and :ref:`service states <compute-service-state-metrics>`.
+Status metrics, see :ref:`service status <service_status>` for details:
 
-Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
-
-* ``openstack.nova.services.<service>.status``, status of Nova services computed from ``openstack.nova.services.<service>.<service_state>``.
-* ``openstack.nova.api.<backend>.status``, status of the API services located behind the HAProxy load-balancer,
+* ``openstack.nova.services.<service>.status``, status of Nova services (workers) computed from ``openstack.nova.services.<service>.<service_state>``.
+* ``openstack.nova.pool.<backend>.status``, status of API services located behind the HAProxy load-balancer,
   computed from ``haproxy.backend.nova-*.servers.(up|down)``.
-* ``openstack.nova.status``, the general status of the Nova service which is computed using the previous metrics and the ``openstack.nova.check_api`` metric.
+* ``openstack.nova.status``, the global status of the Nova service.
 
 Identity
 ^^^^^^^^
@@ -79,13 +77,10 @@ These metrics are retrieved from the Keystone API.
 
 ``<state>`` is one of 'disabled' or 'enabled'.
 
-The following status metrics are computed from other metrics: :ref:`service checks <service_checks>` and
-:ref:`HAproxy servers <haproxy_backend_metric>`.
+Status metrics, see :ref:`service status <service_status>` for details:
 
-Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
-
-* ``openstack.keystone.api.<backend>.status``, status of the API services located behind the HAProxy load-balancer, computed from ``haproxy.backend.keystone-*.servers.(up|down)``.
-* ``openstack.keystone.status``, the general status of the Keystone service which is computed using the previous metric and the ``openstack.keystone.check_api`` metric.
+* ``openstack.keystone.pool.<backend>.status``, status of API services located behind the HAProxy load-balancer, computed from ``haproxy.backend.keystone-*.servers.(up|down)``.
+* ``openstack.keystone.status``, the global status of the Keystone service.
 
 Volume
 ^^^^^^
@@ -116,15 +111,12 @@ These metrics are retrieved from the Cinder database.
 
 ``<service_state>`` is one of 'up', 'down' or 'disabled'.
 
-The following status metrics are computed from other metrics including: :ref:`service checks <service_checks>`,
-:ref:`HAproxy servers <haproxy_backend_metric>` and :ref:`service states <volume-service-state-metrics>`.
+Status metrics, see :ref:`service status <service_status>` for details:
 
-Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
-
-* ``openstack.cinder.services.<service>.status``, status of Cinder services computed from ``openstack.cinder.services.<service>.<service_state>``.
-* ``openstack.cinder.api.<backend>.status``, status of the API services located behind the HAProxy load-balancer,
+* ``openstack.cinder.services.<service>.status``, status of Cinder services (workers) computed from ``openstack.cinder.services.<service>.<service_state>``.
+* ``openstack.cinder.pool.<backend>.status``, status of API services located behind the HAProxy load-balancer,
   computed from ``haproxy.backend.cinder-api.servers.(up|down)``.
-* ``openstack.cinder.status``, the general status of the Cinder service which is computed using the previous metrics and the ``openstack.cinder.check_api`` metric.
+* ``openstack.cinder.status``, the global status of the Cinder.
 
 Image
 ^^^^^
@@ -142,14 +134,11 @@ These metrics are retrieved from the Glance API.
 
 ``<state>`` is one of 'queued', 'saving', 'active', 'killed', 'deleted', 'pending_delete'.
 
-The following status metrics are computed from other metrics including: :ref:`service checks <service_checks>` and
-:ref:`HAproxy servers <haproxy_backend_metric>`.
+Status metrics, see :ref:`service status <service_status>` for details:
 
-Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
-
-* ``openstack.glance.api.<backend>.status``, status of the API services located behind the HAProxy load-balancer,
+* ``openstack.glance.pool.<backend>.status``, status of the API service located behind the HAProxy load-balancer,
   computed from ``haproxy.backend.glance-*.servers.(up|down)``.
-* ``openstack.glance.status``, the general status of the Glance service which is computed using the previous metric and the ``openstack.glance.check_api`` metric.
+* ``openstack.glance.status``, the global status of the Glance service.
 
 Network
 ^^^^^^^
@@ -182,15 +171,12 @@ These metrics are retrieved from the Neutron database.
 
 ``<agent_state>`` is one of 'up', 'down' or 'disabled'.
 
-The following status metrics are computed from other metrics including: :ref:`service checks <service_checks>`,
-:ref:`HAproxy servers <haproxy_backend_metric>` and :ref:`agent states <network-agent-state-metrics>`.
+Status metrics, see :ref:`service status <service_status>` for details:
 
-Their value is one of '0' (ok), '1' (degraded), '2' (down) or '3' (unknown).
-
-* ``openstack.neutron.agents.<agent_type>.status``, status of Neutron services computed from metric ``openstack.neutron.agents.<agent_type>.<agent_state>``.
-* ``openstack.neutron.api.neutron.status``, status f the API services located behind the HAProxy load-balancer,
+* ``openstack.neutron.agents.<agent_type>.status``, status of Neutron services (workers) computed from metric ``openstack.neutron.agents.<agent_type>.<agent_state>``.
+* ``openstack.neutron.pool.neutron.status``, status of the API service located behind the HAProxy load-balancer,
   computed from ``haproxy.backend.neutron.servers.(up|down)``.
-* ``openstack.neutron.status``, the general status of the Neutron service which is computed using the previous metrics and the ``openstack.neutron.check_api`` metric.
+* ``openstack.neutron.status``, the global status of the Neutron service.
 
 API response times
 ^^^^^^^^^^^^^^^^^^
@@ -202,3 +188,61 @@ API response times
 ``<HTTP method>`` is the HTTP method name, eg 'GET', 'POST' and so on.
 
 ``<HTTP status>`` is a 3-digit string representing the HTTP response code, eg '200', '404' and so on.
+
+
+Service status
+^^^^^^^^^^^^^^
+.. _service_status:
+
+A **global status** is computed for each OpenStack service (``openstack.<service>.status``),
+where the value is one of:
+
+* 0, meaning OKAY
+* 1, meaning WARN
+* 2, meaning FAIL
+* 3, meaning UNKNOWN (no metric to determine the status)
+
+The **global status** of a service is based on the following **underlying status**,
+where the value is one of:
+
+* 0, meaning OK
+* 1, meaning DEGRADED
+* 2, meaning DOWN
+* 3, meaning UNKNOWN (no metric to determine the status)
+
+Underlying status:
+
+* ``openstack.<service>.endpoint.<api>.status``, status of all API of the service,
+  based on related :ref:`service checks <service_checks>` (``openstack.<service>.check_api``).
+  To notice that the endpoint status cannot be DEGRADED.
+
+* ``openstack.<service>.pool.<backend>.status``, status of all HAproxy backend pools,
+  based on related status of :ref:`HAproxy server states <haproxy_backend_metric>` (``haproxy.backend.<backend>.servers.(up|down)``).
+  The status is
+
+  * OK if all servers are UP,
+  * DEGRADED if one or more servers are DOWN,
+  * DOWN if all servers are DOWN.
+
+Furhtermore, the global status of services *compute*, *volume* and *network* are
+also based respectively on these underlying 'worker' status:
+
+* ``openstack.nova.services.<service>.status``, status of Nova services computed from ``openstack.nova.services.<service>.<service_state>``,
+  see :ref:`Nova service states <compute-service-state-metrics>`.
+* ``openstack.cinder.services.<service>.status``, status of Nova services computed from ``openstack.cinder.services.<service>.<service_state>``,
+  see :ref:`Cinder service states <volume-service-state-metrics>`.
+* ``openstack.neutron.agents.<agent_type>.status``, status of Neutron agents computed from ``openstack.neutron.agents.<agent_type>.<agent_state>``,
+  see :ref:`Neutron agent states <network-agent-state-metrics>`.
+
+The status of these 3 above is determined as follow:
+
+* OK if all workers are UP and there is no worker DOWN, could have DISABLED worker.
+* DEGRADED if one or more workers are DOWN.
+* DOWN if there is no UP worker.
+
+The **global status** determination follow these simple rules:
+
+* OK if all underlying status are OK.
+* WARN if one of underlying status is DEGRADED.
+* FAIL if one of underlying status is DOWN.
+* UNKNOWN if one of underlying status is UNKNOWN.
