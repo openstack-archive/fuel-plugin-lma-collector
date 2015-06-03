@@ -1,5 +1,5 @@
 - role: '*'
-  stage: post_deployment
+  stage: post_deployment/8200
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/base.pp
@@ -7,7 +7,7 @@
     timeout: 600
 
 - role: ['controller', 'primary-controller']
-  stage: post_deployment
+  stage: post_deployment/8201
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/controller.pp
@@ -15,7 +15,7 @@
     timeout: 600
 
 - role: [ 'compute' ]
-  stage: post_deployment
+  stage: post_deployment/8202
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/compute.pp
@@ -23,7 +23,7 @@
     timeout: 600
 
 - role: ['cinder']
-  stage: post_deployment
+  stage: post_deployment/8203
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/cinder.pp
@@ -31,7 +31,7 @@
     timeout: 600
 
 - role: ['ceph-osd']
-  stage: post_deployment
+  stage: post_deployment/8204
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/ceph_osd.pp
