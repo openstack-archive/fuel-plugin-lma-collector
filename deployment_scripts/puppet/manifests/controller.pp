@@ -72,13 +72,6 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
   $management_vip = hiera('management_vip')
 
   if $ha_deployment {
-    $rabbitmq_pid_file = '/var/run/rabbitmq/p_pid'
-  }
-  else {
-    $rabbitmq_pid_file = '/var/run/rabbitmq/pid'
-  }
-
-  if $ha_deployment {
     $haproxy_socket = '/var/lib/haproxy/stats'
   }else{
     # do not deploy HAproxy collectd plugin
@@ -97,7 +90,6 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     service_password  => $nova['user_password'],
     service_tenant    => 'services',
     keystone_url      => "http://${management_vip}:5000/v2.0",
-    rabbitmq_pid_file => $rabbitmq_pid_file,
     haproxy_socket    => $haproxy_socket,
     ceph_enabled      => $ceph_enabled,
     memcached_host    => hiera('internal_address'),

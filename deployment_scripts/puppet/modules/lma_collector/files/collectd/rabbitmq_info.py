@@ -29,8 +29,6 @@ NAME = 'rabbitmq_info'
 RABBITMQCTL_BIN = '/usr/sbin/rabbitmqctl'
 # Override in config by specifying 'PmapBin'
 PMAP_BIN = '/usr/bin/pmap'
-# Override in config by specifying 'PidFile.
-PID_FILE = "/var/run/rabbitmq/pid"
 # Override in config by specifying 'Vhost'.
 VHOST = "/"
 
@@ -45,7 +43,7 @@ class RabbitMqPlugin(base.Base):
         super(RabbitMqPlugin, self).__init__(*args, **kwargs)
         self.plugin = NAME
         self.rabbitmqctl_bin = RABBITMQCTL_BIN
-        self.pidfile = PID_FILE
+        self.pidfile = None
         self.pmap_bin = PMAP_BIN
         self.vhost = VHOST
 
@@ -136,29 +134,31 @@ class RabbitMqPlugin(base.Base):
                 '%s reports 0 memory usage. This is probably incorrect.' %
                 self.rabbitmqctl_bin)
 
-        # get the PID of the RabbitMQ process
-        try:
-            with open(self.pidfile, 'r') as f:
-                pid = f.read().strip()
-        except:
-            self.logger.error('Unable to read %s' % self.pidfile)
-            return
+        # pmap metrics are only collected if the location of the pid file is
+        # explicitly configured
+        if self.pidfile:
+            try:
+                with open(self.pidfile, 'r') as f:
+                    pid = f.read().strip()
+            except:
+                self.logger.error('Unable to read %s' % self.pidfile)
+                return
 
-        # use pmap to get proper memory stats
-        out, err = self.execute([self.pmap_bin, '-d', pid], shell=False)
-        if not out:
-            self.logger.error('Failed to run %s' % self.pmap_bin)
-            return
+            # use pmap to get proper memory stats
+            out, err = self.execute([self.pmap_bin, '-d', pid], shell=False)
+            if not out:
+                self.logger.error('Failed to run %s' % self.pmap_bin)
+                return
 
-        out = out.split('\n')[-1]
-        if re.match('mapped', out):
-            m = re.match(r"\D+(\d+)\D+(\d+)\D+(\d+)", out)
-            stats['pmap_mapped'] = int(m.group(1))
-            stats['pmap_used'] = int(m.group(2))
-            stats['pmap_shared'] = int(m.group(3))
-        else:
-            self.logger.warning('%s returned something strange.' %
-                                self.pmap_bin)
+            out = out.split('\n')[-1]
+            if re.match('mapped', out):
+                m = re.match(r"\D+(\d+)\D+(\d+)\D+(\d+)", out)
+                stats['pmap_mapped'] = int(m.group(1))
+                stats['pmap_used'] = int(m.group(2))
+                stats['pmap_shared'] = int(m.group(3))
+            else:
+                self.logger.warning('%s returned something strange.' %
+                                    self.pmap_bin)
 
         return stats
 
