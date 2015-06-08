@@ -30,6 +30,10 @@ class lma_collector::notifications::compute (
     'DEFAULT/notification_driver': value => $driver,
     notify => Service[$::nova::params::compute_service_name],
   }
+  nova_config {
+    'DEFAULT/notify_on_state_change': value => 'vm_and_task_state',
+    notify => Service[$::nova::params::compute_service_name],
+  }
 
   service { $::nova::params::compute_service_name:
     hasstatus  => true,
