@@ -21,7 +21,6 @@ class lma_collector::collectd::controller (
   $service_tenant            = $lma_collector::params::openstack_tenant,
   $keystone_url              = $lma_collector::params::keystone_url,
   $nova_cpu_allocation_ratio = $lma_collector::params::nova_cpu_allocation_ratio,
-  $rabbitmq_pid_file         = $lma_collector::params::rabbitmq_pid_file,
   $memcached_host            = $lma_collector::params::memcached_host,
   $apache_host               = $lma_collector::params::apache_status_host,
 ) inherits lma_collector::params {
@@ -33,7 +32,6 @@ class lma_collector::collectd::controller (
   # See https://github.com/pdxcat/puppet-module-collectd/issues/227
   $modules = {
     'rabbitmq_info'       => {
-      'PidFile' => $rabbitmq_pid_file,
     },
     'check_openstack_api' => {
       'Username'    => $service_user,

@@ -76,7 +76,6 @@ class lma_collector::params {
   $mysql_database = ''
   $mysql_username = ''
   $mysql_password = ''
-  $rabbitmq_pid_file = '/var/run/rabbitmq/pid'
   $openstack_user = ''
   $openstack_password = ''
   $openstack_tenant = ''
