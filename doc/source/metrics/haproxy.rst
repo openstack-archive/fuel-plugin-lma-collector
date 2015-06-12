@@ -7,6 +7,8 @@ Server
   0 otherwise.
 * ``haproxy.connections``, number of current connections.
 * ``haproxy.ssl_connections``, number of current SSL connections.
+* ``haproxy.pipes_free``, number of free pipes.
+* ``haproxy.pipes_used``, number of used pipes.
 * ``haproxy.run_queue``, number of connections waiting in the queue.
 * ``haproxy.tasks``, number of tasks.
 * ``haproxy.uptime``, HAProxy server uptime in seconds.
