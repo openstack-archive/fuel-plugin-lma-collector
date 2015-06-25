@@ -17,6 +17,7 @@
 $lma_collector = hiera('lma_collector')
 $roles         = node_roles(hiera('nodes'), hiera('uid'))
 $is_controller = member($roles, 'controller') or member($roles, 'primary-controller')
+$is_base_os    = member($roles, 'base-os')
 
 $tags = {
   deployment_id => hiera('deployment_id'),
@@ -140,7 +141,30 @@ case $influxdb_mode {
       $influxdb_password = $influxdb_grafana['influxdb_userpass']
     }
 
-    class { 'lma_collector::collectd::base':
+    if $is_base_os {
+      if $influxdb_mode == 'local' and $elasticsearch_mode == 'local' {
+        # Elasticsearch is running on a JVM
+        $processes       = ['hekad', 'collectd', 'influxdb']
+        $process_matches = [{name => 'elasticsearch', regex => 'java'}]
+      } elsif $influxdb_mode == 'local' {
+        $processes = ['hekad', 'collectd', 'influxdb']
+        $process_matches = undef
+      } elsif $elasticsearch_mode == 'local' {
+        $processes = ['hekad', 'collectd']
+        $process_matches = [{name => 'elasticsearch', regex => 'java'}]
+      } else {
+        $processes = ['hekad', 'collectd']
+        $process_matches = undef
+      }
+
+      class { 'lma_collector::collectd::base':
+        processes       => $processes,
+        process_matches => $process_matches,
+      }
+    } else {
+      class { 'lma_collector::collectd::base':
+        processes       => ['hekad', 'collectd'],
+      }
     }
 
     class { 'lma_collector::influxdb':
