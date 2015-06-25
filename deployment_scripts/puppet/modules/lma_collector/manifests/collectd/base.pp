@@ -12,7 +12,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-class lma_collector::collectd::base {
+class lma_collector::collectd::base (
+  $processes = undef,
+  $process_matches = undef,
+){
   include lma_collector::params
   include lma_collector::service
 
@@ -75,6 +78,8 @@ class lma_collector::collectd::base {
   }
 
   class { 'collectd::plugin::processes':
+    processes       => $processes,
+    process_matches => $process_matches,
   }
 
   class { 'collectd::plugin::swap':

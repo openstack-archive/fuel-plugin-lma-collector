@@ -17,6 +17,15 @@
 $lma_collector = hiera('lma_collector')
 $roles         = node_roles(hiera('nodes'), hiera('uid'))
 $is_controller = member($roles, 'controller') or member($roles, 'primary-controller')
+$is_base_os    = member($roles, 'base-os')
+
+$elasticsearch_kibana = hiera('elasticsearch_kibana', false)
+$es_node_name = $lma_collector['elasticsearch_node_name']
+$es_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $es_node_name)
+
+$influxdb_grafana = hiera('influxdb_grafana', false)
+$influxdb_node_name = $lma_collector['influxdb_node_name']
+$influxdb_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $influxdb_node_name)
 
 $tags = {
   deployment_id => hiera('deployment_id'),
@@ -47,8 +56,6 @@ case $elasticsearch_mode {
     $es_server = $lma_collector['elasticsearch_address']
   }
   'local': {
-    $es_node_name = $lma_collector['elasticsearch_node_name']
-    $es_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $es_node_name)
     if size($es_nodes) < 1 {
       fail("Could not find node '${es_node_name}' in the environment")
     }
@@ -122,12 +129,9 @@ case $influxdb_mode {
       $influxdb_password = $lma_collector['influxdb_password']
     }
     else {
-      $influxdb_node_name = $lma_collector['influxdb_node_name']
-      $influxdb_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $influxdb_node_name)
       if size($influxdb_nodes) < 1 {
         fail("Could not find node '${influxdb_node_name}' in the environment")
       }
-      $influxdb_grafana = hiera('influxdb_grafana', false)
       if ! $influxdb_grafana {
         fail('Could not get the InfluxDB parameters. The InfluxDB-Grafana plugin is probably not installed.')
       }
@@ -140,8 +144,28 @@ case $influxdb_mode {
       $influxdb_password = $influxdb_grafana['influxdb_userpass']
     }
 
+    if $is_base_os {
+      if $influxdb_node_name == $influxdb_grafana['node_name'] and $influxdb_mode == 'local' {
+        $processes = ['hekad', 'collectd', 'influxdb']
+      } else {
+        $processes = ['hekad', 'collectd']
+      }
+
+      if $es_node_name == $elasticsearch_kibana['node_name'] and $elasticsearch_mode == 'local' {
+        # Elasticsearch is running on a JVM
+        $process_matches = [{name => 'elasticsearch', regex => 'java'}]
+      } else {
+        $process_matches = undef
+      }
+    } else {
+      $processes = ['hekad', 'collectd']
+      $process_matches = undef
+    }
+
     class { 'lma_collector::collectd::base':
-      require => Class['lma_collector'],
+      processes       => $processes,
+      process_matches => $process_matches,
+      require         => Class['lma_collector'],
     }
 
     class { 'lma_collector::influxdb':
@@ -149,7 +173,7 @@ case $influxdb_mode {
       database => $influxdb_database,
       user     => $influxdb_user,
       password => $influxdb_password,
-      require => Class['lma_collector'],
+      require  => Class['lma_collector'],
     }
   }
   'disabled': {
