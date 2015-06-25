@@ -141,6 +141,7 @@ case $influxdb_mode {
     }
 
     class { 'lma_collector::collectd::base':
+      require => Class['lma_collector'],
     }
 
     class { 'lma_collector::influxdb':
@@ -148,6 +149,7 @@ case $influxdb_mode {
       database => $influxdb_database,
       user     => $influxdb_user,
       password => $influxdb_password,
+      require => Class['lma_collector'],
     }
   }
   'disabled': {
