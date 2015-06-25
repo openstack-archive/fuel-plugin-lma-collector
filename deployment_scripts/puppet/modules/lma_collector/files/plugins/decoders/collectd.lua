@@ -74,10 +74,15 @@ function process_message ()
                 msg['Fields']['device'] = sample['plugin_instance']
                 msg['Fields']['name'] = 'net' .. sep .. sample['plugin_instance'] .. sep .. sample['type'] .. sep .. sample['dsnames'][i]
             elseif metric_source == 'processes' then
-                if sample['type'] == 'ps_state' then
-                    msg['Fields']['name'] = 'processes' .. sep .. 'state' .. sep .. sample['type_instance']
+                if sample['plugin_instance'] == '' then
+                    msg['Fields']['name'] = 'processes'
                 else
-                    msg['Fields']['name'] = 'processes' .. sep .. sample['type']
+                    msg['Fields']['name'] = 'lma_components' .. sep .. sample['plugin_instance']
+                end
+                if sample['type'] == 'ps_state' then
+                    msg['Fields']['name'] = msg['Fields']['name'] .. sep .. 'state' .. sep .. sample['type_instance']
+                else
+                    msg['Fields']['name'] = msg['Fields']['name'] .. sep .. sample['type']
                 end
             elseif metric_source ==  'dbi' and sample['plugin_instance'] == 'mysql_status' then
                 msg['Fields']['name'] = 'mysql' .. sep .. sample['type_instance']
