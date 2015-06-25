@@ -114,3 +114,8 @@ Pacemaker
 ---------
 
 .. include:: metrics/pacemaker.rst
+
+LMA self-monitoring
+-------------------
+
+.. include:: metrics/lma.rst
