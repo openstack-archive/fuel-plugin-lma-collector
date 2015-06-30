@@ -21,11 +21,11 @@ $is_base_os        = member($roles, 'base-os')
 $current_node_name = hiera('user_node_name')
 
 $elasticsearch_kibana = hiera('elasticsearch_kibana', false)
-$es_node_name = $lma_collector['elasticsearch_node_name']
+$es_node_name = $elasticsearch_kibana['node_name']
 $es_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $es_node_name)
 
 $influxdb_grafana = hiera('influxdb_grafana', false)
-$influxdb_node_name = $lma_collector['influxdb_node_name']
+$influxdb_node_name = $influxdb_grafana['node_name']
 $influxdb_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $influxdb_node_name)
 
 $tags = {
@@ -57,9 +57,6 @@ case $elasticsearch_mode {
     $es_server = $lma_collector['elasticsearch_address']
   }
   'local': {
-    if size($es_nodes) < 1 {
-      fail("Could not find node '${es_node_name}' in the environment")
-    }
     $es_server = $es_nodes[0]['internal_address']
   }
   'disabled': {
@@ -130,15 +127,8 @@ case $influxdb_mode {
       $influxdb_password = $lma_collector['influxdb_password']
     }
     else {
-      if size($influxdb_nodes) < 1 {
-        fail("Could not find node '${influxdb_node_name}' in the environment")
-      }
-      if ! $influxdb_grafana {
-        fail('Could not get the InfluxDB parameters. The InfluxDB-Grafana plugin is probably not installed.')
-      }
-      elsif ! $influxdb_grafana['metadata']['enabled'] {
-        fail('Could not get the InfluxDB parameters. The InfluxDB-Grafana plugin is probably not enabled for this environment.')
-      }
+      # Note: we don't validate data inputs because another manifest
+      # is responsible to check their coherences.
       $influxdb_server = $influxdb_nodes[0]['internal_address']
       $influxdb_database = $influxdb_grafana['influxdb_dbname']
       $influxdb_user = $influxdb_grafana['influxdb_username']
@@ -146,13 +136,13 @@ case $influxdb_mode {
     }
 
     if $is_base_os {
-      if $current_node_name == $influxdb_grafana['node_name'] and $influxdb_mode == 'local' {
+      if $current_node_name == $influxdb_node_name and $influxdb_mode == 'local' {
         $processes = ['hekad', 'collectd', 'influxdb']
       } else {
         $processes = ['hekad', 'collectd']
       }
 
-      if $current_node_name == $elasticsearch_kibana['node_name'] and $elasticsearch_mode == 'local' {
+      if $current_node_name == $es_node_name and $elasticsearch_mode == 'local' {
         # Elasticsearch is running on a JVM
         $process_matches = [{name => 'elasticsearch', regex => 'java'}]
       } else {
