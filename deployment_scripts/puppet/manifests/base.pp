@@ -14,10 +14,11 @@
 #
 # TODO(spasquier): fail if Neutron isn't used
 
-$lma_collector = hiera('lma_collector')
-$roles         = node_roles(hiera('nodes'), hiera('uid'))
-$is_controller = member($roles, 'controller') or member($roles, 'primary-controller')
-$is_base_os    = member($roles, 'base-os')
+$lma_collector     = hiera('lma_collector')
+$roles             = node_roles(hiera('nodes'), hiera('uid'))
+$is_controller     = member($roles, 'controller') or member($roles, 'primary-controller')
+$is_base_os        = member($roles, 'base-os')
+$current_node_name = hiera('user_node_name')
 
 $elasticsearch_kibana = hiera('elasticsearch_kibana', false)
 $es_node_name = $lma_collector['elasticsearch_node_name']
@@ -145,13 +146,13 @@ case $influxdb_mode {
     }
 
     if $is_base_os {
-      if $influxdb_node_name == $influxdb_grafana['node_name'] and $influxdb_mode == 'local' {
+      if $current_node_name == $influxdb_grafana['node_name'] and $influxdb_mode == 'local' {
         $processes = ['hekad', 'collectd', 'influxdb']
       } else {
         $processes = ['hekad', 'collectd']
       }
 
-      if $es_node_name == $elasticsearch_kibana['node_name'] and $elasticsearch_mode == 'local' {
+      if $current_node_name == $elasticsearch_kibana['node_name'] and $elasticsearch_mode == 'local' {
         # Elasticsearch is running on a JVM
         $process_matches = [{name => 'elasticsearch', regex => 'java'}]
       } else {
