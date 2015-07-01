@@ -26,14 +26,14 @@ all_service_status = {}
 local timeout = read_config("timeout") or 60
 local hostname
 local datapoints = {}
-local all_events = {}
 
 function process_message ()
     local ok, data = pcall(cjson.decode, read_message("Payload"))
     if not ok then
         return -1
     end
-    local ts = floor(read_message("Timestamp")/1e6) -- in ms
+    local timestamp = read_message('Timestamp')
+    local ts = floor(timestamp/1e6) -- in ms
     hostname = read_message("Hostname")
     local service_name = data.name
     local states = data.states
@@ -44,6 +44,7 @@ function process_message ()
     local global_status
     local events = {}
     local not_up_status = {}
+    local msg_event
 
     if not all_service_status[service_name] then all_service_status[service_name] = {} end
 
@@ -63,23 +64,24 @@ function process_message ()
                 string.format('%s.openstack.%s.status', hostname, service_name),
                 {ts, global_status})
 
-    -- only emit event if the public vip is active
+    -- only emit status if the public vip is active
     if not expired(ts, data.vip_active_at) then
-        local event_title
         local prev = all_service_status[service_name].global_status or utils.global_status_map.UNKNOWN
-        if prev and prev ~= global_status then
-            event_title = string.format("General status %s -> %s",
-                                  utils.global_status_to_label_map[prev],
-                                  utils.global_status_to_label_map[global_status])
-        elseif #events > 0 then
-            event_title = string.format("General status remains %s",
-                                  utils.global_status_to_label_map[global_status])
+        local updated = false
+        if prev ~= global_status or #events > 0 then
+            updated = true
         end
-        if event_title then
-            -- append not UP status elements
+        if updated then -- append not UP status elements in details
             for k, v in pairs(not_up_status) do events[#events+1] = v end
-            utils.add_event(all_events, ts, service_name, event_title, events)
         end
+        local details = ''
+        if #events > 0 then
+            details = cjson.encode(events)
+        end
+        local status_msg = utils.make_status_message(timestamp, service_name,
+                                                     global_status, prev,
+                                                     updated, details)
+        inject_message(status_msg)
     end
 
     all_service_status[service_name].global_status = global_status
@@ -87,10 +89,6 @@ function process_message ()
     if #datapoints > 0 then
         inject_payload("json", "influxdb", cjson.encode(datapoints))
         datapoints = {}
-    end
-    if #all_events > 0 then
-        inject_payload("json", "event", cjson.encode(all_events))
-        all_events = {}
     end
     return 0
 end

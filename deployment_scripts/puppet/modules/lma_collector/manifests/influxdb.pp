@@ -38,7 +38,7 @@ class lma_collector::influxdb (
   heka::filter::sandbox { 'influxdb_annotation':
     config_dir      => $lma_collector::params::config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/influxdb_annotation.lua",
-    message_matcher => 'Fields[payload_type] == \'json\' && Fields[payload_name] == \'event\'',
+    message_matcher => 'Type == \'heka.sandbox.status\' && Fields[updated] == TRUE',
     ticker_interval => 1,
     config          => {
       flush_interval => $lma_collector::params::influxdb_flush_interval,

@@ -104,13 +104,27 @@ function add_metric(datapoints, name, points)
     }
 end
 
-function add_event(all_events, time, name, title, events)
-    all_events[#all_events+1] = {
-        time=time,
-        name=name,
-        title=title,
-        events=events,
+global_status_to_severity_map = {
+    [0] = 6, -- OKAY    -> INFO
+    [1] = 4, -- WARN    -> WARNING
+    [2] = 2, -- FAIL    -> CRITICAL
+    [3] = 5, -- UNKNOWN -> NOTICE
+}
+
+function make_status_message(time, service, status, prev_status, updated, details)
+    local msg = {
+        Timestamp = time,
+        Payload = details,
+        Type = 'status', -- prepended with 'heka.sandbox'
+        Severity = global_status_to_severity_map[status],
+        Fields = {
+          service = service,
+          status = status,
+          previous_status = prev_status,
+          updated = updated,
+        }
     }
+    return msg
 end
 
 -- Parse a Syslog-based payload and update the Heka message
