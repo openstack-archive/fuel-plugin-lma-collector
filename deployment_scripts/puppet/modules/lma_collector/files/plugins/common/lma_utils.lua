@@ -77,6 +77,13 @@ global_status_to_label_map = {
     [3] = 'UNKNOWN',
 }
 
+global_status_to_severity_map = {
+    [0] = 6, -- OKAY    -> INFO
+    [1] = 4, -- WARN    -> WARNING
+    [2] = 2, -- FAIL    -> CRITICAL
+    [3] = 5, -- UNKNOWN -> NOTICE
+}
+
 check_api_to_status_map = {
     [0] = 2, -- DOWN
     [1] = 0, -- UP
@@ -104,12 +111,20 @@ function add_metric(datapoints, name, points)
     }
 end
 
-function add_event(all_events, time, name, title, events)
-    all_events[#all_events+1] = {
+event_type_map = {
+    STATUS_TRANSITION = 1,
+    STATUS_IDENTICAL_WITH_CHANGES = 2,
+    STATUS = 3,
+}
+
+function get_event(time, name, title, events, _type, status_code)
+    return {
         time=time,
         name=name,
         title=title,
         events=events,
+        type=_type,
+        status=status_code,
     }
 end
 
