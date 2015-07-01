@@ -15,7 +15,10 @@ require 'cjson'
 require 'string'
 require 'table'
 require "os"
+require 'math'
 
+local floor = math.floor
+local utils  = require 'lma_utils'
 local last_flush = os.time()
 local datapoints = {}
 local base_serie_name = 'annotation'
@@ -35,25 +38,36 @@ function flush ()
 end
 
 function process_message ()
-    local ok, events = pcall(cjson.decode, read_message("Payload"))
-    if not ok then return -1 end
+    local ts = floor(read_message('Timestamp')/1e6) -- ms
+    local msg_type = read_message('Type')
+    local payload = read_message('Payload')
+    local service = read_message('Fields[service]')
+    local name = string.gsub(service, ' ', '_')
+    local serie_name = string.format('%s.%s', base_serie_name, name)
+    local title
+    local text = ''
 
-    for _, event in ipairs(events) do
-        if event.name then
-            local name = string.gsub(event.name, ' ', '_')
-            serie_name = string.format('%s.%s', base_serie_name, name)
-        else
-            serie_name = base_serie_name
+    if msg_type == 'heka.sandbox.status' then
+        local status = read_message('Fields[status]')
+        local prev_status = read_message('Fields[previous_status]')
+        local ok, details = pcall(cjson.decode, payload)
+        if ok then
+            text = table.concat(details, html_break_line)
         end
-
-        local text = table.concat(event.events, html_break_line)
+        if prev_status ~= status then
+            title = string.format('General status %s -> %s',
+                                  utils.global_status_to_label_map[prev_status],
+                                  utils.global_status_to_label_map[status])
+        else
+            title = string.format('General status remains %s',
+                                  utils.global_status_to_label_map[status])
+        end
         datapoints[#datapoints+1] = {
             name = serie_name,
             columns = {"time", "title", "tag", "text"},
-            points = {{event.time, event.title, event.name, text}}
+            points = {{ts, title, service, text}}
         }
     end
-
     flush()
     return 0
 end

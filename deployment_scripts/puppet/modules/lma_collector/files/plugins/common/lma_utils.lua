@@ -15,6 +15,7 @@ local string = require 'string'
 local extra = require 'extra_fields'
 local patt  = require 'patterns'
 local pairs = pairs
+local inject_message = inject_message
 
 local M = {}
 setfenv(1, M) -- Remove external access to contain everything in the module
@@ -104,13 +105,27 @@ function add_metric(datapoints, name, points)
     }
 end
 
-function add_event(all_events, time, name, title, events)
-    all_events[#all_events+1] = {
-        time=time,
-        name=name,
-        title=title,
-        events=events,
+local global_status_to_severity_map = {
+    [global_status_map.OKAY] = label_to_severity_map.INFO,
+    [global_status_map.WARN] = label_to_severity_map.WARNING,
+    [global_status_map.FAIL] = label_to_severity_map.CRITICAL,
+    [global_status_map.UNKNOWN] = label_to_severity_map.NOTICE,
+}
+
+function inject_status_message(time, service, status, prev_status, updated, details)
+    local msg = {
+        Timestamp = time,
+        Payload = details,
+        Type = 'status', -- prepended with 'heka.sandbox'
+        Severity = global_status_to_severity_map[status],
+        Fields = {
+          service = service,
+          status = status,
+          previous_status = prev_status,
+          updated = updated,
+        }
     }
+    inject_message(msg)
 end
 
 -- Parse a Syslog-based payload and update the Heka message
