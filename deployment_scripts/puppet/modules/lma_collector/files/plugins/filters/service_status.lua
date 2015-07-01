@@ -26,7 +26,6 @@ all_service_status = {}
 local timeout = read_config("timeout") or 60
 local hostname
 local datapoints = {}
-local all_events = {}
 
 function process_message ()
     local ok, data = pcall(cjson.decode, read_message("Payload"))
@@ -44,6 +43,7 @@ function process_message ()
     local global_status
     local events = {}
     local not_up_status = {}
+    local msg_event
 
     if not all_service_status[service_name] then all_service_status[service_name] = {} end
 
@@ -67,18 +67,28 @@ function process_message ()
     if not expired(ts, data.vip_active_at) then
         local event_title
         local prev = all_service_status[service_name].global_status or utils.global_status_map.UNKNOWN
+        local event_type = utils.event_type_map.STATUS
         if prev and prev ~= global_status then
             event_title = string.format("General status %s -> %s",
                                   utils.global_status_to_label_map[prev],
                                   utils.global_status_to_label_map[global_status])
+            event_type = utils.event_type_map.STATUS_TRANSITION
         elseif #events > 0 then
             event_title = string.format("General status remains %s",
                                   utils.global_status_to_label_map[global_status])
+            event_type = utils.event_type_map.STATUS_IDENTICAL_WITH_CHANGES
         end
         if event_title then
             -- append not UP status elements
             for k, v in pairs(not_up_status) do events[#events+1] = v end
-            utils.add_event(all_events, ts, service_name, event_title, events)
+            msg_event = utils.get_event(ts, service_name, event_title, events,
+                                        event_type, global_status)
+        else
+            -- global status remains identical and no event occured
+            msg_event = utils.get_event(ts, service_name,
+                                        string.format('Current status %s', utils.global_status_to_label_map[global_status]),
+                                        events, event_type, global_status)
+
         end
     end
 
@@ -88,9 +98,8 @@ function process_message ()
         inject_payload("json", "influxdb", cjson.encode(datapoints))
         datapoints = {}
     end
-    if #all_events > 0 then
-        inject_payload("json", "event", cjson.encode(all_events))
-        all_events = {}
+    if msg_event then
+        inject_payload("json", "event", cjson.encode(msg_event))
     end
     return 0
 end
