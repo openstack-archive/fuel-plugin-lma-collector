@@ -16,6 +16,7 @@ require 'string'
 require 'table'
 require "os"
 
+local utils  = require 'lma_utils'
 local last_flush = os.time()
 local datapoints = {}
 local base_serie_name = 'annotation'
@@ -35,10 +36,11 @@ function flush ()
 end
 
 function process_message ()
-    local ok, events = pcall(cjson.decode, read_message("Payload"))
+    local ok, event = pcall(cjson.decode, read_message("Payload"))
     if not ok then return -1 end
 
-    for _, event in ipairs(events) do
+    if event.type == utils.event_type_map.STATUS_TRANSITION or
+       event.type == utils.event_type_map.STATUS_IDENTICAL_WITH_CHANGES then
         if event.name then
             local name = string.gsub(event.name, ' ', '_')
             serie_name = string.format('%s.%s', base_serie_name, name)
@@ -52,9 +54,8 @@ function process_message ()
             columns = {"time", "title", "tag", "text"},
             points = {{event.time, event.title, event.name, text}}
         }
+        flush()
     end
-
-    flush()
     return 0
 end
 
