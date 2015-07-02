@@ -34,55 +34,63 @@ function process_message ()
         return -1
     end
     local ts = floor(read_message("Timestamp")/1e6) -- in ms
-    local services = data.services
     hostname = read_message("Hostname")
+    local service_name = data.name
+    local states = data.states
 
-    for service_name, service in pairs(services) do
-        local worker_status = -1
-        local check_api_status = -1
-        local haproxy_server_status = -1
-        local global_status
-        local events = {}
-        local not_up_status = {}
+    local worker_status = -1
+    local check_api_status = -1
+    local haproxy_server_status = -1
+    local global_status
+    local events = {}
+    local not_up_status = {}
 
-        if not all_service_status[service_name] then all_service_status[service_name] = {} end
+    if not all_service_status[service_name] then all_service_status[service_name] = {} end
 
-        if service.workers then
-            worker_status = compute_status(events, not_up_status, ts, 'workers', service_name, service.workers, true)
+    if states.workers then
+        worker_status = compute_status(events, not_up_status, ts, 'workers', service_name, states.workers, true)
+    end
+
+    if states.check_api then
+        check_api_status = compute_status(events, not_up_status, ts, 'check_api', service_name, states.check_api, false)
+    end
+    if states.haproxy then
+        haproxy_server_status = compute_status(events, not_up_status, ts, 'haproxy', service_name, states.haproxy, true)
+    end
+    global_status = max(worker_status, check_api_status, haproxy_server_status)
+    -- global service status
+    utils.add_metric(datapoints,
+                string.format('%s.openstack.%s.status', hostname, service_name),
+                {ts, global_status})
+
+    -- only emit event if the public vip is active
+    if not expired(ts, data.vip_active_at) then
+        local event_title
+        local prev = all_service_status[service_name].global_status or utils.global_status_map.UNKNOWN
+        if prev and prev ~= global_status then
+            event_title = string.format("General status %s -> %s",
+                                  utils.global_status_to_label_map[prev],
+                                  utils.global_status_to_label_map[global_status])
+        elseif #events > 0 then
+            event_title = string.format("General status remains %s",
+                                  utils.global_status_to_label_map[global_status])
         end
-
-        if service.check_api then
-            check_api_status = compute_status(events, not_up_status, ts, 'check_api', service_name, service.check_api, false)
+        if event_title then
+            -- append not UP status elements
+            for k, v in pairs(not_up_status) do events[#events+1] = v end
+            utils.add_event(all_events, ts, service_name, event_title, events)
         end
-        if service.haproxy then
-            haproxy_server_status = compute_status(events, not_up_status, ts, 'haproxy', service_name, service.haproxy, true)
-        end
-        global_status = max(worker_status, check_api_status, haproxy_server_status)
-        -- global service status
-        utils.add_metric(datapoints,
-                    string.format('%s.openstack.%s.status', hostname, service_name),
-                    {ts, global_status})
+    end
 
-        -- only emit event if the public vip is active
-        if not expired(ts, data.vip_active_at) then
-            local event_title
-            local prev = all_service_status[service_name].global_status or utils.global_status_map.UNKNOWN
-            if prev and prev ~= global_status then
-                event_title = string.format("General status %s -> %s",
-                                      utils.global_status_to_label_map[prev],
-                                      utils.global_status_to_label_map[global_status])
-            elseif #events > 0 then
-                event_title = string.format("General status remains %s",
-                                      utils.global_status_to_label_map[global_status])
-            end
-            if event_title then
-                -- append not UP status elements
-                for k, v in pairs(not_up_status) do events[#events+1] = v end
-                utils.add_event(all_events, ts, service_name, event_title, events)
-            end
-        end
+    all_service_status[service_name].global_status = global_status
 
-        all_service_status[service_name].global_status = global_status
+    if #datapoints > 0 then
+        inject_payload("json", "influxdb", cjson.encode(datapoints))
+        datapoints = {}
+    end
+    if #all_events > 0 then
+        inject_payload("json", "event", cjson.encode(all_events))
+        all_events = {}
     end
     return 0
 end
@@ -104,7 +112,7 @@ function set_status(service_name, top_entry, name, status)
      all_service_status[service_name][top_entry][name] = status
 end
 
-function compute_status(events, not_up_status, current_time, elts_name, name, service, display_num)
+function compute_status(events, not_up_status, current_time, elts_name, name, states, display_num)
     local down_elts = {}
     local down_elts_count = 0
     local zero_up = {}
@@ -116,7 +124,7 @@ function compute_status(events, not_up_status, current_time, elts_name, name, se
     local up_elements = {}
     local total_elements = {}
 
-    for worker, worker_data in pairs(service) do
+    for worker, worker_data in pairs(states) do
         if not total_elements[worker] then
             total_elements[worker] = 0
         end
@@ -245,15 +253,4 @@ function expired(current_time, last_time)
        return false
     end
     return true
-end
-
-function timer_event(ns)
-    if #datapoints > 0 then
-        inject_payload("json", "influxdb", cjson.encode(datapoints))
-        datapoints = {}
-    end
-    if #all_events > 0 then
-        inject_payload("json", "event", cjson.encode(all_events))
-        all_events = {}
-    end
 end
