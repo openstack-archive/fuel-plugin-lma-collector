@@ -45,6 +45,15 @@ class lma_collector::params {
   # see https://github.com/mozilla-services/heka/issues/1389
   $hekad_max_message_size = 192*1024
 
+  # Injection of 2 messages from the filter 'service_status'
+  # Heka default is 1
+  $hekad_max_process_inject = 2
+
+  # We inject as many messages than the number of OpenStack services in the Heka
+  # filter 'service_accumulator_states'. Currently 9 services.
+  # Hekad default is fine so far with 10 messages allowed from TimerEvent function
+  $hekad_max_timer_inject = 10
+
   # Parameters for OpenStack notifications
   $rabbitmq_host = false
   $rabbitmq_port = '5672'
