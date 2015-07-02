@@ -7,3 +7,9 @@ hostname="<%= @hostname %>"
 <% if @max_message_size -%>
 max_message_size = <%= @max_message_size %>
 <% end -%>
+<% if @max_process_inject -%>
+max_process_inject = <%= @max_process_inject %>
+<% end -%>
+<% if @max_timer_inject -%>
+max_timer_inject = <%= @max_timer_inject %>
+<% end -%>
