@@ -40,7 +40,6 @@ class lma_collector::metrics::service_status (
       filename        => "${lma_collector::params::plugins_dir}/filters/service_status.lua",
       message_matcher => "Fields[payload_type] == 'json' && Fields[payload_name] == '${payload_name}'",
       preserve_data   => true,
-      ticker_interval => 1,
       config          => {
         timeout => $timeout,
       },

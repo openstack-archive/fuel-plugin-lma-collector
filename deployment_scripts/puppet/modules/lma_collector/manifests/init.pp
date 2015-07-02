@@ -53,6 +53,8 @@ class lma_collector (
     pre_script          => $pre_script,
     internal_statistics => true,
     max_message_size    => $lma_collector::params::hekad_max_message_size,
+    max_process_inject  => $lma_collector::params::hekad_max_process_inject,
+    max_timer_inject    => $lma_collector::params::hekad_max_timer_inject,
   }
 
   file { "${lua_modules_dir}/lma_utils.lua":
