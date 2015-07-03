@@ -18,6 +18,19 @@ local utils = require 'lma_utils'
 
 local sep = '.'
 
+local processes_map = {
+    ps_code = 'memory.code',
+    ps_count = 'threads',
+    ps_cputime = 'cputime',
+    ps_data = 'memory.data',
+    ps_disk_octets = 'disk.bytes',
+    ps_disk_ops = 'disk.ops',
+    ps_pagefaults = 'pagefaults',
+    ps_rss = 'memory.rss',
+    ps_stacksize = 'stacksize',
+    ps_vm = 'memory.virtual',
+}
+
 function process_message ()
     local ok, samples = pcall(cjson.decode, read_message("Payload"))
     if not ok then
@@ -76,13 +89,20 @@ function process_message ()
             elseif metric_source == 'processes' then
                 if sample['plugin_instance'] == '' then
                     msg['Fields']['name'] = 'processes'
+                    if sample['type'] == 'ps_state' then
+                        msg['Fields']['name'] = msg['Fields']['name'] .. sep .. 'state' .. sep .. sample['type_instance']
+                    else
+                        msg['Fields']['name'] = msg['Fields']['name'] .. sep .. sample['type']
+                    end
                 else
                     msg['Fields']['name'] = 'lma_components' .. sep .. sample['plugin_instance']
-                end
-                if sample['type'] == 'ps_state' then
-                    msg['Fields']['name'] = msg['Fields']['name'] .. sep .. 'state' .. sep .. sample['type_instance']
-                else
-                    msg['Fields']['name'] = msg['Fields']['name'] .. sep .. sample['type']
+                    if processes_map[sample['type']] then
+                        msg['Fields']['name'] = msg['Fields']['name'] .. sep .. processes_map[sample['type']]
+                    else
+                        -- If we are here then we need to add the missing value in processes_map
+                        -- to fix it.
+                        msg['Fields']['name'] = msg['Fields']['name'] .. sep .. sample['type']
+                    end
                 end
             elseif metric_source ==  'dbi' and sample['plugin_instance'] == 'mysql_status' then
                 msg['Fields']['name'] = 'mysql' .. sep .. sample['type_instance']
