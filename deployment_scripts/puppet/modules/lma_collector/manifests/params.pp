@@ -143,4 +143,25 @@ class lma_collector::params {
     'sahara'              => 'sahara-api',
     'swift'               => 'swift-api',
   }
+
+  # Nagios parameters
+  #
+  $nagios_server = 'localhost'
+  $nagios_http_port = 80
+  $nagios_http_path = 'nagios3/cgi-bin/cmd.cgi'
+  $nagios_user = 'nagiosadmin'
+  $nagios_password = ''
+  $nagios_timeout = 2
+
+  # Following paramater must match the lma_infrastructure_alerting::params::nagios_openstack_dummy_hostname
+  $nagios_hostname_service_status = 'openstack-services'
+  # Following paramater must match the lma_infrastructure_alerting::params::openstack_core_services
+  $nagios_event_status_name_to_service_name_map = {
+    'nova' => 'openstack.nova.status',
+    'keystone' => 'openstack.keystone.status',
+    'glance' => 'openstack.glance.status',
+    'cinder' => 'openstack.cinder.status',
+    'neutron' => 'openstack.neutron.status',
+    'heat' => 'openstack.heat.status',
+  }
 }
