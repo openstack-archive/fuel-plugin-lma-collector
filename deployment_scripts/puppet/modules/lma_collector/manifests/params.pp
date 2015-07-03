@@ -54,7 +54,7 @@ class lma_collector::params {
   $hekad_max_process_inject = 2
 
   # We inject as many messages than the number of OpenStack services in the Heka
-  # filter 'service_accumulator_states'. Currently 9 services.
+  # filter 'service_accumulator_states'. Currently 10 services.
   # Hekad default is fine so far with 10 messages allowed from TimerEvent function
   $hekad_max_timer_inject = 10
 
@@ -101,9 +101,14 @@ class lma_collector::params {
   $heartbeat_timeout = 30
   $service_status_timeout = 65
   $service_status_payload_name = 'service_status'
+
+  # Catch all metrics used to compute OpenStack service statutes
   $service_status_metrics_regexp = [
       '^openstack.(nova|cinder|neutron).(services|agents).*(up|down|disabled)$',
-      '^haproxy.backend.*.servers.(down|up)$',
+      # Exception for mysqld backend because the MySQL service status is
+      # computed by a dedicated filter and this avoids to send an annoying
+      # status Heka message.
+      '^haproxy.backend.(horizon|nova|cinder|neutron|ceilometer|keystone|swift|heat|glance|radosgw)(-.+)?.servers.(down|up)$',
       '^pacemaker.resource.vip__public.active$',
       '^openstack.*check_api$'
       ]
@@ -147,5 +152,30 @@ class lma_collector::params {
     'nova-metadata-api'   => 'nova-metadata-api',
     'sahara'              => 'sahara-api',
     'swift'               => 'swift-api',
+  }
+
+  # Nagios parameters
+  #
+  $nagios_server = 'localhost'
+  $nagios_http_port = 80
+  $nagios_http_path = 'nagios3/cgi-bin/cmd.cgi'
+  $nagios_user = 'nagiosadmin'
+  $nagios_password = ''
+  $nagios_timeout = 2
+
+  # Following parameter must match the lma_infrastructure_alerting::params::nagios_openstack_dummy_hostname
+  $nagios_hostname_service_status = '00-openstack-services'
+  # Following parameter must match the lma_infrastructure_alerting::params::openstack_core_services
+  $nagios_event_status_name_to_service_name_map = {
+    'nova'       => 'openstack.nova.status',
+    'keystone'   => 'openstack.keystone.status',
+    'glance'     => 'openstack.glance.status',
+    'cinder'     => 'openstack.cinder.status',
+    'neutron'    => 'openstack.neutron.status',
+    'heat'       => 'openstack.heat.status',
+    'horizon'    => 'openstack.horizon.status',
+    'swift'      => 'openstack.swift.status',
+    'ceilometer' => 'openstack.ceilometer.status',
+    'radosgw'    => 'openstack.radosgw.status',
   }
 }
