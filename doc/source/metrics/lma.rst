@@ -1,5 +1,8 @@
 .. _LMA_self-monitoring:
 
+Processes and memory
+^^^^^^^^^^^^^^^^^^^^
+
 * ``lma_components.<process name>.ps_code``,  physical memory devoted to executable code (bytes).
 * ``lma_components.<process name>.ps_count``, number of threads currently running.
 * ``lma_components.<process name>.ps_cputime``, time that this process has been scheduled in user/system mode in the last interval (in microseconds).
@@ -13,3 +16,14 @@
 
 Where ``<process name>`` is *hekad*, *collectd*, *influxdb* or *elasticsearch*
 depending of what is running on the node.
+
+
+Heka messages
+^^^^^^^^^^^^^
+
+* ``<decoder>.msg_count``, the number of message processed by the decoder since we monitor it.
+* ``<decoder>.avg_duration``, the average time that it takes for processing the message (nanoseconds).
+* ``<filter>.msg_count``, the number of message processed by the filter since we monitor it.
+* ``<filter>.avg_duration``, the average time that it takes for processing the message (nanoseconds).
+
+``<decoder>`` and ``<filter>`` are the internal name of respectively the decoder and the filter used by *Heka*.

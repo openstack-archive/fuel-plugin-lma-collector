@@ -97,6 +97,10 @@ class { 'lma_collector':
   pre_script => $pre_script,
 }
 
+class { 'lma_collector::metrics::heka_monitoring':
+  require => Class['lma_collector']
+}
+
 if $elasticsearch_mode != 'disabled' {
   class { 'lma_collector::logs::system':
     require => Class['lma_collector'],
