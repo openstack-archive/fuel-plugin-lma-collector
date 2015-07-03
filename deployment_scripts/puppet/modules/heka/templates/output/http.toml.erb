@@ -13,3 +13,10 @@ password = "<%= @password %>"
 http_timeout = <%= @timeout.to_i() * 1000 %>
 <% end -%>
 method = "<%= @method %>"
+<% if @headers.size() > 0 -%>
+ [<%= @title %>_output.headers]
+  <% @headers.keys().sort().each do |header| -%>
+   <%= header %> = ["<%= @headers[header] %>"]
+  <%end%>
+<% end -%>
+

@@ -21,10 +21,13 @@ define heka::output::http (
   $password        = undef,
   $timeout         = undef,
   $method          = 'POST',
+  $headers         = {},
   $ensure          = present,
 ) {
 
   include heka::params
+
+  validate_hash($headers)
 
   file { "${config_dir}/output-${title}.toml":
     ensure  => $ensure,
