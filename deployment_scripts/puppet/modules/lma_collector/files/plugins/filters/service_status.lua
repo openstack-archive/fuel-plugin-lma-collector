@@ -69,9 +69,9 @@ function process_message ()
         local prev = all_service_status[service_name].global_status or utils.global_status_map.UNKNOWN
         local updated
         updated = (prev ~= global_status or #events > 0)
-        if updated then -- append not UP status elements in details
-            for k, v in pairs(not_up_status) do events[#events+1] = v end
-        end
+        -- always append not UP status elements in details
+        for k, v in pairs(not_up_status) do events[#events+1] = v end
+
         local details = ''
         if #events > 0 then
             details = cjson.encode(events)
