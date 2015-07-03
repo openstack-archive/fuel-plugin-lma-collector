@@ -55,3 +55,22 @@ if $influxdb_mode == 'local' {
     fail("Could not find node '${influxdb_node_name}' in the environment")
   }
 }
+
+$nagios_mode = $lma_collector['nagios_mode']
+if $nagios_mode == 'local' {
+  # Check that the LMA-Infrastructure-Alerting plugin is enabled for that environment
+  # and that the node names match
+  $infra_alerting = hiera('lma_infrastructure_alerting', false)
+  if ! $infra_alerting {
+    fail('Could not get the Nagios parameters. The LMA-Infrastructure-Alerting plugin is probably not installed.')
+  }
+  elsif ! $infra_alerting['metadata']['enabled'] {
+    fail('Could not get the Nagios parameters. The LMA-Infrastructure-Alerting plugin is probably not enabled for this environment.')
+  }
+  # Check that the LMA-Infrastructure-Alerting node exists in the environment
+  $infra_alerting_node_name = $influxdb_grafana['node_name']
+  $infra_alerting_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $infra_alerting_node_name)
+  if size($infra_alerting_nodes) < 1 {
+    fail("Could not find node '${infra_alerting_node_name}' in the environment")
+  }
+}

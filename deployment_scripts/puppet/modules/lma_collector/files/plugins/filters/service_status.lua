@@ -71,9 +71,9 @@ function process_message ()
         if prev ~= global_status or #events > 0 then
             updated = true
         end
-        if updated then -- append not UP status elements in details
-            for k, v in pairs(not_up_status) do events[#events+1] = v end
-        end
+        -- append not UP status elements in details
+        for k, v in pairs(not_up_status) do events[#events+1] = v end
+
         local details = ''
         if #events > 0 then
             details = cjson.encode(events)
