@@ -176,6 +176,11 @@ case $influxdb_mode {
       password => $influxdb_password,
       require  => Class['lma_collector'],
     }
+
+    class { 'lma_collector::metrics::heka_monitoring':
+      require => Class['lma_collector']
+    }
+
   }
   'disabled': {
     # Nothing to do
