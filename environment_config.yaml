@@ -87,6 +87,7 @@ attributes:
     type: "text"
     regex: *not_empty_parameter
     restrictions: *disable_influxdb_parameters
+
   influxdb_password:
     value: 'lmapass'
     label: 'InfluxDB password'
@@ -95,3 +96,48 @@ attributes:
     type: "password"
     regex: *not_empty_parameter
     restrictions: *disable_influxdb_parameters
+
+  nagios_mode:
+    type: "radio"
+    weight: 90
+    value: "local"
+    label: "Alerting"
+    values:
+      - data: "disabled"
+        label: "Disabled"
+      - data: "local"
+        label: "Local node"
+      - data: "remote"
+        label: "Remote server"
+    restrictions: *all_disabled_msg
+
+  nagios_url:
+    value: ''
+    label: 'Nagios URL'
+    description: 'ie: http://<server>/nagios3/cgi-bin/cmd.cgi'
+    weight: 100
+    type: "text"
+    regex: &node_url_regex
+      source: '^https?:\/\/([\da-zA-Z\.-]+)\.([a-zA-Z\.]{2,6})([\/\w \.-]*)*\/?$'
+      error: "Invalid URL"
+    restrictions: &not_remote
+        - condition: "settings:lma_collector.nagios_mode.value != 'remote'"
+          action: "disable"
+
+  nagios_user:
+    value: 'nagiosadmin'
+    label: 'Nagios user'
+    description: ''
+    weight: 105
+    type: "text"
+    regex: *not_empty_parameter
+    restrictions: *not_remote
+
+  nagios_password:
+    value: ''
+    label: 'Nagios password'
+    description: ''
+    weight: 110
+    type: "password"
+    regex: *not_empty_parameter
+    restrictions: *not_remote
