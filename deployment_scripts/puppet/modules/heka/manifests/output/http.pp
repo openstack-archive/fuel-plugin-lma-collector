@@ -21,6 +21,7 @@ define heka::output::http (
   $password        = undef,
   $timeout         = undef,
   $method          = 'POST',
+  $headers         = [],
   $ensure          = present,
 ) {
 
