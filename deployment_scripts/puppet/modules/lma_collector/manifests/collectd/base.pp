@@ -15,17 +15,20 @@
 class lma_collector::collectd::base (
   $processes = undef,
   $process_matches = undef,
+  $queue_limit = $lma_collector::params::collectd_queue_limit,
 ){
   include lma_collector::params
   include lma_collector::service
 
   $port = $lma_collector::params::collectd_port
   class { '::collectd':
-    purge        => true,
-    recurse      => true,
-    purge_config => true,
-    fqdnlookup   => false,
-    interval     => $lma_collector::params::collectd_interval,
+    purge                  => true,
+    recurse                => true,
+    purge_config           => true,
+    fqdnlookup             => false,
+    interval               => $lma_collector::params::collectd_interval,
+    write_queue_limit_low  => $lma_collector::params::collectd_queue_limit,
+    write_queue_limit_high => $lma_collector::params::collectd_queue_limit,
   }
 
   class { 'collectd::plugin::logfile':

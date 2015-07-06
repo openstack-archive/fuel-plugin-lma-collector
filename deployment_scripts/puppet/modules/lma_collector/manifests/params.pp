@@ -58,6 +58,7 @@ class lma_collector::params {
   # collectd parameters
   $collectd_port = '8325'
   $collectd_interval = 10
+  $collectd_queue_limit = 10000
   $collectd_logfile = '/var/log/collectd.log'
   case $::osfamily {
     'Debian': {
