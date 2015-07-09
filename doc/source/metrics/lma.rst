@@ -1,18 +1,23 @@
 .. _LMA_self-monitoring:
 
-Processes and memory
-^^^^^^^^^^^^^^^^^^^^
+System
+^^^^^^
 
-* ``lma_components.<service>.cputime``, time that this process has been scheduled in user/system mode in the last interval (in microseconds).
-* ``lma_components.<service>.disk.bytes``, number of bytes the task has caused to be read or written from storage in the last interval.
-* ``lma_components.<service>.disk.ops``, number of read and write I/O operations in the last interval, i.e. syscalls like read(), pread().
+* ``lma_components.<service>.count.processes``, number of processes currently running.
+* ``lma_components.<service>.count.threads``, number of threads currently running.
+* ``lma_components.<service>.cputime.user``, percentage of CPU time spent in user mode by the service. It can be greater than 100% when the node has more than one CPU.
+* ``lma_components.<service>.cputime.syst``, percentage of CPU time spent in system mode by the service. It can be greater than 100% when the node has more than one CPU.
+* ``lma_components.<service>.disk.bytes.read``, number of bytes read from disk(s) per second.
+* ``lma_components.<service>.disk.bytes.write``, number of bytes written to disk(s) per second.
+* ``lma_components.<service>.disk.ops.read``, number of read operations from disk(s) per second.
+* ``lma_components.<service>.disk.ops.write``, number of write operations to disk(s) per second.
 * ``lma_components.<service>.memory.code``,  physical memory devoted to executable code (bytes).
 * ``lma_components.<service>.memory.data``, physical memory devoted to other than executable code (bytes).
 * ``lma_components.<service>.memory.rss``, non-swapped physical memory used (bytes).
 * ``lma_components.<service>.memory.vm``, virtual memory size (bytes).
-* ``lma_components.<service>.pagefaults``, minor and major page faults in the last interval.
+* ``lma_components.<service>.pagefaults.minflt``, minor page faults per second.
+* ``lma_components.<service>.pagefaults.majflt``, major page faults per second.
 * ``lma_components.<service>.stacksize``, absolute value of the address of the start (i.e., bottom) of the stack minus the current value of the stack pointer.
-* ``lma_components.<service>.threads``, number of threads currently running.
 
 Where ``<service>`` is *hekad*, *collectd*, *influxdb* or *elasticsearch*
 depending of what is running on the node.
