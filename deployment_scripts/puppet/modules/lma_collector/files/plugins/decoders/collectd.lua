@@ -20,7 +20,7 @@ local sep = '.'
 
 local processes_map = {
     ps_code = 'memory.code',
-    ps_count = 'threads',
+    ps_count = 'count',
     ps_cputime = 'cputime',
     ps_data = 'memory.data',
     ps_disk_octets = 'disk.bytes',
@@ -87,20 +87,17 @@ function process_message ()
                 msg['Fields']['device'] = sample['plugin_instance']
                 msg['Fields']['name'] = 'net' .. sep .. sample['plugin_instance'] .. sep .. sample['type'] .. sep .. sample['dsnames'][i]
             elseif metric_source == 'processes' then
-                if sample['plugin_instance'] == '' then
+                if processes_map[sample['type']] then
+                    -- We are in ps_disk_octects and so on
+                    msg['Fields']['name'] = 'lma_components' .. sep .. sample['plugin_instance'] .. sep .. processes_map[sample['type']]
+                    if sample['dsnames'][i] ~= 'value' then
+                        msg['Fields']['name'] = msg['Fields']['name'] .. sep .. sample['dsnames'][i]
+                    end
+                else
                     msg['Fields']['name'] = 'processes'
                     if sample['type'] == 'ps_state' then
                         msg['Fields']['name'] = msg['Fields']['name'] .. sep .. 'state' .. sep .. sample['type_instance']
                     else
-                        msg['Fields']['name'] = msg['Fields']['name'] .. sep .. sample['type']
-                    end
-                else
-                    msg['Fields']['name'] = 'lma_components' .. sep .. sample['plugin_instance']
-                    if processes_map[sample['type']] then
-                        msg['Fields']['name'] = msg['Fields']['name'] .. sep .. processes_map[sample['type']]
-                    else
-                        -- If we are here then we need to add the missing value in processes_map
-                        -- to fix it.
                         msg['Fields']['name'] = msg['Fields']['name'] .. sep .. sample['type']
                     end
                 end
