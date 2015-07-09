@@ -17,6 +17,10 @@ class lma_collector::params {
   $config_dir = "/etc/${service_name}"
   $plugins_dir = "/usr/share/${service_name}"
 
+  # Address and port of the Heka dashboard for health reports.
+  $dashboard_address = '127.0.0.1'
+  $dashboard_port    = '4352'
+
   $tags = {}
 
   $syslog_pattern = '<%PRI%>%TIMESTAMP% %HOSTNAME% %syslogtag%%msg:::sp-if-no-1st-sp%%msg%\n'
