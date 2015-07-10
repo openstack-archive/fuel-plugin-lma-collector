@@ -16,6 +16,7 @@ class lma_collector::collectd::base (
   $processes = undef,
   $process_matches = undef,
   $queue_limit = $lma_collector::params::collectd_queue_limit,
+  $read_threads = $lma_collector::params::collectd_read_threads,
 ){
   include lma_collector::params
   include lma_collector::service
@@ -27,6 +28,7 @@ class lma_collector::collectd::base (
     purge_config           => true,
     fqdnlookup             => false,
     interval               => $lma_collector::params::collectd_interval,
+    threads                => $read_threads,
     write_queue_limit_low  => $lma_collector::params::collectd_queue_limit,
     write_queue_limit_high => $lma_collector::params::collectd_queue_limit,
   }

@@ -163,9 +163,19 @@ case $influxdb_mode {
       $process_matches = undef
     }
 
+    if $is_controller {
+      # plugins on the controllers do many network I/O operations so it is
+      # recommended to increase this value.
+      $collectd_read_threads = 10
+    }
+    else {
+      $collectd_read_threads = 5
+    }
+
     class { 'lma_collector::collectd::base':
       processes       => $processes,
       process_matches => $process_matches,
+      read_threads    => $collectd_read_threads,
       require         => Class['lma_collector'],
     }
 
