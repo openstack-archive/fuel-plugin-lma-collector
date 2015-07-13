@@ -1,7 +1,7 @@
 .. _outputs:
 
 ==================
-Supported Ouptputs
+Supported Outputs
 ==================
 
 The LMA collector can forward part or all of the processed Heka messages to any
