@@ -95,6 +95,7 @@ class lma_collector::params {
 
   $heartbeat_timeout = 30
   $service_status_timeout = 65
+  $service_status_interval = floor($collectd_interval * 1.5)
   $service_status_payload_name = 'service_status'
 
   # Catch all metrics used to compute OpenStack service statutes
