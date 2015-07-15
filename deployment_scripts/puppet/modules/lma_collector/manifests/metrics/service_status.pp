@@ -27,7 +27,7 @@ class lma_collector::metrics::service_status (
       config_dir            => $lma_collector::params::config_dir,
       filename              => "${lma_collector::params::plugins_dir}/filters/service_accumulator_states.lua",
       message_matcher       => inline_template('<%= @metrics_regexp.collect{|x| "Fields[name] =~ /%s/" % x}.join(" || ") %>'),
-      ticker_interval       => 10,
+      ticker_interval       => $lma_collector::params::service_status_interval,
       preserve_data         => true,
       config                => {
         inject_payload_name => $payload_name,
