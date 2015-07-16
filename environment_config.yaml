@@ -28,17 +28,6 @@ attributes:
         action: "none"
         message: "Please enable Events or Metrics analytics or both"
 
-
-  elasticsearch_node_name:
-    value: 'elasticsearch'
-    label: "Elasticsearch node name"
-    description: 'Label of the node running the Elasticsearch/Kibana plugin that is deployed in the environment.'
-    weight: 30
-    type: "text"
-    restrictions:
-        - condition: "settings:lma_collector.elasticsearch_mode.value != 'local'"
-          action: "disable"
-
   elasticsearch_address:
     value: ''
     label: 'Elasticsearch address'
@@ -65,16 +54,6 @@ attributes:
       - data: "remote"
         label: "Remote server"
     restrictions: *all_disabled_msg
-
-  influxdb_node_name:
-    value: 'influxdb'
-    label: "InfluxDB node name"
-    description: 'Label of the node running the InfluxDB/Grafana plugin that is deployed in the environment.'
-    weight: 65
-    type: "text"
-    restrictions:
-        - condition: "settings:lma_collector.influxdb_mode.value != 'local'"
-          action: "disable"
 
   influxdb_address:
     value: ''
