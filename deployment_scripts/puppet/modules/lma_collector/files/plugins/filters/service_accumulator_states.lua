@@ -12,10 +12,12 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
--- The filter accumulates data into a table and emits regularly a message with
--- a payload like this:
--- { ...
--- "nova":{
+-- The filter accumulates data into a table and emits regularly a message per
+-- service with a payload like this:
+-- {
+-- "vip_active_at": 1435829917607,
+-- "name": "nova",
+-- "states": {
 --     "check_api":{
 --         "nova":{
 --             "down":{
@@ -66,8 +68,7 @@
 --         }
 --     }
 --         ...
--- },
--- ..
+-- }
 -- }
 
 require 'cjson'
@@ -168,5 +169,8 @@ function process_message ()
 end
 
 function timer_event(ns)
-    inject_payload('json', payload_name, cjson.encode({vip_active_at=vip_active_at, services=services}))
+    for name, states in pairs(services) do
+       inject_payload('json', payload_name,
+                      cjson.encode({vip_active_at=vip_active_at, name=name, states=states}))
+    end
 end
