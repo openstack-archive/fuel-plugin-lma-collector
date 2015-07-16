@@ -6,8 +6,9 @@ MODULES_DIR="${ROOT}"/deployment_scripts/puppet/modules
 RPM_REPO="${ROOT}"/repositories/centos/
 DEB_REPO="${ROOT}"/repositories/ubuntu/
 HEKA_VERSION="0.9.2"
-FUEL_LIB_VERSION="6.0"
-FUEL_LIB_TARBALL_URL="https://github.com/stackforge/fuel-library/archive/${FUEL_LIB_VERSION}.tar.gz"
+# This is the commit id for the current stable/6.1 branch
+FUEL_LIB_COMMIT="be44e9ea792fe4314ac8c1b7596742ceb5163f61"
+FUEL_LIB_TARBALL_URL="https://github.com/stackforge/fuel-library/archive/${FUEL_LIB_COMMIT}.tar.gz"
 COLLECTD_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/pdxcat-collectd-3.2.0.tar.gz"
 APACHE_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppetlabs-apache-1.4.0.tar.gz"
 
@@ -65,7 +66,7 @@ download_packages \
 rm -rf "${MODULES_DIR:?}"/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack,stdlib,concat}
 wget -qO- "${FUEL_LIB_TARBALL_URL}" | \
     tar -C "${MODULES_DIR}" --strip-components=3 -zxvf - \
-    fuel-library-${FUEL_LIB_VERSION}/deployment/puppet/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack,stdlib,concat}
+    fuel-library-${FUEL_LIB_COMMIT}/deployment/puppet/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack,stdlib,concat}
 
 rm -rf "${MODULES_DIR:?}"/collectd
 mkdir -p "${MODULES_DIR}"/collectd
