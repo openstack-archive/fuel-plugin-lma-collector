@@ -100,6 +100,14 @@ class lma_collector (
     require => File[$plugins_dir]
   }
 
+  file { "${plugins_dir}/encoders":
+    ensure  => directory,
+    source  => 'puppet:///modules/lma_collector/plugins/encoders',
+    recurse => remote,
+    notify  => Class['lma_collector::service'],
+    require => File[$plugins_dir]
+  }
+
   if size($lma_collector::params::additional_packages) > 0 {
     package { $lma_collector::params::additional_packages:
       ensure => present,
