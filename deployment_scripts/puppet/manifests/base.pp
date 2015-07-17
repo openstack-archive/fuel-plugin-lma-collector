@@ -27,6 +27,7 @@ $es_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $es_node_name)
 $influxdb_grafana = hiera('influxdb_grafana', false)
 $influxdb_node_name = $influxdb_grafana['node_name']
 $influxdb_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $influxdb_node_name)
+$influxdb_legacy = $lma_collector['influxdb_legacy']
 
 $tags = {
   deployment_id => hiera('deployment_id'),
@@ -89,11 +90,21 @@ if $is_controller{
   $pre_script = undef
 }
 
-class { 'lma_collector':
-  tags       => merge($tags, $additional_tags),
-  groups     => $additional_groups,
-  pre_script => $pre_script,
+if $influxdb_legacy {
+  class { 'lma_collector':
+    tags       => merge($tags, $additional_tags),
+    groups     => $additional_groups,
+    pre_script => $pre_script,
+  }
+} else {
+  class { 'lma_collector':
+    tags       => merge($tags, $additional_tags),
+    groups     => $additional_groups,
+    pre_script => $pre_script,
+    version    => 'latest',
+  }
 }
+
 
 if $elasticsearch_mode != 'disabled' {
   class { 'lma_collector::logs::system':

@@ -6,6 +6,8 @@ MODULES_DIR="${ROOT}"/deployment_scripts/puppet/modules
 RPM_REPO="${ROOT}"/repositories/centos/
 DEB_REPO="${ROOT}"/repositories/ubuntu/
 HEKA_VERSION="0.9.2"
+# Alternative Heka version for supporting InfluxDB v0.9
+HEKA_ALT_VERSION="0.10.0b0"
 # This is the commit id for the current stable/6.1 branch
 FUEL_LIB_COMMIT="be44e9ea792fe4314ac8c1b7596742ceb5163f61"
 FUEL_LIB_TARBALL_URL="https://github.com/stackforge/fuel-library/archive/${FUEL_LIB_COMMIT}.tar.gz"
@@ -28,8 +30,10 @@ function download_packages {
 }
 
 download_packages \
-    https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka_${HEKA_VERSION}_amd64.deb > "${DEB_REPO}"/heka_${HEKA_VERSION}_amd64.deb \
     https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka-${HEKA_VERSION//./_}-linux-amd64.rpm > "${RPM_REPO}"/heka-${HEKA_VERSION//./_}-linux-amd64.rpm \
+    https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka-${HEKA_VERSION//./_}-linux-amd64.rpm > "${RPM_REPO}"/heka-${HEKA_VERSION//./_}-linux-amd64.rpm \
+    https://github.com/mozilla-services/heka/releases/download/v${HEKA_ALT_VERSION}/heka_${HEKA_VERSION}_amd64.deb > "${DEB_REPO}"/heka_${HEKA_ALT_VERSION}_amd64.deb \
+    https://github.com/mozilla-services/heka/releases/download/v${HEKA_ALT_VERSION}/heka-${HEKA_VERSION//./_}-linux-amd64.rpm > "${RPM_REPO}"/heka-${HEKA_ALT_VERSION//./_}-linux-amd64.rpm \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fonts-dejavu/fonts-dejavu-core_2.34-1ubuntu1_all.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fontconfig/fontconfig-config_2.11.0-0ubuntu4.1_all.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fontconfig/libfontconfig1_2.11.0-0ubuntu4.1_amd64.deb \

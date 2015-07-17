@@ -73,6 +73,7 @@
 # Copyright 2015 Mirantis Inc, unless otherwise noted.
 #
 class heka (
+  $ensure = present,
   $service_name = $heka::params::service_name,
   $config_dir = $heka::params::config_dir,
   $run_as_root = $heka::params::run_as_root,
@@ -94,7 +95,7 @@ class heka (
   $log_file      = "/var/log/${service_name}.log"
 
   package { $heka::params::package_name:
-    ensure => present,
+    ensure => $ensure,
     alias  => 'heka',
   }
 
