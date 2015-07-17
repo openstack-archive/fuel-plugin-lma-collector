@@ -14,6 +14,7 @@
 #
 class lma_collector::params {
   $service_name = 'lma_collector'
+  $version = '0.9.2'
   $config_dir = "/etc/${service_name}"
   $plugins_dir = "/usr/share/${service_name}"
 

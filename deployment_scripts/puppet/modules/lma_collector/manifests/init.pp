@@ -33,6 +33,7 @@ class lma_collector (
   $tags = $lma_collector::params::tags,
   $groups = [],
   $pre_script = undef,
+  $version = $lma_collector::params::version,
 ) inherits lma_collector::params {
   include heka::params
   include lma_collector::service
@@ -45,6 +46,7 @@ class lma_collector (
   $lua_modules_dir = $heka::params::lua_modules_dir
 
   class { 'heka':
+    ensure              => $version,
     service_name        => $service_name,
     config_dir          => $config_dir,
     run_as_root         => $lma_collector::params::run_as_root,
