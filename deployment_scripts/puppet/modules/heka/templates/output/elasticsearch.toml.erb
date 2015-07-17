@@ -10,5 +10,9 @@ flush_count = <%= @flush_count %>
 server = "http://<%= @server %>:<%= @port %>"
 
 use_buffering = <%= @use_buffering %>
-queue_max_buffer_size = <%= @queue_max_buffer_size %>
-queue_full_action = "<%= @queue_full_action %>"
+
+<% if @use_buffering -%>
+[<%= @title %>_output.buffering]
+max_buffer_size = <%= @queue_max_buffer_size %>
+full_action = "<%= @queue_full_action %>"
+<% end -%>
