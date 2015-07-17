@@ -42,10 +42,10 @@
 #   The maxium Heka message size in bytes (default: undef to use default Heka value).
 #
 # [*max_process_inject*]
-#   The maximum number of messages that a sandbox filter’s ProcessMessage function can inject in a single call (default: undef to use default Heka value).
+#   The maximum number of messages that a sandbox filter's ProcessMessage function can inject in a single call (default: undef to use default Heka value).
 #
 # [*max_timer_inject*]
-#   The maximum number of messages that a sandbox filter’s TimerEvent function can inject in a single call (default: undef to use default Heka value).
+#   The maximum number of messages that a sandbox filter's TimerEvent function can inject in a single call (default: undef to use default Heka value).
 #
 # [*dashboard_address*]
 #   The listening adddress for the Heka dashboard (default: undef).
