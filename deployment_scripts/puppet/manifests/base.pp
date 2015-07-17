@@ -180,12 +180,22 @@ case $influxdb_mode {
       require         => Class['lma_collector'],
     }
 
-    class { 'lma_collector::influxdb':
-      server   => $influxdb_server,
-      database => $influxdb_database,
-      user     => $influxdb_user,
-      password => $influxdb_password,
-      require  => Class['lma_collector'],
+    if $lma_collector['influxdb_legacy'] {
+      class { 'lma_collector::influxdb_legacy':
+        server   => $influxdb_server,
+        database => $influxdb_database,
+        user     => $influxdb_user,
+        password => $influxdb_password,
+        require  => Class['lma_collector'],
+      }
+    } else {
+      class { 'lma_collector::influxdb':
+        server    => $influxdb_server,
+        database  => $influxdb_database,
+        user      => $influxdb_user,
+        password  => $influxdb_password,
+        require   => Class['lma_collector'],
+      }
     }
 
     class { 'lma_collector::metrics::heka_monitoring':
