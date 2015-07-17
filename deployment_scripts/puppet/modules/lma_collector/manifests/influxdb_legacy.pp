@@ -12,31 +12,37 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-class lma_collector::influxdb (
-  $server         = $lma_collector::params::influxdb_server,
-  $port           = $lma_collector::params::influxdb_port,
-  $database       = $lma_collector::params::influxdb_database,
-  $user           = $lma_collector::params::influxdb_user,
-  $password       = $lma_collector::params::influxdb_password,
-  $time_precision = $lma_collector::params::influxdb_time_precision,
+class lma_collector::influxdb_legacy (
+  $server   = $lma_collector::params::influxdb_server,
+  $port     = $lma_collector::params::influxdb_port,
+  $database = $lma_collector::params::influxdb_database,
+  $user     = $lma_collector::params::influxdb_user,
+  $password = $lma_collector::params::influxdb_password,
 ) inherits lma_collector::params {
   include lma_collector::service
 
   validate_string($server)
 
-  heka::filter::sandbox { 'influxdb_accumulator':
+  heka::filter::sandbox { 'influxdb_accumulator_legacy':
     config_dir      => $lma_collector::params::config_dir,
-    filename        => "${lma_collector::params::plugins_dir}/filters/influxdb_accumulator.lua",
+    filename        => "${lma_collector::params::plugins_dir}/filters/influxdb_accumulator_legacy.lua",
     message_matcher => 'Type == \'metric\' || Type == \'heka.sandbox.metric\'',
     ticker_interval => 1,
     config          => {
       flush_interval => $lma_collector::params::influxdb_flush_interval,
       flush_count    => $lma_collector::params::influxdb_flush_count,
-      tag_fields     => 'hostname deployment_id tenant_id user_id',
-      time_precision => $time_precision,
-      # FIXME(pasquier-s): provide the default_tenant_id & default_user_id
-      # parameters but this requires to request Keystone since we only have
-      # access to the tenant name and user name for services
+    },
+    notify          => Class['lma_collector::service'],
+  }
+
+  heka::filter::sandbox { 'influxdb_annotation':
+    config_dir      => $lma_collector::params::config_dir,
+    filename        => "${lma_collector::params::plugins_dir}/filters/influxdb_annotation.lua",
+    message_matcher => 'Type == \'heka.sandbox.status\' && Fields[updated] == TRUE',
+    ticker_interval => 1,
+    config          => {
+      flush_interval => $lma_collector::params::influxdb_flush_interval,
+      flush_count    => $lma_collector::params::influxdb_flush_count,
     },
     notify          => Class['lma_collector::service'],
   }
@@ -48,15 +54,12 @@ class lma_collector::influxdb (
 
   heka::output::http { 'influxdb':
     config_dir      => $lma_collector::params::config_dir,
-    url             => "http://${server}:${port}/write?db=${database}&precision=${time_precision}",
-    message_matcher => 'Fields[payload_type] == \'txt\' && Fields[payload_name] == \'influxdb\'',
+    url             => "http://${server}:${port}/db/${database}/series",
+    message_matcher => 'Fields[payload_type] == \'json\' && Fields[payload_name] == \'influxdb\'',
     username        => $user,
     password        => $password,
     timeout         => $lma_collector::params::influxdb_timeout,
-    headers         => {
-      'Content-Type' => 'application/x-www-form-urlencoded'
-    },
-    require         => Heka::Encoder::Payload['influxdb'],
+    require         => [Heka::Encoder::Payload['influxdb'], Heka::Filter::Sandbox['influxdb_accumulator']],
     notify          => Class['lma_collector::service'],
   }
 }
