@@ -162,14 +162,14 @@ case $influxdb_mode {
       $collectd_read_threads = 5
     }
 
-    class { 'lma_collector::collectd::base':
-      processes       => $processes,
-      process_matches => $process_matches,
-      read_threads    => $collectd_read_threads,
-      require         => Class['lma_collector'],
-    }
-
     if $lma_collector['influxdb_legacy'] {
+      class { 'lma_collector::collectd::base_legacy':
+        processes       => $processes,
+        process_matches => $process_matches,
+        read_threads    => $collectd_read_threads,
+        require         => Class['lma_collector'],
+      }
+
       class { 'lma_collector::influxdb_legacy':
         server   => $influxdb_server,
         database => $influxdb_database,
@@ -178,6 +178,13 @@ case $influxdb_mode {
         require  => Class['lma_collector'],
       }
     } else {
+      class { 'lma_collector::collectd::base':
+        processes       => $processes,
+        process_matches => $process_matches,
+        read_threads    => $collectd_read_threads,
+        require         => Class['lma_collector'],
+      }
+
       class { 'lma_collector::influxdb':
         server   => $influxdb_server,
         database => $influxdb_database,
