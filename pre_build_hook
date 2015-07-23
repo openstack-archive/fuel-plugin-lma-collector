@@ -72,8 +72,6 @@ rm -rf "${MODULES_DIR:?}"/collectd
 mkdir -p "${MODULES_DIR}"/collectd
 wget -qO- "${COLLECTD_TARBALL_URL}" | tar -C "${MODULES_DIR}/collectd" --strip-components=1 -xz
 
-# Apache is not available in Fuel 6.0. It will be available in 6.1. So until the switch to 6.1
-# we download it from puppetlabs.
 rm -rf "${MODULES_DIR:?}"/apache
 mkdir -p "${MODULES_DIR}"/apache
 wget -qO- "${APACHE_TARBALL_URL}" | tar -C "${MODULES_DIR}/apache" --strip-components=1 -xz
