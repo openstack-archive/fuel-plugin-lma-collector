@@ -20,11 +20,11 @@ $is_controller     = member($roles, 'controller') or member($roles, 'primary-con
 $is_base_os        = member($roles, 'base-os')
 $current_node_name = hiera('user_node_name')
 
-$elasticsearch_kibana = hiera('elasticsearch_kibana', false)
+$elasticsearch_kibana = hiera('elasticsearch_kibana', {})
 $es_node_name = $elasticsearch_kibana['node_name']
 $es_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $es_node_name)
 
-$influxdb_grafana = hiera('influxdb_grafana', false)
+$influxdb_grafana = hiera('influxdb_grafana', {})
 $influxdb_node_name = $influxdb_grafana['node_name']
 $influxdb_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $influxdb_node_name)
 
