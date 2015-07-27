@@ -27,6 +27,8 @@ class Base(object):
     """ Base class for writing Python plugins.
     """
 
+    MAX_IDENTIFIER_LENGTH = 63
+
     def __init__(self, *args, **kwargs):
         self.debug = False
         self.timeout = 5
@@ -79,6 +81,12 @@ class Base(object):
                 self.dispatch_metric(metric, data)
 
     def dispatch_metric(self, metric, value, _type='gauge'):
+        if len(metric) > self.MAX_IDENTIFIER_LENGTH:
+            self.logger.warning(
+                '%s: Identifier "%s..." too long (length: %d, max limit: %d)' %
+                (self.plugin, metric[:24], len(metric),
+                 self.MAX_IDENTIFIER_LENGTH))
+
         v = collectd.Values(
             plugin=self.plugin,
             type=_type,
