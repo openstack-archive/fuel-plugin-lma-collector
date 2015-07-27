@@ -176,7 +176,7 @@ if $nagios_mode != 'disabled' {
     $nagios_user = $lma_infra_alerting['nagios_user']
     $nagios_password = $lma_infra_alerting['nagios_password']
 
-    # TODO: $http_port and $http_path must match automatically the
+    # Important: $http_port and $http_path must match the
     # lma_infra_monitoring configuration.
     $http_port = $lma_collector::params::nagios_http_port
     $http_path = $lma_collector::params::nagios_http_path
