@@ -160,15 +160,15 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
   }
 }
 
-$nagios_mode = $lma_collector['nagios_mode']
-if $nagios_mode != 'disabled' {
+$alerting_mode = $lma_collector['alerting_mode']
+if $alerting_mode != 'disabled' {
 
   $deployment_id = hiera('deployment_id')
-  if $nagios_mode == 'remote' {
+  if $alerting_mode == 'remote' {
     $nagios_url = $lma_collector['nagios_url']
     $nagios_user = $lma_collector['nagios_user']
     $nagios_password = $lma_collector['nagios_password']
-  } elsif $nagios_mode == 'local' {
+  } elsif $alerting_mode == 'local' {
     $lma_infra_alerting = hiera('lma_infrastructure_alerting', false)
     $nagios_node_name = $lma_infra_alerting['node_name']
     $nagios_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $nagios_node_name)
@@ -182,7 +182,7 @@ if $nagios_mode != 'disabled' {
     $http_path = $lma_collector::params::nagios_http_path
     $nagios_url = "http://${nagios_server}:${http_port}/${http_path}"
   } else {
-    fail("'${nagios_mode}' mode not supported for the infrastructure alerting service")
+    fail("'${alerting_mode}' mode not supported for the infrastructure alerting service")
   }
 
   class { 'lma_collector::nagios':
