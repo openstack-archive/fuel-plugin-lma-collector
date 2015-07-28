@@ -138,7 +138,11 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     require  => Class['lma_collector::collectd::dbi'],
   }
 
-  class { 'lma_collector::logs::metrics': }
+  if $lma_collector['influxdb_legacy'] {
+    class { 'lma_collector::logs::metrics_legacy': }
+  } else {
+    class { 'lma_collector::logs::metrics': }
+  }
 
   # Notification are always collected, lets extract metrics from there
   class { 'lma_collector::notifications::metrics': }
