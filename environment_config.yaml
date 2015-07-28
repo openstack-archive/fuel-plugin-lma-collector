@@ -106,19 +106,85 @@ attributes:
         - condition: "true"
           action: "hide"
 
-  nagios_mode:
+  alerting_mode:
     type: "radio"
     weight: 90
-    value: "local"
+    value: "disabled"
     label: "Alerting"
     values:
       - data: "disabled"
         label: "Disabled"
+      - data: "standalone"
+        label: "Alert by email using directly SMTP(s) protocol"
       - data: "local"
-        label: "Local node"
+        label: "Use local node provided by LMA Infrastructure Alerting plugin"
       - data: "remote"
-        label: "Remote server"
+        label: "Remote Nagios server"
     restrictions: *all_disabled_msg
+
+  send_to:
+    value: ''
+    label: 'Recipient email address'
+    description: ''
+    weight: 91
+    type: "text"
+    restrictions: &not_standalone
+        - condition: "settings:lma_collector.alerting_mode.value != 'standalone'"
+          action: "disable"
+    regex: &email
+      source: '[a-z0-9!#$%&*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.?)?[a-z0-9]?(?:[a-z0-9-]*[a-z0-9])?'
+      error: "Invalid Email"
+
+  send_from:
+    value: ''
+    label: 'Send from email address'
+    description: ''
+    weight: 92
+    type: "text"
+    restrictions: *not_standalone
+    regex: *email
+
+  smtp_server:
+    value: ''
+    label: 'SMTP server IP and port'
+    description: 'ie: 10.2.2.3:25'
+    weight: 93
+    type: "text"
+    restrictions: *not_standalone
+    regex:
+      source: '^[a-zA-Z\d][a-zA-Z\d_\-.]+(:[0-9]+)?$'
+      error: 'Invalid address or name'
+
+  smtp_auth:
+    type: "radio"
+    weight: 93
+    value: "none"
+    label: "SMTP AUTH method"
+    restrictions: *not_standalone
+    values:
+      - data: "none"
+        label: "None"
+      - data: "plain"
+        label: "Plain"
+      - data: "crammd5"
+        label: "CRAMMD5"
+  smtp_user:
+    value: ''
+    label: 'SMTP user'
+    description: ''
+    weight: 96
+    type: "text"
+    restrictions: &not_standalone_and_no_auth
+        - condition: "settings:lma_collector.alerting_mode.value != 'standalone' or settings:lma_collector.smtp_auth.value == 'none'"
+          action: "disable"
+
+  smtp_password:
+    value: ''
+    label: 'SMTP password'
+    description: ''
+    weight: 97
+    type: "password"
+    restrictions: *not_standalone_and_no_auth
 
   nagios_url:
     value: ''
@@ -130,7 +196,7 @@ attributes:
       source: '^(http(s?):\/\/)?([a-zA-Z\d]+[a-zA-Z\d_\-.]*)(:[0-9]+)?(\/[a-zA-Z0-9_\-\s.\/\?%#&=]*)?$'
       error: "Invalid URL"
     restrictions: &not_remote
-        - condition: "settings:lma_collector.nagios_mode.value != 'remote'"
+        - condition: "settings:lma_collector.alerting_mode.value != 'remote'"
           action: "disable"
 
   nagios_user:
