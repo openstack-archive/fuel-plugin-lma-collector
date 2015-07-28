@@ -165,10 +165,12 @@ if $alerting_mode != 'disabled' {
 
   $deployment_id = hiera('deployment_id')
   if $alerting_mode == 'remote' {
+    $use_nagios = true
     $nagios_url = $lma_collector['nagios_url']
     $nagios_user = $lma_collector['nagios_user']
     $nagios_password = $lma_collector['nagios_password']
   } elsif $alerting_mode == 'local' {
+    $use_nagios = true
     $lma_infra_alerting = hiera('lma_infrastructure_alerting', false)
     $nagios_node_name = $lma_infra_alerting['node_name']
     $nagios_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $nagios_node_name)
@@ -181,15 +183,26 @@ if $alerting_mode != 'disabled' {
     $http_port = $lma_collector::params::nagios_http_port
     $http_path = $lma_collector::params::nagios_http_path
     $nagios_url = "http://${nagios_server}:${http_port}/${http_path}"
+  } elsif $alerting_mode == 'standalone' {
+    $use_nagios = false
+    class { 'lma_collector::alert':
+      send_from => $lma_collector['send_from'],
+      send_to   => [$lma_collector['send_to']],
+      host      => $lma_collector['smtp_host'],
+      auth      => $lma_collector['smtp_auth'],
+      user      => $lma_collector['smtp_user'],
+      password  => $lma_collector['smtp_password'],
+    }
   } else {
     fail("'${alerting_mode}' mode not supported for the infrastructure alerting service")
   }
 
-  class { 'lma_collector::nagios':
-    openstack_deployment_name => $deployment_id,
-    url => $nagios_url,
-    user => $nagios_user,
-    password => $nagios_password,
+  if $use_nagios {
+    class { 'lma_collector::nagios':
+      openstack_deployment_name => $deployment_id,
+      url => $nagios_url,
+      user => $nagios_user,
+      password => $nagios_password,
+    }
   }
 }
-
