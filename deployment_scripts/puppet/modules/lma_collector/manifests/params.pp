@@ -180,4 +180,9 @@ class lma_collector::params {
     'ceilometer' => 'openstack.ceilometer.status',
     'radosgw'    => 'openstack.radosgw.status',
   }
+
+  # Parameters for SMTP alert of service status
+  $smtp_from = 'lma-alert@localhost.localdomain'
+  $smtp_subject = 'LMA Alert Notification'
+  $smtp_send_interval = 0
 }
