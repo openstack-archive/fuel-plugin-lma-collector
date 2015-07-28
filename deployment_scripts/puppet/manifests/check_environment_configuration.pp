@@ -56,8 +56,8 @@ if $influxdb_mode == 'local' {
   }
 }
 
-$nagios_mode = $lma_collector['nagios_mode']
-if $nagios_mode == 'local' {
+$alerting_mode = $lma_collector['alerting_mode']
+if $alerting_mode == 'local' {
   # Check that the LMA-Infrastructure-Alerting plugin is enabled for that environment
   # and that the node names match
   $infra_alerting = hiera('lma_infrastructure_alerting', false)
