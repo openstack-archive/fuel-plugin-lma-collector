@@ -11,6 +11,7 @@ FUEL_LIB_COMMIT="be44e9ea792fe4314ac8c1b7596742ceb5163f61"
 FUEL_LIB_TARBALL_URL="https://github.com/stackforge/fuel-library/archive/${FUEL_LIB_COMMIT}.tar.gz"
 COLLECTD_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/pdxcat-collectd-3.2.0.tar.gz"
 APACHE_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppetlabs-apache-1.4.0.tar.gz"
+STDLIB_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppetlabs-stdlib-4.7.0.tar.gz"
 
 function download_packages {
     while [ $# -gt 0 ]; do
@@ -63,10 +64,10 @@ download_packages \
 
 
 # Extract dependent manifests from fuel-library
-rm -rf "${MODULES_DIR:?}"/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack,stdlib,concat}
+rm -rf "${MODULES_DIR:?}"/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack,concat}
 wget -qO- "${FUEL_LIB_TARBALL_URL}" | \
     tar -C "${MODULES_DIR}" --strip-components=3 -zxvf - \
-    fuel-library-${FUEL_LIB_COMMIT}/deployment/puppet/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack,stdlib,concat}
+    fuel-library-${FUEL_LIB_COMMIT}/deployment/puppet/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack,concat}
 
 rm -rf "${MODULES_DIR:?}"/collectd
 mkdir -p "${MODULES_DIR}"/collectd
@@ -75,3 +76,7 @@ wget -qO- "${COLLECTD_TARBALL_URL}" | tar -C "${MODULES_DIR}/collectd" --strip-c
 rm -rf "${MODULES_DIR:?}"/apache
 mkdir -p "${MODULES_DIR}"/apache
 wget -qO- "${APACHE_TARBALL_URL}" | tar -C "${MODULES_DIR}/apache" --strip-components=1 -xz
+
+rm -rf "${MODULES_DIR:?}"/stdlib
+mkdir -p "${MODULES_DIR}"/stdlib
+wget -qO- "${STDLIB_TARBALL_URL}" | tar -C "${MODULES_DIR}/stdlib" --strip-components=1 -xz
