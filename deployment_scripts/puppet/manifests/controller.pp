@@ -163,7 +163,11 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
 
   # Enable pacemaker resource location metrics
   if $ha_deployment {
-    class { 'lma_collector::metrics::pacemaker_resources': }
+    if $lma_collector['influxdb_legacy'] {
+      class { 'lma_collector::metrics::pacemaker_resources_legacy': }
+    } else {
+      class { 'lma_collector::metrics::pacemaker_resources': }
+    }
   }
 }
 
