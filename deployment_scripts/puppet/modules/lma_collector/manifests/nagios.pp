@@ -34,7 +34,7 @@ class lma_collector::nagios (
 
   heka::encoder::sandbox { 'nagios':
     config_dir => $lma_collector::params::config_dir,
-    filename   => "${lma_collector::params::plugins_dir}/encoders/event_nagios.lua",
+    filename   => "${lma_collector::params::plugins_dir}/encoders/status_nagios.lua",
     config     => $config,
     notify     => Class['lma_collector::service'],
   }
