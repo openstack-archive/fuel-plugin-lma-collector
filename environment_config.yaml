@@ -127,7 +127,7 @@ attributes:
     weight: 100
     type: "text"
     regex: &node_url_regex
-      source: '^(http(s?):\/\/)?(((www\.)?+[a-zA-Z0-9\.\-\_]+(\.[a-zA-Z]{2,6}){0,})|(\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b))(\/[a-zA-Z0-9\_\-\s\.\/\?\%\#\&\=]*)?$'
+      source: '^(http(s?):\/\/)?([a-zA-Z\d]+[a-zA-Z\d_\-.]*)(:[0-9]+)?(\/[a-zA-Z0-9_\-\s.\/\?%#&=]*)?$'
       error: "Invalid URL"
     restrictions: &not_remote
         - condition: "settings:lma_collector.nagios_mode.value != 'remote'"
