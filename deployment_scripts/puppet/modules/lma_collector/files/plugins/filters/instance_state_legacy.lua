@@ -11,8 +11,6 @@
 -- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
-require 'math'
-local patt = require 'patterns'
 local utils = require 'lma_utils'
 
 local msg = {
@@ -21,37 +19,24 @@ local msg = {
     Severity = 6,
 }
 
-local event_type_to_name = {
-    ["compute.instance.create.end"] = "openstack_nova_instance_creation_time",
-    ["volume.create.end"] = "openstack_cinder_volume_creation_time",
-}
+count = 0
 
 function process_message ()
-    local metric_name = event_type_to_name[read_message("Fields[event_type]")]
-    if not metric_name then
-        return -1
+    local state = read_message("Fields[state]")
+    local old_state = read_message("Fields[old_state]")
+    if old_state ~= nil and state == old_state then
+        -- nothing to do
+        return 0
     end
-
-    local created_at = read_message("Fields[created_at]") or ''
-    local launched_at = read_message("Fields[launched_at]") or ''
-
-    created_at = patt.Timestamp:match(created_at)
-    launched_at = patt.Timestamp:match(launched_at)
-    if created_at == nil or launched_at == nil or created_at == 0 or launched_at == 0 or created_at > launched_at then
-        return -1
-    end
-
     msg.Timestamp = read_message("Timestamp")
     msg.Fields = {
         source = read_message('Logger'),
-        name = metric_name,
+        name = "openstack.nova.instance_state." .. state,
         -- preserve the original hostname in the Fields attribute because
         -- sandboxed filters cannot override the Hostname attribute
         hostname = read_message("Fields[hostname]"),
-        type = utils.metric_type['GAUGE'],
-        -- Having a millisecond precision for creation time is good enough given
-        -- that the created_at field has only a 1-second precision.
-        value = {value = math.floor((launched_at - created_at)/1e6 + 0.5) / 1e3, representation = 's'},
+        type = utils.metric_type['COUNTER'],
+        value = 1,
         tenant_id = read_message("Fields[tenant_id]"),
         user_id = read_message("Fields[user_id]"),
     }

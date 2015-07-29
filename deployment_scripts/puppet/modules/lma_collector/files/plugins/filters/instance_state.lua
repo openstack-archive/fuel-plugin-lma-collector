@@ -31,7 +31,7 @@ function process_message ()
     msg.Timestamp = read_message("Timestamp")
     msg.Fields = {
         source = read_message('Logger'),
-        name = "openstack.nova.instance_state." .. state,
+        name = "openstack_nova_instance_state",
         -- preserve the original hostname in the Fields attribute because
         -- sandboxed filters cannot override the Hostname attribute
         hostname = read_message("Fields[hostname]"),
@@ -39,6 +39,8 @@ function process_message ()
         value = 1,
         tenant_id = read_message("Fields[tenant_id]"),
         user_id = read_message("Fields[user_id]"),
+        state = state,
+        tag_fields = { 'state' },
     }
     utils.inject_tags(msg)
 

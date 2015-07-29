@@ -22,8 +22,8 @@ local msg = {
 }
 
 local event_type_to_name = {
-    ["compute.instance.create.end"] = "openstack_nova_instance_creation_time",
-    ["volume.create.end"] = "openstack_cinder_volume_creation_time",
+    ["compute.instance.create.end"] = "openstack.nova.instance_creation_time",
+    ["volume.create.end"] = "openstack.cinder.volume_creation_time",
 }
 
 function process_message ()

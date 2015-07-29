@@ -140,12 +140,15 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
 
   if $lma_collector['influxdb_legacy'] {
     class { 'lma_collector::logs::metrics_legacy': }
+
+    # Notification are always collected, lets extract metrics from there
+    class { 'lma_collector::notifications::metrics_legacy': }
   } else {
     class { 'lma_collector::logs::metrics': }
-  }
 
-  # Notification are always collected, lets extract metrics from there
-  class { 'lma_collector::notifications::metrics': }
+    # Notification are always collected, lets extract metrics from there
+    class { 'lma_collector::notifications::metrics': }
+  }
 
   # Enable Apache status module
   class { 'lma_collector::mod_status': }
