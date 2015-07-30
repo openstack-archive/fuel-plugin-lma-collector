@@ -23,7 +23,7 @@ class lma_collector::influxdb_legacy (
 
   validate_string($server)
 
-  heka::filter::sandbox { 'influxdb_accumulator_legacy':
+  heka::filter::sandbox { 'influxdb_accumulator':
     config_dir      => $lma_collector::params::config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/influxdb_accumulator_legacy.lua",
     message_matcher => 'Type == \'metric\' || Type == \'heka.sandbox.metric\'',
