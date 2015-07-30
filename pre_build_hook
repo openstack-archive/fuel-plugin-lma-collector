@@ -5,7 +5,7 @@ ROOT="$(dirname "$(readlink -f "$0")")"
 MODULES_DIR="${ROOT}"/deployment_scripts/puppet/modules
 RPM_REPO="${ROOT}"/repositories/centos/
 DEB_REPO="${ROOT}"/repositories/ubuntu/
-HEKA_VERSION="0.10.0b0"
+HEKA_VERSION="0.9.2"
 # This is the commit id for the current stable/6.1 branch
 FUEL_LIB_COMMIT="be44e9ea792fe4314ac8c1b7596742ceb5163f61"
 FUEL_LIB_TARBALL_URL="https://github.com/stackforge/fuel-library/archive/${FUEL_LIB_COMMIT}.tar.gz"
