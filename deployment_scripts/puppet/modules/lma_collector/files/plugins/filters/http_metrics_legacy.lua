@@ -32,20 +32,16 @@ function process_message ()
 
     -- keep only the first 2 tokens because some services like Neutron report
     -- themselves as 'openstack.<service>.server'
-    local service = string.gsub(read_message("Logger"), '(%w+)%.(%w+).*', '%1_%2')
+    local service = string.gsub(read_message("Logger"), '(%w+)%.(%w+).*', '%1.%2')
 
     msg.Timestamp = read_message("Timestamp")
     msg.Fields = {
-        hostname = read_message("Hostname"),
         source = read_message('Fields[programname]') or service,
-        name = service .. '_http_responses',
+        name = string.format("%s.http.%s.%s", service, http_method, http_status),
         type = utils.metric_type['GAUGE'],
         value = {value = response_time, representation = 's'},
         tenant_id = read_message('Fields[tenant_id]'),
         user_id = read_message('Fields[user_id]'),
-        http_method = http_method,
-        http_status = http_status,
-        tag_fields = {'http_method', 'http_status'},
     }
     utils.inject_tags(msg)
     inject_message(msg)
