@@ -39,6 +39,9 @@ CLUSTER_STATUS = re.compile('.*disc,\[([^\]]+)\].*running_nodes,\[([^\]]+)\]',
 
 class RabbitMqPlugin(base.Base):
 
+    # we need to substract the length of the longest prefix (eg '.consumers')
+    MAX_QUEUE_IDENTIFIER_LENGTH = base.Base.MAX_IDENTIFIER_LENGTH - 10
+
     def __init__(self, *args, **kwargs):
         super(RabbitMqPlugin, self).__init__(*args, **kwargs)
         self.plugin = NAME
@@ -120,7 +123,7 @@ class RabbitMqPlugin(base.Base):
                 ctl_stats[3] = int(ctl_stats[3])
             except:
                 continue
-            queue_name = ctl_stats[0]
+            queue_name = ctl_stats[0][:self.MAX_QUEUE_IDENTIFIER_LENGTH]
             stats['queues'] += 1
             stats['messages'] += ctl_stats[1]
             stats['memory'] += ctl_stats[2]
