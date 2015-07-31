@@ -137,7 +137,11 @@ case $influxdb_mode {
 
     if $is_base_os {
       if $current_node_name == $influxdb_node_name and $influxdb_mode == 'local' {
-        $processes = ['hekad', 'collectd', 'influxdb']
+        if $lma_collector['influxdb_legacy'] {
+          $processes = ['hekad', 'collectd', 'influxdb']
+        } else {
+          $processes = ['hekad', 'collectd', 'influxd']
+        }
       } else {
         $processes = ['hekad', 'collectd']
       }
