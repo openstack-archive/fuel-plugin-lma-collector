@@ -265,6 +265,8 @@ function process_message ()
                 msg['Fields']['tag_fields'] = { 'service', 'state' }
                 msg['Fields']['service'] = service
                 msg['Fields']['state'] = state
+            elseif metric_source == 'pacemaker_resource' then
+                msg['Fields']['name'] = 'pacemaker_resource' .. sep .. sample['type_instance'] .. sep .. 'active'
             else
                 msg['Fields']['name'] = replace_dot_by_sep(metric_name)
             end

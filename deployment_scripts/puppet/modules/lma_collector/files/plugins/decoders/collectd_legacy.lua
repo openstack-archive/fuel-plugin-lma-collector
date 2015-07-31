@@ -158,6 +158,8 @@ function process_message ()
                 msg['Fields']['name'] = 'openstack.cinder' .. sep ..  sample['type_instance']
             elseif metric_source ==  'dbi' and sample['plugin_instance'] == 'agents_neutron' then
                 msg['Fields']['name'] = 'openstack.neutron' .. sep ..  sample['type_instance']
+            elseif metric_source == 'pacemaker_resource' then
+                msg['Fields']['name'] = 'pacemaker.resource' .. sep .. sample['type_instance'] .. sep .. 'active'
             else
                 msg['Fields']['name'] = metric_name
             end

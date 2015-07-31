@@ -128,9 +128,6 @@ class lma_collector::params {
   $influxdb_timeout = 5
   $influxdb_time_precision = 'ms'
 
-  $pacemaker_resources_script = '/usr/local/bin/pacemaker_locate_resources.sh'
-  $pacemaker_resources_interval = '60'
-
   $apache_status_host = '127.0.0.1'
   $apache_allow_from  = ['127.0.0.1','::1']
 

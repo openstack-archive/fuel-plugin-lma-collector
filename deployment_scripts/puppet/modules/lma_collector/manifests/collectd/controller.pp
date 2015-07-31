@@ -23,6 +23,7 @@ class lma_collector::collectd::controller (
   $nova_cpu_allocation_ratio = $lma_collector::params::nova_cpu_allocation_ratio,
   $memcached_host            = $lma_collector::params::memcached_host,
   $apache_host               = $lma_collector::params::apache_status_host,
+  $pacemaker_resources       = undef,
 ) inherits lma_collector::params {
   include collectd::params
   include lma_collector::collectd::service
@@ -83,6 +84,12 @@ class lma_collector::collectd::controller (
       'KeystoneUrl' => $keystone_url,
       'Timeout' => $lma_collector::params::openstack_client_timeout,
     },
+  }
+
+  if $pacemaker_resources {
+    $modules['pacemaker_resource'] = {
+      'Resource' => $pacemaker_resources,
+    }
   }
 
   if $haproxy_socket {
@@ -146,6 +153,11 @@ class lma_collector::collectd::controller (
 
   if $haproxy_socket {
     lma_collector::collectd::python_script { 'haproxy.py':
+    }
+  }
+
+  if $pacemaker_resources {
+    lma_collector::collectd::python_script { 'pacemaker_resource.py':
     }
   }
 
