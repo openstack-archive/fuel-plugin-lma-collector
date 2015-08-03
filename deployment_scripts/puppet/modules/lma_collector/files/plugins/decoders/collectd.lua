@@ -269,6 +269,9 @@ function process_message ()
                 msg['Fields']['tag_fields'] = { 'service', 'state' }
                 msg['Fields']['service'] = service
                 msg['Fields']['state'] = state
+            elseif metric_source ==  'users' then
+                -- 'users' is a reserved name for InfluxDB v0.9
+                msg['Fields']['name'] = 'logged_users'
             else
                 msg['Fields']['name'] = replace_dot_by_sep(metric_name)
             end
