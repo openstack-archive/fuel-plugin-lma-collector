@@ -64,7 +64,8 @@ class lma_collector::collectd::base (
 
   # TODO: pass this list as a parameter or add a custom fact
   class { 'collectd::plugin::df':
-    mountpoints => ['/', '/boot'],
+    mountpoints       => ['/', '/boot'],
+    valuespercentage  => true,
   }
 
   $block_devices = join(split($::blockdevices, ','), '|')

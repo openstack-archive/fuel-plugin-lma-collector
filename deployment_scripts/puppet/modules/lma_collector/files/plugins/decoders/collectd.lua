@@ -86,6 +86,10 @@ function process_message ()
                 local entity
                 if sample['type'] == 'df_inodes' then
                     entity = 'inodes'
+                elseif sample['type'] == 'percent_inodes' then
+                    entity = 'inodes_percent'
+                elseif sample['type'] == 'percent_bytes' then
+                    entity = 'space_percent'
                 else -- sample['type'] == 'df_complex'
                     entity = 'space'
                 end
