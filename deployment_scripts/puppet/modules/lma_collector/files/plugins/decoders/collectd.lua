@@ -271,6 +271,9 @@ function process_message ()
                 msg['Fields']['state'] = state
             elseif metric_source == 'pacemaker_resource' then
                 msg['Fields']['name'] = 'pacemaker_resource' .. sep .. sample['type_instance'] .. sep .. 'active'
+            elseif metric_source ==  'users' then
+                -- 'users' is a reserved name for InfluxDB v0.9
+                msg['Fields']['name'] = 'logged_users'
             else
                 msg['Fields']['name'] = replace_dot_by_sep(metric_name)
             end
