@@ -98,17 +98,30 @@ class heka (
     alias  => 'heka',
   }
 
+  if $::osfamily == 'Debian' {
+    # Starting from Heka 0.10.0, the Debian package provides an init script so
+    # stop the service and disable it.
+    service { '_hekad_from_package':
+      ensure  => stopped,
+      name    => 'heka',
+      enable  => false,
+      require => Package['heka'],
+      before  => User['heka'],
+    }
+  }
+
   file { $heka::params::lua_modules_dir:
     ensure  => directory,
     require => Package['heka'],
   }
 
   user { $heka_user:
-    shell  => '/sbin/nologin',
-    home   => $base_dir,
-    system => true,
-    groups => $additional_groups,
-    alias  => 'heka',
+    shell   => '/sbin/nologin',
+    home    => $base_dir,
+    system  => true,
+    groups  => $additional_groups,
+    alias   => 'heka',
+    require => Package['heka'],
   }
 
   file { $base_dir:
