@@ -11,10 +11,12 @@
 -- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
+require 'cjson'
 require 'os'
 require 'string'
 require 'table'
 local field_util = require 'field_util'
+local util = require 'lma_util'
 local l = require 'lpeg'
 l.locale(l)
 
@@ -39,20 +41,6 @@ function escape_string(str)
     return tostring(str):gsub("([ ,])", "\\%1")
 end
 
-function encode_tag(tag, default_value)
-    local value = read_message(string.format('Fields[%s]', tag))
-
-    if not value or value == '' then
-        if default_value ~= nil then
-            value = default_value
-        else
-            return nil
-        end
-    end
-
-    return escape_string(tag) .. '=' .. escape_string(value)
-end
-
 -- Flush the datapoints to InfluxDB if enough items are present or if the
 -- timeout has expired
 function flush ()
@@ -66,49 +54,53 @@ function flush ()
     end
 end
 
--- TODO(pasquier-s): support messages with multiple points
 -- TODO(pasquier-s): support points with multiple fields
 function process_message()
-    local point
-    local tags = {}
-    local value = read_message("Fields[value]")
-    local ts
-    if time_precision  and time_precision ~= 'ns' then
-        ts = field_util.message_timestamp(time_precision)
+    local msg_type = read_message("Type")
+    if msg_type:match('bulk_metric$') then
+        return process_bulk_metric()
     else
-        ts = read_message('Timestamp')
+        return process_single_metric()
     end
+end
 
-    if value == nil then
+function process_single_metric()
+    local tags = {}
+    local name = read_message("Fields[name]")
+    local value = read_message("Fields[value]")
+
+    if value == nil or name == nil then
         return -1
     end
 
     -- collect Fields[tag_fields]
-    local msg_tag_fields = {}
     local i = 0
     while true do
         local t = read_message("Fields[tag_fields]", 0, i)
         if not t then
             break
         end
-        table.insert(msg_tag_fields, t)
+        tags[t] = read_message(string.format('Fields[%s]', t))
         i = i + 1
     end
 
-    -- Add common tags
-    for _, tag in ipairs(tag_fields) do
-        local t = encode_tag(tag, defaults[tag])
-        if t then
-            table.insert(tags, t)
-        end
-    end
+    encode_datapoint(name, value, tags)
+    flush()
 
-    -- Add specific tags
-    for _, tag in ipairs(msg_tag_fields) do
-        local t = encode_tag(tag)
-        if t then
-            table.insert(tags, t)
-        end
+    return 0
+end
+
+-- name:  the measurement's name
+-- value: the datapoint's value
+-- tags:  table of tags
+--
+-- Timestamp is taken from the Heka message
+function encode_datapoint(name, value, tags)
+    local ts
+    if time_precision  and time_precision ~= 'ns' then
+        ts = field_util.message_timestamp(time_precision)
+    else
+        ts = read_message('Timestamp')
     end
 
     -- Encode the value field
@@ -122,23 +114,42 @@ function process_message()
         value = string.format("%.6f", value)
     end
 
-    if #tags > 0 then
-        -- for performance reasons, it is recommended to always send the tags
-        -- in the same order.
-        table.sort(tags)
+    -- Add the common tags
+    for _, t in ipairs(tag_fields) do
+        tags[t] = read_message(string.format('Fields[%s]', t)) or defaults[t]
+    end
+
+    local tags_array = {}
+    for k,v in pairs(tags) do
+        table.insert(tags_array, escape_string(k) .. '=' .. escape_string(v))
+    end
+    -- for performance reasons, it is recommended to always send the tags
+    -- in the same order.
+    table.sort(tags_array)
+
+    if #tags_array > 0 then
         point = string.format("%s,%s value=%s %d",
-            escape_string(read_message('Fields[name]')),
-            table.concat(tags, ','),
+            escape_string(name),
+            table.concat(tags_array, ','),
             value,
             ts)
     else
         point = string.format("%s value=%s %d",
-            escape_string(read_message('Fields[name]')),
+            escape_string(name),
             value,
             ts)
     end
 
     datapoints[#datapoints+1] = point
+end
+
+function process_bulk_metric()
+    local datapoints = utils.decode_bulk_metric()
+
+    for _, point in ipairs(datapoints) do
+        encode_datapoint(point.name, point.value, point.tags or {})
+    end
+
     flush()
     return 0
 end

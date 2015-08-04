@@ -16,12 +16,11 @@ require 'string'
 require 'math'
 local utils  = require 'lma_utils'
 
-function process_table(typ, array)
-    -- NOTE: It has been written for "filters" and "decoders". If we need to
-    -- use it to collect metrics from other components  of the Heka pipeline,
-    -- we need to ensure that JSON provides names and table with
-    -- ProcessMessageCount and ProcessMessageAvgDuration:
-    --
+function process_table(datapoints, timestamp, hostname, kind, array)
+    -- NOTE: It has been written for "filters" and "decoders". If we need
+    -- to use it to process other part of the Heka pipeline we need to ensure
+    -- that JSON provides names and table with ProcessMessageCount and
+    -- ProcessMessageAvgDuration:
     --    "decoder": {
     --        ...
     --        },
@@ -35,44 +34,47 @@ function process_table(typ, array)
     --            "value": 192913
     --        },
     --        { ... }}
-    --
     for _, v in pairs(array) do
         if type(v) == "table" then
-            -- strip off the '_decoder'/'_filter' suffix
-            local name = v['Name']:gsub("_" .. typ, "")
 
-            local tags = {
-                ['type'] = typ,
-                ['name'] = name,
-            }
+            name = v['Name']:gsub("_" .. kind, "")
             msgCount = v['ProcessMessageCount']['value']
             avgDuration = v['ProcessMessageAvgDuration']['value']
 
-            utils.add_to_bulk_metric('hekad_msg_count', v['ProcessMessageCount']['value'], tags)
-            utils.add_to_bulk_metric('hekad_msg_avg_duration', v['ProcessMessageAvgDuration']['value'], tags)
+            utils.add_metric(datapoints,
+                             string.format('%s.lma_components.hekad.%s.%s.count', hostname, kind, name),
+                             {timestamp, msgCount})
+            utils.add_metric(datapoints,
+                             string.format('%s.lma_components.hekad.%s.%s.duration', hostname, kind, name),
+                             {timestamp, avgDuration})
         end
     end
 end
 
-function singularize(str)
-    return str:gsub('s$', '')
-end
-
 function process_message ()
-    local ok, data = pcall(cjson.decode, read_message("Payload"))
+    local ok, json = pcall(cjson.decode, read_message("Payload"))
     if not ok then
         return -1
     end
 
     local hostname = read_message("Hostname")
     local ts = read_message("Timestamp")
+    local ts_ms = math.floor(ts/1e6)
+    local datapoints = {}
 
-    for k, v in pairs(data) do
+    for k, v in pairs(json) do
         if k == "filters" or k == "decoders" then
-            process_table(singularize(k), v)
+            -- remove the last character from k
+            process_table(datapoints, ts_ms, hostname, k:sub(1, -2), v)
         end
     end
 
-    utils.inject_bulk_metric(ts, hostname, 'heka_monitoring')
-    return 0
+    if #datapoints > 0 then
+        inject_payload("json", "influxdb", cjson.encode(datapoints))
+        return 0
+    end
+
+    -- We should not reach this point
+    return -1
+
 end

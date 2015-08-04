@@ -181,6 +181,10 @@ case $influxdb_mode {
         password => $influxdb_password,
         require  => Class['lma_collector'],
       }
+
+      class { 'lma_collector::metrics::heka_monitoring_legacy':
+        require => Class['lma_collector']
+      }
     } else {
       class { 'lma_collector::collectd::base':
         processes       => $processes,
@@ -196,10 +200,10 @@ case $influxdb_mode {
         password => $influxdb_password,
         require  => Class['lma_collector'],
       }
-    }
 
-    class { 'lma_collector::metrics::heka_monitoring':
-      require => Class['lma_collector']
+      class { 'lma_collector::metrics::heka_monitoring':
+        require => Class['lma_collector']
+      }
     }
 
   }
