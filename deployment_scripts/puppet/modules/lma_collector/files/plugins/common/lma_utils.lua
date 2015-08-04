@@ -11,11 +11,14 @@
 -- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
+local cjson = require 'cjson'
 local string = require 'string'
 local extra = require 'extra_fields'
 local patt  = require 'patterns'
 local pairs = pairs
 local inject_message = inject_message
+local read_message = read_message
+local pcall = pcall
 
 local M = {}
 setfenv(1, M) -- Remove external access to contain everything in the module
@@ -103,6 +106,49 @@ function add_metric(datapoints, name, points)
         columns = {"time", "value" },
         points = {points}
     }
+end
+
+local bulk_datapoints = {}
+
+-- Add a datapoint to the bulk metric message
+function add_to_bulk_metric(name, value, tags)
+    bulk_datapoints[#bulk_datapoints+1] = {
+        name = name,
+        value = value,
+        tags = tags or {},
+    }
+end
+
+-- Send the bulk metric message to the Heka pipeline
+function inject_bulk_metric(ts, hostname, source)
+    if #bulk_datapoints == 0 then
+        return
+    end
+
+    local msg = {
+        Hostname = hostname,
+        Timestamp = ts,
+        Payload = cjson.encode(bulk_datapoints),
+        Type = 'bulk_metric', -- prepended with 'heka.sandbox'
+        Severity = label_to_severity_map.INFO,
+        Fields = {
+            hostname = hostname,
+            source = source
+      }
+    }
+    -- reset the local table storing the datapoints
+    bulk_datapoints = {}
+
+    inject_tags(msg)
+    inject_message(msg)
+end
+
+-- Return a list of datapoints, each point being a table formatted like this:
+-- {name='foo',value=1,tags={k1=v1,...}}
+function decode_bulk_metric()
+    local ok, datapoints = pcall(cjson.decode, read_message("Payload"))
+
+    return datapoints or {}
 end
 
 local global_status_to_severity_map = {
