@@ -16,6 +16,10 @@
             <%- value.sort.each do |original,new| -%>
            <%= key -%> "<%= original -%>" "<%= new -%>"
             <%- end -%>
+        <%- elsif value.is_a?(Array) -%>
+            <% value.sort.each do |x| -%>
+           <%= key -%> "<%= x -%>"
+            <% end -%>
         <%- else -%>
            <%= key -%> "<%= value -%>"
         <%- end -%>

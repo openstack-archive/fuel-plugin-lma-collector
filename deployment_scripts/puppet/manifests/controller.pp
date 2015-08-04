@@ -86,13 +86,16 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
   }
 
   class { 'lma_collector::collectd::controller':
-    service_user      => 'nova',
-    service_password  => $nova['user_password'],
-    service_tenant    => 'services',
-    keystone_url      => "http://${management_vip}:5000/v2.0",
-    haproxy_socket    => $haproxy_socket,
-    ceph_enabled      => $ceph_enabled,
-    memcached_host    => hiera('internal_address'),
+    service_user        => 'nova',
+    service_password    => $nova['user_password'],
+    service_tenant      => 'services',
+    keystone_url        => "http://${management_vip}:5000/v2.0",
+    haproxy_socket      => $haproxy_socket,
+    ceph_enabled        => $ceph_enabled,
+    memcached_host      => hiera('internal_address'),
+    pacemaker_resources => [
+      'vip__public', 'vip__management', 'vip__public_vrouter',
+      'vip__management_vrouter'],
   }
 
   class { 'lma_collector::collectd::mysql':
@@ -160,11 +163,6 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
 
   # Service status metrics and annotations
   class { 'lma_collector::metrics::service_status': }
-
-  # Enable pacemaker resource location metrics
-  if $ha_deployment {
-    class { 'lma_collector::metrics::pacemaker_resources': }
-  }
 }
 
 $alerting_mode = $lma_collector['alerting_mode']
