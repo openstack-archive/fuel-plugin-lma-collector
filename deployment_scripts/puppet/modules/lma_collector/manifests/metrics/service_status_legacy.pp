@@ -12,32 +12,32 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-class lma_collector::metrics::service_status (
-  $metrics_matcher = $lma_collector::params::service_status_metrics_matcher,
+class lma_collector::metrics::service_status_legacy (
+  $metrics_regexp = $lma_collector::params::service_status_metrics_regexp_legacy,
+  $payload_name = $lma_collector::params::service_status_payload_name,
   $timeout  = $lma_collector::params::service_status_timeout,
-) inherits lma_collector::params {
+){
+  include heka::params
 
-  validate_string($metrics_regexp)
-
-  $payload_name = $lma_collector::params::service_status_payload_name
+  validate_array($metrics_regexp)
 
   if (size(metrics_regexp) > 0){
 
     heka::filter::sandbox { 'service_accumulator_states':
-      config_dir      => $lma_collector::params::config_dir,
-      filename        => "${lma_collector::params::plugins_dir}/filters/service_accumulator_states.lua",
-      message_matcher => $metrics_matcher,
-      ticker_interval => $lma_collector::params::service_status_interval,
-      preserve_data   => true,
-      config          => {
+      config_dir            => $lma_collector::params::config_dir,
+      filename              => "${lma_collector::params::plugins_dir}/filters/service_accumulator_states_legacy.lua",
+      message_matcher       => inline_template('<%= @metrics_regexp.collect{|x| "Fields[name] =~ /%s/" % x}.join(" || ") %>'),
+      ticker_interval       => $lma_collector::params::service_status_interval,
+      preserve_data         => true,
+      config                => {
         inject_payload_name => $payload_name,
       },
-      notify          => Class['lma_collector::service'],
+      notify                => Class['lma_collector::service'],
     }
 
     heka::filter::sandbox { 'service_status':
       config_dir      => $lma_collector::params::config_dir,
-      filename        => "${lma_collector::params::plugins_dir}/filters/service_status.lua",
+      filename        => "${lma_collector::params::plugins_dir}/filters/service_status_legacy.lua",
       message_matcher => "Fields[payload_type] == 'json' && Fields[payload_name] == '${payload_name}'",
       preserve_data   => true,
       config          => {

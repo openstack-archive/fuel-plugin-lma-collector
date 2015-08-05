@@ -14,15 +14,18 @@
 require 'cjson'
 require 'string'
 require 'math'
+local floor = math.floor
 local max = math.max
 local utils  = require 'lma_utils'
 
-_PRESERVATION_VERSION = 3
+_PRESERVATION_VERSION = 2
 -- variables with global scope are preserved between restarts
 all_service_status = {}
 
 -- local scope variables
-local timeout = (read_config("timeout") or 60) * 1e9
+local timeout = read_config("timeout") or 60
+local hostname
+local datapoints = {}
 
 function process_message ()
     local ok, data = pcall(cjson.decode, read_message("Payload"))
@@ -30,7 +33,8 @@ function process_message ()
         return -1
     end
     local timestamp = read_message('Timestamp')
-    local hostname = read_message("Hostname")
+    local ts = floor(timestamp/1e6) -- in ms
+    hostname = read_message("Hostname")
     local service_name = data.name
     local states = data.states
 
@@ -45,25 +49,23 @@ function process_message ()
     if not all_service_status[service_name] then all_service_status[service_name] = {} end
 
     if states.workers then
-        worker_status = compute_status(events, not_up_status, timestamp, 'workers', service_name, states.workers, true)
+        worker_status = compute_status(events, not_up_status, ts, 'workers', service_name, states.workers, true)
     end
 
     if states.check_api then
-        check_api_status = compute_status(events, not_up_status, timestamp, 'check_api', service_name, states.check_api, false)
+        check_api_status = compute_status(events, not_up_status, ts, 'check_api', service_name, states.check_api, false)
     end
     if states.haproxy then
-        haproxy_server_status = compute_status(events, not_up_status, timestamp, 'haproxy', service_name, states.haproxy, true)
+        haproxy_server_status = compute_status(events, not_up_status, ts, 'haproxy', service_name, states.haproxy, true)
     end
     global_status = max(worker_status, check_api_status, haproxy_server_status)
     -- global service status
-    utils.add_to_bulk_metric(
-        string.format('openstack_%s_status', service_name),
-        global_status
-    )
-    utils.inject_bulk_metric(timestamp, hostname, 'service_status_filter')
+    utils.add_metric(datapoints,
+                string.format('%s.openstack.%s.status', hostname, service_name),
+                {ts, global_status})
 
     -- only emit status if the public vip is active
-    if not expired(data.vip_active_at) then
+    if not expired(ts, data.vip_active_at) then
         local prev = all_service_status[service_name].global_status or utils.global_status_map.UNKNOWN
         local updated
         updated = (prev ~= global_status or #events > 0)
@@ -74,13 +76,17 @@ function process_message ()
         if #events > 0 then
             details = cjson.encode(events)
         end
-        utils.inject_status_message(
-            timestamp, service_name, global_status, prev, updated, details
-        )
+        utils.inject_status_message(timestamp, service_name,
+                                    global_status, prev,
+                                    updated, details)
     end
 
     all_service_status[service_name].global_status = global_status
 
+    if #datapoints > 0 then
+        inject_payload("json", "influxdb", cjson.encode(datapoints))
+        datapoints = {}
+    end
     return 0
 end
 
@@ -177,13 +183,10 @@ function compute_status(events, not_up_status, current_time, elts_name, name, st
                                               utils.service_status_to_label_map[DOWN],
                                               event_detail)
         end
-        utils.add_to_bulk_metric(
-            string.format('openstack_%s_%s_status', name, worker.group_name),
-            utils.service_status_map.DOWN,
-            { service = worker_name}
-        )
+        utils.add_metric(datapoints, string.format('%s.openstack.%s.%s.%s.status',
+                    hostname, name, worker.group_name, worker_name),
+                    {current_time, utils.service_status_map.DOWN})
     end
-
     -- elements down or degraded
     for worker_name, worker in pairs(down_elts) do
         local prev = get_previous_status(name, elts_name, worker_name)
@@ -195,11 +198,11 @@ function compute_status(events, not_up_status, current_time, elts_name, name, st
             new_status = utils.service_status_map.DOWN
         end
         set_status(name, elts_name, worker_name, new_status)
-        utils.add_to_bulk_metric(
-            string.format('openstack_%s_%s_status', name, worker.group_name),
-            new_status,
-            { service = worker_name}
-        )
+        utils.add_metric(datapoints,
+                         string.format("%s.openstack.%s.%s.%s.status",
+                         hostname, name, worker.group_name, worker_name),
+                         {current_time, new_status})
+
         if display_num then
             event_detail = string.format("(%s/%s UP)", up_elements[worker_name],
                                                        total_elements[worker_name])
@@ -232,16 +235,17 @@ function compute_status(events, not_up_status, current_time, elts_name, name, st
                                                  utils.service_status_to_label_map[prev],
                                                  utils.service_status_to_label_map[UP])
             end
-            utils.add_to_bulk_metric(
-                string.format('openstack_%s_%s_status', name, worker.group_name),
-                utils.service_status_map.UP,
-                { service = worker_name}
-            )
+            utils.add_metric(datapoints, string.format("%s.openstack.%s.%s.%s.status",
+                        hostname, name, worker.group_name, worker_name),
+                        {current_time, utils.service_status_map.UP})
         end
     end
     return service_status
 end
 
-function expired(last_time)
-    return not (last_time > 0 and (read_message('Timestamp') - last_time) <= timeout)
+function expired(current_time, last_time)
+    if last_time > 0 and current_time - last_time <= timeout * 1000 then
+       return false
+    end
+    return true
 end

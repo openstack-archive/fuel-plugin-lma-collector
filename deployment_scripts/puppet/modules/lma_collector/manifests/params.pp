@@ -105,15 +105,25 @@ class lma_collector::params {
   $service_status_payload_name = 'service_status'
 
   # Catch all metrics used to compute OpenStack service statutes
-  $service_status_metrics_regexp = [
-      '^openstack.(nova|cinder|neutron).(services|agents).*(up|down|disabled)$',
-      # Exception for mysqld backend because the MySQL service status is
-      # computed by a dedicated filter and this avoids to send an annoying
-      # status Heka message.
-      '^haproxy.backend.(horizon|nova|cinder|neutron|ceilometer|keystone|swift|heat|glance|radosgw)(-.+)?.servers.(down|up)$',
-      '^pacemaker.resource.vip__public.active$',
-      '^openstack.*check_api$'
-      ]
+  $service_status_metrics_regexp_legacy = [
+    '^openstack.(nova|cinder|neutron).(services|agents).*(up|down|disabled)$',
+    # Exception for mysqld backend because the MySQL service status is
+    # computed by a dedicated filter and this avoids to send an annoying
+    # status Heka message.
+    '^haproxy.backend.(horizon|nova|cinder|neutron|ceilometer|keystone|swift|heat|glance|radosgw)(-.+)?.servers.(down|up)$',
+    '^pacemaker.resource.vip__public.active$',
+    '^openstack.*check_api$'
+  ]
+  $service_status_metrics_matcher = join([
+    '(Type == \'metric\' || Type == \'heka.sandbox.metric\') && ',
+    '(Fields[name] =~ /^openstack_(nova|cinder|neutron)_(services|agents)_status$/ || ',
+    # Exception for mysqld backend because the MySQL service status is
+    # computed by a dedicated filter and this avoids to send an annoying
+    # status Heka message.
+    '(Fields[name] == \'haproxy_backend_servers\' && Fields[backend] !~ /mysql/) || ',
+    '(Fields[name] == \'pacemaker_local_resource_active\' && Fields[resource] == \'vip__public\') || ',
+    'Fields[name] =~ /^openstack.*check_api$/)'
+  ], '')
   $worker_report_interval = 60
   $worker_downtime_factor = 2
 
