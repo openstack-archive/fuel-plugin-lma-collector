@@ -162,7 +162,12 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
   }
 
   # Service status metrics and annotations
-  class { 'lma_collector::metrics::service_status': }
+  if $lma_collector['influxdb_legacy'] {
+    class { 'lma_collector::metrics::service_status_legacy': }
+  } else {
+    class { 'lma_collector::metrics::service_status': }
+  }
+
 }
 
 $alerting_mode = $lma_collector['alerting_mode']
