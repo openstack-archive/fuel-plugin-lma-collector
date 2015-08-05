@@ -157,6 +157,11 @@ function process_message ()
             elseif metric_source == 'check_openstack_api' then
                 -- For OpenStack API metrics, plugin_instance = <service name>
                 msg['Fields']['name'] = 'openstack' .. sep .. sample['plugin_instance'] .. sep .. 'check_api'
+                -- 'service' isn't used as a tag because there is no point to
+                -- aggregate data across all services. It is stored in the
+                -- Fields table though because it simplifies the life of
+                -- downstream filters consuming this data.
+                msg['Fields']['service'] = sample['plugin_instance']
                 if sample['type_instance'] ~= nil and sample['type_instance'] ~= '' then
                     msg['Fields']['os_region'] = sample['type_instance']
                 end
@@ -270,7 +275,9 @@ function process_message ()
                 msg['Fields']['service'] = service
                 msg['Fields']['state'] = state
             elseif metric_source == 'pacemaker_resource' then
-                msg['Fields']['name'] = 'pacemaker_resource' .. sep .. sample['type_instance'] .. sep .. 'active'
+                msg['Fields']['name'] = 'pacemaker_local_resource_active'
+                msg['Fields']['tag_fields'] = { 'resource' }
+                msg['Fields']['resource'] = sample['type_instance']
             elseif metric_source ==  'users' then
                 -- 'users' is a reserved name for InfluxDB v0.9
                 msg['Fields']['name'] = 'logged_users'

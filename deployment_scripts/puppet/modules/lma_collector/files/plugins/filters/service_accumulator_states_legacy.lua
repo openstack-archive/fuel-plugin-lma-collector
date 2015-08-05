@@ -77,29 +77,24 @@ require 'math'
 local floor = math.floor
 local utils  = require 'lma_utils'
 
-_PRESERVATION_VERSION = 2
+_PRESERVATION_VERSION = 1
 -- variables with global scope are preserved between restarts
 services = {}
 vip_active_at = 0
 
 local payload_name = read_config('inject_payload_name') or 'service_status'
 
-local state_label_map = {
-    up = utils.state_map.UP,
-    down = utils.state_map.DOWN,
-    disabled = utils.state_map.DISABLED,
-}
 function process_message ()
-    local ts = read_message("Timestamp")
+    local ts = floor(read_message("Timestamp")/1e6) -- ms
     local metric_name = read_message("Fields[name]")
     local value = read_message("Fields[value]")
-    local state = state_label_map[read_message('Fields[state]')]
     local name
     local top_entry
     local item_name
     local group_name
+    local state
 
-    if metric_name == 'pacemaker_local_resource_active' and read_message("Fields[resource]") == 'vip__public' then
+    if string.find(metric_name, '^pacemaker.resource.vip__public') then
         if value == 1 then
             vip_active_at = ts
         else
@@ -108,34 +103,42 @@ function process_message ()
         return 0
     end
 
-    if string.find(metric_name, '^openstack_([^._]+)_services$') or string.find(metric_name, '^openstack_([^._]+)_agents$') then
-        name, group_name = string.match(metric_name, '([^_]+)_([^_]+)$')
-        top_entry = 'workers'
-        item_name = read_message('Fields[service]')
-
-    elseif string.find(metric_name, '_check_api$') then
-        -- A service can have several API checks, by convention the service name
-        -- is written down "<name>-<item>" or just "<name>".
-        name = string.match(read_message('Fields[service]'), '^([^-]+)')
-        top_entry = 'check_api'
-        group_name = 'endpoint'
-        item_name = read_message('Fields[service]')
-
-        -- convert 0/1 value to up/down state
-        state = utils.check_api_status_to_state_map[value]
-        -- and always override value to 1
-        value = 1
-
-    elseif metric_name == 'haproxy_backend_servers' then
-        name = string.match(read_message('Fields[backend]'), '^([^-]+)')
-        top_entry = 'haproxy'
-        group_name = 'pool'
-        item_name = read_message('Fields[backend]')
-
+    if string.find(metric_name, '%.up$') then
+        state = utils.state_map.UP
+    elseif string.find(metric_name, '%.down$') then
+        state = utils.state_map.DOWN
+    elseif string.find(metric_name, '%.disabled$') then
+        state = utils.state_map.DISABLED
     end
 
+    if string.find(metric_name, '^openstack') then
+        name, group_name, item_name = string.match(metric_name, '^openstack%.([^._]+)%.([^._]+)%.([^._]+)')
+        top_entry = 'workers'
+        if not item_name then
+            -- A service can have several API checks, by convention the service name
+            -- is written down "<name>-<item>" or just "<name>".
+            item_name = string.match(metric_name, '^openstack%.([^.]+)%.check_api$')
+            name, _ = string.match(item_name, '^([^-]+)\-(.*)')
+            if not name then
+                name = item_name
+            end
+
+            top_entry = 'check_api'
+            group_name = 'endpoint'
+            -- retrieve the current state
+            state = utils.check_api_status_to_state_map[value]
+            -- and always override value to 1
+            value = 1
+        end
+
+    elseif string.find(metric_name, '^haproxy%.backend') then
+        top_entry = 'haproxy'
+        group_name = 'pool'
+        item_name = string.match(metric_name, '^haproxy%.backend%.([^.]+)%.servers')
+        name = string.match(item_name, '^([^-]+)')
+    end
     if not name or not item_name then
-        return -1
+      return -1
     end
 
     -- table initialization for the first time we see a service
@@ -162,7 +165,6 @@ function process_message ()
             service[invert_state] = {last_seen=ts, value=0, group_name=group_name}
         end
     end
-
     return 0
 end
 
