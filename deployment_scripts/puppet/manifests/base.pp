@@ -140,7 +140,7 @@ case $influxdb_mode {
         if $lma_collector['influxdb_legacy'] {
           $processes = ['hekad', 'collectd', 'influxdb']
         } else {
-          $processes = ['hekad', 'collectd', 'influxd']
+          $processes = ['hekad', 'collectd', 'influxd', 'grafana']
         }
       } else {
         $processes = ['hekad', 'collectd']
