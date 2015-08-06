@@ -11,49 +11,38 @@
 -- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
-require 'cjson'
 require 'string'
-require 'math'
+local utils = require 'lma_utils'
 
-local timeout = read_config("timeout") or 30
+local timeout = (read_config("timeout") or 30) * 1e9 -- in ns
+local hostname
 
 services = {}
-local floor = math.floor
 
 function process_message ()
-    local ts = floor(read_message("Timestamp")/1e6) -- in ms
-    local service_name = string.match(read_message("Fields[name]"), '^[^._]+')
-    local hostname = read_message("Fields[hostname]")
-    local key = string.format('%s.%s', hostname, service_name)
+    local service = string.match(read_message("Fields[name]"), '^[^_]+')
+    hostname = hostname or read_message("Fields[hostname]")
 
-    local service = services[key]
+    local entry = services[service]
     if service then
         service.last_seen = ts
     else
-        service = {last_seen = ts, status = 1, host = hostname, name = service_name}
-        services[key] = service
+        entry = {last_seen = ts, status = 1, host = hostname}
+        services[service] = entry
     end
+
     return 0
 end
 
 function timer_event(ns)
-    local current_time = floor(ns / 1e6) -- in ms
-    local datapoints = {}
-
-    for k, service in pairs(services) do
-        if current_time - service.last_seen > timeout * 1000 then
-            service.status = 0
+    for service, data in pairs(services) do
+        if ns - service.last_seen > timeout then
+            data.status = 0
         else
-            service.status = 1
+            data.status = 1
         end
-        datapoints[#datapoints+1] = {
-            name = string.format('%s.%s.status', service.host, service.name),
-            columns = {"time", "value"},
-            points = {{service.last_seen, service.status}}
-        }
+        utils.add_to_bulk_metric(service .. '_status', data.value)
     end
 
-    if #datapoints > 0 then
-        inject_payload("json", "influxdb", cjson.encode(datapoints))
-    end
+    utils.inject_bulk_metric(ns, hostname, 'service_heartbeat')
 end
