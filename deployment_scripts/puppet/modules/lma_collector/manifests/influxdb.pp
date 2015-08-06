@@ -27,7 +27,7 @@ class lma_collector::influxdb (
   heka::filter::sandbox { 'influxdb_accumulator':
     config_dir      => $lma_collector::params::config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/influxdb_accumulator.lua",
-    message_matcher => 'Type == \'metric\' || Type == \'heka.sandbox.metric\' || Type == \'heka.sandbox.bulk_metric\'',
+    message_matcher => 'Type == \'metric\' || Type == \'heka.sandbox.metric\' || Type == \'heka.sandbox.bulk_metric\' || Type == \'heka.sandbox.multivalue_metric\'',
     ticker_interval => 1,
     config          => {
       flush_interval => $lma_collector::params::influxdb_flush_interval,
@@ -37,6 +37,16 @@ class lma_collector::influxdb (
       # FIXME(pasquier-s): provide the default_tenant_id & default_user_id
       # parameters but this requires to request Keystone since we only have
       # access to the tenant name and user name for services
+    },
+    notify          => Class['lma_collector::service'],
+  }
+
+  heka::filter::sandbox { 'influxdb_annotation':
+    config_dir      => $lma_collector::params::config_dir,
+    filename        => "${lma_collector::params::plugins_dir}/filters/influxdb_annotation.lua",
+    message_matcher => 'Type == \'heka.sandbox.status\' && Fields[updated] == TRUE',
+    config          => {
+      serie_name => $lma_collector::params::annotations_serie_name
     },
     notify          => Class['lma_collector::service'],
   }

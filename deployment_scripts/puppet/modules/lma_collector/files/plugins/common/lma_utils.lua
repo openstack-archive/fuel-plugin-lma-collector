@@ -143,12 +143,10 @@ function inject_bulk_metric(ts, hostname, source)
     inject_message(msg)
 end
 
--- Return a list of datapoints, each point being a table formatted like this:
--- {name='foo',value=1,tags={k1=v1,...}}
-function decode_bulk_metric()
-    local ok, datapoints = pcall(cjson.decode, read_message("Payload"))
+function decode_json_payload()
+    local ok, data = pcall(cjson.decode, read_message("Payload"))
 
-    return datapoints or {}
+    return data
 end
 
 local global_status_to_severity_map = {

@@ -54,7 +54,6 @@ function flush ()
     end
 end
 
--- TODO(pasquier-s): support points with multiple fields
 function process_message()
     local msg_type = read_message("Type")
     if msg_type:match('bulk_metric$') then
@@ -67,7 +66,13 @@ end
 function process_single_metric()
     local tags = {}
     local name = read_message("Fields[name]")
-    local value = read_message("Fields[value]")
+    local value
+
+    if read_message('Type'):match('multivalue_metric$') then
+        value = utils.decode_json_payload()
+    else
+        value = read_message("Fields[value]")
+    end
 
     if value == nil or name == nil then
         return -1
@@ -90,9 +95,53 @@ function process_single_metric()
     return 0
 end
 
+function process_bulk_metric()
+    -- The payload contains a list of datapoints, each point being formatted
+    -- like this: {name='foo',value=1,tags={k1=v1,...}}
+    local datapoints = utils.decode_json_payload() or {}
+
+    for _, point in ipairs(datapoints) do
+        encode_datapoint(point.name, point.value, point.tags or {})
+    end
+
+    flush()
+    return 0
+end
+
+function encode_scalar_value(value)
+    if type(value) == "number" then
+        -- Always send numbers as formatted floats, so InfluxDB will accept
+        -- them if they happen to change from ints to floats between
+        -- points in time.  Forcing them to always be floats avoids this.
+        return string.format("%.6f", value)
+    elseif type(value) == "string" then
+        -- string values need to be double quoted
+        return '"' .. value:gsub('"', '\\"') .. '"'
+    elseif type(value) == "boolean" then
+        return '"' .. tostring(value) .. '"'
+    end
+end
+
+function encode_value(value)
+    if type(value) == "table" then
+        local values = {}
+        for k,v in pairs(value) do
+            table.insert(
+                values,
+                string.format("%s=%s", escape_string(k), encode_scalar_value(v))
+            )
+        end
+        return table.concat(values, ',')
+    else
+        return "value=" .. encode_scalar_value(value)
+    end
+end
+
+-- encode a single datapoint using the InfluxDB line protocol
+--
 -- name:  the measurement's name
--- value: the datapoint's value
--- tags:  table of tags
+-- value: a scalar value or a list of key-value pairs
+-- tags:  a table of tags
 --
 -- Timestamp is taken from the Heka message
 function encode_datapoint(name, value, tags)
@@ -101,17 +150,6 @@ function encode_datapoint(name, value, tags)
         ts = field_util.message_timestamp(time_precision)
     else
         ts = read_message('Timestamp')
-    end
-
-    -- Encode the value field
-    if type(value) == "string" then
-        -- string values need to be double quoted
-        value = '"' .. value:gsub('"', '\\"') .. '"'
-    elseif type(value) == "number" or string.match(value, "^[%d.]+$") then
-        -- Always send numbers as formatted floats, so InfluxDB will accept
-        -- them if they happen to change from ints to floats between
-        -- points in time.  Forcing them to always be floats avoids this.
-        value = string.format("%.6f", value)
     end
 
     -- Add the common tags
@@ -128,15 +166,15 @@ function encode_datapoint(name, value, tags)
     table.sort(tags_array)
 
     if #tags_array > 0 then
-        point = string.format("%s,%s value=%s %d",
+        point = string.format("%s,%s %s %d",
             escape_string(name),
             table.concat(tags_array, ','),
-            value,
+            encode_value(value),
             ts)
     else
-        point = string.format("%s value=%s %d",
+        point = string.format("%s %s %d",
             escape_string(name),
-            value,
+            encoder_value(value),
             ts)
     end
 
@@ -144,7 +182,10 @@ function encode_datapoint(name, value, tags)
 end
 
 function process_bulk_metric()
-    local datapoints = utils.decode_bulk_metric()
+    -- the list of datapoints is encoded in the message payload, each point
+    -- is a hash table formatted like this:
+    -- {name='foo',value=1,tags={k1=v1,...}}
+    local datapoints = utils.decode_json_payload()
 
     for _, point in ipairs(datapoints) do
         encode_datapoint(point.name, point.value, point.tags or {})
