@@ -145,6 +145,11 @@ end
 --
 -- Timestamp is taken from the Heka message
 function encode_datapoint(name, value, tags)
+    if type(name) ~= 'string' or value == nil or type(tags) ~= 'table' then
+        -- fail silently if any input parameter is invalid
+        return
+    end
+
     local ts
     if time_precision  and time_precision ~= 'ns' then
         ts = field_util.message_timestamp(time_precision)
