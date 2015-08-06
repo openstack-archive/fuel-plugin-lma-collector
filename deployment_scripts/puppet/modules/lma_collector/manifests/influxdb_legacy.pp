@@ -37,7 +37,7 @@ class lma_collector::influxdb_legacy (
 
   heka::filter::sandbox { 'influxdb_annotation':
     config_dir      => $lma_collector::params::config_dir,
-    filename        => "${lma_collector::params::plugins_dir}/filters/influxdb_annotation.lua",
+    filename        => "${lma_collector::params::plugins_dir}/filters/influxdb_annotation_legacy.lua",
     message_matcher => 'Type == \'heka.sandbox.status\' && Fields[updated] == TRUE',
     ticker_interval => 1,
     config          => {
