@@ -37,6 +37,9 @@ end
 
 function split_service_and_state(str)
     local service, state = string.match(str, '^services%.(.+)%.([^.]+)$')
+    if service == nil then
+        service, state = string.match(str, '^agents%.(.+)%.([^.]+)$')
+    end
     return replace_dot_by_sep(service), state
 end
 
@@ -234,7 +237,7 @@ function process_message ()
                     msg['Fields']['owner'] = owner
                     msg['Fields']['state'] = state
                 else
-                    local resource, owner = string.match(sample['type_instance'], '^([^.]+)%.(.+)$')
+                    local resource, state = string.match(sample['type_instance'], '^([^.]+)%.(.+)$')
                     msg['Fields']['name'] = 'openstack'  .. sep .. 'neutron' .. sep .. replace_dot_by_sep(resource)
                     msg['Fields']['tag_fields'] = { 'state' }
                     msg['Fields']['state'] = state
@@ -272,11 +275,13 @@ function process_message ()
                 msg['Fields']['service'] = service
                 msg['Fields']['state'] = state
             elseif metric_source ==  'dbi' and sample['plugin_instance'] == 'services_cinder' then
+                local service, state = split_service_and_state(sample['type_instance'])
                 msg['Fields']['name'] = 'openstack' .. sep .. 'cinder' .. sep .. 'services'
                 msg['Fields']['tag_fields'] = { 'service', 'state' }
                 msg['Fields']['service'] = service
                 msg['Fields']['state'] = state
             elseif metric_source ==  'dbi' and sample['plugin_instance'] == 'agents_neutron' then
+                local service, state = split_service_and_state(sample['type_instance'])
                 msg['Fields']['name'] = 'openstack' .. sep .. 'neutron' .. sep .. 'agents'
                 msg['Fields']['tag_fields'] = { 'service', 'state' }
                 msg['Fields']['service'] = service
