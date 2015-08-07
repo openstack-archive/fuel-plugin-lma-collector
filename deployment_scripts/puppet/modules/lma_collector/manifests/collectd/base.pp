@@ -62,10 +62,9 @@ class lma_collector::collectd::base (
   class { 'collectd::plugin::cpu':
   }
 
-  # TODO: pass this list as a parameter or add a custom fact
   class { 'collectd::plugin::df':
-    mountpoints       => ['/', '/boot'],
-    valuespercentage  => true,
+    fstypes          => $lma_collector::params::fstypes,
+    valuespercentage => true,
   }
 
   $block_devices = join(split($::blockdevices, ','), '|')

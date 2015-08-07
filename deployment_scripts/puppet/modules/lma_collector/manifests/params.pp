@@ -98,6 +98,7 @@ class lma_collector::params {
   $openstack_client_timeout = 5
   $nova_cpu_allocation_ratio = 8.0
   $memcached_host = '127.0.0.1'
+  $fstypes = ['ext2', 'ext3', 'ext4', 'xfs']
 
   $heartbeat_timeout = 30
   $service_status_timeout = 65

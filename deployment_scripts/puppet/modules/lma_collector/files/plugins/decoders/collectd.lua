@@ -82,7 +82,6 @@ function process_message ()
             -- always consistent on metric namespaces so we need a few if/else
             -- statements to cover all cases.
             if metric_source == 'df' then
-                local mount = sample['plugin_instance']
                 local entity
                 if sample['type'] == 'df_inodes' then
                     entity = 'inodes'
@@ -93,6 +92,14 @@ function process_message ()
                 else -- sample['type'] == 'df_complex'
                     entity = 'space'
                 end
+
+                local mount = sample['plugin_instance']
+                if mount == 'root' then
+                    mount  = '/'
+                else
+                    mount = '/' .. mount:gsub('-', '/')
+                end
+
                 msg['Fields']['name'] = 'fs' .. sep .. entity .. sep .. sample['type_instance']
                 msg['Fields']['fs'] = mount
                 msg['Fields']['tag_fields'] = { 'fs' }
