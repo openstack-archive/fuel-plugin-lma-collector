@@ -105,6 +105,8 @@ class lma_collector::params {
   $service_status_interval = floor($collectd_interval * 1.5)
   $service_status_payload_name = 'service_status'
 
+  $annotations_serie_name = 'annotations'
+
   # Catch all metrics used to compute OpenStack service statutes
   $service_status_metrics_regexp_legacy = [
     '^openstack.(nova|cinder|neutron).(services|agents).*(up|down|disabled)$',

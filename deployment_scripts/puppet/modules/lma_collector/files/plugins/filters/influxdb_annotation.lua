@@ -14,64 +14,48 @@
 require 'cjson'
 require 'string'
 require 'table'
-require "os"
-require 'math'
-
-local floor = math.floor
 local utils  = require 'lma_utils'
-local last_flush = os.time()
-local datapoints = {}
-local base_serie_name = 'annotation'
+
+local measurement_name = read_config('measurement_name') or 'annotations'
 local html_break_line = '<br />'
 
-local flush_count = read_config('flush_count') or 100
-local flush_interval = read_config('flush_interval') or 5
-
-function flush ()
-    local now = os.time()
-    if #datapoints > 0 and (#datapoints > flush_count or now - last_flush > flush_interval) then
-        inject_payload("json", "influxdb", cjson.encode(datapoints))
-
-        datapoints = {}
-        last_flush = now
-    end
-end
-
+-- Transform a status message into an InfluxDB datapoint
 function process_message ()
-    local ts = floor(read_message('Timestamp')/1e6) -- ms
-    local msg_type = read_message('Type')
-    local payload = read_message('Payload')
-    local service = read_message('Fields[service]')
-    local name = string.gsub(service, ' ', '_')
-    local serie_name = string.format('%s.%s', base_serie_name, name)
     local title
     local text = ''
+    local service = read_message('Fields[service]')
+    local status = read_message('Fields[status]')
+    local prev_status = read_message('Fields[previous_status]')
 
-    if msg_type == 'heka.sandbox.status' then
-        local status = read_message('Fields[status]')
-        local prev_status = read_message('Fields[previous_status]')
-        local ok, details = pcall(cjson.decode, payload)
-        if ok then
-            text = table.concat(details, html_break_line)
-        end
-        if prev_status ~= status then
-            title = string.format('General status %s -> %s',
-                                  utils.global_status_to_label_map[prev_status],
-                                  utils.global_status_to_label_map[status])
-        else
-            title = string.format('General status remains %s',
-                                  utils.global_status_to_label_map[status])
-        end
-        datapoints[#datapoints+1] = {
-            name = serie_name,
-            columns = {"time", "title", "tag", "text"},
-            points = {{ts, title, service, text}}
-        }
+    local ok, details = pcall(cjson.decode, read_message('Payload'))
+    if ok then
+        text = table.concat(details, html_break_line)
     end
-    flush()
-    return 0
-end
 
-function timer_event(ns)
-    flush()
+    if prev_status ~= status then
+        title = string.format('General status %s -> %s',
+                              utils.global_status_to_label_map[prev_status],
+                              utils.global_status_to_label_map[status])
+    else
+        title = string.format('General status remains %s',
+                              utils.global_status_to_label_map[status])
+    end
+
+    local msg = {
+        Timestamp = read_message('Timestamp'),
+        Type = 'multivalue_metric',
+        Severity = utils.label_to_severity_map.INFO,
+        Hostname = read_message('Hostname'),
+        Payload = cjson.encode({title=title, tags=service, text=text}),
+        Fields = {
+            name = measurement_name,
+            tag_fields = { 'service' },
+            service = service,
+            source = 'influxdb_annotation'
+      }
+    }
+    utils.inject_tags(msg)
+    inject_message(msg)
+
+    return 0
 end

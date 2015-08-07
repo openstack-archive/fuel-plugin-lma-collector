@@ -180,7 +180,7 @@ function compute_status(events, not_up_status, current_time, elts_name, name, st
         utils.add_to_bulk_metric(
             string.format('openstack_%s_%s_status', name, worker.group_name),
             utils.service_status_map.DOWN,
-            { service = worker_name}
+            { service = worker_name }
         )
     end
 
@@ -198,7 +198,7 @@ function compute_status(events, not_up_status, current_time, elts_name, name, st
         utils.add_to_bulk_metric(
             string.format('openstack_%s_%s_status', name, worker.group_name),
             new_status,
-            { service = worker_name}
+            { service = worker_name }
         )
         if display_num then
             event_detail = string.format("(%s/%s UP)", up_elements[worker_name],
@@ -235,7 +235,7 @@ function compute_status(events, not_up_status, current_time, elts_name, name, st
             utils.add_to_bulk_metric(
                 string.format('openstack_%s_%s_status', name, worker.group_name),
                 utils.service_status_map.UP,
-                { service = worker_name}
+                { service = worker_name }
             )
         end
     end
