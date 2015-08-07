@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-class lma_collector::metrics::service_heartbeat (
+class lma_collector::metrics::service_heartbeat_legacy (
   $services,
   $timeout  = $lma_collector::params::heartbeat_timeout,
 ) inherits lma_collector::params {
@@ -21,9 +21,11 @@ class lma_collector::metrics::service_heartbeat (
   validate_array($services)
 
   if (size($services) > 0) {
+    $regexp = join(sort($services), '|')
+
     heka::filter::sandbox { 'service_heartbeat':
       config_dir      => $lma_collector::params::config_dir,
-      filename        => "${lma_collector::params::plugins_dir}/filters/service_heartbeat.lua",
+      filename        => "${lma_collector::params::plugins_dir}/filters/service_heartbeat_legacy.lua",
       message_matcher => join(['Fields[name] =~ /^', join(sort($services), '|'), '/'], ''),
       ticker_interval => 10,
       config          => {

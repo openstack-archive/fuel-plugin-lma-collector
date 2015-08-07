@@ -157,8 +157,14 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
   class { 'lma_collector::mod_status': }
 
   # Enable service heartbeat metrics
-  class { 'lma_collector::metrics::service_heartbeat':
-    services => ['mysql', 'rabbitmq', 'haproxy', 'memcached', 'apache']
+  if $lma_collector['influxdb_legacy'] {
+    class { 'lma_collector::metrics::service_heartbeat_legacy':
+      services => ['mysql', 'rabbitmq', 'haproxy', 'memcached', 'apache']
+    }
+  } else {
+    class { 'lma_collector::metrics::service_heartbeat':
+      services => ['mysql', 'rabbitmq', 'haproxy', 'memcached', 'apache']
+    }
   }
 
   # Service status metrics and annotations
