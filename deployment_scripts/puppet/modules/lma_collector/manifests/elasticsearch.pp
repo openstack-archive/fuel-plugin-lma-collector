@@ -22,7 +22,7 @@ class lma_collector::elasticsearch (
 
   heka::encoder::es_json { 'elasticsearch':
     config_dir              => $lma_collector::params::config_dir,
-    index                   => '%{Type}-%{2006.01.02}',
+    index                   => '%{Type}-%{%Y.%m.%d}',
     es_index_from_timestamp => true,
     notify                  => Class['lma_collector::service'],
   }
