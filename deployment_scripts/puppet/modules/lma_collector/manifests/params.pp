@@ -21,6 +21,9 @@ class lma_collector::params {
   $dashboard_address = '127.0.0.1'
   $dashboard_port    = '4352'
 
+  $aggregator_address = '127.0.0.1'
+  $aggregator_port    = '5565'
+
   $tags = {}
 
   $syslog_pattern = '<%PRI%>%TIMESTAMP% %HOSTNAME% %syslogtag%%msg:::sp-if-no-1st-sp%%msg%\n'
