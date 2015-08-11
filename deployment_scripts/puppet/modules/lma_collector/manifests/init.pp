@@ -33,6 +33,8 @@ class lma_collector (
   $tags = $lma_collector::params::tags,
   $groups = [],
   $pre_script = undef,
+  $aggregator_address = undef,
+  $aggregator_port = $lma_collector::params::aggregator_port,
 ) inherits lma_collector::params {
   include heka::params
   include lma_collector::service
@@ -109,6 +111,14 @@ class lma_collector (
   if size($lma_collector::params::additional_packages) > 0 {
     package { $lma_collector::params::additional_packages:
       ensure => present,
+    }
+  }
+
+  if $aggregator_address {
+    heka::output::tcp { 'aggregator':
+      config_dir => $config_dir,
+      address    => $aggregator_address,
+      port       => $aggregator_port,
     }
   }
 }

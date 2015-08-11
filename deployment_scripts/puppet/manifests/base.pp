@@ -90,9 +90,10 @@ if $is_controller{
 }
 
 class { 'lma_collector':
-  tags       => merge($tags, $additional_tags),
-  groups     => $additional_groups,
-  pre_script => $pre_script,
+  tags               => merge($tags, $additional_tags),
+  groups             => $additional_groups,
+  pre_script         => $pre_script,
+  aggregator_address => hiera('management_vip'),
 }
 
 if $elasticsearch_mode != 'disabled' {

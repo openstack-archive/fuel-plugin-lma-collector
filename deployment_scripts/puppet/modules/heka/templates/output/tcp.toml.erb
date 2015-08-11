@@ -1,0 +1,13 @@
+[<%= @title %>_tcpoutput]
+type="TcpOutput"
+address = "<%= @address %>:<%= @port %>"
+encoder = "ProtobufEncoder"
+message_matcher = "<%= @message_matcher %>"
+
+use_buffering = <%= @use_buffering %>
+<% if @use_buffering -%>
+[<%= @title %>_tcpoutput.buffering]
+max_buffer_size = <%= @queue_max_buffer_size %>
+full_action = "<%= @queue_full_action %>"
+<% end -%>
+
