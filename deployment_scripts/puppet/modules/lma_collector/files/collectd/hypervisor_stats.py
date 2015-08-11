@@ -18,7 +18,7 @@ import collectd
 import openstack
 
 PLUGIN_NAME = 'hypervisor_stats'
-INTERVAL = 60
+INTERVAL = openstack.INTERVAL
 
 
 class HypervisorStatsPlugin(openstack.CollectdPlugin):
@@ -54,6 +54,7 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
         )
         v.dispatch()
 
+    @openstack.read_callback_wrapper
     def read_callback(self):
         r = self.get('nova', 'os-hypervisors/statistics')
         if not r:
@@ -66,7 +67,7 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
         if 'cpu_ratio' in self.extra_config:
             vcpus = int(self.extra_config['cpu_ratio'] * stats.get('vcpus', 0))
             self.dispatch_value('total_free_vcpus',
-                               vcpus - stats.get('vcpus_used', 0))
+                                vcpus - stats.get('vcpus_used', 0))
 
 
 plugin = HypervisorStatsPlugin(collectd)
@@ -76,8 +77,13 @@ def config_callback(conf):
     plugin.config_callback(conf)
 
 
+def notification_callback(notification):
+    plugin.notification_callback(notification)
+
+
 def read_callback():
     plugin.read_callback()
 
 collectd.register_config(config_callback)
+collectd.register_notification(notification_callback)
 collectd.register_read(read_callback, INTERVAL)

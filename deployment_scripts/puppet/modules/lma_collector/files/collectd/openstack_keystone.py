@@ -18,7 +18,7 @@ import collectd
 import openstack
 
 PLUGIN_NAME = 'keystone'
-INTERVAL = 60
+INTERVAL = openstack.INTERVAL
 
 
 class KeystoneStatsPlugin(openstack.CollectdPlugin):
@@ -31,6 +31,7 @@ class KeystoneStatsPlugin(openstack.CollectdPlugin):
     def config_callback(self, config):
         super(KeystoneStatsPlugin, self).config_callback(config)
 
+    @openstack.read_callback_wrapper
     def read_callback(self):
 
         def groupby(d):
@@ -85,8 +86,13 @@ def config_callback(conf):
     plugin.config_callback(conf)
 
 
+def notification_callback(notification):
+    plugin.notification_callback(notification)
+
+
 def read_callback():
     plugin.read_callback()
 
 collectd.register_config(config_callback)
+collectd.register_notification(notification_callback)
 collectd.register_read(read_callback, INTERVAL)
