@@ -24,71 +24,52 @@ class lma_collector::collectd::controller (
   $memcached_host            = $lma_collector::params::memcached_host,
   $apache_host               = $lma_collector::params::apache_status_host,
   $pacemaker_resources       = undef,
+  $pacemaker_master_resource = undef,
 ) inherits lma_collector::params {
+
   include collectd::params
   include lma_collector::collectd::service
 
-  # We can't use the collectd::plugin::python type here because it doesn't
+  $openstack_configuration = {
+    'Username'    => $service_user,
+    'Password'    => $service_password,
+    'Tenant'      => $service_tenant,
+    'KeystoneUrl' => $keystone_url,
+    'Timeout'     => $lma_collector::params::openstack_client_timeout,
+  }
+  if $pacemaker_master_resource {
+    $openstack_configuration['DependsOnResource'] = $pacemaker_master_resource
+  }
+
+  # We can't use the collectd::plugin::python resource here because it doesn't
   # support the configuration of multiple Python plugins yet.
   # See https://github.com/pdxcat/puppet-module-collectd/issues/227
   $modules = {
     'rabbitmq_info'       => {
     },
-    'check_openstack_api' => {
-      'Username'    => $service_user,
-      'Password'    => $service_password,
-      'Tenant'      => $service_tenant,
-      'KeystoneUrl' => $keystone_url,
-      'Timeout'     => $lma_collector::params::openstack_client_timeout,
-    },
-    'hypervisor_stats'    => {
-      'Username'           => $service_user,
-      'Password'           => $service_password,
-      'Tenant'             => $service_tenant,
-      'KeystoneUrl'        => $keystone_url,
-      'Timeout'            => $lma_collector::params::openstack_client_timeout,
-      'CpuAllocationRatio' => $nova_cpu_allocation_ratio,
-    },
-    'openstack_nova' => {
-      'Username' => $service_user,
-      'Password' => $service_password,
-      'Tenant' => $service_tenant,
-      'KeystoneUrl' => $keystone_url,
-      'Timeout' => $lma_collector::params::openstack_client_timeout,
-    },
-    'openstack_cinder' => {
-      'Username' => $service_user,
-      'Password' => $service_password,
-      'Tenant' => $service_tenant,
-      'KeystoneUrl' => $keystone_url,
-      'Timeout' => $lma_collector::params::openstack_client_timeout,
-    },
-    'openstack_glance' => {
-      'Username' => $service_user,
-      'Password' => $service_password,
-      'Tenant' => $service_tenant,
-      'KeystoneUrl' => $keystone_url,
-      'Timeout' => $lma_collector::params::openstack_client_timeout,
-    },
-    'openstack_keystone' => {
-      'Username' => $service_user,
-      'Password' => $service_password,
-      'Tenant' => $service_tenant,
-      'KeystoneUrl' => $keystone_url,
-      'Timeout' => $lma_collector::params::openstack_client_timeout,
-    },
-    'openstack_neutron' => {
-      'Username' => $service_user,
-      'Password' => $service_password,
-      'Tenant' => $service_tenant,
-      'KeystoneUrl' => $keystone_url,
-      'Timeout' => $lma_collector::params::openstack_client_timeout,
-    },
+    'check_openstack_api' => $openstack_configuration,
+    'hypervisor_stats'    => merge(
+      $openstack_configuration,
+      {'CpuAllocationRatio' => $nova_cpu_allocation_ratio,}
+    ),
+    'openstack_nova'      => $openstack_configuration,
+    'openstack_cinder'    => $openstack_configuration,
+    'openstack_glance'    => $openstack_configuration,
+    'openstack_keystone'  => $openstack_configuration,
+    'openstack_neutron'   => $openstack_configuration,
   }
 
   if $pacemaker_resources {
+    validate_array($pacemaker_resources)
+
     $modules['pacemaker_resource'] = {
       'Resource' => $pacemaker_resources,
+    }
+
+    if $pacemaker_master_resource {
+      if ! member($pacemaker_resources, $pacemaker_master_resource) {
+        fail("${pacemaker_master_resource} isn't a member of ${pacemaker_resources}")
+      }
     }
 
     # Configure the filter that will notify other collectd plugins about the
@@ -107,7 +88,8 @@ class lma_collector::collectd::controller (
           'match'   => {
             'type'    => 'regex',
             'matches' => {
-              'Plugin' => '^pacemaker_resource$',
+              'Plugin'       => '^pacemaker_resource$',
+              'TypeInstance' => "^${pacemaker_master_resource}$",
             },
           },
           'targets' => [

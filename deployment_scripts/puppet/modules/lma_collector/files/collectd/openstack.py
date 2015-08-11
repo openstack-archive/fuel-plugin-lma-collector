@@ -146,6 +146,9 @@ class CollectdPlugin(object):
         self.timeout = 5
         self.max_retries = 3
         self.extra_config = {}
+        # attributes controlling whether the plugin is in collecd mode or not
+        self.do_collect_data = True
+        self.depends_on_resource = None
 
     def _build_url(self, service, resource):
         s = (self.get_service(service) or {})
@@ -201,12 +204,37 @@ class CollectdPlugin(object):
                 tenant_name = node.values[0]
             elif node.key == 'KeystoneUrl':
                 keystone_url = node.values[0]
+            elif node.key == 'DependsOnResource':
+                self.depends_on_resource = node.values[0]
         self.os_client = OSClient(username, password, tenant_name,
                                   keystone_url, self.timeout, self.logger,
                                   self.max_retries)
 
+    def notification_callback(self, notification):
+        if not self.depends_on_resource:
+            return
+
+        try:
+            data = json.loads(notification.message)
+        except ValueError:
+            pass
+        else:
+            if data.get('resource', '') == self.depends_on_resource and \
+               self.do_collect_data != (data.get('value', 1) > 0):
+                    self.do_collect_data = not self.do_collect_data
+                    self.logger.notice("%s: do_collect_data=%s" %
+                                       (self.__class__.__name__, self.do_collect_data))
+
     def read_callback(self):
-        raise "read_callback method needs to be overriden!"
+        if self.do_collect_data:
+            self.collect_data()
+
+    def collect_data(self):
+        """ Read metrics and dispatch values
+
+        This method should be overriden by the derived classes.
+        """
+        raise "collect_data() method needs to be overriden!"
 
     def get_objects(self, project, object_name, api_version='',
                     params='all_tenants=1'):
