@@ -20,7 +20,7 @@ import openstack
 from urlparse import urlparse
 
 PLUGIN_NAME = 'check_openstack_api'
-INTERVAL = 60
+INTERVAL = openstack.INTERVAL
 
 
 class APICheckPlugin(openstack.CollectdPlugin):
@@ -89,7 +89,7 @@ class APICheckPlugin(openstack.CollectdPlugin):
                 'region': service['region']
             }
 
-    def read_callback(self):
+    def collect_data(self):
         for item in self.check_api():
             if item['status'] == self.UNKNOWN:
                 # skip if status is UNKNOWN
@@ -115,8 +115,13 @@ def config_callback(conf):
     plugin.config_callback(conf)
 
 
+def notification_callback(notification):
+    plugin.notification_callback(notification)
+
+
 def read_callback():
     plugin.read_callback()
 
 collectd.register_config(config_callback)
+collectd.register_notification(notification_callback)
 collectd.register_read(read_callback, INTERVAL)

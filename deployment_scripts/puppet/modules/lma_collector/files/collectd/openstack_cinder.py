@@ -18,7 +18,7 @@ import collectd
 import openstack
 
 PLUGIN_NAME = 'cinder'
-INTERVAL = 60
+INTERVAL = openstack.INTERVAL
 
 
 class CinderStatsPlugin(openstack.CollectdPlugin):
@@ -31,7 +31,7 @@ class CinderStatsPlugin(openstack.CollectdPlugin):
     def config_callback(self, config):
         super(CinderStatsPlugin, self).config_callback(config)
 
-    def read_callback(self):
+    def collect_data(self):
         volumes_details = self.get_objects_details('cinder', 'volumes')
 
         def groupby(d):
@@ -83,9 +83,13 @@ def config_callback(conf):
     plugin.config_callback(conf)
 
 
+def notification_callback(notification):
+    plugin.notification_callback(notification)
+
+
 def read_callback():
     plugin.read_callback()
 
 collectd.register_config(config_callback)
+collectd.register_notification(notification_callback)
 collectd.register_read(read_callback, INTERVAL)
-
