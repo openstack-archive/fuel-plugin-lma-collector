@@ -38,6 +38,11 @@ if hiera('deployment_mode') =~ /^ha_/ {
   $ha_deployment = false
 }
 
+class { 'lma_collector::aggregator':
+  listen_address => hiera('internal_address'),
+  listen_port    => 5565,
+}
+
 # OpenStack notifcations are always useful for indexation and metrics collection
 class { 'lma_collector::notifications::controller':
   host     => '127.0.0.1',
