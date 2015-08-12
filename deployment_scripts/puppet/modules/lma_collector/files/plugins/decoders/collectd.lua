@@ -190,11 +190,12 @@ function process_message ()
             elseif metric_source == 'rabbitmq_info' then
                 if sample['type_instance'] ~= 'consumers' and
                    sample['type_instance'] ~= 'messages' and
+                   sample['type_instance'] ~= 'memory' and
                    (string.match(sample['type_instance'], '%.consumers$') or
                    string.match(sample['type_instance'], '%.messages$') or
                    string.match(sample['type_instance'], '%.memory$')) then
                     local q, m = string.match(sample['type_instance'], '^(.+)%.([^.]+)$')
-                    msg['Fields']['name'] = 'rabbitmq' .. sep .. m
+                    msg['Fields']['name'] = 'rabbitmq_queue' .. sep .. m
                     msg['Fields']['queue'] = q
                     msg['Fields']['tag_fields'] = { 'queue' }
                 else
