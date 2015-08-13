@@ -75,7 +75,8 @@
 class heka (
   $service_name = $heka::params::service_name,
   $config_dir = $heka::params::config_dir,
-  $run_as_root = $heka::params::run_as_root,
+  $heka_user = $heka::params::user,
+  #$run_as_root = $heka::params::run_as_root,
   $additional_groups = $heka::params::additional_groups,
   $hostname = $heka::params::hostname,
   $maxprocs = $heka::params::maxprocs,
@@ -88,7 +89,7 @@ class heka (
   $internal_statistics = $heka::params::internal_statistics,
 ) inherits heka::params {
 
-  $heka_user     = $heka::params::user
+  $run_as_root   = $heka_user == 'root'
   $hekad_wrapper = "/usr/local/bin/${service_name}_wrapper"
   $base_dir      = "/var/cache/${service_name}"
   $log_file      = "/var/log/${service_name}.log"
@@ -99,14 +100,19 @@ class heka (
   }
 
   if $::osfamily == 'Debian' {
-    # Starting from Heka 0.10.0, the Debian package provides an init script so
-    # stop the service and disable it.
-    service { '_hekad_from_package':
-      ensure  => stopped,
-      name    => 'heka',
-      enable  => false,
+    # Starting from Heka 0.10.0, the Debian package provides a SysV init
+    # script so we need to stop the service and disable it.
+    exec { 'stop_heka_daemon':
+      command => '/etc/init.d/heka stop',
+      onlyif  => '/usr/bin/test -f /etc/init.d/heka',
       require => Package['heka'],
       before  => User['heka'],
+      notify  => Exec['disable_heka_daemon']
+    }
+
+    exec { 'disable_heka_daemon':
+      command     => '/usr/sbin/update-rc.d heka disable',
+      refreshonly => true,
     }
   }
 
@@ -115,13 +121,19 @@ class heka (
     require => Package['heka'],
   }
 
-  user { $heka_user:
-    shell   => '/sbin/nologin',
-    home    => $base_dir,
-    system  => true,
-    groups  => $additional_groups,
-    alias   => 'heka',
-    require => Package['heka'],
+  if ! $run_as_root {
+    # TODO: check if this is really needed
+    user { $heka_user:
+    }
+  } else {
+    user { $heka_user:
+      shell   => '/sbin/nologin',
+      home    => $base_dir,
+      system  => true,
+      groups  => $additional_groups,
+      alias   => 'heka',
+      require => Package['heka'],
+    }
   }
 
   file { $base_dir:

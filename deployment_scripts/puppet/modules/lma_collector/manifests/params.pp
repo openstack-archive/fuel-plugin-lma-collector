@@ -17,6 +17,8 @@ class lma_collector::params {
   $config_dir = "/etc/${service_name}"
   $plugins_dir = "/usr/share/${service_name}"
 
+  $pacemaker_managed = false
+
   # Address and port of the Heka dashboard for health reports.
   $dashboard_address = '127.0.0.1'
   $dashboard_port    = '4352'

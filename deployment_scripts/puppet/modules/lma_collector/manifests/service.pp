@@ -28,6 +28,7 @@ class lma_collector::service (
   $service_enable = true,
   $service_ensure = 'running',
   $service_manage = true,
+  $provider       = undef,
 ) {
   # The base class must be included first because parameter defaults depend on it
   if ! defined(Class['lma_collector::params']) {
@@ -46,11 +47,26 @@ class lma_collector::service (
     }
   }
 
+  if member(split($::pacemaker_resources, ','), $service_name) {
+    $real_provider = 'pacemaker'
+  } else {
+    $real_provider = $provider
+  }
+
   if $service_manage {
-    service { 'lma_collector':
-      ensure => $_service_ensure,
-      name => $service_name,
-      enable => $service_enable,
+    if $real_provider {
+      service { 'lma_collector':
+        ensure   => $_service_ensure,
+        name     => $service_name,
+        enable   => $service_enable,
+        provider => $real_provider,
+      }
+    } else {
+      service { 'lma_collector':
+        ensure => $_service_ensure,
+        name   => $service_name,
+        enable => $service_enable,
+      }
     }
   }
 }
