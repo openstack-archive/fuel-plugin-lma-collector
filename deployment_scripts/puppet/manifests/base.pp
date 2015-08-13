@@ -46,8 +46,12 @@ else {
 
 if hiera('deployment_mode') =~ /^ha_/ and $is_controller {
   $additional_groups = ['haclient']
+  $pacemaker_managed = true
+  $rabbitmq_resource = 'master_p_rabbitmq-server'
 }else{
   $additional_groups = []
+  $pacemaker_managed = false
+  $rabbitmq_resource = undef
 }
 
 $elasticsearch_mode = $lma_collector['elasticsearch_mode']
@@ -69,7 +73,7 @@ case $elasticsearch_mode {
 
 # Notifications are always collected even when event indexation is disabled
 if $is_controller{
-  $pre_script        = '/usr/local/bin/wait_for_rabbitmq'
+  #$pre_script        = '/usr/local/bin/wait_for_rabbitmq'
   # Params used by the script.
   $rabbit            = hiera('rabbit')
   $rabbitmq_port     = hiera('amqp_port', '5673')
@@ -77,14 +81,14 @@ if $is_controller{
   $rabbitmq_password = $rabbit['password']
   $wait_delay        = 30
 
-  file { $pre_script:
-    ensure  => present,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
-    content => template('lma_collector/wait_for_rabbitmq.erb'),
-    before  => Class['lma_collector']
-  }
+  #  file { $pre_script:
+  #    ensure  => present,
+  #    owner   => 'root',
+  #    group   => 'root',
+  #    mode    => '0755',
+  #    content => template('lma_collector/wait_for_rabbitmq.erb'),
+  #    before  => Class['lma_collector']
+  #  }
 } else {
   $pre_script = undef
 }
@@ -92,8 +96,10 @@ if $is_controller{
 class { 'lma_collector':
   tags               => merge($tags, $additional_tags),
   groups             => $additional_groups,
-  pre_script         => $pre_script,
+  #  pre_script         => $pre_script,
   aggregator_address => hiera('management_vip'),
+  pacemaker_managed  => $pacemaker_managed,
+  rabbitmq_resource  => $rabbitmq_resource,
 }
 
 if $elasticsearch_mode != 'disabled' {
