@@ -1,10 +1,7 @@
 #!/bin/bash
 set -eux
 
-ROOT="$(dirname "$(readlink -f "$0")")"
-MODULES_DIR="${ROOT}"/deployment_scripts/puppet/modules
-RPM_REPO="${ROOT}"/repositories/centos/
-DEB_REPO="${ROOT}"/repositories/ubuntu/
+. "$(dirname "$(readlink -f "$0")")"/functions.sh
 HEKA_VERSION="0.10.0b0"
 # This is the commit id for the current stable/6.1 branch
 FUEL_LIB_COMMIT="be44e9ea792fe4314ac8c1b7596742ceb5163f61"
@@ -14,24 +11,9 @@ APACHE_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppetlabs-apache-1
 STDLIB_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppetlabs-stdlib-4.7.0.tar.gz"
 CONCAT_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppetlabs-concat-1.2.4.tar.gz"
 
-function download_packages {
-    while [ $# -gt 0 ]; do
-        FILENAME=$(basename "$1")
-        EXT=${FILENAME##*.}
-        case ${EXT} in
-            deb) REPO=$DEB_REPO;;
-            rpm) REPO=$RPM_REPO;;
-        esac
-
-        rm -f "$REPO"/"$FILENAME"
-        wget -qO - "$1" > "$REPO"/"$FILENAME"
-        shift
-    done
-}
-
 download_packages \
-    https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka_${HEKA_VERSION}_amd64.deb > "${DEB_REPO}"/heka_${HEKA_VERSION}_amd64.deb \
-    https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka-${HEKA_VERSION//./_}-linux-amd64.rpm > "${RPM_REPO}"/heka-${HEKA_VERSION//./_}-linux-amd64.rpm \
+    https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka_${HEKA_VERSION}_amd64.deb \
+    https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka-${HEKA_VERSION//./_}-linux-amd64.rpm \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fonts-dejavu/fonts-dejavu-core_2.34-1ubuntu1_all.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fontconfig/fontconfig-config_2.11.0-0ubuntu4.1_all.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fontconfig/libfontconfig1_2.11.0-0ubuntu4.1_amd64.deb \
@@ -65,23 +47,12 @@ download_packages \
 
 
 # Extract dependent manifests from fuel-library
-rm -rf "${MODULES_DIR:?}"/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack}
+rm -rf "${MODULES_DIR:?}"/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack,pacemaker}
 wget -qO- "${FUEL_LIB_TARBALL_URL}" | \
     tar -C "${MODULES_DIR}" --strip-components=3 -zxvf - \
-    fuel-library-${FUEL_LIB_COMMIT}/deployment/puppet/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack}
+    fuel-library-${FUEL_LIB_COMMIT}/deployment/puppet/{cinder,glance,heat,inifile,keystone,neutron,nova,openstack,pacemaker}
 
-rm -rf "${MODULES_DIR:?}"/collectd
-mkdir -p "${MODULES_DIR}"/collectd
-wget -qO- "${COLLECTD_TARBALL_URL}" | tar -C "${MODULES_DIR}/collectd" --strip-components=1 -xz
-
-rm -rf "${MODULES_DIR:?}"/apache
-mkdir -p "${MODULES_DIR}"/apache
-wget -qO- "${APACHE_TARBALL_URL}" | tar -C "${MODULES_DIR}/apache" --strip-components=1 -xz
-
-rm -rf "${MODULES_DIR:?}"/stdlib
-mkdir -p "${MODULES_DIR}"/stdlib
-wget -qO- "${STDLIB_TARBALL_URL}" | tar -C "${MODULES_DIR}/stdlib" --strip-components=1 -xz
-
-rm -rf "${MODULES_DIR:?}"/concat
-mkdir -p "${MODULES_DIR}"/concat
-wget -qO- "${CONCAT_TARBALL_URL}" | tar -C "${MODULES_DIR}/concat" --strip-components=1 -xz
+download_puppet_module "collectd" "${COLLECTD_TARBALL_URL}"
+download_puppet_module "apache" "${APACHE_TARBALL_URL}"
+download_puppet_module "stdlib" "${STDLIB_TARBALL_URL}"
+download_puppet_module "concat" "${CONCAT_TARBALL_URL}"
