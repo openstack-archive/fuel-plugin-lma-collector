@@ -121,8 +121,7 @@ class heka (
     require => Package['heka'],
   }
 
-  if ! $run_as_root {
-    # TODO: check if this is really needed
+  if $run_as_root {
     user { $heka_user:
     }
   } else {
