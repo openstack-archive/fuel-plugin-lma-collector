@@ -1,0 +1,13 @@
+[<%= @title %>_output]
+type = "SandboxOutput"
+filename = "<%= @filename %>"
+message_matcher = "<%= @message_matcher %>"
+
+<% if @config.size() > 0 %>
+[<%= @title %>_filter.config]
+<% @config.each do |k,v| %>
+<%   next if v.nil? or v == :undef -%>
+    <%= k %> = <%= v.is_a?(String) ? "'#{v}'" : v %>
+<%  end %>
+<% end %>
+
