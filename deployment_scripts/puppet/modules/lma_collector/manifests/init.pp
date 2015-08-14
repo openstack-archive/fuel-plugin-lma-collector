@@ -188,6 +188,14 @@ class lma_collector (
     require => File[$plugins_dir]
   }
 
+  file { "${plugins_dir}/outputs":
+    ensure  => directory,
+    source  => 'puppet:///modules/lma_collector/plugins/outputs',
+    recurse => remote,
+    notify  => Class['lma_collector::service'],
+    require => File[$plugins_dir]
+  }
+
   if size($lma_collector::params::additional_packages) > 0 {
     package { $lma_collector::params::additional_packages:
       ensure => present,
@@ -200,5 +208,24 @@ class lma_collector (
       address    => $aggregator_address,
       port       => $aggregator_port,
     }
+  }
+
+  heka::filter::sandbox { 'watchdog':
+      config_dir      => $config_dir,
+      filename        => "${lma_collector::params::plugins_dir}/filters/watchdog.lua",
+      message_matcher => 'FALSE',
+      ticker_interval => $lma_collector::params::watchdog_interval,
+      config          => {
+        payload_name => $lma_collector::params::watchdog_payload_name
+      }
+  }
+
+  heka::output::sandbox { 'watchdog':
+      config_dir      => $config_dir,
+      filename        => "${lma_collector::params::plugins_dir}/outputs/watchdog.lua",
+      message_matcher => "Fields[payload_name] == '${lma_collector::params::watchdog_payload_name}'",
+      config          => {
+        path => $lma_collector::params::watchdog_file,
+      }
   }
 }

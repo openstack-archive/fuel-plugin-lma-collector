@@ -26,6 +26,10 @@ class lma_collector::params {
   $aggregator_address = '127.0.0.1'
   $aggregator_port    = '5565'
 
+  $watchdog_file = "/tmp/${service_name}.watchdog"
+  $watchdog_payload_name = "${service_name}.watchdog"
+  $watchdog_interval = 1
+
   $tags = {}
 
   $syslog_pattern = '<%PRI%>%TIMESTAMP% %HOSTNAME% %syslogtag%%msg:::sp-if-no-1st-sp%%msg%\n'
