@@ -11,20 +11,23 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-#
-class lma_collector::aggregator (
-  $listen_address = $lma_collector::params::aggregator_address,
-  $listen_port    = $lma_collector::params::aggregator_port,
+class lma_collector::aggregator::client (
+  $address = undef,
+  $port    = $lma_collector::params::aggregator_port,
 ) inherits lma_collector::params {
-  include lma_collector::service
 
-  validate_string($listen_address)
-  validate_integer($listen_port)
+  if $address == undef {
+    fail('address parameter should be defined!')
+  }
 
-  heka::input::tcp { 'aggregator':
-    config_dir => $lma_collector::params::config_dir,
-    address    => $listen_address,
-    port       => $listen_port,
-    notify     => Class['lma_collector::service'],
+  validate_string($address)
+
+  $config_dir = $lma_collector::params::config_dir
+
+  heka::output::tcp { 'aggregator':
+    config_dir    => $config_dir,
+    address       => $address,
+    port          => $port,
+    max_file_size => $lma_collector::params::buffering_max_file_size,
   }
 }

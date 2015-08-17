@@ -193,13 +193,4 @@ class lma_collector (
       ensure => present,
     }
   }
-
-  if $aggregator_address {
-    heka::output::tcp { 'aggregator':
-      config_dir    => $config_dir,
-      address       => $aggregator_address,
-      port          => $aggregator_port,
-      max_file_size => $lma_collector::params::buffering_max_file_size,
-    }
-  }
 }
