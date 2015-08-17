@@ -17,6 +17,7 @@ include lma_collector::params
 $ceilometer     = hiera('ceilometer')
 $lma_collector  = hiera('lma_collector')
 $rabbit         = hiera('rabbit')
+$management_vip = hiera('management_vip')
 
 if $ceilometer['enabled'] {
   $notification_topics = [$lma_collector::params::openstack_topic, $lma_collector::params::lma_topic]
@@ -36,11 +37,6 @@ if hiera('deployment_mode') =~ /^ha_/ {
   $ha_deployment = true
 }else{
   $ha_deployment = false
-}
-
-class { 'lma_collector::aggregator':
-  listen_address => hiera('internal_address'),
-  listen_port    => 5565,
 }
 
 # OpenStack notifcations are always useful for indexation and metrics collection
@@ -74,7 +70,6 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
   $nova           = hiera('nova')
   $neutron        = hiera('quantum_settings')
   $cinder         = hiera('cinder')
-  $management_vip = hiera('management_vip')
 
   if $ha_deployment {
     $haproxy_socket = '/var/lib/haproxy/stats'
