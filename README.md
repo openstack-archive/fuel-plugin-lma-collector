@@ -22,7 +22,7 @@ Requirements
 | ------------------------------ | ------------------------------------------------------------- |
 | Mirantis OpenStack compatility | 6.1 or higher                                                 |
 | A running Elasticsearch server | 1.4 or higher, the RESTful API must be enabled over port 9200 |
-| A running InfluxDB server      | 0.8.8,  the RESTful API must be enabled over port 8086        |
+| A running InfluxDB server      | 0.9.2,  the RESTful API must be enabled over port 8086        |
 
 
 Limitations
@@ -136,6 +136,7 @@ Release Notes
 **0.8.0**
 
 * Monitoring of the LMA collector.
+* Support of InfluxDB 0.9.2 and higher.
 
 **0.7.0**
 

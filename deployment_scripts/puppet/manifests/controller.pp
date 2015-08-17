@@ -118,7 +118,7 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     password        => $nova['db_password'],
     report_interval => 60,
     downtime_factor => 2,
-    require  => Class['lma_collector::collectd::dbi'],
+    require         => Class['lma_collector::collectd::dbi'],
   }
 
   lma_collector::collectd::dbi_mysql_status{ 'mysql_status':
@@ -134,7 +134,7 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     password        => $cinder['db_password'],
     report_interval => 60,
     downtime_factor => 2,
-    require  => Class['lma_collector::collectd::dbi'],
+    require         => Class['lma_collector::collectd::dbi'],
   }
 
   lma_collector::collectd::dbi_services { 'neutron':
@@ -143,41 +143,24 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     password        => $neutron['database']['passwd'],
     report_interval => 15,
     downtime_factor => 4,
-    require  => Class['lma_collector::collectd::dbi'],
+    require         => Class['lma_collector::collectd::dbi'],
   }
 
-  if $lma_collector['influxdb_legacy'] {
-    class { 'lma_collector::logs::metrics_legacy': }
+  class { 'lma_collector::logs::metrics': }
 
-    # Notification are always collected, lets extract metrics from there
-    class { 'lma_collector::notifications::metrics_legacy': }
-  } else {
-    class { 'lma_collector::logs::metrics': }
-
-    # Notification are always collected, lets extract metrics from there
-    class { 'lma_collector::notifications::metrics': }
-  }
+  # Notification are always collected, lets extract metrics from there
+  class { 'lma_collector::notifications::metrics': }
 
   # Enable Apache status module
   class { 'lma_collector::mod_status': }
 
   # Enable service heartbeat metrics
-  if $lma_collector['influxdb_legacy'] {
-    class { 'lma_collector::metrics::service_heartbeat_legacy':
-      services => ['mysql', 'rabbitmq', 'haproxy', 'memcached', 'apache']
-    }
-  } else {
-    class { 'lma_collector::metrics::service_heartbeat':
-      services => ['mysql', 'rabbitmq', 'haproxy', 'memcached', 'apache']
-    }
+  class { 'lma_collector::metrics::service_heartbeat':
+    services => ['mysql', 'rabbitmq', 'haproxy', 'memcached', 'apache']
   }
 
   # Service status metrics and annotations
-  if $lma_collector['influxdb_legacy'] {
-    class { 'lma_collector::metrics::service_status_legacy': }
-  } else {
-    class { 'lma_collector::metrics::service_status': }
-  }
+  class { 'lma_collector::metrics::service_status': }
 
 }
 
@@ -223,9 +206,9 @@ if $alerting_mode != 'disabled' {
   if $use_nagios {
     class { 'lma_collector::nagios':
       openstack_deployment_name => $deployment_id,
-      url => $nagios_url,
-      user => $nagios_user,
-      password => $nagios_password,
+      url                       => $nagios_url,
+      user                      => $nagios_user,
+      password                  => $nagios_password,
     }
   }
 }

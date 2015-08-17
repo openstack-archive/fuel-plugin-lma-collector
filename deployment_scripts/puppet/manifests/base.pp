@@ -144,11 +144,7 @@ case $influxdb_mode {
 
     if $is_base_os {
       if $current_node_name == $influxdb_node_name and $influxdb_mode == 'local' {
-        if $lma_collector['influxdb_legacy'] {
-          $processes = ['hekad', 'collectd', 'influxdb']
-        } else {
-          $processes = ['hekad', 'collectd', 'influxd', 'grafana-server']
-        }
+        $processes = ['hekad', 'collectd', 'influxd', 'grafana-server']
       } else {
         $processes = ['hekad', 'collectd']
       }
@@ -173,44 +169,23 @@ case $influxdb_mode {
       $collectd_read_threads = 5
     }
 
-    if $lma_collector['influxdb_legacy'] {
-      class { 'lma_collector::collectd::base_legacy':
-        processes       => $processes,
-        process_matches => $process_matches,
-        read_threads    => $collectd_read_threads,
-        require         => Class['lma_collector'],
-      }
+    class { 'lma_collector::collectd::base':
+      processes       => $processes,
+      process_matches => $process_matches,
+      read_threads    => $collectd_read_threads,
+      require         => Class['lma_collector'],
+    }
 
-      class { 'lma_collector::influxdb_legacy':
-        server   => $influxdb_server,
-        database => $influxdb_database,
-        user     => $influxdb_user,
-        password => $influxdb_password,
-        require  => Class['lma_collector'],
-      }
+    class { 'lma_collector::influxdb':
+      server   => $influxdb_server,
+      database => $influxdb_database,
+      user     => $influxdb_user,
+      password => $influxdb_password,
+      require  => Class['lma_collector'],
+    }
 
-      class { 'lma_collector::metrics::heka_monitoring_legacy':
-        require => Class['lma_collector']
-      }
-    } else {
-      class { 'lma_collector::collectd::base':
-        processes       => $processes,
-        process_matches => $process_matches,
-        read_threads    => $collectd_read_threads,
-        require         => Class['lma_collector'],
-      }
-
-      class { 'lma_collector::influxdb':
-        server   => $influxdb_server,
-        database => $influxdb_database,
-        user     => $influxdb_user,
-        password => $influxdb_password,
-        require  => Class['lma_collector'],
-      }
-
-      class { 'lma_collector::metrics::heka_monitoring':
-        require => Class['lma_collector']
-      }
+    class { 'lma_collector::metrics::heka_monitoring':
+      require => Class['lma_collector']
     }
 
   }
