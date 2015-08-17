@@ -17,6 +17,7 @@ include lma_collector::params
 $ceilometer     = hiera('ceilometer')
 $lma_collector  = hiera('lma_collector')
 $rabbit         = hiera('rabbit')
+$management_vip = hiera('management_vip')
 
 if $ceilometer['enabled'] {
   $notification_topics = [$lma_collector::params::openstack_topic, $lma_collector::params::lma_topic]
@@ -38,12 +39,47 @@ if hiera('deployment_mode') =~ /^ha_/ {
   $ha_deployment = false
 }
 
+# TODO: move the configuration of the aggregator to a dedicated task
 class { 'lma_collector::aggregator':
-  listen_address => hiera('internal_address'),
-  listen_port    => 5565,
+  listen_address  => hiera('internal_address'),
+  listen_port     => 5565,
+  http_check_port => 5566,
 }
 
-# OpenStack notifcations are always useful for indexation and metrics collection
+# Hacks needed to leverage the haproxy_service defined type
+include haproxy::params
+Haproxy::Service { use_include => true }
+Haproxy::Balancermember { use_include => true }
+
+# HAProxy configuration
+openstack::ha::haproxy_service { 'lma':
+  order                  => '999',
+  listen_port            => 5565,
+  balancermember_port    => 5565,
+  haproxy_config_options => {
+    'option'  => ['httpchk', 'tcplog'],
+    'balance' => 'roundrobin',
+    'mode'    => 'tcp',
+  },
+  balancermember_options => 'check port 5566',
+  internal               => true,
+  internal_virtual_ip    => $management_vip,
+  public                 => false,
+  public_virtual_ip      => undef,
+  ipaddresses            => [ hiera('internal_address') ],
+  server_names           => [ $::hostname ],
+}
+
+# Allow traffic from HAProxy to the local LMA collector
+firewall { '998 lma':
+  port        => [5565, 5566],
+  source      => $management_vip,
+  destination => hiera('internal_address'),
+  proto       => 'tcp',
+  action      => 'accept',
+}
+
+# OpenStack notefcations are always useful for indexation and metrics collection
 class { 'lma_collector::notifications::controller':
   host     => '127.0.0.1',
   port     => hiera('amqp_port', '5673'),
@@ -74,7 +110,6 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
   $nova           = hiera('nova')
   $neutron        = hiera('quantum_settings')
   $cinder         = hiera('cinder')
-  $management_vip = hiera('management_vip')
 
   if $ha_deployment {
     $haproxy_socket = '/var/lib/haproxy/stats'
