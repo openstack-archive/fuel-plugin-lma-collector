@@ -24,7 +24,7 @@ class lma_collector::params {
   $dashboard_port    = '4352'
 
   $aggregator_address = '127.0.0.1'
-  $aggregator_port    = '5565'
+  $aggregator_port    = 5565
 
   $tags = {}
 

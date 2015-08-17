@@ -94,12 +94,10 @@ if $is_controller{
 }
 
 class { 'lma_collector':
-  tags               => merge($tags, $additional_tags),
-  groups             => $additional_groups,
-  #  pre_script         => $pre_script,
-  aggregator_address => hiera('management_vip'),
-  pacemaker_managed  => $pacemaker_managed,
-  rabbitmq_resource  => $rabbitmq_resource,
+  tags              => merge($tags, $additional_tags),
+  groups            => $additional_groups,
+  pacemaker_managed => $pacemaker_managed,
+  rabbitmq_resource => $rabbitmq_resource,
 }
 
 if $elasticsearch_mode != 'disabled' {
