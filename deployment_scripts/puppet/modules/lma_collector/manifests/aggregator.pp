@@ -13,8 +13,9 @@
 #    under the License.
 #
 class lma_collector::aggregator (
-  $listen_address = $lma_collector::params::aggregator_address,
-  $listen_port    = $lma_collector::params::aggregator_port,
+  $listen_address  = $lma_collector::params::aggregator_address,
+  $listen_port     = $lma_collector::params::aggregator_port,
+  $http_check_port = undef,
 ) inherits lma_collector::params {
   include lma_collector::service
 
@@ -26,5 +27,22 @@ class lma_collector::aggregator (
     address    => $listen_address,
     port       => $listen_port,
     notify     => Class['lma_collector::service'],
+  }
+
+  if $http_check_port {
+    heka::decoder::sandbox { 'http-check':
+      config_dir => $lma_collector::params::config_dir,
+      filename   => "${lma_collector::params::plugins_dir}/decoders/noop.lua" ,
+      notify     => Class['lma_collector::service'],
+    }
+
+    heka::input::httplisten { 'http-check':
+      config_dir => $lma_collector::params::config_dir,
+      address    => $listen_address,
+      port       => $http_check_port,
+      decoder    => 'http-check',
+      require    => Heka::Decoder::Sandbox['http-check'],
+      notify     => Class['lma_collector::service'],
+    }
   }
 }
