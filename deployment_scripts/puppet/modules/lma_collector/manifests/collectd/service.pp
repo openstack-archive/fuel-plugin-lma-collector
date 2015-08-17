@@ -45,7 +45,6 @@ class lma_collector::collectd::service (
   if $service_manage {
     service { 'collectd':
       ensure => $_service_ensure,
-      name   => $service_name,
       enable => $service_enable,
     }
   }

@@ -22,16 +22,16 @@ class lma_collector::notifications::compute (
 
   include nova::params
 
-  nova_config {
-    'DEFAULT/notification_topics': value => join($topics, ','),
+  nova_config { 'DEFAULT/notification_topics':
+    value  => join($topics, ','),
     notify => Service[$::nova::params::compute_service_name],
   }
-  nova_config {
-    'DEFAULT/notification_driver': value => $driver,
+  nova_config { 'DEFAULT/notification_driver':
+    value  => $driver,
     notify => Service[$::nova::params::compute_service_name],
   }
-  nova_config {
-    'DEFAULT/notify_on_state_change': value => 'vm_and_task_state',
+  nova_config { 'DEFAULT/notify_on_state_change':
+    value  => 'vm_and_task_state',
     notify => Service[$::nova::params::compute_service_name],
   }
 

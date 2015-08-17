@@ -17,7 +17,7 @@ class lma_collector::metrics::service_status (
   $timeout  = $lma_collector::params::service_status_timeout,
 ) inherits lma_collector::params {
 
-  validate_string($metrics_regexp)
+  validate_string($metrics_matcher)
 
   $payload_name = $lma_collector::params::service_status_payload_name
 

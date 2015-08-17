@@ -94,16 +94,16 @@ class lma_collector::notifications::controller (
   # Nova
   include nova::params
 
-  nova_config {
-    'DEFAULT/notification_topics': value => $notification_topics,
+  nova_config { 'DEFAULT/notification_topics':
+    value  => $notification_topics,
     notify => Service[$::nova::params::api_service_name, $::nova::params::conductor_service_name, $::nova::params::scheduler_service_name],
   }
-  nova_config {
-    'DEFAULT/notification_driver': value => $driver,
+  nova_config { 'DEFAULT/notification_driver':
+    value  => $driver,
     notify => Service[$::nova::params::api_service_name, $::nova::params::conductor_service_name, $::nova::params::scheduler_service_name],
   }
-  nova_config {
-    'DEFAULT/notify_on_state_change': value => 'vm_and_task_state',
+  nova_config { 'DEFAULT/notify_on_state_change':
+    value  => 'vm_and_task_state',
     notify => Service[$::nova::params::api_service_name, $::nova::params::conductor_service_name, $::nova::params::scheduler_service_name],
   }
 
@@ -115,12 +115,12 @@ class lma_collector::notifications::controller (
   # Cinder
   include cinder::params
 
-  cinder_config {
-    'DEFAULT/notification_topics': value => $notification_topics,
+  cinder_config { 'DEFAULT/notification_topics':
+    value  => $notification_topics,
     notify => Service[$::cinder::params::api_service, $::cinder::params::scheduler_service],
   }
-  cinder_config {
-    'DEFAULT/notification_driver': value => $driver,
+  cinder_config { 'DEFAULT/notification_driver':
+    value  => $driver,
     notify => Service[$::cinder::params::api_service, $::cinder::params::scheduler_service],
   }
 
@@ -132,12 +132,12 @@ class lma_collector::notifications::controller (
   # Keystone
   include keystone::params
 
-  keystone_config {
-    'DEFAULT/notification_topics': value => $notification_topics,
+  keystone_config { 'DEFAULT/notification_topics':
+    value  => $notification_topics,
     notify => Service[$::keystone::params::service_name],
   }
-  keystone_config {
-    'DEFAULT/notification_driver': value => $driver,
+  keystone_config { 'DEFAULT/notification_driver':
+    value  => $driver,
     notify => Service[$::keystone::params::service_name],
   }
 
@@ -149,12 +149,12 @@ class lma_collector::notifications::controller (
   # Neutron
   include neutron::params
 
-  neutron_config {
-    'DEFAULT/notification_topics': value => $notification_topics,
+  neutron_config { 'DEFAULT/notification_topics':
+    value  => $notification_topics,
     notify => Service[$::neutron::params::server_service],
   }
-  neutron_config {
-    'DEFAULT/notification_driver': value => $driver,
+  neutron_config { 'DEFAULT/notification_driver':
+    value  => $driver,
     notify => Service[$::neutron::params::server_service],
   }
 
@@ -169,28 +169,28 @@ class lma_collector::notifications::controller (
   # Default value is 'image.localhost' for Glance
   $glance_publisher_id = "image.${::hostname}"
 
-  glance_api_config {
-    'DEFAULT/notification_topics': value => $notification_topics,
+  glance_api_config { 'DEFAULT/notification_topics':
+    value  => $notification_topics,
     notify => Service[$::glance::params::api_service_name],
   }
-  glance_api_config {
-    'DEFAULT/notification_driver': value => $driver,
+  glance_api_config { 'DEFAULT/notification_driver':
+    value  => $driver,
     notify => Service[$::glance::params::api_service_name],
   }
-  glance_api_config {
-    'DEFAULT/default_publisher_id': value => $glance_publisher_id,
+  glance_api_config { 'DEFAULT/default_publisher_id':
+    value  => $glance_publisher_id,
     notify => Service[$::glance::params::api_service_name],
   }
-  glance_registry_config {
-    'DEFAULT/notification_topics': value => $notification_topics,
+  glance_registry_config { 'DEFAULT/notification_topics':
+    value  => $notification_topics,
     notify => Service[$::glance::params::registry_service_name],
   }
-  glance_registry_config {
-    'DEFAULT/notification_driver': value => $driver,
+  glance_registry_config { 'DEFAULT/notification_driver':
+    value  => $driver,
     notify => Service[$::glance::params::registry_service_name],
   }
-  glance_registry_config {
-    'DEFAULT/default_publisher_id': value => $glance_publisher_id,
+  glance_registry_config { 'DEFAULT/default_publisher_id':
+    value  => $glance_publisher_id,
     notify => Service[$::glance::params::registry_service_name],
   }
 
@@ -212,16 +212,16 @@ class lma_collector::notifications::controller (
   # heat-engine is no longer managed by pacemaker and rollback to a traditional
   # service restart.
   exec { $reload_heat_engine:
-    command => '/usr/bin/pkill -10 heat-engine',
+    command     => '/usr/bin/pkill -10 heat-engine',
     refreshonly => true,
   }
 
-  heat_config {
-    'DEFAULT/notification_topics': value => $notification_topics,
+  heat_config { 'DEFAULT/notification_topics':
+    value  => $notification_topics,
     notify => [Service[$::heat::params::api_service_name], Exec[$reload_heat_engine]],
   }
-  heat_config {
-    'DEFAULT/notification_driver': value => $driver,
+  heat_config { 'DEFAULT/notification_driver':
+    value  => $driver,
     notify => [Service[$::heat::params::api_service_name], Exec[$reload_heat_engine]],
   }
 

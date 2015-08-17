@@ -47,7 +47,9 @@ class lma_collector::nagios (
     password        => $password,
     encoder         => 'nagios',
     timeout         => $lma_collector::params::nagios_timeout,
-    headers         => {'Content-Type' => 'application/x-www-form-urlencoded'},
+    headers         => {
+      'Content-Type' => 'application/x-www-form-urlencoded'
+    },
     require         => Heka::Encoder::Sandbox['nagios'],
     notify          => Class['lma_collector::service'],
   }

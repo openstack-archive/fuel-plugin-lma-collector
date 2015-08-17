@@ -11,12 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-require 'rspec-puppet'
+source 'https://rubygems.org'
 
-fixture_path = File.expand_path(File.join(__FILE__, '..', 'fixtures'))
-
-RSpec.configure do |c|
-  c.module_path = File.join(fixture_path, 'modules')
-  c.manifest_dir = File.join(fixture_path, 'manifests')
-  c.environmentpath = File.join(Dir.pwd, 'spec')
+group :development, :test do
+  gem 'rake'
+  gem "puppet", ENV['PUPPET_VERSION'] || '~> 3.4.0'
+  gem 'rspec'
+  gem 'rspec-puppet'
+  gem 'rspec-puppet-facts'
+  gem 'puppetlabs_spec_helper'
+  gem 'metadata-json-lint'
 end

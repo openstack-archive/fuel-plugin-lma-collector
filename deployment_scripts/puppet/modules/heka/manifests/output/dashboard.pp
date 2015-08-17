@@ -17,6 +17,7 @@ define heka::output::dashboard (
   $dashboard_address = '0.0.0.0',
   $dashboard_port    = '4352',
   $ticker_interval   = '30',
+  $ensure = present,
 ) {
 
   include heka::params
