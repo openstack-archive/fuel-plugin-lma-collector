@@ -1,3 +1,9 @@
+GIT
+  remote: https://github.com/rodjek/puppet-lint.git
+  revision: 2546fed6be894bbcff15c3f48d4b6f6bc15d94d1
+  specs:
+    puppet-lint (0.3.2)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -17,7 +23,6 @@ GEM
       facter (~> 1.6)
       hiera (~> 1.0)
       rgen (~> 0.6.5)
-    puppet-lint (1.1.0)
     puppet-syntax (2.0.0)
       rake
     puppetlabs_spec_helper (0.10.3)
@@ -55,6 +60,7 @@ PLATFORMS
 DEPENDENCIES
   metadata-json-lint
   puppet (~> 3.4.0)
+  puppet-lint!
   puppetlabs_spec_helper
   rake
   rspec
