@@ -18,16 +18,24 @@ define lma_collector::collectd::dbi_services (
   $username         = undef,
   $password         = undef,
   $dbname           = undef,
-  $report_interval  = $lma_collector::params::worker_report_interval,
-  $downtime_factor  = $lma_collector::params::worker_downtime_factor,
-){
+  $report_interval  = undef,
+  $downtime_factor  = undef,
+) {
   include collectd::params
   include lma_collector::collectd::service
   $service = $title
 
+  if $report_interval == undef {
+    fail('report_interval needs to be defined!')
+  }
+  if $downtime_factor == undef {
+    fail('downtime_factor needs to be defined!')
+  }
+
   # A service is declared 'down' if no heartbeat has been received since
   # "downtime_factor * report_interval" seconds,
-  # The "report_interval" must match the corresponding configuration of the service.
+  # The "report_interval" must match the corresponding configuration of the
+  # service.
 
   $downtime = $report_interval * $downtime_factor
 
