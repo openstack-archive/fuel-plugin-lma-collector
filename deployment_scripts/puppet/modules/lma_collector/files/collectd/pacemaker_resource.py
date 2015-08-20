@@ -42,17 +42,7 @@ class PacemakerResourcePlugin(base.Base):
             elif node.key == 'CrmResourceBin':
                 self.crm_resource_bin = node.values[0]
 
-    def get_metrics(self):
-        """ Returns a dict containing the monitored resources and whether
-        they are located on this node or not.
-
-        {
-            'vip__management': 0, # not located on this node
-            'vip__public': 1, # located on this node
-            ...
-        }
-        """
-        metrics = {}
+    def itermetrics(self):
         for resource in self.resources:
             out, err = self.execute([self.crm_resource_bin, '--locate',
                                      '--quiet', '--resource', resource],
@@ -62,12 +52,13 @@ class PacemakerResourcePlugin(base.Base):
                                   (self.plugin, resource))
 
             else:
+                value = 0
                 if self.hostname == out.lstrip("\n"):
-                    metrics[resource] = 1
-                else:
-                    metrics[resource] = 0
-
-        return metrics
+                    value = 1
+                yield {
+                    'type_instance': resource,
+                    'values': value
+                }
 
 plugin = PacemakerResourcePlugin()
 

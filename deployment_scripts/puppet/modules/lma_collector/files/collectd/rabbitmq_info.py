@@ -65,7 +65,7 @@ class RabbitMqPlugin(base.Base):
             else:
                 self.logger.warning('Unknown config key: %s' % node.key)
 
-    def get_metrics(self):
+    def itermetrics(self):
         stats = {}
         stats['messages'] = 0
         stats['memory'] = 0
@@ -163,7 +163,10 @@ class RabbitMqPlugin(base.Base):
                 self.logger.warning('%s returned something strange.' %
                                     self.pmap_bin)
 
-        return stats
+        # TODO(pasquier-s): define and use own types instead of the generic
+        # GAUGE type
+        for k, v in stats.iteritems():
+            yield {'type_instance': k, 'values': v}
 
 
 plugin = RabbitMqPlugin()

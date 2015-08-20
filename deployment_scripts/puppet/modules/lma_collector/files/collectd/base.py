@@ -46,53 +46,50 @@ class Base(object):
 
     def read_callback(self):
         try:
-            metrics = self.get_metrics()
+            for metric in self.itermetrics():
+                self.dispatch_metric(metric)
         except Exception as e:
             self.logger.error('%s: Failed to get metrics: %s: %s' %
                               (self.plugin, e, traceback.format_exc()))
             return
 
-        if metrics:
-            self.dispatch(metrics)
-        else:
-            self.logger.warning('%s: Empty metrics' % self.plugin)
-
-    def get_metrics(self):
+    def itermetrics(self):
         """
-        Retrieves the metrics from the system.
+        Iterate over the collected metrics
 
-        This class must be implemented by the subclass.
+        This class must be implemented by the subclass and should yield dict
+        objects that represent the collected values. Each dict has 3 keys:
+            - 'values', a scalar number or a list of numbers if the type
+            defines several datasources.
+            - 'type_instance' (optional)
+            - 'type' (optional, default='gauge')
 
-        Returns:
-            A dict object where the key is the metric name and the value is the
-            value of the metric (either a number or a dict contating the value
-            of the metric as a number + the metric's type). For example:
+        For example:
 
-            {'foo.bar': 123,
-             'fred': {'value': '123', 'type': 'derive'}}
+            {'type_instance':'foo', 'values': 1}
+            {'type_instance':'bar', 'type': 'DERIVE', 'values': 1}
+            {'type': 'dropped_bytes', 'values': [1,2]}
         """
         raise NotImplemented("Must be implemented by the subclass!")
 
-    def dispatch(self, metrics):
-        for metric, data in metrics.iteritems():
-            if isinstance(data, dict):
-                self.dispatch_metric(metric, data['value'], _type=data['type'])
-            else:
-                self.dispatch_metric(metric, data)
+    def dispatch_metric(self, metric):
+        values = metric['values']
+        if not isinstance(values, list) and not isinstance(values, tuple):
+            values = (values,)
 
-    def dispatch_metric(self, metric, value, _type='gauge'):
-        if len(metric) > self.MAX_IDENTIFIER_LENGTH:
+        type_instance = str(metric.get('type_instance', ''))
+        if len(type_instance) > self.MAX_IDENTIFIER_LENGTH:
             self.logger.warning(
                 '%s: Identifier "%s..." too long (length: %d, max limit: %d)' %
-                (self.plugin, metric[:24], len(metric),
+                (self.plugin, type_instance[:24], len(type_instance),
                  self.MAX_IDENTIFIER_LENGTH))
 
         v = collectd.Values(
             plugin=self.plugin,
-            type=_type,
+            type=metric.get('type', 'gauge'),
             plugin_instance=self.plugin_instance,
-            type_instance=metric,
-            values=[value],
+            type_instance=type_instance,
+            values=values,
             # w/a for https://github.com/collectd/collectd/issues/716
             meta={'0': True}
         )
@@ -148,7 +145,7 @@ class Base(object):
                              (cmd, returncode, elapsedtime))
 
         if not stdout and self.debug:
-            self.logger.info("Command '%s' returned no output!")
+            self.logger.info("Command '%s' returned no output!", cmd)
 
         return (stdout, stderr)
 
@@ -164,7 +161,7 @@ class Base(object):
         outputs = self.execute(*args, **kwargs)
         if outputs:
             return json.loads(outputs[0])
-        return None
+        return
 
     @staticmethod
     def restore_sigchld():
@@ -188,7 +185,6 @@ class CephBase(Base):
     def __init__(self, *args, **kwargs):
         super(CephBase, self).__init__(*args, **kwargs)
         self.cluster = 'ceph'
-        self.plugin = 'ceph'
 
     def config_callback(self, conf):
         super(CephBase, self).config_callback(conf)
@@ -196,4 +192,4 @@ class CephBase(Base):
         for node in conf.children:
             if node.key == "Cluster":
                 self.cluster = node.values[0]
-        self.plugin_instance = 'cluster-%s' % self.cluster
+        self.plugin_instance = self.cluster
