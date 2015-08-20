@@ -22,24 +22,30 @@ INTERVAL = 60
 class CephOSDStatsPlugin(base.CephBase):
     """ Collect per OSD stats about store size and commit latency."""
 
-    def get_metrics(self):
-        pgs = self.execute_to_json('ceph pg dump --format json')
-        if not pgs:
-            return {}
+    def __init__(self, *args, **kwargs):
+        super(CephOSDStatsPlugin, self).__init__(*args, **kwargs)
+        self.plugin = 'ceph_osd'
 
-        metrics = {}
-        for osd in pgs['osd_stats']:
-            metric = "osd.%s" % osd['osd']
-            used = "%s.used" % metric
-            metrics[used] = osd['kb_used'] * 1000
-            total = "%s.total" % metric
-            metrics[total] = osd['kb'] * 1000
-            apply_latency = "%s.apply_latency" % metric
-            metrics[apply_latency] = osd['fs_perf_stat']['apply_latency_ms']
-            commit_latency = "%s.commit_latency" % metric
-            metrics[commit_latency] = osd['fs_perf_stat']['commit_latency_ms']
+    def itermetrics(self):
+        osd_stats = self.execute_to_json('ceph pg dump osds --format json')
+        if not osd_stats:
+            return
 
-        return metrics
+        for osd in osd_stats:
+            osd_id = osd['osd']
+
+            yield {
+                'type_instance': osd_id,
+                'type': 'osd_space',
+                'values': [osd['kb_used'] * 1000, osd['kb'] * 1000],
+            }
+
+            yield {
+                'type_instance': osd_id,
+                'type': 'osd_latency',
+                'values': [osd['fs_perf_stat']['apply_latency_ms'],
+                           osd['fs_perf_stat']['commit_latency_ms']],
+            }
 
 plugin = CephOSDStatsPlugin()
 

@@ -24,72 +24,97 @@ class CephPoolPlugin(base.CephBase):
 
     def __init__(self, *args, **kwargs):
         super(CephPoolPlugin, self).__init__(*args, **kwargs)
+        self.plugin = 'ceph_pool'
 
-    def get_metrics(self):
-        df = self.execute_to_json("ceph df --format json")
+    def itermetrics(self):
+        df = self.execute_to_json('ceph df --format json')
         if not df:
-            return {}
+            return
 
-        metrics = {}
+        objects_count = 0
         for pool in df['pools']:
+            objects_count += pool['stats'].get('objects', 0)
             for m in ('bytes_used', 'max_avail', 'objects'):
-                metric = "pool.%s.%s" % (pool['name'], m)
-                if m in pool['stats']:
-                    metrics[metric] = pool['stats'][m]
-                else:
-                    metrics[metric] = 0
+                yield {
+                    'type': 'pool_%s' % m,
+                    'type_instance': pool['name'],
+                    'values': pool['stats'].get(m, 0),
+                }
 
-        metrics['pool.total_number'] = len(df['pools'])
+        yield {
+            'type': 'objects_count',
+            'values': objects_count
+        }
+        yield {
+            'type': 'pool_count',
+            'values': len(df['pools'])
+        }
 
         if 'total_bytes' in df['stats']:
             # compatibility with 0.84+
-            metrics['pool.total_bytes'] = df['stats']['total_bytes']
-            metrics['pool.total_used_bytes'] = df['stats']['total_used_bytes']
-            metrics['pool.total_avail_bytes'] = df['stats']['total_avail_bytes']
+            total = df['stats']['total_bytes']
+            used = df['stats']['total_used_bytes']
+            avail = df['stats']['total_avail_bytes']
         else:
             # compatibility with <0.84
-            metrics['pool.total_bytes'] = df['stats']['total_space'] * 1024
-            metrics['pool.total_used_bytes'] = df['stats']['total_used'] * 1024
-            metrics['pool.total_avail_bytes'] = df['stats']['total_avail'] * 1024
+            total = df['stats']['total_space'] * 1024
+            used = df['stats']['total_used'] * 1024
+            avail = df['stats']['total_avail'] * 1024
 
-        stats = self.execute_to_json("ceph osd pool stats --format json")
+        yield {
+            'type': 'pool_total_bytes',
+            'values': [used, avail, total]
+        }
+        yield {
+            'type': 'pool_total_percent',
+            'values': [100.0 * used / total, 100.0 * avail / total]
+        }
+
+        stats = self.execute_to_json('ceph osd pool stats --format json')
         if not stats:
-            return metrics
+            return
 
         for pool in stats:
-            for m in ('read_bytes_sec', 'write_bytes_sec', 'op_per_sec'):
-                metric = "pool.%s.%s" % (pool['pool_name'], m)
-                if m in pool['client_io_rate']:
-                    metrics[metric] = pool['client_io_rate'][m]
-                else:
-                    metrics[metric] = 0
+            client_io_rate = pool.get('client_io_rate', {})
+            yield {
+                'type': 'pool_bytes_rate',
+                'type_instance': pool['pool_name'],
+                'values': [client_io_rate.get('read_bytes_sec', 0),
+                           client_io_rate.get('write_bytes_sec', 0)]
+            }
+            yield {
+                'type': 'pool_ops_rate',
+                'type_instance': pool['pool_name'],
+                'values': client_io_rate.get('op_per_sec', 0)
+            }
 
-        osd = self.execute_to_json("ceph osd dump --format json")
+        osd = self.execute_to_json('ceph osd dump --format json')
         if not osd:
-            return metrics
+            return
 
         for pool in osd['pools']:
-            for name in ('size', 'pg_num', 'pg_num_placement'):
-                if name in pool:  # pg_num_placement not present w/ ceph 0.80.7
-                    metric = 'pool.%s.%s' % (pool['pool_name'], name)
-                    metrics[metric] = pool[name]
+            for name in ('size', 'pg_num', 'pg_placement_num'):
+                yield {
+                    'type': 'pool_%s' % name,
+                    'type_instance': pool['pool_name'],
+                    'values': pool[name]
+                }
 
-        metrics['osd.up'] = 0
-        metrics['osd.down'] = 0
-        metrics['osd.in'] = 0
-        metrics['osd.out'] = 0
+        _up, _down, _in, _out = (0, 0, 0, 0)
         for osd in osd['osds']:
             if osd['up'] == 1:
-                metrics['osd.up'] += 1
+                _up += 1
             else:
-                metrics['osd.down'] += 1
+                _down += 1
             if osd['in'] == 1:
-                metrics['osd.in'] += 1
+                _in += 1
             else:
-                metrics['osd.out'] += 1
+                _out += 1
 
-        return metrics
-
+        yield {
+            'type': 'osd_count',
+            'values': [_up, _down, _in, _out]
+        }
 
 plugin = CephPoolPlugin()
 

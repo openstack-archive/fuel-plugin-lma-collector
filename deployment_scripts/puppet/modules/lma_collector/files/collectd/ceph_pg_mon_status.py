@@ -31,36 +31,53 @@ class CephMonPlugin(base.CephBase):
 
     def __init__(self, *args, **kwargs):
         super(CephMonPlugin, self).__init__(*args, **kwargs)
+        self.plugin = 'ceph_mon'
 
-    def get_metrics(self):
+    def itermetrics(self):
         status = self.execute_to_json('ceph -s --format json')
         if not status:
-            return {}
+            return
 
-        metrics = {}
-        metrics['health'] = HEALTH_MAP[status['health']['overall_status']]
+        yield {
+            'type': 'health',
+            'values': HEALTH_MAP[status['health']['overall_status']],
+        }
+
         if 'mons' in status['monmap']:
-            metrics['monitor'] = len(status['monmap']['mons'])
+            monitor_nb = len(status['monmap']['mons'])
         else:
-            metrics['monitor'] = 0
+            monitor_nb = 0
+        yield {
+            'type': 'monitor_count',
+            'values': monitor_nb
+        }
 
-        if 'quorum' in status:
-            metrics['quorum'] = len(status['quorum'])
-        else:
-            metrics['monitor'] = 0
+        yield {
+            'type': 'quorum_count',
+            'values': len(status.get('quorum', []))
+        }
 
         pgmap = status['pgmap']
-        metrics['pg.bytes_avail'] = pgmap['bytes_avail']
-        metrics['pg.bytes_total'] = pgmap['bytes_total']
-        metrics['pg.bytes_used'] = pgmap['bytes_used']
-        metrics['pg.data_bytes'] = pgmap['data_bytes']
-        metrics['pg.total'] = pgmap['num_pgs']
+        yield {
+            'type': 'pg_bytes',
+            'values': [pgmap['bytes_used'], pgmap['bytes_avail'],
+                       pgmap['bytes_total']],
+        }
+        yield {
+            'type': 'pg_data_bytes',
+            'values': pgmap['data_bytes']
+        }
+        yield {
+            'type': 'pg_count',
+            'values': pgmap['num_pgs']
+        }
 
         for state in pgmap['pgs_by_state']:
-            metric = "pg.state.%s" % state['state_name']
-            metrics[metric] = state['count']
-
-        return metrics
+            yield {
+                'type': 'pg_state_count',
+                'type_instance': state['state_name'],
+                'values': state['count']
+            }
 
 plugin = CephMonPlugin()
 
