@@ -267,8 +267,35 @@ function process_message ()
             elseif metric_source == 'apache' then
                 metric_name = string.gsub(metric_name, 'apache_', '')
                 msg['Fields']['name'] = 'apache' .. sep .. string.gsub(metric_name, 'scoreboard', 'workers')
-            elseif metric_source == 'ceph' then
-                msg['Fields']['name'] = 'ceph' .. sep .. sample['plugin_instance'] .. sep ..  sample['type_instance']
+            elseif metric_source == 'ceph_osd_perf' then
+                msg['Fields']['name'] = 'ceph_perf' .. sep .. sample['type']
+
+                msg['Fields']['tag_fields'] = { 'cluster', 'osd' }
+                msg['Fields']['cluster'] = sample['plugin_instance']
+                msg['Fields']['osd'] = sample['type_instance']
+            elseif metric_source:match('^ceph') then
+                msg['Fields']['name'] = 'ceph' .. sep .. sample['type']
+                if sample['dsnames'][i] ~= 'value' then
+                    msg['Fields']['name'] = msg['Fields']['name'] .. sep .. sample['dsnames'][i]
+                end
+
+                msg['Fields']['tag_fields'] = { 'cluster' }
+                msg['Fields']['cluster'] = sample['plugin_instance']
+
+                if sample['type_instance'] ~= '' then
+                    local additional_tag
+                    if string.match(sample['type'], '^pool_') then
+                        additional_tag = 'pool'
+                    elseif string.match(sample['type'], '^pg_state') then
+                        additional_tag = 'state'
+                    elseif string.match(sample['type'], '^osd_') then
+                        additional_tag = 'osd'
+                    end
+                    if additional_tag then
+                        msg['Fields']['tag_fields'][2] = additional_tag
+                        msg['Fields'][additional_tag] = sample['type_instance']
+                    end
+                end
             elseif metric_source ==  'dbi' and sample['plugin_instance'] == 'services_nova' then
                 local service, state = split_service_and_state(sample['type_instance'])
                 msg['Fields']['name'] = 'openstack' .. sep .. 'nova' .. sep .. 'services'

@@ -104,6 +104,7 @@ class lma_collector::params {
   $nova_cpu_allocation_ratio = 8.0
   $memcached_host = '127.0.0.1'
   $fstypes = ['ext2', 'ext3', 'ext4', 'xfs']
+  $collectd_types = [ 'ceph', 'ceph_perf' ]
 
   $heartbeat_timeout = 30
   $service_status_timeout = 65

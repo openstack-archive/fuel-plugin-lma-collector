@@ -21,6 +21,16 @@ class lma_collector::collectd::base (
   include lma_collector::params
   include lma_collector::service
 
+  $type_directory = "${lma_collector::params::plugins_dir}/collectd_types"
+  $type_files = suffix(prefix($lma_collector::params::collectd_types, $type_directory), '.db')
+
+  file { $type_directory:
+    ensure  => directory,
+    source  => 'puppet:///modules/lma_collector/collectd/types',
+    recurse => remote,
+    before  => Class['::collectd'],
+  }
+
   $port = $lma_collector::params::collectd_port
   class { '::collectd':
     purge                  => true,
@@ -31,6 +41,7 @@ class lma_collector::collectd::base (
     threads                => $read_threads,
     write_queue_limit_low  => $lma_collector::params::collectd_queue_limit,
     write_queue_limit_high => $lma_collector::params::collectd_queue_limit,
+    typesdb                => concat(['/usr/share/collectd/types.db'], $type_files)
   }
 
   class { 'collectd::plugin::logfile':
