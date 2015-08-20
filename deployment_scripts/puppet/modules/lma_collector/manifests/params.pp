@@ -54,6 +54,14 @@ class lma_collector::params {
   # see https://github.com/mozilla-services/heka/issues/1389
   $hekad_max_message_size = 192*1024
 
+  # max_file_size must be greater than maximum record size of
+  # max_message_size otherwise it will fail to initialize buffer.
+  $buffering_max_file_size = 256*1024
+
+  if $buffering_max_file_size < $hekad_max_message_size {
+      fail('max_message_size setting must be greater than max_file_size')
+  }
+
   # Injection of 2 messages from the filter 'service_status'
   # Heka default is 1
   $hekad_max_process_inject = 2

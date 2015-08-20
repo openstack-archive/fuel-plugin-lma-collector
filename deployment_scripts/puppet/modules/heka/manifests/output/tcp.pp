@@ -20,6 +20,7 @@ define heka::output::tcp (
   $use_buffering = true,
   $queue_max_buffer_size = 1000000000, # 1GB
   $queue_full_action = 'drop',
+  $max_file_size = undef,
   $ensure = present,
 ) {
 

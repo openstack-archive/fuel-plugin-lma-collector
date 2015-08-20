@@ -14,5 +14,8 @@ use_buffering = <%= @use_buffering %>
 <% if @use_buffering -%>
 [<%= @title %>_output.buffering]
 max_buffer_size = <%= @queue_max_buffer_size %>
+<% if @max_file_size != :undef -%>
+max_file_size = <%= @max_file_size %>
+<% end -%>
 full_action = "<%= @queue_full_action %>"
 <% end -%>
