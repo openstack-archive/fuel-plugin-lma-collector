@@ -6,23 +6,27 @@ Overview
 --------
 
 The Logging, Monitoring & Alerting (LMA) collector is a service running on each
-OpenStack node that collects logs, OpenStack notifications and metrics.
+OpenStack node that collects logs, OpenStack notifications and metrics. It is
+also able to detect anomalous events and generate alerts to external monitoring
+systems.
 
 * Logs and notifications are sent to an Elasticsearch server for diagnostic,
 troubleshooting and alerting purposes.
 * Metrics are sent to an InfluxDB server for usage and performance analysis as
 well as alerting purposes.
+* Alerts are sent to a Nagios server or directly to a SMTP server.
 
 
 Requirements
 ------------
 
 
-| Requirement                    | Version/Comment                                               |
-| ------------------------------ | ------------------------------------------------------------- |
-| Mirantis OpenStack compatility | 6.1 or higher                                                 |
-| A running Elasticsearch server | 1.4 or higher, the RESTful API must be enabled over port 9200 |
-| A running InfluxDB server      | 0.9.2,  the RESTful API must be enabled over port 8086        |
+| Requirement                                              | Version/Comment                                                 |
+| -------------------------------------------------------- | --------------------------------------------------------------- |
+| Mirantis OpenStack compatility                           | 6.1 or higher                                                   |
+| A running Elasticsearch server<br>(for log analytics)    | 1.4 or higher, the RESTful API must be enabled over port 9200   |
+| A running InfluxDB server<br>(for metric analytics)      | 0.9.2 or higher, the RESTful API must be enabled over port 8086 |
+| A running Nagios server<br>(for infrastructure alerting) | 3.5 or higher, the command CGI must be enabled                  |
 
 
 Limitations
@@ -38,18 +42,21 @@ Installation Guide
 Prior to installing the LMA Collector Plugin, you may want to install its
 dependencies:
 
-* Elasticsearch and Kibana
-* InfluxDB and Grafana
+* Elasticsearch and Kibana for log analytics
+* InfluxDB and Grafana for metrics analytics
+* Nagios for alerting
 
 To install them automatically using Fuel, you can refer to the
 [Elasticsearch-Kibana Fuel Plugin
 ](https://github.com/stackforge/fuel-plugin-elasticsearch-kibana)
-and [InfluxDB-Grafana Fuel Plugin
-](https://github.com/stackforge/fuel-plugin-influxdb-grafana).
+, [InfluxDB-Grafana Fuel Plugin
+](https://github.com/stackforge/fuel-plugin-influxdb-grafana) and [LMA
+Infrastructure Alerting Fuel Plugin
+](https://github.com/stackforge/fuel-plugin-lma-infrastructure-alerting).
 
-You can install Elasticsearch/Kibana and InfluxDB/Grafana outside of Fuel as
-long as your installation meets the LMA Collector plugin's requirements defined
-above.
+You can install Elasticsearch/Kibana, InfluxDB/Grafana and Nagios outside of
+Fuel as long as your installation meets the LMA Collector plugin's requirements
+defined above.
 
 
 **LMA collector plugin** installation
@@ -90,9 +97,8 @@ User Guide
 
 1. Create a new environment with the Fuel UI wizard.
 2. Click on the Settings tab of the Fuel web UI.
-3. Scroll down the page, select the LMA collector plugin checkbox and
-fill-in
-the required fields.
+3. Scroll down the page, select the LMA collector plugin checkbox and fill-in
+   the required fields.
 
 Exploring the data
 ------------------
@@ -113,9 +119,11 @@ following:
 1. The LMA collector service is running
 
     ```
-    # On CentOS
+    # On controller node
+    crm resource status lma_collector
+    # On CentOS (other than a controller)
     /etc/init.d/lma_collector status
-    # On Ubuntu
+    # On Ubuntu (other than a controller)
     status lma_collector
     ```
 
@@ -135,8 +143,13 @@ Release Notes
 
 **0.8.0**
 
-* Monitoring of the LMA collector.
+* Support for alerting with 2 modes:
+  * Email notifications.
+  * Integration with Nagios.
 * Support of InfluxDB 0.9.2 and higher.
+* Management of the LMA collector service by Pacemaker on the controller nodes
+  for improved reliability.
+* Monitoring of the LMA toolchain components.
 
 **0.7.0**
 
@@ -148,6 +161,19 @@ Development
 The *OpenStack Development Mailing List* is the preferred way to communicate,
 emails should be sent to `openstack-dev@lists.openstack.org` with the subject
 prefixed by `[fuel][plugins][lma]`.
+
+Running tests
+-------------
+
+You need to have `tox` and `bundler` installed for running the tests.
+
+Quickstart for Ubuntu Trusty:
+
+    ```
+    apt-get install tox ruby
+    gem install bundler
+    tox
+    ```
 
 Reporting Bugs
 --------------
