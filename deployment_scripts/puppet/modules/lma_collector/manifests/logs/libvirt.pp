@@ -22,10 +22,7 @@ class lma_collector::logs::libvirt {
   $libvirt_log       = 'libvirtd.log'
   $libvirt_hooks_dir = '/etc/libvirt/hooks'
   $libvirt_hook      = "${libvirt_hooks_dir}/daemon"
-  $libvirt_service   = $::osfamily ? {
-    'debian' => 'libvirt-bin',
-    default  => 'libvirtd'
-  }
+  $libvirt_service   = $::libvirt_daemon
 
   service {$libvirt_service: }
 
