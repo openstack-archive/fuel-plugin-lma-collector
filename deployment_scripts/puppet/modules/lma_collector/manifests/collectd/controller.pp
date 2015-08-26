@@ -90,6 +90,38 @@ class lma_collector::collectd::controller (
     $modules['pacemaker_resource'] = {
       'Resource' => $pacemaker_resources,
     }
+
+    # Configure the filter that will notify other collectd plugins about the
+    # state of the Pacemaker resources
+    collectd::plugin { 'target_notification':
+    }
+
+    collectd::plugin { 'match_regex':
+    }
+
+    class { 'collectd::plugin::chain':
+      chainname     => 'PostCache',
+      defaulttarget => 'write',
+      rules         => [
+        {
+          'match'   => {
+            'type'    => 'regex',
+            'matches' => {
+              'Plugin' => '^pacemaker_resource$',
+            },
+          },
+          'targets' => [
+            {
+              'type'       => 'notification',
+              'attributes' => {
+                'Message'  => '{\"resource\":\"%{type_instance}\",\"value\":%{ds:value}}',
+                'Severity' => 'OKAY',
+              },
+            },
+          ],
+        },
+      ],
+    }
   }
 
   if $haproxy_socket {
