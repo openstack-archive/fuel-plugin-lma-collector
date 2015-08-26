@@ -16,6 +16,7 @@ class heka::params {
   $package_name = 'heka'
   $service_name = 'hekad'
   $user = 'heka'
+  $run_as_root = false
   $additional_groups = []
 
   $hostname = undef
