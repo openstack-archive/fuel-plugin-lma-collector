@@ -96,8 +96,8 @@ class lma_collector::collectd::controller (
     $modules['haproxy'] = {
       'Socket' => $haproxy_socket,
       'Mapping' => $haproxy_names_mapping,
-      # Ignore internal proxy
-      'ProxyIgnore' => 'Stats',
+      # Ignore internal stats and lma proxies
+      'ProxyIgnore' => ['Stats', 'lma'],
     }
   }
 
