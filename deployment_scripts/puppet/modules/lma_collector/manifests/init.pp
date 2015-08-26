@@ -56,7 +56,6 @@ class lma_collector (
   class { 'heka':
     service_name        => $service_name,
     config_dir          => $config_dir,
-    heka_user           => $heka_user,
     additional_groups   => union($lma_collector::params::groups, $groups),
     hostname            => $::hostname,
     pre_script          => $pre_script,

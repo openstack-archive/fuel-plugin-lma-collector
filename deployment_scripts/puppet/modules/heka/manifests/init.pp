@@ -24,11 +24,6 @@
 # [*config_dir*]
 #   The directory where to store the configuration (default: '/etc/hekad').
 #
-# [*run_as_root*]
-#   Whether or not to run the Heka service as root (default: false).
-#   You may have to set this parameter to true on some systems to access log
-#   files, run additional commands, ...
-#
 # [*additional_groups*]
 #   Additional groups to which the heka user should be added.
 #
@@ -75,8 +70,6 @@
 class heka (
   $service_name = $heka::params::service_name,
   $config_dir = $heka::params::config_dir,
-  $heka_user = $heka::params::user,
-  #$run_as_root = $heka::params::run_as_root,
   $additional_groups = $heka::params::additional_groups,
   $hostname = $heka::params::hostname,
   $maxprocs = $heka::params::maxprocs,
@@ -89,10 +82,10 @@ class heka (
   $internal_statistics = $heka::params::internal_statistics,
 ) inherits heka::params {
 
-  $run_as_root   = $heka_user == 'root'
   $hekad_wrapper = "/usr/local/bin/${service_name}_wrapper"
   $base_dir      = "/var/cache/${service_name}"
   $log_file      = "/var/log/${service_name}.log"
+  $heka_user     = $heka::params::user
 
   package { $heka::params::package_name:
     ensure => present,
@@ -106,7 +99,7 @@ class heka (
       command => '/etc/init.d/heka stop',
       onlyif  => '/usr/bin/test -f /etc/init.d/heka',
       require => Package['heka'],
-      before  => User['heka'],
+      before  => User[$heka_user],
       notify  => Exec['disable_heka_daemon']
     }
 
@@ -121,18 +114,13 @@ class heka (
     require => Package['heka'],
   }
 
-  if $run_as_root {
-    user { $heka_user:
-    }
-  } else {
-    user { $heka_user:
-      shell   => '/sbin/nologin',
-      home    => $base_dir,
-      system  => true,
-      groups  => $additional_groups,
-      alias   => 'heka',
-      require => Package['heka'],
-    }
+  user { $heka_user:
+    shell   => '/sbin/nologin',
+    home    => $base_dir,
+    system  => true,
+    groups  => $additional_groups,
+    alias   => 'heka',
+    require => Package['heka'],
   }
 
   file { $base_dir:
@@ -140,7 +128,7 @@ class heka (
     owner   => $heka_user,
     group   => $heka_user,
     mode    => '0750',
-    require => [User['heka'], Package['heka']],
+    require => [User[$heka_user], Package['heka']],
   }
 
   file { $config_dir:
@@ -148,7 +136,7 @@ class heka (
     owner   => $heka_user,
     group   => $heka_user,
     mode    => '0750',
-    require => [User['heka'], Package['heka']],
+    require => [User[$heka_user], Package['heka']],
   }
 
   file { $log_file:
@@ -156,7 +144,7 @@ class heka (
     owner   => $heka_user,
     group   => $heka_user,
     mode    => '0660',
-    require => [User['heka'], Package['heka']],
+    require => [User[$heka_user], Package['heka']],
   }
 
   file { "/etc/logrotate.d/${service_name}":
