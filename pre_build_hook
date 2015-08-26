@@ -6,7 +6,7 @@ HEKA_VERSION="0.10.0b1"
 # This is the commit id for the current stable/6.1 branch
 FUEL_LIB_COMMIT="be44e9ea792fe4314ac8c1b7596742ceb5163f61"
 FUEL_LIB_TARBALL_URL="https://github.com/stackforge/fuel-library/archive/${FUEL_LIB_COMMIT}.tar.gz"
-COLLECTD_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/pdxcat-collectd-3.2.0.tar.gz"
+COLLECTD_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppet-collectd-4.1.2.tar.gz"
 APACHE_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppetlabs-apache-1.4.0.tar.gz"
 STDLIB_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppetlabs-stdlib-4.7.0.tar.gz"
 CONCAT_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppetlabs-concat-1.2.4.tar.gz"

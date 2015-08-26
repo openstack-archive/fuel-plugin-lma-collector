@@ -16,7 +16,7 @@ require 'spec_helper'
 describe 'lma_collector::collectd::base' do
     let(:facts) do
         {:kernel => 'Linux', :operatingsystem => 'Ubuntu',
-         :osfamily => 'Debian'}
+         :osfamily => 'Debian', :concat_basedir => '/foo'}
     end
 
     describe 'with defaults' do
