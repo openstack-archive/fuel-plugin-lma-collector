@@ -47,16 +47,10 @@ class lma_collector (
   $plugins_dir = $lma_collector::params::plugins_dir
   $lua_modules_dir = $heka::params::lua_modules_dir
 
-  if $lma_collector::params::run_as_root {
-    $heka_user = 'root'
-  } else {
-    $heka_user = $heka::params::user
-  }
-
   class { 'heka':
     service_name        => $service_name,
     config_dir          => $config_dir,
-    heka_user           => $heka_user,
+    run_as_root         => $lma_collector::params::run_as_root,
     additional_groups   => union($lma_collector::params::groups, $groups),
     hostname            => $::hostname,
     pre_script          => $pre_script,
@@ -68,6 +62,12 @@ class lma_collector (
 
   if $pacemaker_managed {
     validate_string($rabbitmq_resource)
+
+    if $lma_collector::params::run_as_root {
+      $heka_user = 'root'
+    } else {
+      $heka_user = $heka::params::user
+    }
 
     file { 'ocf-lma_collector':
       ensure => present,
