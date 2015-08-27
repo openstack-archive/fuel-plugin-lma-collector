@@ -24,11 +24,15 @@ RE_OSD_ID = re.compile(".*?osd\.(\d+)\.asok$")
 
 
 class CephOSDPerfPlugin(base.CephBase):
-    """ Collect performance counters of all OSD daemons running on the host.
+    """ Collect OSD performance counters of all OSD daemons running on the host.
     """
+
+    # Collect only metrics from the 'osd' namespace
+    PREFIXES = ('osd')
 
     def __init__(self, *args, **kwargs):
         super(CephOSDPerfPlugin, self).__init__(*args, **kwargs)
+        self.plugin = 'ceph_osd_perf'
         self.socket_glob = None
 
     def config_callback(self, conf):
@@ -40,34 +44,41 @@ class CephOSDPerfPlugin(base.CephBase):
         if not self.socket_glob:
             raise Exception("AdminSocket not defined")
 
-    def flatten_metrics(self, prefix, stats):
-        metrics = {}
-        for key, value in stats.iteritems():
-            metric = "%s.%s" % (prefix, key)
-            if isinstance(value, dict):
-                v = value['avgcount']
+    @staticmethod
+    def convert_to_collectd_value(value):
+        if isinstance(value, dict):
+            if value['avgcount'] > 0:
+                # See https://www.mail-archive.com/ceph-users@lists.ceph.com/msg18705.html
+                return value['sum'] / value['avgcount']
             else:
-                v = value
-            metrics[metric] = v
-        return metrics
+                return 0.0
+        else:
+            return value
 
-    def get_metrics(self):
-        metrics = {}
+    @staticmethod
+    def convert_to_collectd_type(*args):
+        return '_'.join([s.replace('::', '_').replace('-', '_').lower() for s
+                         in args])
+
+    def itermetrics(self):
         for socket_name in glob.glob(self.socket_glob):
             m = RE_OSD_ID.match(socket_name)
             if not m:
                 continue
+
             osd_id = m.group(1)
-            perf_dump = self.execute_to_json(
-                "ceph --admin-daemon %s perf dump" % socket_name
-            )
+            perf_dump = self.execute_to_json('ceph --admin-daemon %s perf dump'
+                                             % socket_name)
             for prefix, stats in perf_dump.iteritems():
-                prefix = "osd-%s.%s" % (osd_id, prefix)
-                if not stats:
+                if prefix not in self.PREFIXES or not stats:
                     continue
-                m = self.flatten_metrics(prefix, stats)
-                metrics.update(m)
-        return metrics
+
+                for k in sorted(stats.iterkeys()):
+                    yield {
+                        'type': self.convert_to_collectd_type(prefix, k),
+                        'type_instance': osd_id,
+                        'values': self.convert_to_collectd_value(stats[k])
+                    }
 
 plugin = CephOSDPerfPlugin()
 
