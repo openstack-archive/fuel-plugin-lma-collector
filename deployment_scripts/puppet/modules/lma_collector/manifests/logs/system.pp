@@ -29,7 +29,7 @@ class lma_collector::logs::system {
   heka::input::logstreamer { 'system':
     config_dir     => $lma_collector::params::config_dir,
     decoder        => 'system',
-    file_match     => '(?P<Service>daemon\.log|cron\.log|kern\.log|auth\.log|syslog|messages|debug)',
+    file_match     => '(?P<Service>daemon\.log|cron\.log|haproxy\.log|kern\.log|auth\.log|syslog|messages|debug)',
     differentiator => '[ \'system.\', \'Service\' ]',
     require        => Heka::Decoder::Sandbox['system'],
     notify         => Class['lma_collector::service'],
