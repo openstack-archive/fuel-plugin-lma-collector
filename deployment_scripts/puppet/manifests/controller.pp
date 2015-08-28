@@ -14,10 +14,11 @@
 #
 include lma_collector::params
 
-$ceilometer     = hiera('ceilometer')
-$lma_collector  = hiera('lma_collector')
-$rabbit         = hiera('rabbit')
-$management_vip = hiera('management_vip')
+$ceilometer      = hiera('ceilometer')
+$lma_collector   = hiera('lma_collector')
+$rabbit          = hiera('rabbit')
+$management_vip  = hiera('management_vip')
+$storage_options = hiera('storage', {})
 
 if $ceilometer['enabled'] {
   $notification_topics = [$lma_collector::params::openstack_topic, $lma_collector::params::lma_topic]
@@ -51,6 +52,10 @@ class { 'lma_collector::notifications::controller':
 # OpenStack logs are always useful for indexation and metrics collection
 class { 'lma_collector::logs::openstack': }
 
+if ! $storage_options['objects_ceph'] {
+  class { 'lma_collector::logs::swift': }
+}
+
 # Logs
 if $lma_collector['elasticsearch_mode'] != 'disabled' {
 
@@ -78,7 +83,6 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     $haproxy_socket = undef
   }
 
-  $storage_options = hiera('storage', {})
   if $storage_options['volumes_ceph'] or $storage_options['images_ceph'] or $storage_options['objects_ceph'] or $storage_options['ephemeral_ceph']{
     $ceph_enabled = true
   } else {
