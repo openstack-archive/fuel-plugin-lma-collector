@@ -13,17 +13,36 @@
 -- limitations under the License.
 
 local cjson = require 'cjson'
+local string = require 'string'
 
 local lma = require 'lma_utils'
 local consts = require 'gse_constants'
 
 local inject_message = inject_message
+local read_message = read_message
 local assert = assert
 local ipairs = ipairs
+local pcall = pcall
 local table = table
 
 local M = {}
 setfenv(1, M) -- Remove external access to contain everything in the module
+
+function get_entity_name(field)
+    return read_message(string.format('Fields[%s]', field))
+end
+
+function get_status()
+    return read_message('Fields[value]')
+end
+
+function extract_alarms()
+    local ok, payload = pcall(cjson.decode, read_message('Payload'))
+    if not ok or not payload.alarms then
+        return nil
+    end
+    return payload.alarms
+end
 
 -- return a list of alarm objects as a list of human-readable messages
 -- for instance: "CPU load too high (severity=WARNING, rule='last(load_midterm) >= 5', current value=7)"
