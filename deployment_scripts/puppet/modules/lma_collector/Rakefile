@@ -23,3 +23,19 @@ task :test => [
   :syntax,
   :spec,
 ]
+
+LUA_TESTS = Rake::FileList.new("tests/**/test_*.lua")
+desc "Run Lua unit tests."
+task :lua_tests => [:lua_5_1] do |t|
+    LUA_TESTS.each do |f|
+        sh "lua5.1 #{f}"
+    end
+end
+
+task :lua_5_1 do |t|
+    sh "lua5.1", "-v", {:verbose => false} do |ok, res|
+        if ! ok then
+            raise "lua5.1 needs to be installed!"
+        end
+    end
+end
