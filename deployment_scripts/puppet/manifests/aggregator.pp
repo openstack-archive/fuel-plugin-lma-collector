@@ -65,4 +65,25 @@ if $is_controller {
     proto       => 'tcp',
     action      => 'accept',
   }
+
+  # Configure the GSE filter for cluster service metrics
+  lma_collector::gse_filter { 'service':
+    input_message_type   => 'afd_service_metric',
+    entity_field         => 'service',
+    metric_name          => 'cluster_service_status',
+    interval             => 10,
+    level_1_dependencies => {
+      'nova'    => ['nova-api',
+                    'nova-scheduler',
+                    'nova-compute',
+                    'nova-conductor'],
+      'cinder'  => ['cinder-api',
+                    'cinder-scheduler',
+                    'cinder-volume'],
+      'neutron' => ['neutron-api'],
+    },
+    level_2_dependencies => {
+      'nova-api' => ['neutron-api'],
+    },
+  }
 }
