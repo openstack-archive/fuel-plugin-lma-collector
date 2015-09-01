@@ -65,4 +65,35 @@ if $is_controller {
     proto       => 'tcp',
     action      => 'accept',
   }
+
+  # Configure the GSE filter for cluster service metrics
+  lma_collector::gse_cluster_filter { 'service':
+    input_message_type   => 'afd_service_metric',
+    entity_field         => 'service',
+    metric_name          => 'cluster_service_status',
+    interval             => 10,
+    level_1_dependencies => {
+      'nova'     => ['nova-api-backends', 'nova-ec2-api-backends', 'nova-api-metadata-backends', 'nova-novncproxy-websocket-backends',
+                    'nova-endpoint',
+                    'nova-scheduler', 'nova-compute', 'nova-conductor'],
+      'cinder'   => ['cinder-api-backends',
+                    'cinder-endpoint', 'cinder-v2-endpoint',
+                    'cinder-scheduler',
+                    'cinder-volume'],
+      'neutron'  => ['neutron-api-backends',
+                    'neutron-endpoint',
+                    'l3', 'dhcp', 'metadata', 'openvswitch'],
+      'keystone' => ['keystone-public-api-backends', 'keystone-admin-api-backends',
+                    'keystone-endpoint'],
+      'glance'   => ['glance-api-backends', 'glance-registry-backends',
+                    'glance-endpoint'],
+      'heat'     => ['heat-api-backends', 'heat-cfn-api-backends',
+                    'heat-endpoint'],
+    },
+    level_2_dependencies => {
+      'nova-endpoint' => ['neutron-api-backends',
+                          'glance-api-backends',
+                          'cinder-api-backends'],
+    },
+  }
 }
