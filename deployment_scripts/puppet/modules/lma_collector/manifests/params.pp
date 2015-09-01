@@ -67,14 +67,13 @@ class lma_collector::params {
       fail('max_message_size setting must be greater than max_file_size')
   }
 
-  # Injection of 2 messages from the filter 'service_status'
-  # Heka default is 1
+  # The 'service_status' filter injects 2 message per process_message() call
+  # Heka's default value is 1
   $hekad_max_process_inject = 2
 
-  # We inject as many messages than the number of OpenStack services in the Heka
-  # filter 'service_accumulator_states'. Currently 10 services.
-  # Hekad default is fine so far with 10 messages allowed from TimerEvent function
-  $hekad_max_timer_inject = 10
+  # The GSE filters can inject up to 20 messages per timer_event() call
+  # Heka's default value is 10
+  $hekad_max_timer_inject = 20
 
   # Parameters for OpenStack notifications
   $rabbitmq_host = false
