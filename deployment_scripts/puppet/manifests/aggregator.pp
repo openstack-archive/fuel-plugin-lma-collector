@@ -65,4 +65,76 @@ if $is_controller {
     proto       => 'tcp',
     action      => 'accept',
   }
+
+  # Configure the GSE filter emitting the cluster service metrics
+  lma_collector::gse_cluster_filter { 'service':
+    input_message_types  => ['afd_service_metric'],
+    aggregator_flag      => true,
+    entity_field         => 'service',
+    output_message_type  => 'gse_service_cluster_metric',
+    output_metric_name   => 'cluster_service_status',
+    interval             => 10,
+    level_1_dependencies => {
+      'nova-api'         => ['nova-api-backends', 'nova-ec2-api-backends', 'nova-novncproxy-websocket-backends',
+                            'nova-endpoint'],
+      'nova-metadata'    => ['nova-api-metadata-backends', 'metadata'],
+      'nova-scheduler'   => ['nova-scheduler'],
+      'nova-compute'     => ['nova-compute'],
+      'nova-conductor'   => ['nova-conductor'],
+      'cinder-api'       => ['cinder-api-backends',
+                            'cinder-endpoint', 'cinder-v2-endpoint'],
+      'cinder-scheduler' => ['cinder-scheduler'],
+      'cinder-volume'    => ['cinder-volume'],
+      'neutron-api'      => ['neutron-api-backends',
+                            'neutron-endpoint'],
+      'neutron-l3'       => ['l3'],
+      'neutron-dhcp'     => ['dhcp'],
+      'neutron-ovs'      => ['openvswitch'],
+      'keystone-api'     => ['keystone-public-api-backends', 'keystone-admin-api-backends',
+                            'keystone-endpoint'],
+      'glance-api'       => ['glance-api-backends',
+                            'glance-endpoint'],
+      'glance-registry'  => ['glance-registry-api-backends'],
+      'heat-api'         => ['heat-api-backends', 'heat-cfn-api-backends',
+                            'heat-endpoint'],
+    },
+    level_2_dependencies => {}
+  }
+
+  # Configure the GSE filter emitting the cluster node metrics
+  lma_collector::gse_cluster_filter { 'node':
+    input_message_types  => ['afd_node_metric'],
+    aggregator_flag      => true,
+    entity_field         => 'hostname',
+    output_message_type  => 'gse_node_cluster_metric',
+    output_metric_name   => 'cluster_node_status',
+    interval             => 10,
+    level_1_dependencies => {},
+    level_2_dependencies => {},
+  }
+
+  # Configure the GSE filter emitting the global cluster metrics
+  lma_collector::gse_cluster_filter { 'global':
+    input_message_types  => ['gse_service_cluster_metric', 'gse_node_cluster_metric'],
+    aggregator_flag      => false,
+    entity_field         => 'cluster_name',
+    output_message_type  => 'gse_cluster_metric',
+    output_metric_name   => 'cluster_status',
+    interval             => 10,
+    level_1_dependencies => {
+      'nova'     => ['nova-api', 'nova-scheduler', 'nova-compute', 'nova-conductor'],
+      'cinder'   => ['cinder-api', 'cinder-scheduler', 'cinder-volume'],
+      'neutron'  => ['neutron-api', 'neutron-l3', 'neutron-dhcp', 'neutron-metadata', 'neutron-ovs'],
+      'keystone' => ['keystone-api'],
+      'glance'   => ['glance-api', 'glance-registry'],
+      'heat'     => ['heat-api'],
+    },
+    level_2_dependencies => {
+      'nova-api'    => ['neutron-api', 'keystone-api', 'cinder-api', 'glance-api'],
+      'cinder-api'  => ['keystone-api'],
+      'neutron-api' => ['keystone-api'],
+      'glance-api'  => ['keystone-api'],
+      'heat-api'    => ['keystone-api'],
+    },
+  }
 }
