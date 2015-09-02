@@ -85,4 +85,4 @@ Attributes in **bold** are always present in the messages while attributes in
     terminated.
 
 .. [#]
-   `OpenStack notifications <http://docs.openstack.org/admin-guide-cloud/content/section_telemetry-notifications.html>`_
+   `OpenStack notifications <http://docs.openstack.org/admin-guide-cloud/telemetry-data-collection.html#notifications>`_
