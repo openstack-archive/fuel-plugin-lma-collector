@@ -160,18 +160,14 @@ class lma_collector (
     include lma_collector::service
   }
 
-  file { "${lua_modules_dir}/lma_utils.lua":
+  # Copy our Lua modules to Heka's modules directory so they're available for
+  # the sandboxes
+  file { $lua_modules_dir:
     ensure  => directory,
-    source  => 'puppet:///modules/lma_collector/plugins/common/lma_utils.lua',
-    require => File[$lua_modules_dir],
+    source  => 'puppet:///modules/lma_collector/plugins/common',
+    recurse => remote,
     notify  => Class['lma_collector::service'],
-  }
-
-  file { "${lua_modules_dir}/patterns.lua":
-    ensure  => directory,
-    source  => 'puppet:///modules/lma_collector/plugins/common/patterns.lua',
-    require => File[$lua_modules_dir],
-    notify  => Class['lma_collector::service'],
+    require => Class['heka'],
   }
 
   file { "${lua_modules_dir}/extra_fields.lua":
