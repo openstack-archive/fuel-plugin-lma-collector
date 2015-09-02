@@ -161,6 +161,10 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
   # Service status metrics and annotations
   class { 'lma_collector::metrics::service_status': }
 
+  # AFD filters
+  class { 'lma_collector::afd::api_endpoints': }
+  class { 'lma_collector::afd::workers': }
+
 }
 
 $alerting_mode = $lma_collector['alerting_mode']
