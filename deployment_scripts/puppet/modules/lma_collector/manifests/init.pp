@@ -139,25 +139,12 @@ class lma_collector (
     include lma_collector::service
   }
 
-  file { "${lua_modules_dir}/lma_utils.lua":
+  file { "${lua_modules_dir}/common":
     ensure  => directory,
-    source  => 'puppet:///modules/lma_collector/plugins/common/lma_utils.lua',
-    require => File[$lua_modules_dir],
+    source  => 'puppet:///modules/lma_collector/plugins/common',
+    recurse => remote,
     notify  => Class['lma_collector::service'],
-  }
-
-  file { "${lua_modules_dir}/patterns.lua":
-    ensure  => directory,
-    source  => 'puppet:///modules/lma_collector/plugins/common/patterns.lua',
     require => File[$lua_modules_dir],
-    notify  => Class['lma_collector::service'],
-  }
-
-  file { "${lua_modules_dir}/extra_fields.lua":
-    ensure  => present,
-    content => template('lma_collector/extra_fields.lua.erb'),
-    require => File[$lua_modules_dir],
-    notify  => Class['lma_collector::service'],
   }
 
   file { $plugins_dir:
