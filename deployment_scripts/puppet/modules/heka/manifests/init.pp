@@ -114,11 +114,6 @@ class heka (
     }
   }
 
-  file { $heka::params::lua_modules_dir:
-    ensure  => directory,
-    require => Package['heka'],
-  }
-
   # This Puppet User resource is used by other manifests even if the hekad
   # process runs as 'root'.
   user { $heka_user:
