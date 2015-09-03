@@ -13,7 +13,7 @@
 -- limitations under the License.
 
 require('luaunit')
-package.path = package.path .. ";files/plugins/common/?.lua"
+package.path = package.path .. ";files/plugins/common/?.lua;tests/lua/mocks/?.lua"
 
 -- mock the inject_message() function from the Heka sandbox library
 local last_injected_msg
@@ -22,6 +22,8 @@ function inject_message(msg)
 end
 
 local afd = require('afd')
+local consts = require('gse_constants')
+local extra = require('extra_fields')
 
 TestAfd = {}
 
@@ -30,36 +32,80 @@ TestAfd = {}
     end
 
     function TestAfd:test_add_to_alarms()
-        afd.add_to_alarms('crit', 'last', 'metric_1', '==', 0, nil, nil, "crit message")
+        afd.add_to_alarms(consts.CRIT, 'last', 'metric_1', {}, {}, '==', 0, 0, nil, nil, "crit message")
         local alarms = afd.get_alarms()
+        assertEquals(alarms[1].severity, 'CRITICAL')
         assertEquals(alarms[1].metric, 'metric_1')
         assertEquals(alarms[1].message, 'crit message')
 
-        afd.add_to_alarms('warn', 'last', 'metric_2', '>=', 2, 5, 600, "warn message")
+        afd.add_to_alarms(consts.WARN, 'last', 'metric_2', {}, {}, '>=', 10, 2, 5, 600, "warn message")
         alarms = afd.get_alarms()
+        assertEquals(alarms[2].severity, 'WARN')
         assertEquals(alarms[2].metric, 'metric_2')
         assertEquals(alarms[2].message, 'warn message')
     end
 
     function TestAfd:test_inject_afd_service_event_without_alarms()
-        afd.inject_afd_service_event('nova-scheduler', 'okay', 10, 'some_source')
+        afd.inject_afd_service_event('nova-scheduler', consts.OKAY, 'node-1', 10, 'some_source')
 
         local alarms = afd.get_alarms()
         assertEquals(#alarms, 0)
         assertEquals(last_injected_msg.Type, 'afd_service_metric')
-        assertEquals(last_injected_msg.Fields.value, 'okay')
+        assertEquals(last_injected_msg.Fields.value, consts.OKAY)
+        assertEquals(last_injected_msg.Fields.hostname, 'node-1')
         assertEquals(last_injected_msg.Payload, '{"alarms":[]}')
     end
 
     function TestAfd:test_inject_afd_service_event_with_alarms()
-        afd.add_to_alarms('crit', 'last', 'metric_1', '==', 0, nil, nil, "crit message")
-        afd.inject_afd_service_event('nova-scheduler', 'crit', 10, 'some_source')
+        afd.add_to_alarms(consts.CRIT, 'last', 'metric_1', {}, {}, '==', 0, 0, nil, nil, "important message")
+        afd.inject_afd_service_event('nova-scheduler', consts.CRIT, 'node-1', 10, 'some_source')
 
         local alarms = afd.get_alarms()
         assertEquals(#alarms, 0)
         assertEquals(last_injected_msg.Type, 'afd_service_metric')
-        assertEquals(last_injected_msg.Fields.value, 'crit')
-        assert(last_injected_msg.Payload:match('crit message'))
+        assertEquals(last_injected_msg.Fields.value, consts.CRIT)
+        assertEquals(last_injected_msg.Fields.hostname, 'node-1')
+        assertEquals(last_injected_msg.Fields.environment_id, extra.environment_id)
+        assert(last_injected_msg.Payload:match('"message":"important message"'))
+        assert(last_injected_msg.Payload:match('"severity":"CRITICAL"'))
+    end
+
+    function TestAfd:test_alarms_for_human_without_fields()
+        local alarms = afd.alarms_for_human({{
+            severity='WARNING',
+            ['function']='avg',
+            metric='load_longterm',
+            fields={},
+            tags={},
+            operator='>',
+            value=7,
+            threshold=5,
+            window=600,
+            periods=0,
+            message='load too high',
+        }})
+
+        assertEquals(#alarms, 1)
+        assertEquals(alarms[1], 'load too high (severity=WARNING, rule=\'avg(load_longterm) > 5\', current value=7)')
+    end
+
+    function TestAfd:test_alarms_for_human_with_fields()
+        local alarms = afd.alarms_for_human({{
+            severity='CRITICAL',
+            ['function']='avg',
+            metric='fs_space_percent_free',
+            fields={{name='fs',value='/'}},
+            tags={},
+            operator='<=',
+            value=2,
+            threshold=5,
+            window=600,
+            periods=0,
+            message='free disk space too low'
+        }})
+
+        assertEquals(#alarms, 1)
+        assertEquals(alarms[1], 'free disk space too low (severity=CRITICAL, rule=\'avg(fs_space_percent_free[fs="/"]) <= 5\', current value=2)')
     end
 
 lu = LuaUnit
