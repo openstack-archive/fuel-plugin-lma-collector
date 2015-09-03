@@ -13,7 +13,7 @@
 -- limitations under the License.
 
 require('luaunit')
-package.path = package.path .. ";files/plugins/common/?.lua"
+package.path = package.path .. ";files/plugins/common/?.lua;tests/lua/mocks/?.lua"
 
 -- mock the inject_message() function from the Heka sandbox library
 local last_injected_msg
@@ -22,6 +22,8 @@ function inject_message(msg)
 end
 
 local afd = require('afd')
+local consts = require('gse_constants')
+local extra = require('extra_fields')
 
 TestAfd = {}
 
@@ -30,36 +32,42 @@ TestAfd = {}
     end
 
     function TestAfd:test_add_to_alarms()
-        afd.add_to_alarms('crit', 'last', 'metric_1', '==', 0, nil, nil, "crit message")
+        afd.add_to_alarms(consts.CRIT, 'last', 'metric_1', '==', 0, nil, nil, "crit message")
         local alarms = afd.get_alarms()
+        assertEquals(alarms[1].severity, 'crit')
         assertEquals(alarms[1].metric, 'metric_1')
         assertEquals(alarms[1].message, 'crit message')
 
-        afd.add_to_alarms('warn', 'last', 'metric_2', '>=', 2, 5, 600, "warn message")
+        afd.add_to_alarms(consts.WARN, 'last', 'metric_2', '>=', 2, 5, 600, "warn message")
         alarms = afd.get_alarms()
+        assertEquals(alarms[2].severity, 'warn')
         assertEquals(alarms[2].metric, 'metric_2')
         assertEquals(alarms[2].message, 'warn message')
     end
 
     function TestAfd:test_inject_afd_service_event_without_alarms()
-        afd.inject_afd_service_event('nova-scheduler', 'okay', 10, 'some_source')
+        afd.inject_afd_service_event('nova-scheduler', consts.OKAY, 'node-1', 10, 'some_source')
 
         local alarms = afd.get_alarms()
         assertEquals(#alarms, 0)
         assertEquals(last_injected_msg.Type, 'afd_service_metric')
-        assertEquals(last_injected_msg.Fields.value, 'okay')
+        assertEquals(last_injected_msg.Fields.value, consts.OKAY)
+        assertEquals(last_injected_msg.Fields.hostname, 'node-1')
         assertEquals(last_injected_msg.Payload, '{"alarms":[]}')
     end
 
     function TestAfd:test_inject_afd_service_event_with_alarms()
-        afd.add_to_alarms('crit', 'last', 'metric_1', '==', 0, nil, nil, "crit message")
-        afd.inject_afd_service_event('nova-scheduler', 'crit', 10, 'some_source')
+        afd.add_to_alarms(consts.CRIT, 'last', 'metric_1', '==', 0, nil, nil, "important message")
+        afd.inject_afd_service_event('nova-scheduler', consts.CRIT, 'node-1', 10, 'some_source')
 
         local alarms = afd.get_alarms()
         assertEquals(#alarms, 0)
         assertEquals(last_injected_msg.Type, 'afd_service_metric')
-        assertEquals(last_injected_msg.Fields.value, 'crit')
-        assert(last_injected_msg.Payload:match('crit message'))
+        assertEquals(last_injected_msg.Fields.value, consts.CRIT)
+        assertEquals(last_injected_msg.Fields.hostname, 'node-1')
+        assertEquals(last_injected_msg.Fields.environment_id, extra.environment_id)
+        assert(last_injected_msg.Payload:match('"message":"important message"'))
+        assert(last_injected_msg.Payload:match('"severity":"crit"'))
     end
 
 lu = LuaUnit
