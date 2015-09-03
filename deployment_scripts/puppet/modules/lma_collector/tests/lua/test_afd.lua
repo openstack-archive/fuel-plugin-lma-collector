@@ -13,7 +13,7 @@
 -- limitations under the License.
 
 require('luaunit')
-package.path = package.path .. ";files/plugins/common/?.lua"
+package.path = package.path .. ";files/plugins/common/?.lua;tests/lua/mocks/?.lua"
 
 -- mock the inject_message() function from the Heka sandbox library
 local last_injected_msg
@@ -22,6 +22,7 @@ function inject_message(msg)
 end
 
 local afd = require('afd')
+local extra = require('extra_fields')
 
 TestAfd = {}
 
@@ -59,6 +60,7 @@ TestAfd = {}
         assertEquals(#alarms, 0)
         assertEquals(last_injected_msg.Type, 'afd_service_metric')
         assertEquals(last_injected_msg.Fields.value, 'crit')
+        assertEquals(last_injected_msg.Fields.environment_id, extra.environment_id)
         assert(last_injected_msg.Payload:match('crit message'))
     end
 
