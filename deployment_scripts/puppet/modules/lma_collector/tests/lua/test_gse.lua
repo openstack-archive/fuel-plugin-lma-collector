@@ -13,7 +13,7 @@
 -- limitations under the License.
 
 require('luaunit')
-package.path = package.path .. ";files/plugins/common/?.lua"
+package.path = package.path .. ";files/plugins/common/?.lua;tests/lua/mocks/?.lua"
 
 -- mock the inject_message() function from the Heka sandbox library
 local last_injected_msg
@@ -92,6 +92,7 @@ TestGse = {}
             'gse_service_cluster_metric',
             'nova',
             'service_cluster_status',
+            'node-1',
             10,
             'gse_service_cluster_plugin'
         )
@@ -99,7 +100,8 @@ TestGse = {}
         assertEquals(metric.Type, 'gse_service_cluster_metric')
         assertEquals(metric.Fields.cluster_name, 'nova')
         assertEquals(metric.Fields.name, 'service_cluster_status')
-        assertEquals(metric.Fields.value, consts.CRIT)
+        assertEquals(metric.Fields.value, consts.NUMERICAL_STATUS.crit)
+        assertEquals(metric.Fields.hostname, 'node-1')
         assertEquals(metric.Fields.interval, 10)
         assert(metric.Payload:match("All neutron endpoints are down"))
     end
@@ -109,6 +111,7 @@ TestGse = {}
             'gse_service_cluster_metric',
             'glance',
             'service_cluster_status',
+            'node-1',
             10,
             'gse_service_cluster_plugin'
         )
@@ -116,7 +119,8 @@ TestGse = {}
         assertEquals(metric.Type, 'gse_service_cluster_metric')
         assertEquals(metric.Fields.cluster_name, 'glance')
         assertEquals(metric.Fields.name, 'service_cluster_status')
-        assertEquals(metric.Fields.value, consts.DOWN)
+        assertEquals(metric.Fields.value, consts.NUMERICAL_STATUS.down)
+        assertEquals(metric.Fields.hostname, 'node-1')
         assertEquals(metric.Fields.interval, 10)
         assert(metric.Payload:match("glance%-registry endpoints are down"))
         assert(metric.Payload:match("glance%-api endpoint is down on node%-1"))
@@ -127,6 +131,7 @@ TestGse = {}
             'gse_service_cluster_metric',
             'keystone',
             'service_cluster_status',
+            'node-1',
             10,
             'gse_service_cluster_plugin'
         )
@@ -134,7 +139,8 @@ TestGse = {}
         assertEquals(metric.Type, 'gse_service_cluster_metric')
         assertEquals(metric.Fields.cluster_name, 'keystone')
         assertEquals(metric.Fields.name, 'service_cluster_status')
-        assertEquals(metric.Fields.value, consts.OKAY)
+        assertEquals(metric.Fields.value, consts.NUMERICAL_STATUS.okay)
+        assertEquals(metric.Fields.hostname, 'node-1')
         assertEquals(metric.Fields.interval, 10)
         assertEquals(metric.Payload, '{"alarms":[]}')
     end
