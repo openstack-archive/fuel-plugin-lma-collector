@@ -179,8 +179,7 @@ if $alerting_mode != 'disabled' {
   } elsif $alerting_mode == 'local' {
     $use_nagios = true
     $lma_infra_alerting = hiera('lma_infrastructure_alerting', false)
-    $nagios_node_name = $lma_infra_alerting['node_name']
-    $nagios_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $nagios_node_name)
+    $nagios_nodes = filter_nodes(hiera('nodes'), 'role', 'infrastructure_alerting')
     $nagios_server = $nagios_nodes[0]['internal_address']
     $nagios_user = $lma_infra_alerting['nagios_user']
     $nagios_password = $lma_infra_alerting['nagios_password']

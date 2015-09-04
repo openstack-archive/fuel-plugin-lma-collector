@@ -68,9 +68,8 @@ if $alerting_mode == 'local' {
     fail('Could not get the LMA Infrastructure Alerting parameters. The LMA-Infrastructure-Alerting plugin is probably not enabled for this environment.')
   }
   # Check that the LMA-Infrastructure-Alerting node exists in the environment
-  $infra_alerting_node_name = $influxdb_grafana['node_name']
-  $infra_alerting_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $infra_alerting_node_name)
+  $infra_alerting_nodes = filter_nodes(hiera('nodes'), 'role', 'infrastructure_alerting')
   if size($infra_alerting_nodes) < 1 {
-    fail("Could not find node '${infra_alerting_node_name}' in the environment")
+    fail("Could not find node with role 'infrastructure_alerting' in the environment")
   }
 }
