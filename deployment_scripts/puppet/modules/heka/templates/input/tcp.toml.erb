@@ -1,5 +1,5 @@
 [<%= @title %>_tcpinput]
 type="TcpInput"
 address = "<%= @address %>:<%= @port %>"
-decoder = "ProtobufDecoder"
+decoder = "<%= @decoder_instance %>"
 splitter = "HekaFramingSplitter"

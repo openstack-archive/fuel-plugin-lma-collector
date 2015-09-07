@@ -12,25 +12,30 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-define heka::input::tcp (
+define heka::decoder::multidecoder (
   $config_dir,
-  $address = '127.0.0.1',
-  $port    = 5565,
-  $decoder = 'ProtobufDecoder',
-  $ensure  = present,
+  $subs             = [],
+  $log_sub_errors   = true,
+  $cascade_strategy = 'all',
+  $ensure           = present,
 ) {
 
   include heka::params
 
-  if $decoder == 'ProtobufDecoder' {
-    $decoder_instance = $decoder
-  } else {
-    $decoder_instance = "${decoder}_decoder"
+  validate_array($subs)
+  validate_string($cascade_strategy)
+  validate_bool($log_sub_errors)
+
+  if size($subs) < 1 {
+    fail('subs parameter must be greater than 0')
+  }
+  if $cascade_strategy != 'all' and $cascade_strategy != 'first-wins' {
+    fail('cascade_strategy parameter must be either \'all\' or \'first-wins\'')
   }
 
-  file { "${config_dir}/input-${title}.toml":
+  file { "${config_dir}/multidecoder-${title}.toml":
     ensure  => $ensure,
-    content => template('heka/input/tcp.toml.erb'),
+    content => template('heka/decoder/multidecoder.toml.erb'),
     mode    => '0600',
     owner   => $heka::params::user,
     group   => $heka::params::user,
