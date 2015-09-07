@@ -1,0 +1,5 @@
+[<%= @title %>_decoder]
+type = "MultiDecoder"
+subs = [<%= @subs.sort.collect{|x| '"' + x + '"'}.join(',') %>]
+cascade_strategy = "<%= @cascade_strategy %>"
+log_sub_errors = <%= @log_sub_errors %>
