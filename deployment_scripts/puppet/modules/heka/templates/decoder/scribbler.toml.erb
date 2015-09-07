@@ -1,0 +1,8 @@
+[<%= @title %>_decoder]
+type = "ScribbleDecoder"
+
+[<%= @title %>_decoder.message_fields]
+<% @config.sort.each do |k,v| %>
+<%   next if v.nil? or v == :undef -%>
+    <%= k %> = "<%= v %>"
+<%  end %>

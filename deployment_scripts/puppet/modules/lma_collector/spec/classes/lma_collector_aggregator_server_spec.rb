@@ -21,6 +21,8 @@ describe 'lma_collector::aggregator::server' do
 
     describe 'with defaults' do
         it { is_expected.to contain_heka__input__tcp('aggregator') }
+        it { is_expected.to contain_heka__decoder__multidecoder('aggregator') }
+        it { is_expected.to contain_heka__decoder__scribbler('aggregator_flag') }
         it { is_expected.not_to contain_heka__input__http_listen('check-http') }
     end
 
@@ -29,6 +31,8 @@ describe 'lma_collector::aggregator::server' do
             {:http_check_port => 3000}
         end
         it { is_expected.to contain_heka__input__tcp('aggregator') }
+        it { is_expected.to contain_heka__decoder__multidecoder('aggregator') }
+        it { is_expected.to contain_heka__decoder__scribbler('aggregator_flag') }
         it { is_expected.to contain_heka__input__httplisten('http-check').with_port(3000) }
     end
 end

@@ -12,27 +12,22 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-define heka::input::tcp (
+define heka::decoder::scribbler (
   $config_dir,
-  $address = '127.0.0.1',
-  $port    = 5565,
-  $decoder = 'ProtobufDecoder',
-  $ensure  = present,
+  $config = {},
+  $ensure = present,
 ) {
 
   include heka::params
 
-  if $decoder == 'ProtobufDecoder' {
-    $decoder_instance = $decoder
-  } else {
-    $decoder_instance = "${decoder}_decoder"
-  }
+  validate_hash($config)
 
-  file { "${config_dir}/input-${title}.toml":
+  file { "${config_dir}/scribbler-${title}.toml":
     ensure  => $ensure,
-    content => template('heka/input/tcp.toml.erb'),
+    content => template('heka/decoder/scribbler.toml.erb'),
     mode    => '0600',
     owner   => $heka::params::user,
     group   => $heka::params::user,
   }
 }
+
