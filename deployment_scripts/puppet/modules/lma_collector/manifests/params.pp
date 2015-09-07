@@ -126,6 +126,11 @@ class lma_collector::params {
 
   $annotations_serie_name = 'annotations'
 
+  $aggregator_flag = 'aggregator'
+  $aggregator_client_message_matcher = join([
+    "Fields[${aggregator_flag}] == NIL", ' && ',
+    'Type =~ /^heka\.sandbox\.afd.*metric$/'
+  ], '')
   # Catch all metrics used to compute OpenStack service statutes
   $service_status_metrics_matcher = join([
     '(Type == \'metric\' || Type == \'heka.sandbox.metric\') && ',
