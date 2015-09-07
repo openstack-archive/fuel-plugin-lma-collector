@@ -22,10 +22,27 @@ class lma_collector::aggregator::server (
   validate_string($listen_address)
   validate_integer($listen_port)
 
+  heka::decoder::scribbler { 'aggregator_flag':
+    config_dir => $lma_collector::params::config_dir,
+    config     => {
+      "${lma_collector::params::aggregator_flag}" => 'present',
+    },
+    notify     => Class['lma_collector::service'],
+  }
+
+  heka::decoder::multidecoder { 'aggregator':
+    config_dir       => $lma_collector::params::config_dir,
+    subs             => ['ProtobufDecoder', 'aggregator_flag_decoder'],
+    log_sub_errors   => true,
+    cascade_strategy => 'all',
+    notify           => Class['lma_collector::service'],
+  }
+
   heka::input::tcp { 'aggregator':
     config_dir => $lma_collector::params::config_dir,
     address    => $listen_address,
     port       => $listen_port,
+    decoder    => 'aggregator',
     notify     => Class['lma_collector::service'],
   }
 
