@@ -25,9 +25,10 @@ class lma_collector::aggregator::client (
   $config_dir = $lma_collector::params::config_dir
 
   heka::output::tcp { 'aggregator':
-    config_dir    => $config_dir,
-    address       => $address,
-    port          => $port,
-    max_file_size => $lma_collector::params::buffering_max_file_size,
+    config_dir      => $config_dir,
+    address         => $address,
+    port            => $port,
+    max_file_size   => $lma_collector::params::buffering_max_file_size,
+    message_matcher => "${lma_collector::params::not_aggregator_matcher} && FALSE",
   }
 }
