@@ -49,17 +49,18 @@ Attributes in **bold** are always present in the messages while attributes in
    captured the notification and ``Fields[hostname]`` is the host that emitted
    the notification.
 
- * *device* (string), the name of the physical device. For instance ``sda`` or
-   ``eth0``.
-
  * *interval* (number), the interval at which the metric is emitted (for
-   ``collectd`` metrics).
+   the ``collectd`` metrics).
 
  * *tenant_id* (string), the UUID of the OpenStack tenant to which the metric
    applies.
 
  * *user_id* (string), the UUID of the OpenStack user to which the metric
    applies.
+
+Metric messages may include additional fields to specify the scope of the
+measurement. When this is the case, these fields are detailed in the list of
+metrics presented hereafter.
 
 .. _metric_list:
 
