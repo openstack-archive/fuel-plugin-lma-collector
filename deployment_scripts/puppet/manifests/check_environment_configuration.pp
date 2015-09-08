@@ -30,10 +30,9 @@ if $elasticsearch_mode == 'local' {
   }
 
   # Check that the Elasticsearch-Kibana node exists in the environment
-  $es_node_name = $elasticsearch_kibana['node_name']
-  $es_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $es_node_name)
+  $es_nodes = filter_nodes(hiera('nodes'), 'role', 'elasticsearch_kibana')
   if size($es_nodes) < 1 {
-    fail("Could not find node '${es_node_name}' in the environment")
+    fail("Could not find node with role 'elasticsearch_kibana' in the environment")
   }
 }
 
@@ -49,10 +48,9 @@ if $influxdb_mode == 'local' {
     fail('Could not get the InfluxDB parameters. The InfluxDB-Grafana plugin is probably not enabled for this environment.')
   }
   # Check that the InfluxDB-Grafana node exists in the environment
-  $influxdb_node_name = $influxdb_grafana['node_name']
-  $influxdb_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $influxdb_node_name)
+  $influxdb_nodes = filter_nodes(hiera('nodes'), 'role', 'influxdb_grafana')
   if size($influxdb_nodes) < 1 {
-    fail("Could not find node '${influxdb_node_name}' in the environment")
+    fail("Could not find node with role 'influxdb_grafana' in the environment")
   }
 }
 
