@@ -50,7 +50,16 @@ class { 'lma_collector::notifications::controller':
 }
 
 # OpenStack logs are always useful for indexation and metrics collection
-class { 'lma_collector::logs::openstack': }
+
+if hiera('fuel_version') == '7.0' {
+  # On MOS 7.0, keystone is using apache to serve HTTP request and logs
+  # that are in /var/log/keystone are not copied in keystone-all.log. So
+  # we need to add a specific logger.
+  class { 'lma_collector::logs::openstack_7_0': }
+  class { 'lma_collector::logs::keystone_wsgi': }
+} else {
+  class { 'lma_collector::logs::openstack': }
+}
 
 if ! $storage_options['objects_ceph'] {
   class { 'lma_collector::logs::swift': }
