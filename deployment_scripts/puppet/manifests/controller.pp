@@ -39,9 +39,9 @@ if hiera('deployment_mode') =~ /^ha_/ {
   $ha_deployment = false
 }
 
-# OpenStack notifcations are always useful for indexation and metrics collection
+# OpenStack notifications are always useful for indexation and metrics collection
 class { 'lma_collector::notifications::controller':
-  host     => '127.0.0.1',
+  host     => hiera('internal_address'),
   port     => hiera('amqp_port', '5673'),
   user     => $rabbitmq_user,
   password => $rabbit['password'],

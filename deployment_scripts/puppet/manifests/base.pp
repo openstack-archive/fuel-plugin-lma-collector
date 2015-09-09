@@ -68,6 +68,7 @@ if $is_controller{
   # Params used by the script.
   $rabbit            = hiera('rabbit')
   $rabbitmq_port     = hiera('amqp_port', '5673')
+  $rabbitmq_host     = hiera('internal_address')
   $rabbitmq_user     = 'nova'
   $rabbitmq_password = $rabbit['password']
   $wait_delay        = 30
