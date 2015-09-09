@@ -50,7 +50,16 @@ class { 'lma_collector::notifications::controller':
 }
 
 # OpenStack logs are always useful for indexation and metrics collection
-class { 'lma_collector::logs::openstack': }
+
+if hiera('fuel_version') == '7.0' {
+  # With MOS 7.0, logs from keystone "main" and "admin" applications are not
+  # copied in keystone-all.log. So we need to add a specific logger for them.
+  # Also the format of keystone-all.log is different so we need to add a
+  # specific treatment for it.
+  class { 'lma_collector::logs::openstack_7_0': }
+} else {
+  class { 'lma_collector::logs::openstack': }
+}
 
 if ! $storage_options['objects_ceph'] {
   class { 'lma_collector::logs::swift': }
