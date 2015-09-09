@@ -133,6 +133,12 @@ None
 Release Notes
 -------------
 
+**0.7.3**
+
+* Support for MOS 7.0.
+* Collect Swift logs ([LP#1480293](https://bugs.launchpad.net/fuel-plugins/+bug/1480293)).
+* Collect HAProxy logs ([LP#1480297](https://bugs.launchpad.net/fuel-plugins/+bug/1480297)).
+
 **0.7.0**
 
 * Initial release of the plugin. This is a beta version.
