@@ -19,14 +19,13 @@ $roles             = node_roles(hiera('nodes'), hiera('uid'))
 $is_controller     = member($roles, 'controller') or member($roles, 'primary-controller')
 $is_base_os        = member($roles, 'base-os')
 $current_node_name = hiera('user_node_name')
+$current_roles     = hiera('roles')
 
 $elasticsearch_kibana = hiera('elasticsearch_kibana', {})
-$es_node_name = $elasticsearch_kibana['node_name']
-$es_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $es_node_name)
+$es_nodes = filter_nodes(hiera('nodes'), 'role', 'elasticsearch_kibana')
 
 $influxdb_grafana = hiera('influxdb_grafana', {})
-$influxdb_node_name = $influxdb_grafana['node_name']
-$influxdb_nodes = filter_nodes(hiera('nodes'), 'user_node_name', $influxdb_node_name)
+$influxdb_nodes = filter_nodes(hiera('nodes'), 'role', 'influxdb_grafana')
 
 $tags = {
   deployment_id => hiera('deployment_id'),
@@ -140,21 +139,18 @@ case $influxdb_mode {
       $influxdb_password = $influxdb_grafana['influxdb_userpass']
     }
 
-    if $is_base_os {
-      if $current_node_name == $influxdb_node_name and $influxdb_mode == 'local' {
-        $processes = ['hekad', 'collectd', 'influxd', 'grafana-server']
-      } else {
-        $processes = ['hekad', 'collectd']
-      }
+    $processes_hash = {'hekad'    => true,
+                       'collectd' => true,
+                      }
 
-      if $current_node_name == $es_node_name and $elasticsearch_mode == 'local' {
-        # Elasticsearch is running on a JVM
-        $process_matches = [{name => 'elasticsearch', regex => 'java'}]
-      } else {
-        $process_matches = undef
-      }
-    } else {
-      $processes = ['hekad', 'collectd']
+    if member($current_roles, 'influxdb_grafana') {
+      $processes_hash['influxd'] = true
+      $processes_hash['grafana-server'] = true
+    }
+
+    if member($current_roles, 'elasticsearch_kibana') {
+      $process_matches = [{name => 'elasticsearch', regex => 'java'}]
+    }else{
       $process_matches = undef
     }
 
@@ -168,7 +164,7 @@ case $influxdb_mode {
     }
 
     class { 'lma_collector::collectd::base':
-      processes       => $processes,
+      processes       => keys($processes_hash),
       process_matches => $process_matches,
       read_threads    => $collectd_read_threads,
       require         => Class['lma_collector'],
