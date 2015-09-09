@@ -139,13 +139,10 @@ case $influxdb_mode {
       $influxdb_password = $influxdb_grafana['influxdb_userpass']
     }
 
-    $processes_hash = {'hekad'    => true,
-                       'collectd' => true,
-                      }
-
     if member($current_roles, 'influxdb_grafana') {
-      $processes_hash['influxd'] = true
-      $processes_hash['grafana-server'] = true
+      $processes = ['influxd', 'grafana-server', 'hekad', 'collectd']
+    } else {
+      $processes = ['hekad', 'collectd']
     }
 
     if member($current_roles, 'elasticsearch_kibana') {
@@ -164,7 +161,7 @@ case $influxdb_mode {
     }
 
     class { 'lma_collector::collectd::base':
-      processes       => keys($processes_hash),
+      processes       => $processes,
       process_matches => $process_matches,
       read_threads    => $collectd_read_threads,
       require         => Class['lma_collector'],
