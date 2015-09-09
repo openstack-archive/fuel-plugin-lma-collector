@@ -16,7 +16,7 @@ def errback(exc, interval):
     print_message("{0}, retry in {1} seconds".format(exc, interval))
 
 # First we need to check the connection
-with Connection('amqp://<%= @rabbitmq_user %>:<%= @rabbitmq_password %>@localhost:<%= @rabbitmq_port %>//') as conn:
+with Connection('amqp://<%= @rabbitmq_user %>:<%= @rabbitmq_password %>@<%= @rabbitmq_host %>:<%= @rabbitmq_port %>//') as conn:
 
     conn.ensure_connection(errback, interval_start=<%= @wait_delay %>, interval_step=0)
 
