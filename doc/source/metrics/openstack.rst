@@ -53,7 +53,7 @@ These metrics are retrieved from the Nova database.
 
 .. _compute-service-state-metrics:
 
-* ``openstack_nova_services.<service>.<service_state>``, the total count of Nova
+* ``openstack_nova_services``, the total count of Nova
   services by state. The metric contains a ``service`` field (one of 'compute',
   'conductor', 'scheduler', 'cert' or 'consoleauth') and a ``state`` field (one
   of 'up', 'down' or 'disabled').
