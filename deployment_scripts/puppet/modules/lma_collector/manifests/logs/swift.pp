@@ -30,7 +30,7 @@ class lma_collector::logs::swift {
     config_dir     => $lma_collector::params::config_dir,
     decoder        => 'swift',
     file_match     => 'swift-all\.log$',
-    differentiator => '[ \'swift\' ]',
+    differentiator => '[ \'openstack.swift\' ]',
     require        => Heka::Decoder::Sandbox['swift'],
     notify         => Class['lma_collector::service'],
   }
