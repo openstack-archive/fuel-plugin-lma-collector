@@ -1,0 +1,250 @@
+#
+#    Copyright 2015 Mirantis, Inc.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License"); you may
+#    not use this file except in compliance with the License. You may obtain
+#    a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#    License for the specific language governing permissions and limitations
+#    under the License.
+
+alarms:
+  - alarm:
+      name: "CpuMonitCritical"
+      description: "An alarm for monitoring all cpus activity"
+      enabled: true
+      trigger:
+        rules:
+          -
+            relational_operator: "<="
+            metric: "cpu_idle"
+            fields:
+              -
+                name: "cpu_number"
+                value: ""
+            window: 300
+            periods: 0
+            function: "avg"
+            threshold: 5
+        logical_operator: "or"
+      severity: "critical"
+
+  - alarm:
+      name: "CpuMonitWarning"
+      description: "An alarm for monitoring all cpus activity"
+      enabled: true
+      trigger:
+        rules:
+          -
+            relational_operator: "<="
+            metric: "cpu_idle"
+            fields:
+              -
+                name: "cpu_number"
+                value: ""
+            window: 300
+            periods: 0
+            function: "avg"
+            threshold: 10
+        logical_operator: "or"
+      severity: "warning"
+
+  - alarm:
+      name: "DiskMonitCritical"
+      description: "An alarm for monitoring disks activity"
+      enabled: true
+      trigger:
+        rules:
+          -
+            relational_operator: ">="
+            metric: "disk_time_read"
+            fields:
+              -
+                name: "device"
+                value: "*"
+            window: 300
+            periods: 0
+            function: "avg"
+            threshold: 0.050 # must be tuned
+          -
+            relational_operator: ">="
+            metric: "disk_time_write"
+            fields:
+              -
+                name: "device"
+                value: "*"
+            window: 300
+            periods: 0
+            function: "avg"
+            threshold: 0.200 # mut be tuned
+        logical_operator: "or"
+    severity: "critical"
+
+  - alarm:
+      name: "FilesystemMonitCritical"
+      description: "An alarm for monitoring the filesystems"
+      enabled: true
+      trigger:
+        rules:
+          -
+            relational_operator: "<="
+            metric: "fs_space_percent_free"
+            fields:
+              -
+                name: "fs"
+                value: "*"
+            window: 300
+            periods: 0
+            function: "last"
+            threshold: 5
+      logical_operator: "or"
+      severity: "critical"
+
+  - alarm:
+      name: "FilesystemMonitWarning"
+      description: "An alarm for monitoring the filesystems"
+      enabled: true
+      trigger:
+        rules:
+          -
+            relational_operator: "<="
+            metric: "fs_space_percent_free"
+            fields:
+              -
+                name: "fs"
+                value: "*"
+            window: 300
+            periods: 0
+            function: "last"
+            threshold: 10
+        logical_operator: "or"
+      severity: "warning"
+
+  - alarm:
+      name: "LoadAverageWarning"
+      description: "An alarm for monitoring the system load"
+      enabled: true
+      trigger:
+        rules:
+          -
+            relational_operator: ">="
+            metric: "load_midterm"
+            fields:
+              -
+                name: ""
+                value: ""
+            window: 60
+            periods: 0
+            function: "avg"
+            threshold: 10 # must be tuned
+        logical_operator: "or"
+      severity: "warning"
+
+  - alarm:
+      name: "MemoryFreeCritical"
+      description: "An alarm for monitoring the memory"
+      enabled: true
+      trigger:
+        rules:
+          -
+            relational_operator: "<="
+            metric: "memory_free"
+            fields:
+              -
+                name: ""
+                value: ""
+            window: 300
+            periods: 0
+            function: "avg"
+            threshold: 52428800 # less than 50 MB but must be tuned
+        logical_operator: "or"
+      severity: "warning"
+
+  - alarm:
+      name: "MemoryFreewarning"
+      description: "An alarm for monitoring the memory"
+      enabled: true
+      trigger:
+        rules:
+          -
+            relational_operator: "<="
+            metric: "memory_free"
+            fields:
+              -
+                name: ""
+                value: ""
+            window: 300
+            periods: 0
+            function: "avg"
+            threshold: 104857600  # less than 100 MB but must be tuned
+        logical_operator: "or"
+      severity: "warning"
+
+  - alarm:
+      name: "NetworkErrorsWarning"
+      description: "An alarm for monitoring the network"
+      enabled: true
+      trigger:
+        rules:
+          -
+            relational_operator: ">="
+            metric: "if_errors_rx"
+            fields:
+              -
+                name: "interface"
+                value: "*"
+            window: 300
+            periods: 0
+            function: "avg"
+            threshold: 5  # 5 erros / sec but must be tuned
+          -
+            relational_operator: ">="
+            metric: "if_errors_tx"
+            fields:
+              -
+                name: "interface"
+                value: "*"
+            window: 300
+            periods: 0
+            function: "avg"
+            threshold: 5  # 5 errors / sec but must be tuned
+        logical_operator: "or"
+      severity: "warning"
+
+  - alarm:
+      name: "SwapFreewarning"
+      description: "An alarm for monitoring the swap"
+      enabled: true
+      trigger:
+        rules:
+          -
+            relational_operator: "<="
+            metric: "swap_free"
+            fields:
+              -
+                name: ""
+                value: ""
+            window: 300
+            periods: 0
+            function: "avg"
+            threshold: 104857600  # less than 100 MB but must be tuned
+        logical_operator: "or"
+      severity: "warning"
+
+
+roles:
+  - controller:
+      alarms: ["CpuMonitCrtical", "CpuMonitWarning", "FilesystemMonitCritical", "FilesystemMonitWarning"]
+  - compute:
+      alarms: ["CpuMonitCrtical", "CpuMonitWarning", "FilesystemMonitCritical", "FilesystemMonitWarning"]
+  - storage:
+      alarms: ["CpuMonitCrtical", "CpuMonitWarning", "FilesystemMonitCritical", "FilesystemMonitWarning"]
+
+services:
+  - nova_api:
+      alarms: []
