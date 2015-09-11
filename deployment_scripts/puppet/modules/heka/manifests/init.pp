@@ -105,7 +105,6 @@ class heka (
       command => '/etc/init.d/heka stop',
       onlyif  => '/usr/bin/test -f /etc/init.d/heka',
       require => Package['heka'],
-      before  => User[$heka_user],
       notify  => Exec['disable_heka_daemon']
     }
 
@@ -123,12 +122,12 @@ class heka (
   # This Puppet User resource is used by other manifests even if the hekad
   # process runs as 'root'.
   user { $heka_user:
-    shell   => '/sbin/nologin',
-    home    => $base_dir,
-    system  => true,
-    groups  => $additional_groups,
-    alias   => 'heka',
-    require => Package['heka'],
+    shell  => '/sbin/nologin',
+    home   => $base_dir,
+    system => true,
+    groups => $additional_groups,
+    alias  => 'heka',
+    before => Package['heka'],
   }
 
   file { $base_dir:
