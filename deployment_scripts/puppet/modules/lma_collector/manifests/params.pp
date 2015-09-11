@@ -27,6 +27,12 @@ class lma_collector::params {
 
   $aggregator_address = '127.0.0.1'
   $aggregator_port    = 5565
+  $aggregator_flag = 'aggregator'
+  # matcher for the messages sent to the aggregator
+  $aggregator_client_message_matcher = join([
+    "Fields[${aggregator_flag}] == NIL", ' && ',
+    'Type =~ /^heka\\.sandbox\\.afd.*metric$/'
+  ], '')
 
   $watchdog_file = "/tmp/${service_name}.watchdog"
   $watchdog_payload_name = "${service_name}.watchdog"
@@ -127,11 +133,6 @@ class lma_collector::params {
 
   $annotations_serie_name = 'annotations'
 
-  $aggregator_flag = 'aggregator'
-  $aggregator_client_message_matcher = join([
-    "Fields[${aggregator_flag}] == NIL", ' && ',
-    'Type =~ /^heka\\.sandbox\\.afd.*metric$/'
-  ], '')
   # Catch all metrics used to compute OpenStack service statutes
   $service_status_metrics_matcher = join([
     '(Type == \'metric\' || Type == \'heka.sandbox.metric\') && ',
@@ -156,6 +157,10 @@ class lma_collector::params {
   $influxdb_password = 'lmapass'
   $influxdb_timeout = 5
   $influxdb_time_precision = 'ms'
+  $influxdb_message_matcher = join([
+    "Fields[${aggregator_flag}] == NIL", ' && ',
+    'Type =~ /metric$/'
+  ], '')
 
   $apache_status_host = '127.0.0.1'
   $apache_allow_from  = ['127.0.0.1','::1']
