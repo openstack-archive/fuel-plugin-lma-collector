@@ -3,24 +3,26 @@
 Service
 ^^^^^^^
 
-* ``rabbitmq.status``, the status of the RabbitMQ service, 1 if it is
+* ``rabbitmq_status``, the status of the RabbitMQ service, 1 if it is
   responsive, 0 otherwise.
 
 Cluster
 ^^^^^^^
 
-* ``rabbitmq.connections``, Number of connections.
-* ``rabbitmq.consumers``, Number of consumers.
-* ``rabbitmq.exchanges``, Number of exchanges.
-* ``rabbitmq.memory``, Bytes of memory consumed by the Erlang process associated with all queues, including stack, heap and internal structures.
-* ``rabbitmq.messages``, Total number of messages which are ready to be consumed or not yet acknowledged.
-* ``rabbitmq.total_nodes``, Number of nodes in the cluster.
-* ``rabbitmq.running_nodes``, Number of running nodes in the cluster.
-* ``rabbitmq.queues``, Number of queues.
+* ``rabbitmq_connections``, total number of connections.
+* ``rabbitmq_consumers``, total number of consumers.
+* ``rabbitmq_exchanges``, total number of exchanges.
+* ``rabbitmq_memory``, bytes of memory consumed by the Erlang process associated with all queues, including stack, heap and internal structures.
+* ``rabbitmq_messages``, total number of messages which are ready to be consumed or not yet acknowledged.
+* ``rabbitmq_total_nodes``, total number of nodes in the cluster.
+* ``rabbitmq_running_nodes``, total number of running nodes in the cluster.
+* ``rabbitmq_queues``, total number of queues.
 
 Queues
 ^^^^^^
 
-* ``rabbitmq.<name_of_the_queue>.consumers``, Number of consumers.
-* ``rabbitmq.<name_of_the_queue>.memory``, Bytes of memory consumed by the Erlang process associated with the queue, including stack, heap and internal structures.
-* ``rabbitmq.<name_of_the_queue>.messages``, Number of messages which are ready to be consumed or not yet acknowledged.
+All metrics have a ``queue`` field which contains the name of the RabbitMQ queue.
+
+* ``rabbitmq_queue_consumers``, number of consumers for a given queue.
+* ``rabbitmq_queue_memory``, bytes of memory consumed by the Erlang process associated with the queue, including stack, heap and internal structures. 
+* ``rabbitmq_queue_messages``, number of messages which are ready to be consumed or not yet acknowledged for the given queue.
