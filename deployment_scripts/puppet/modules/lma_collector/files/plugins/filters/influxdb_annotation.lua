@@ -15,30 +15,55 @@ require 'cjson'
 require 'string'
 require 'table'
 local utils  = require 'lma_utils'
+local consts = require 'gse_constants'
+local afd = require 'afd'
 
 local measurement_name = read_config('measurement_name') or 'annotations'
 local html_break_line = '<br />'
 
--- Transform a status message into an InfluxDB datapoint
-function process_message ()
-    local title
-    local text = ''
-    local service = read_message('Fields[service]')
-    local status = read_message('Fields[status]')
-    local prev_status = read_message('Fields[previous_status]')
+local statuses = {}
 
-    local ok, details = pcall(cjson.decode, read_message('Payload'))
-    if ok then
-        text = table.concat(details, html_break_line)
+-- Transform a GSE cluster metric into an annotation stored into InfluxDB
+function process_message ()
+    local previous
+    local text
+    local cluster = afd.get_entity_name('cluster_name')
+    local status = afd.get_status()
+    local alarms = afd.extract_alarms()
+
+    if not cluster or not status or not alarms then
+        return -1
     end
 
-    if prev_status ~= status then
+    if not statuses[cluster] then
+        statuses[cluster] = {}
+    end
+    previous = statuses[cluster]
+
+    -- build the full message
+    local alarm_messages = {}
+    for i, alarm in ipairs(alarms) do
+        alarm_messages[#alarm_messages+1] = alarm.message
+    end
+    text = table.concat(alarm_messages, html_break_line)
+
+    -- build the title
+    if not previous.status and status == consts.OKAY then
+        -- don't send an annotation when we detect a new cluster which is OKAY
+        return 0
+    elseif not previous.status then
+        title = string.format('General status is %s',
+                              consts.status_label(status))
+    elseif previous.status ~= status then
         title = string.format('General status %s -> %s',
-                              utils.global_status_to_label_map[prev_status],
-                              utils.global_status_to_label_map[status])
-    else
+                              consts.status_label(previous.status),
+                              consts.status_label(status))
+    elseif previous.text ~= text then
         title = string.format('General status remains %s',
-                              utils.global_status_to_label_map[status])
+                              consts.status_label(status))
+    else
+        -- nothing has changed since the last message
+        return 0
     end
 
     local msg = {
@@ -46,16 +71,20 @@ function process_message ()
         Type = 'multivalue_metric',
         Severity = utils.label_to_severity_map.INFO,
         Hostname = read_message('Hostname'),
-        Payload = cjson.encode({title=title, tags=service, text=text}),
+        Payload = cjson.encode({title=title, tags=cluster, text=text}),
         Fields = {
             name = measurement_name,
-            tag_fields = { 'service' },
-            service = service,
+            tag_fields = { 'cluster' },
+            cluster = cluster,
             source = 'influxdb_annotation'
       }
     }
     utils.inject_tags(msg)
     inject_message(msg)
+
+    -- store the last status and alarm text for future messages
+    previous.status = status
+    previous.text = text
 
     return 0
 end
