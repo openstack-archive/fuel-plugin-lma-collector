@@ -44,7 +44,7 @@ class lma_collector::influxdb (
   heka::filter::sandbox { 'influxdb_annotation':
     config_dir      => $lma_collector::params::config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/influxdb_annotation.lua",
-    message_matcher => 'Type == \'heka.sandbox.status\' && Fields[updated] == TRUE',
+    message_matcher => 'Type == \'heka.sandbox.gse_cluster_metric\'',
     config          => {
       serie_name => $lma_collector::params::annotations_serie_name
     },

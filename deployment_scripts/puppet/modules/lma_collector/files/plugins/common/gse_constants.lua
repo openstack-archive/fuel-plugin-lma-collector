@@ -27,9 +27,9 @@ DOWN=4
 
 local STATUS_LABELS = {
     [OKAY]='okay',
-    [WARN]='warn',
-    [UNKW]='unkw',
-    [CRIT]='crit',
+    [WARN]='warning',
+    [UNKW]='unkwown',
+    [CRIT]='critical',
     [DOWN]='down'
 }
 
