@@ -179,7 +179,7 @@ function encode_datapoint(name, value, tags)
     else
         point = string.format("%s %s %d",
             escape_string(name),
-            encoder_value(value),
+            encode_value(value),
             ts)
     end
 
