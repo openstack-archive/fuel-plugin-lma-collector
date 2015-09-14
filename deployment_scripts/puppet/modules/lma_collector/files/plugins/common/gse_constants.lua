@@ -26,11 +26,11 @@ CRIT=3
 DOWN=4
 
 local STATUS_LABELS = {
-    [OKAY]='okay',
-    [WARN]='warning',
-    [UNKW]='unkwown',
-    [CRIT]='critical',
-    [DOWN]='down'
+    [OKAY]='OKAY',
+    [WARN]='WARN',
+    [UNKW]='UNKNOWN',
+    [CRIT]='CRITICAL',
+    [DOWN]='DOWN'
 }
 
 function status_label(v)
