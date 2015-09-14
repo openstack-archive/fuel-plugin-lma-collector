@@ -42,7 +42,7 @@ class lma_collector::nagios (
   heka::output::http { 'nagios':
     config_dir      => $lma_collector::params::config_dir,
     url             => $url,
-    message_matcher => 'Type == \'heka.sandbox.status\'',
+    message_matcher => 'Type == \'heka.sandbox.gse_cluster_metric\'',
     username        => $user,
     password        => $password,
     encoder         => 'nagios',
