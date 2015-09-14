@@ -13,8 +13,8 @@
 -- limitations under the License.
 require 'table'
 require 'string'
-require 'cjson'
-local utils = require 'lma_utils'
+local afd = require 'afd'
+local consts = require 'gse_constants'
 
 local host = read_config('nagios_host')
 local data = {
@@ -27,6 +27,14 @@ local data = {
    performance_data = '',
 }
 local nagios_break_line = '\\n'
+-- mapping GSE statuses to Nagios states
+local nagios_state_map = {
+    [consts.OKAY]=0,
+    [consts.WARN]=1,
+    [consts.UNKW]=3,
+    [consts.CRIT]=2,
+    [consts.DOWN]=2
+}
 
 function url_encode(str)
   if (str) then
@@ -38,21 +46,31 @@ function url_encode(str)
 end
 
 function process_message()
-    local service = read_message('Fields[service]')
+    local service = afd.get_entity_name('cluster_name')
     local service_name = read_config(service)
-    if not service_name then
+    local status = afd.get_status()
+    local alarms = afd.extract_alarms()
+
+    if not service_name or not nagios_state_map[status] or not alarms then
         return -1
     end
-    local status = read_message('Fields[status]')
-    local payload = read_message('Payload')
+
     data['service'] = service_name
-    data['plugin_state'] = status
-    local ok, details = pcall(cjson.decode, payload)
-    if not ok or not details then details = {'no detail'} end
-    local title = string.format('%s %s',
-                                service_name,
-                                utils.global_status_to_label_map[status])
-    table.insert(details, 1, title)
+    data['plugin_state'] = nagios_state_map[status]
+
+    local details = {
+        string.format('%s %s', service_name, consts.status_label(status))
+    }
+    for i, alarm in ipairs(alarms) do
+        details[#details+1] = alarm.message
+    end
+    if #alarms == 0 then
+        details[#details+1] = 'no details'
+    else
+        for i, alarm in ipairs(alarms) do
+            details[#details+1] = alarm.message
+        end
+    end
     data['plugin_output'] = table.concat(details, nagios_break_line)
 
     local params = {}
