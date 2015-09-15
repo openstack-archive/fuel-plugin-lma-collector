@@ -109,8 +109,8 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     pacemaker_resources       => [
         'vip__public',
         'vip__management',
-        'vip__public_vrouter',
-        'vip__management_vrouter',
+        'vip__vrouter_pub',
+        'vip__vrouter',
     ],
     pacemaker_master_resource => 'vip__management',
   }
