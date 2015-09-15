@@ -1,0 +1,10 @@
+Verified+2: Jenkins
+Workflow+1: Simon Pasquier <spasquier@mirantis.com>
+Code-Review+2: Guillaume Thouvenin <gthouvenin@mirantis.com>
+Code-Review+2: Swann Croiset <scroiset@mirantis.com>
+Code-Review+1: venkatamahesh <venkatamaheshkotha@gmail.com>
+Submitted-by: Jenkins
+Submitted-at: Tue, 15 Sep 2015 14:20:52 +0000
+Reviewed-on: https://review.openstack.org/223577
+Project: stackforge/fuel-plugin-lma-collector
+Branch: refs/heads/stable/0.7
