@@ -159,10 +159,8 @@ class lma_collector::params {
     'glance-api'          => 'glance-api',
     'glance-registry'     => 'glance-registry-api',
     'heat-api'            => 'heat-api',
-    # Heat APIs are inverted within MOS 6.1
-    # see bug https://bugs.launchpad.net/fuel/+bug/1459752
-    'heat-api-cfn'        => 'heat-cloudwatch-api',
-    'heat-api-cloudwatch' => 'heat-cfn-api',
+    'heat-api-cfn'        => 'heat-cfn-api',
+    'heat-api-cloudwatch' => 'heat-cloudwatch-api',
     'horizon'             => 'horizon-web',
     'keystone-1'          => 'keystone-public-api',
     'keystone-2'          => 'keystone-admin-api',
