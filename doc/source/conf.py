@@ -71,16 +71,7 @@ release = '0.8.0'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 exclude_patterns = [
-    'metrics/apache.rst',
-    'metrics/haproxy.rst',
-    'metrics/memcached.rst',
-    'metrics/ceph.rst',
-    'metrics/mysql.rst',
-    'metrics/openstack.rst',
-    'metrics/rabbitmq.rst',
-    'metrics/system.rst',
-    'metrics/pacemaker.rst',
-    'metrics/lma.rst',
+    'dev/metrics/*.rst',
 ]
 
 # The reST default role (used for this markup: `text`) to use for all

@@ -12,7 +12,7 @@ messages.
 Notification Messages Format
 ============================
 
-In addition to the common :ref:`common_message_format`, notification-based messages
+In addition to the :ref:`common_message_format`, notification-based messages
 have additional properties.
 
 Attributes in **bold** are always present in the messages while attributes in
