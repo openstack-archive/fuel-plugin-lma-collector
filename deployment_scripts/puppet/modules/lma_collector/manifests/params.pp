@@ -17,6 +17,8 @@ class lma_collector::params {
   $config_dir = "/etc/${service_name}"
   $plugins_dir = "/usr/share/${service_name}"
 
+  $apt_config_file = '/etc/apt/apt.conf.d/99norecommends'
+
   $tags = {}
 
   $syslog_pattern = '<%PRI%>%TIMESTAMP% %HOSTNAME% %syslogtag%%msg:::sp-if-no-1st-sp%%msg%\n'
