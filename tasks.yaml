@@ -8,6 +8,17 @@
     timeout: 300
 
 # The following tasks are executed in the order they are declared
+
+# We need to control what is deployed when we install a new package. So
+# we need to prevent the installation of recommended packages.
+- role: '*'
+  stage: post_deployment/8200
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/configure_apt.pp
+    puppet_modules: puppet/modules
+    timeout: 600
+
 - role: '*'
   stage: post_deployment/8200
   type: puppet
@@ -55,3 +66,12 @@
     puppet_manifest: puppet/manifests/ceph_osd.pp
     puppet_modules: puppet/modules
     timeout: 600
+
+- role: '*'
+  stage: post_deployment/8200
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/cleanup_apt_config.pp
+    puppet_modules: puppet/modules
+    timeout: 600
+
