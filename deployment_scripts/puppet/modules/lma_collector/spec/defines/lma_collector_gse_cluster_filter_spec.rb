@@ -23,24 +23,26 @@ describe 'lma_collector::gse_cluster_filter' do
     describe 'with defaults' do
         let(:params) do
             {:input_message_types => ['afd_service_metric'],
+             :aggregator_flag => true,
              :entity_field => 'service',
-             :output_message_type => 'gse_service_cluster_status',
+             :output_message_type => 'gse_service_cluster_metric',
              :output_metric_name => 'cluster_service_status'}
         end
-        it { is_expected.to contain_heka__filter__sandbox('gse_service').with_message_matcher("Type =~ /afd_service_metric$/") }
+        it { is_expected.to contain_heka__filter__sandbox('gse_service').with_message_matcher("Fields[aggregator] != NIL && (Type =~ /afd_service_metric$/)") }
     end
 
     describe 'with dependencies' do
         let(:params) do
-            {:input_message_types => ['afd_service_metric', 'afd_node_metric'],
-             :entity_field => 'service',
-             :output_message_type => 'gse_service_cluster_status',
-             :output_metric_name => 'cluster_service_status',
+            {:input_message_types => ['gse_service_cluster_metric', 'gse_node_cluster_metric'],
+             :aggregator_flag => false,
+             :entity_field => 'cluster_name',
+             :output_message_type => 'gse_cluster_metric',
+             :output_metric_name => 'cluster_status',
              :level_1_dependencies => {'nova' => ['nova-api','nova-scheduler'],
                                        'cinder' => ['cinder-api']},
              :level_2_dependencies => {'nova-api' => ['neutron-api']}
             }
         end
-        it { is_expected.to contain_heka__filter__sandbox('gse_service').with_message_matcher("Type =~ /afd_service_metric$/ || Type =~ /afd_node_metric$/") }
+        it { is_expected.to contain_heka__filter__sandbox('gse_service').with_message_matcher("Fields[aggregator] == NIL && (Type =~ /gse_service_cluster_metric$/ || Type =~ /gse_node_cluster_metric$/)") }
     end
 end

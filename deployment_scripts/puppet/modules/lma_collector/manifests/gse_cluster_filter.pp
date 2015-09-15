@@ -13,6 +13,7 @@
 #    under the License.
 define lma_collector::gse_cluster_filter (
   $input_message_types,
+  $aggregator_flag,
   $entity_field,
   $output_message_type,
   $output_metric_name,
@@ -33,7 +34,17 @@ define lma_collector::gse_cluster_filter (
 
   $lua_modules_dir = $heka::params::lua_modules_dir
   $topology_file = "gse_${title}_topology"
-  $message_matcher = inline_template('<%= @input_message_types.collect{|x| "Type =~ /#{x}$/"}.join(" || ") %>')
+  if $aggregator_flag {
+    $aggregator_flag_operator = '!='
+  } else {
+    $aggregator_flag_operator = '=='
+  }
+
+  $message_matcher = join([
+    "Fields[${lma_collector::params::aggregator_flag}] ${aggregator_flag_operator} NIL && (",
+    inline_template('<%= @input_message_types.collect{|x| "Type =~ /#{x}$/"}.join(" || ") %>'),
+    ')',
+  ], '')
 
   heka::filter::sandbox { "gse_${title}":
     config_dir      => $lma_collector::params::config_dir,

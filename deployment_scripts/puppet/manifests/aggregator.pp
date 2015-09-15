@@ -69,6 +69,7 @@ if $is_controller {
   # Configure the GSE filter emitting the cluster service metrics
   lma_collector::gse_cluster_filter { 'service':
     input_message_types  => ['afd_service_metric'],
+    aggregator_flag      => true,
     entity_field         => 'service',
     output_message_type  => 'gse_service_cluster_metric',
     output_metric_name   => 'cluster_service_status',
@@ -103,6 +104,7 @@ if $is_controller {
   # Configure the GSE filter emitting the cluster node metrics
   lma_collector::gse_cluster_filter { 'node':
     input_message_types  => ['afd_node_metric'],
+    aggregator_flag      => true,
     entity_field         => 'hostname',
     output_message_type  => 'gse_node_cluster_metric',
     output_metric_name   => 'cluster_node_status',
@@ -114,6 +116,7 @@ if $is_controller {
   # Configure the GSE filter emitting the global cluster metrics
   lma_collector::gse_cluster_filter { 'global':
     input_message_types  => ['gse_service_cluster_metric', 'gse_node_cluster_metric'],
+    aggregator_flag      => false,
     entity_field         => 'cluster_name',
     output_message_type  => 'gse_cluster_metric',
     output_metric_name   => 'cluster_status',
