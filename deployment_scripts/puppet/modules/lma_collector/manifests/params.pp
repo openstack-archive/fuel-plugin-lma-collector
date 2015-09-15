@@ -164,6 +164,7 @@ class lma_collector::params {
     'heat-api-cfn'        => 'heat-cloudwatch-api',
     'heat-api-cloudwatch' => 'heat-cfn-api',
     'horizon'             => 'horizon-web',
+    'horizon-ssl'         => 'horizon-https',
     'keystone-1'          => 'keystone-public-api',
     'keystone-2'          => 'keystone-admin-api',
     'murano'              => 'murano-api',
@@ -174,6 +175,7 @@ class lma_collector::params {
     'nova-novncproxy'     => 'nova-novncproxy-websocket',
     'nova-metadata-api'   => 'nova-metadata-api',
     'sahara'              => 'sahara-api',
+    'stats'               => 'stats',
     'swift'               => 'swift-api',
   }
 
