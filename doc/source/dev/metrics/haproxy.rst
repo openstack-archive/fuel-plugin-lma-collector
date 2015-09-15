@@ -8,7 +8,8 @@
 * heat-api
 * heat-cfn-api
 * heat-cloudwatch-api
-* horizon-web
+* horizon-web (when Horizon is deployed without TLS)
+* horizon-https (when Horizon is deployed with TLS)
 * keystone-public-api
 * keystone-admin-api
 * mysqld-tcp

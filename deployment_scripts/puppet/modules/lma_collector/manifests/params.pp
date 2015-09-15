@@ -162,6 +162,7 @@ class lma_collector::params {
     'heat-api-cfn'        => 'heat-cfn-api',
     'heat-api-cloudwatch' => 'heat-cloudwatch-api',
     'horizon'             => 'horizon-web',
+    'horizon-ssl'         => 'horizon-https',
     'keystone-1'          => 'keystone-public-api',
     'keystone-2'          => 'keystone-admin-api',
     'murano'              => 'murano-api',
