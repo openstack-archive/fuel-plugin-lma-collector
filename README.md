@@ -38,7 +38,6 @@ for networking.
 Installation Guide
 ==================
 
-
 Prior to installing the LMA Collector Plugin, you may want to install its
 dependencies:
 
@@ -55,39 +54,94 @@ Infrastructure Alerting Fuel Plugin
 ](https://github.com/stackforge/fuel-plugin-lma-infrastructure-alerting).
 
 You can install Elasticsearch/Kibana, InfluxDB/Grafana and Nagios outside of
-Fuel as long as your installation meets the LMA Collector plugin's requirements
+Fuel as long as your installation meets the LMA Collector Plugin's requirements
 defined above.
 
 
-**LMA collector plugin** installation
--------------------------------------
+LMA collector plugin install from the RPM file
+----------------------------------------------
 
-To install the LMA Collector plugin, follow these steps:
+To install the LMA Collector Plugin from the RPM file of the plugin, follow these steps:
 
-1. Download the plugin from the [Fuel Plugins
+1. Download the RPM file from the [Fuel Plugins
    Catalog](https://software.mirantis.com/download-mirantis-openstack-fuel-plug-ins/).
-2. Copy the plugin file to the Fuel Master node.
+
+2. Copy the RPM file to the Fuel Master node.
 
     ```
-    scp lma_collector-0.8-0.8.0-0.noarch.rpm root@<Fuel Master node IP address>:
+    # scp lma_collector-0.8-0.8.0-0.noarch.rpm root@<Fuel Master node IP address>:
     ```
 
-3. Install the plugin using the `fuel` command line:
+3. Install the RPM file using the `fuel` command line:
 
     ```
-    fuel plugins --install lma_collector-0.8-0.8.0-0.noarch.rpm
+    # fuel plugins --install lma_collector-0.8-0.8.0-0.noarch.rpm
     ```
 
 4. Verify that the plugin is installed correctly:
 
     ```
-    fuel plugins --list
+    # fuel plugins --list
     ```
 
-Please refer to the [Fuel Plugins
-wiki](https://wiki.openstack.org/wiki/Fuel/Plugins) if you want to build the
-plugin by yourself, version 2.0.0 (or higher) of the Fuel Plugin Builder is
-required.
+LMA collector plugin install from source
+----------------------------------------
+
+To install the LMA Collector Plugin from source, you first need to prepare an
+environement to build the RPM file of the plugin.
+The recommended approach is to build the RPM file directly onto the Fuel Master
+node so that you won't have to copy that file later.
+
+**Prepare an environment for building the plugin on the Fuel Master Node**
+
+1. Install the standard Linux development tools:
+
+    ```
+    # yum install createrepo rpm rpm-build dpkg-devel
+    ```
+
+2. Install the Fuel Plugin Builder. To do that, you should first get pip:
+
+    ```
+    # easy_install pip
+    ```
+
+3. Then install the Fuel Plugin Builder (the `fpb` command line) with `pip`:
+
+    ```
+    # pip install fuel-plugin-builder
+    ```
+
+*Note: You may also have to build the Fuel Plugin Builder if the package version of the
+plugin is higher than package version supported by the Fuel Plugin Builder you get from `pypi`.
+In this case, please refer to the section "Preparing an environment for plugin development"
+of the [Fuel Plugins wiki](https://wiki.openstack.org/wiki/Fuel/Plugins) if you
+need further instructions about how to build the Fuel Plugin Builder.*
+
+4. Clone the LMA Collector Plugin git repository:
+
+    ```
+    # git clone git@github.com:stackforge/fuel-plugin-lma-collector.git
+    ```
+
+5. Check that the plugin is valid:
+
+    ```
+    # fpb --check ./fuel-plugin-lma-collector
+    ```
+
+6.  And finally, build the plugin:
+
+    ```
+    # fpb --build ./fuel-plugin-lma-collector
+    ```
+
+6. Now you have created an RPM file that you can install using the steps described above:
+
+    ```
+    # ls -l fuel-plugin-lma-collector/lma_collector-0.8-0.8.0-1.noarch.rpm
+    -rw-r--r-- 1 root root 27841564 16 sept. 16:18 fuel-plugin-lma-collector/lma_collector-0.8-0.8.0-1.noarch.rpm
+    ```
 
 User Guide
 ==========
