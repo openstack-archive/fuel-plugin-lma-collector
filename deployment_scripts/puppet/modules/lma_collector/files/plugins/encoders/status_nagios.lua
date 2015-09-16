@@ -54,6 +54,7 @@ function process_message()
                                 utils.global_status_to_label_map[status])
     table.insert(details, 1, title)
     data['plugin_output'] = table.concat(details, nagios_break_line)
+    data['btnSubmit'] = 'Commit'
 
     local params = {}
     for k, v in pairs(data) do
