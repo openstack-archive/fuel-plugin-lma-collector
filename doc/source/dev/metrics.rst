@@ -1,8 +1,8 @@
 .. _metrics:
 
-================
+===============
 Metric Messages
-================
+===============
 
 Metrics are extracted from several sources:
 
