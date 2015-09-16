@@ -38,7 +38,6 @@ for networking.
 Installation Guide
 ==================
 
-
 Prior to installing the LMA Collector Plugin, you may want to install its
 dependencies:
 
@@ -59,20 +58,20 @@ Fuel as long as your installation meets the LMA Collector plugin's requirements
 defined above.
 
 
-**LMA collector plugin** installation
--------------------------------------
+LMA collector plugin install from the rpm file 
+----------------------------------------------
 
-To install the LMA Collector plugin, follow these steps:
+To install the LMA Collector plugin from the rpm file of the plugin, follow these steps:
 
-1. Download the plugin from the [Fuel Plugins
+1. Download the rpm file from the [Fuel Plugins
    Catalog](https://software.mirantis.com/download-mirantis-openstack-fuel-plug-ins/).
-2. Copy the plugin file to the Fuel Master node.
+2. Copy the rpm file for the plugin to the Fuel Master node.
 
     ```
     scp lma_collector-0.8-0.8.0-0.noarch.rpm root@<Fuel Master node IP address>:
     ```
 
-3. Install the plugin using the `fuel` command line:
+3. Install the rpm file using the `fuel` command line:
 
     ```
     fuel plugins --install lma_collector-0.8-0.8.0-0.noarch.rpm
@@ -84,10 +83,59 @@ To install the LMA Collector plugin, follow these steps:
     fuel plugins --list
     ```
 
-Please refer to the [Fuel Plugins
-wiki](https://wiki.openstack.org/wiki/Fuel/Plugins) if you want to build the
-plugin by yourself, version 2.0.0 (or higher) of the Fuel Plugin Builder is
-required.
+LMA collector plugin install from source
+----------------------------------------
+
+To install the LMA Collector plugin from source, you first need to prepare an environement to build the rpm file of plugin.
+The recommended approach is to build the plugin directly onto the Fuel Master node so that you won't have to remote copy the rpm file.
+
+**Prepare an environment for building the plugin on the Fuel Master Node**
+
+1. Install the standard Linux development tools:
+
+    ```
+    yum install createrepo rpm rpm-build dpkg-devel
+    ```
+
+2. Install the Fuel Plugin Builder. To do that, you should first get pip:
+
+    ```
+    easy_install pip
+    ```
+
+3. Then, install the Fuel Plugin Builder (the `fpb` command line):
+
+    ```
+    pip install fuel-plugin-builder
+    ```
+
+*Note: If you need to build the latest version of `fpb` (version 3.0.0 or higher),
+please refer to the section "Preparing an environment for plugin development"
+of the [Fuel Plugins wiki](https://wiki.openstack.org/wiki/Fuel/Plugins).*
+
+4. then git clone the LMA Fuel Plugin repo: 
+
+    ```
+    git clone git@github.com:stackforge/fuel-plugin-lma-collector.git 
+    ```
+
+5. Check that the plugin is valid: 
+
+    ```
+    fpb --check ./fuel-plugin-lma-collector
+    ```
+
+6.  And finally, build the plugin: 
+
+    ```
+    fpb --check ./fuel-plugin-lma-collector
+    ```
+
+6. Now you have created an rpm file that you can install using the steps described above:
+
+    ```
+    ./fuel-plugin-lma-collector/lma_collector-0.8-0.8.0-1.noarch.rpm
+    ```
 
 User Guide
 ==========
