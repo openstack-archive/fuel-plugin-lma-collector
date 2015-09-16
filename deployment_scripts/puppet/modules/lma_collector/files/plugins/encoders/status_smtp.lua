@@ -14,33 +14,63 @@
 
 require 'table'
 require 'string'
-require 'cjson'
-local utils = require 'lma_utils'
+
+local afd = require 'afd'
+
+local statuses = {}
+
+local concat_string = '\n'
 
 function process_message()
-    local service = read_message('Fields[service]')
-    local status = read_message('Fields[status]')
-    local previous_status = read_message('Fields[previous_status]')
+    local previous
+    local text
+    local cluster = afd.get_entity_name('cluster_name')
+    local status = afd.get_status()
+    local alarms = afd.extract_alarms()
 
-    local payload = read_message('Payload')
-    local ok, details = pcall(cjson.decode, payload)
-    if not ok or not details then
-        details = {'no detail'}
+    if not cluster or not status or not alarms then
+        return -1
     end
-    local title
-    if status ~= previous_status then
-        title = string.format('%s status %s -> %s',
-                              service,
-                              utils.global_status_to_label_map[previous_status],
-                              utils.global_status_to_label_map[status])
+
+    if not statuses[cluster] then
+        statuses[cluster] = {}
+    end
+    previous = statuses[cluster]
+
+    local text
+    if #alarms == 0 then
+        text = 'no detail'
     else
-        title = string.format('%s status remains %s',
-                              service,
-                              utils.global_status_to_label_map[status])
+        text = table.concat(afd.alarms_for_human(alarms), concat_string)
     end
-    table.insert(details, 1, title)
-    local text = table.concat(details, '\n')
-    inject_payload('txt', '', text)
+
+    local title
+    if not previous.status and status == consts.OKAY then
+        -- don't send a email when we detect a new cluster which is OKAY
+        return 0
+    elseif not previous.status then
+        title = string.format('%s status is %s',
+                              cluster,
+                              consts.status_label(status))
+    elseif status ~= previous.status then
+        title = string.format('%s status %s -> %s',
+                              cluster,
+                              consts.status_label(previous.status),
+                              consts.status_label(status))
+    elseif previous.text ~= text then
+        title = string.format('%s status remains %s',
+                              cluster,
+                              consts.status_label(status))
+    else
+        -- nothing has changed since the last message
+        return 0
+    end
+
+    inject_payload('txt', '', table.concat({title, text}, concat_string))
+
+    -- store the last status and text for future messages
+    previous.status = status
+    previous.text = text
 
     return 0
 end
