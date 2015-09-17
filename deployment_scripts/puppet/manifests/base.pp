@@ -112,10 +112,6 @@ if $elasticsearch_mode != 'disabled' {
     }
   }
 
-  class { 'lma_collector::logs::monitor':
-    require => Class['lma_collector'],
-  }
-
   class { 'lma_collector::elasticsearch':
     server  => $es_server,
     require => Class['lma_collector'],
