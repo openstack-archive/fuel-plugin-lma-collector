@@ -53,61 +53,6 @@ metric_type = {
 
 local default_severity = 7
 
-service_status_map = {
-    UP = 0,
-    DEGRADED = 1,
-    DOWN = 2,
-    UNKNOWN = 3,
-}
-
-service_status_to_label_map = {
-    [0] = 'UP',
-    [1] = 'DEGRADED',
-    [2] = 'DOWN',
-    [3] = 'UNKNOWN',
-}
-
-global_status_map = {
-    OKAY = 0,
-    WARN = 1,
-    FAIL = 2,
-    UNKNOWN = 3,
-}
-
-global_status_to_label_map = {
-    [0] = 'OKAY',
-    [1] = 'WARN',
-    [2] = 'FAIL',
-    [3] = 'UNKNOWN',
-}
-
-check_api_to_status_map = {
-    [0] = 2, -- DOWN
-    [1] = 0, -- UP
-    [2] = 3, -- UNKNOWN
-}
-
-check_api_status_to_state_map = {
-    [0] = 'down',
-    [1] = 'up',
-    [2] = 'unknown',
-}
-
-state_map = {
-    UP = 'up',
-    DOWN = 'down',
-    DISABLED = 'disabled',
-    UNKNOWN = 'unknown'
-}
-
-function add_metric(datapoints, name, points)
-    datapoints[#datapoints+1] = {
-        name = name,
-        columns = {"time", "value" },
-        points = {points}
-    }
-end
-
 local bulk_datapoints = {}
 
 -- Add a datapoint to the bulk metric message
@@ -147,29 +92,6 @@ function decode_json_payload()
     local ok, data = pcall(cjson.decode, read_message("Payload"))
 
     return data
-end
-
-local global_status_to_severity_map = {
-    [global_status_map.OKAY] = label_to_severity_map.INFO,
-    [global_status_map.WARN] = label_to_severity_map.WARNING,
-    [global_status_map.FAIL] = label_to_severity_map.CRITICAL,
-    [global_status_map.UNKNOWN] = label_to_severity_map.NOTICE,
-}
-
-function inject_status_message(time, service, status, prev_status, updated, details)
-    local msg = {
-        Timestamp = time,
-        Payload = details,
-        Type = 'status', -- prepended with 'heka.sandbox'
-        Severity = global_status_to_severity_map[status],
-        Fields = {
-          service = service,
-          status = status,
-          previous_status = prev_status,
-          updated = updated,
-        }
-    }
-    inject_message(msg)
 end
 
 -- Parse a Syslog-based payload and update the Heka message
