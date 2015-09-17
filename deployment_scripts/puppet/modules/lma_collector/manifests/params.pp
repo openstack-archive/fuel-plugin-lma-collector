@@ -31,7 +31,7 @@ class lma_collector::params {
   $watchdog_file = "/tmp/${service_name}.watchdog"
   $watchdog_payload_name = "${service_name}.watchdog"
   $watchdog_interval = 1
-  $watchdog_timeout = 5 * $watchdog_interval
+  $watchdog_timeout = 10 * $watchdog_interval
 
   $tags = {}
 
