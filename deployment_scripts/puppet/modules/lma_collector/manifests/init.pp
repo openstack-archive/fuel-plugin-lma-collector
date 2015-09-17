@@ -86,7 +86,9 @@ class lma_collector (
       ms_metadata     => {
         # the resource should start as soon as the dependent resources (eg
         # RabbitMQ) are running *locally*
-        'interleave' => true,
+        'interleave'          => true,
+        'migration-threshold' => '3',
+        'failure-timeout'     => '120',
       },
       parameters      => {
         'config'           => $config_dir,
@@ -97,14 +99,14 @@ class lma_collector (
       },
       operations      => {
         'monitor' => {
-          'interval' => '10s',
-          'timeout'  => '30s',
+          'interval' => '20',
+          'timeout'  => '10',
         },
         'start'   => {
-          'timeout' => '30s',
+          'timeout' => '30',
         },
         'stop'    => {
-          'timeout' => '30s',
+          'timeout' => '30',
         },
       },
       require         => [File['ocf-lma_collector'], Class['heka']],
