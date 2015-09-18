@@ -140,6 +140,14 @@ Release Notes
 * Collect Swift logs ([LP#1480293](https://bugs.launchpad.net/fuel-plugins/+bug/1480293)).
 * Collect HAProxy logs ([LP#1480297](https://bugs.launchpad.net/fuel-plugins/+bug/1480297)).
 
+**0.7.2**
+
+* Fix issues with Licence.
+
+**0.7.1**
+
+* Fix issues with Licence.
+
 **0.7.0**
 
 * Initial release of the plugin. This is a beta version.
