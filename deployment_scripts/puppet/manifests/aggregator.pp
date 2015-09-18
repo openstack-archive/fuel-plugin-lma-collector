@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-$lma_collector  = hiera('lma_collector')
+$lma_collector  = hiera_hash('lma_collector')
 $roles          = node_roles(hiera('nodes'), hiera('uid'))
 $is_controller  = member($roles, 'controller') or member($roles, 'primary-controller')
 
