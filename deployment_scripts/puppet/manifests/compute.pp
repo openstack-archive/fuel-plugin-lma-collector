@@ -14,8 +14,8 @@
 #
 include lma_collector::params
 
-$ceilometer    = hiera('ceilometer')
-$lma_collector = hiera('lma_collector')
+$ceilometer    = hiera_hash('ceilometer', {})
+$lma_collector = hiera_hash('lma_collector')
 
 if $lma_collector['elasticsearch_mode'] != 'disabled' {
 
