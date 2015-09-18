@@ -133,4 +133,9 @@ function inject_afd_service_metric(service, value, hostname, interval, source)
     inject_message(msg)
 end
 
+MATCH = 1
+NO_MATCH = 2
+NO_DATA = 3
+MISSING_DATA = 4
+
 return M
