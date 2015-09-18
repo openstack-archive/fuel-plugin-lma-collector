@@ -26,7 +26,7 @@ task :test => [
 
 LUA_TESTS = Rake::FileList.new("tests/**/test_*.lua")
 desc "Run Lua unit tests."
-task :lua_tests => [:lua_5_1, :lua_libraries] do |t|
+task :lua_tests => [:lua_5_1, :lua_libraries, :lib_cbuf] do |t|
     LUA_TESTS.each do |f|
         sh "lua5.1 #{f}"
     end
@@ -42,12 +42,36 @@ end
 
 # Need to pull date_time.lua from the lua_sandbox repository because some tests
 # depend on it indirectly
-task :lua_libraries => ['tests/lua/mocks/date_time.lua']
+task :lua_libraries => ['tests/lua/mocks/date_time.lua', 'tests/lua/mocks/inspect.lua']
 
 file 'tests/lua/mocks/date_time.lua' do |t|
     sh "curl", "-s", "-o", t.name, "https://raw.githubusercontent.com/mozilla-services/lua_sandbox/dev/modules/date_time.lua" do |ok, res|
         if ! ok then
             raise "Fail to download date_time.lua from lua_sandbox repository!"
+        end
+    end
+end
+
+file 'tests/lua/mocks/inspect.lua' do |t|
+    sh "curl", "-s", "-o", t.name, "https://raw.githubusercontent.com/kikito/inspect.lua/master/inspect.lua" do |ok, res|
+        if ! ok then
+            raise "Fail to download inspect.lua from gitub repository!"
+        end
+    end
+end
+
+# Need to pull circular_buffer library from mozilla Github and compile it
+task :lib_cbuf => ['./circular_buffer.so']
+
+file './circular_buffer.so' do |t|
+    sh %{cd /tmp && rm -rf lua_circular_buffer && git clone https://github.com/mozilla-services/lua_circular_buffer.git && cd lua_circular_buffer && mkdir release && cd release && cmake -DCMAKE_BUILD_TYPE=release .. && make} do |ok, res|
+        if ! ok then
+            raise "failed to compile circular_buffer!"
+        end
+    end
+    sh %{cp /tmp/lua_circular_buffer/release/circular_buffer.so .} do |ok, res|
+        if ! ok then
+            raise "failed bloom_filter to compule!"
         end
     end
 end
