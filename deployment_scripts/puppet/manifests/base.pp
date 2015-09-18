@@ -14,17 +14,17 @@
 #
 # TODO(spasquier): fail if Neutron isn't used
 
-$lma_collector     = hiera('lma_collector')
+$lma_collector     = hiera_hash('lma_collector')
 $roles             = node_roles(hiera('nodes'), hiera('uid'))
 $is_controller     = member($roles, 'controller') or member($roles, 'primary-controller')
 $is_base_os        = member($roles, 'base-os')
 $current_node_name = hiera('user_node_name')
 $current_roles     = hiera('roles')
 
-$elasticsearch_kibana = hiera('elasticsearch_kibana', {})
+$elasticsearch_kibana = hiera_hash('elasticsearch_kibana', {})
 $es_nodes = filter_nodes(hiera('nodes'), 'role', 'elasticsearch_kibana')
 
-$influxdb_grafana = hiera('influxdb_grafana', {})
+$influxdb_grafana = hiera_hash('influxdb_grafana', {})
 $influxdb_nodes = filter_nodes(hiera('nodes'), 'role', 'influxdb_grafana')
 
 $tags = {

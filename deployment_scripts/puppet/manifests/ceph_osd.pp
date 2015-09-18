@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-$lma_collector_hash = hiera('lma_collector')
+$lma_collector_hash = hiera_hash('lma_collector')
 
 if $lma_collector_hash['influxdb_mode'] != 'disabled' {
   $nodes_hash = hiera('nodes', {})

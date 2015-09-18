@@ -15,13 +15,13 @@
 # This manifest is only executed on the primrary-controller to verify that the
 # plugin's configuration matches with the environment.
 
-$lma_collector = hiera('lma_collector')
+$lma_collector = hiera_hash('lma_collector')
 
 $elasticsearch_mode = $lma_collector['elasticsearch_mode']
 if $elasticsearch_mode == 'local' {
   # Check that the Elasticsearch-Kibana plugin is enabled for that environment
   # and that the node names match
-  $elasticsearch_kibana = hiera('elasticsearch_kibana', false)
+  $elasticsearch_kibana = hiera_hash('elasticsearch_kibana', false)
   if ! $elasticsearch_kibana {
     fail('Could not get the Elasticsearch parameters. The Elasticsearch-Kibana plugin is probably not installed.')
   }
@@ -40,7 +40,7 @@ $influxdb_mode = $lma_collector['influxdb_mode']
 if $influxdb_mode == 'local' {
   # Check that the InfluxDB-Grafana plugin is enabled for that environment
   # and that the node names match
-  $influxdb_grafana = hiera('influxdb_grafana', false)
+  $influxdb_grafana = hiera_hash('influxdb_grafana', false)
   if ! $influxdb_grafana {
     fail('Could not get the InfluxDB parameters. The InfluxDB-Grafana plugin is probably not installed.')
   }
@@ -58,7 +58,7 @@ $alerting_mode = $lma_collector['alerting_mode']
 if $alerting_mode == 'local' {
   # Check that the LMA-Infrastructure-Alerting plugin is enabled for that environment
   # and that the node names match
-  $infra_alerting = hiera('lma_infrastructure_alerting', false)
+  $infra_alerting = hiera_hash('lma_infrastructure_alerting', false)
   if ! $infra_alerting {
     fail('Could not get the LMA Infrastructure Alerting parameters. The LMA-Infrastructure-Alerting plugin is probably not installed.')
   }

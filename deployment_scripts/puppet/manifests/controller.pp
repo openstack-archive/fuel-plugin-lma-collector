@@ -14,11 +14,11 @@
 #
 include lma_collector::params
 
-$ceilometer      = hiera('ceilometer')
-$lma_collector   = hiera('lma_collector')
-$rabbit          = hiera('rabbit')
+$ceilometer      = hiera_hash('ceilometer', {})
+$lma_collector   = hiera_hash('lma_collector')
+$rabbit          = hiera_hash('rabbit')
 $management_vip  = hiera('management_vip')
-$storage_options = hiera('storage', {})
+$storage_options = hiera_hash('storage', {})
 
 if $ceilometer['enabled'] {
   $notification_topics = [$lma_collector::params::openstack_topic, $lma_collector::params::lma_topic]
@@ -81,9 +81,9 @@ if $lma_collector['elasticsearch_mode'] != 'disabled' {
 # Metrics
 if $lma_collector['influxdb_mode'] != 'disabled' {
 
-  $nova           = hiera('nova')
-  $neutron        = hiera('quantum_settings')
-  $cinder         = hiera('cinder')
+  $nova           = hiera_hash('nova', {})
+  $neutron        = hiera_hash('quantum_settings', {})
+  $cinder         = hiera_hash('cinder', {})
 
   if $ha_deployment {
     $haproxy_socket = '/var/lib/haproxy/stats'
@@ -191,7 +191,7 @@ if $alerting_mode != 'disabled' {
     $nagios_password = $lma_collector['nagios_password']
   } elsif $alerting_mode == 'local' {
     $use_nagios = true
-    $lma_infra_alerting = hiera('lma_infrastructure_alerting', false)
+    $lma_infra_alerting = hiera_hash('lma_infrastructure_alerting', false)
     $nagios_nodes = filter_nodes(hiera('nodes'), 'role', 'infrastructure_alerting')
     $nagios_server = $nagios_nodes[0]['internal_address']
     $nagios_user = $lma_infra_alerting['nagios_user']

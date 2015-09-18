@@ -24,6 +24,14 @@
   stage: post_deployment/8200
   type: puppet
   parameters:
+    puppet_manifest: puppet/manifests/hiera_override.pp
+    puppet_modules: puppet/modules
+    timeout: 600
+
+- role: '*'
+  stage: post_deployment/8200
+  type: puppet
+  parameters:
     puppet_manifest: puppet/manifests/base.pp
     puppet_modules: puppet/modules
     timeout: 600
