@@ -47,8 +47,8 @@ local STATUS_MAPPING_FOR_LEVEL_1 = {
 }
 
 local STATUS_WEIGHTS = {
-    [consts.UNKW]=0,
     [consts.OKAY]=1,
+    [consts.UNKW]=0,
     [consts.WARN]=2,
     [consts.CRIT]=3,
     [consts.DOWN]=4
@@ -94,12 +94,14 @@ end
 -- The status of the level-2 dependencies don't modify the overall status
 -- but their alarms are returned.
 function resolve_status(name)
-    local service_status = consts.UNKW
+    local service_status = consts.OKAY
     local alarms = {}
+    local found = false
 
     for _, level_1_dep in ipairs(level_1_deps[name] or {}) do
         if facts[level_1_dep] then
             local status = STATUS_MAPPING_FOR_LEVEL_1[facts[level_1_dep].status]
+            found = true
             if status ~= consts.OKAY then
                 for _, v in ipairs(facts[level_1_dep].alarms) do
                     alarms[#alarms+1] = lma.deepcopy(v)
@@ -128,6 +130,9 @@ function resolve_status(name)
                 end
             end
         end
+    end
+    if not found then
+        service_status = consts.UNKW
     end
 
     return service_status, alarms
