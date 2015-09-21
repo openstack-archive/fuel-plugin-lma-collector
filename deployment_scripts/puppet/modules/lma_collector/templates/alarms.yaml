@@ -1,0 +1,239 @@
+lma:
+  alarms:
+    - name: 'cpu-critical-controller'
+      description: 'CPU critical on controller'
+      severity: 'critical'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: cpu_idle
+            relational_operator: '<='
+            threshold: 5
+            window: 120
+            period: 0
+            function: avg
+          - metric: cpu_wait
+            relational_operator: '>='
+            threshold: 35
+            window: 120
+            period: 0
+            function: avg
+    - name: 'cpu-warn-controller'
+      description: 'CPU warning on controller'
+      severity: 'warning'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: cpu_idle
+            relational_operator: '<='
+            threshold: 15
+            window: 120
+            period: 0
+            function: avg
+          - metric: cpu_wait
+            relational_operator: '<='
+            threshold: 25
+            window: 120
+            period: 0
+            function: avg
+    - name: 'cpu-critical-compute'
+      description: 'CPU critical on compute'
+      severity: 'critical'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: cpu_wait
+            relational_operator: '>='
+            threshold: 30
+            window: 300
+            period: 0
+            function: avg
+    - name: 'cpu-warn-compute'
+      description: 'CPU critical on compute'
+      severity: 'warning'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: cpu_wait
+            relational_operator: '>='
+            threshold: 20
+            window: 120
+            period: 0
+            function: avg
+    - name: 'cpu-critical-storage'
+      description: 'CPU critical on storage'
+      severity: 'critical'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: cpu_wait
+            relational_operator: '>='
+            threshold: 40
+            window: 120
+            period: 0
+            function: avg
+          - metric: cpu_idle
+            relational_operator: '<='
+            threshold: 5
+            window: 120
+            period: 0
+            function: avg
+    - name: 'cpu-warn-storage'
+      description: 'CPU warning on storage'
+      severity: 'warning'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: cpu_wait
+            relational_operator: '>='
+            threshold: 30
+            window: 120
+            period: 0
+            function: avg
+          - metric: cpu_idle
+            relational_operator: '<='
+            threshold: 15
+            window: 120
+            period: 0
+            function: avg
+    - name: 'cpu-critical-default'
+      description: 'CPU critical'
+      severity: 'critical'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: cpu_wait
+            relational_operator: '>='
+            threshold: 35
+            window: 120
+            period: 0
+            function: avg
+          - metric: cpu_idle
+            relational_operator: '<='
+            threshold: 5
+            window: 120
+            period: 0
+            function: avg
+    - name: 'mq-queue'
+      description: 'Number of message in queues too high'
+      severity: 'warning'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: rabbitmq_messages
+            relational_operator: '>='
+            threshold: 200
+            window: 120
+            period: 0
+            function: avg
+    - name: 'apache'
+      description: ''
+      severity: 'warning'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: apache_idle_workers
+            relational_operator: '='
+            threshold: 0
+            window: 60
+            period: 0
+            function: min
+          - metric: apache_status
+            relational_operator: '='
+            threshold: 0
+            window: 60
+            period: 0
+            function: min
+    - name: 'haproxy'
+      description: 'HAproxy warning'
+      severity: 'warning'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: haproxy_status
+            relational_operator: '='
+            threshold: 0
+            window: 60
+            period: 0
+            function: min
+    - name: 'memcached'
+      description: 'Memcached warning'
+      severity: 'warning'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: memcached_status
+            relational_operator: '='
+            threshold: 0
+            window: 60
+            period: 0
+            function: min
+          - metric: memcached_percent_hitratio
+            relational_operator: '>='
+            threshold: 50
+            window: 120
+            period: 0
+            function: avg
+    - name: 'fs-warn'
+      description: 'Filesystem usage'
+      severity: 'warning'
+      trigger:
+        rules:
+          - metric: fs_space_percent_free
+            fields:
+              name: fs
+              value: '*'
+            relational_operator: '<'
+            threshold: 5
+            window: 60
+            period: 0
+            function: avg
+    - name: 'fs-critical'
+      description: 'Filesystem usage'
+      severity: 'critical'
+      trigger:
+        rules:
+          - metric: fs_space_percent_free
+            fields:
+              name: fs
+              value: '*'
+            relational_operator: '<'
+            threshold: 2
+            window: 30
+            period: 0
+            function: avg
+    - name: 'error-rate-log'
+      description: 'Error rate in logs is too high'
+      severity: 'warning'
+      trigger:
+        rules:
+          - metric: log_error_rate
+            fields:
+              name: severity
+              value: 'ERROR'
+            relational_operator: '>='
+            threshold: 10
+            window: 30
+            period: 0
+            function: avg
+  cluster_nodes_roles_map:
+    - controller: ['primary-controller', 'controller']
+    - compute: ['compute']
+    - storage: ['cinder', 'ceph-osd']
+  cluster_services_roles_map:
+    - rabbitmq: ['controller']
+    - apache: ['controller']
+    - mysql: ['controller']
+    - haproxy: ['controller']
+    - memcached: ['controller']
+  cluster_nodes:
+    - controller: ['cpu-critical-controller', 'cpu-warn-controller']
+    - compute: ['cpu-critical-compute', 'cpu-warn-compute']
+    - storage: ['cpu-critical-storage', 'cpu-warn-storage']
+    - _all: ['fs-warn', 'fs-critical', 'error-rate-log']
+    - _default: ['cpu-critical-default']
+  cluster_services:
+    - rabbitmq: ['mq-queue']
+    - apache: ['apache']
+    - memcached: ['memcached']
+    - haproxy: ['haproxy']
