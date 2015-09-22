@@ -171,9 +171,6 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     services => ['mysql', 'rabbitmq', 'haproxy', 'memcached', 'apache']
   }
 
-  # Service status metrics and annotations
-  class { 'lma_collector::metrics::service_status': }
-
   # AFD filters
   class { 'lma_collector::afd::api': }
   class { 'lma_collector::afd::workers': }
