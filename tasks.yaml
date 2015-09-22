@@ -80,6 +80,14 @@
   stage: post_deployment/8200
   type: puppet
   parameters:
+    puppet_manifest: puppet/manifests/configure_afd_alarms.pp
+    puppet_modules: puppet/modules
+    timeout: 600
+
+- role: '*'
+  stage: post_deployment/8200
+  type: puppet
+  parameters:
     puppet_manifest: puppet/manifests/cleanup_apt_config.pp
     puppet_modules: puppet/modules
     timeout: 600
