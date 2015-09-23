@@ -180,4 +180,15 @@ function chomp(s)
     return string.gsub(s, "\n$", "")
 end
 
+function deepcopy(t)
+    if type(t) == 'table' then
+        local copy = {}
+        for k, v in pairs(t) do
+            copy[k] = deepcopy(v)
+        end
+        return copy
+    end
+    return t
+end
+
 return M

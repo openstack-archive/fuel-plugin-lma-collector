@@ -46,14 +46,6 @@ local STATUS_MAPPING_FOR_LEVEL_1 = {
     [consts.UNKW]=consts.UNKW
 }
 
-local STATUS_MAPPING_FOR_LEVEL_2 = {
-    [consts.OKAY]=consts.OKAY,
-    [consts.WARN]=consts.OKAY,
-    [consts.CRIT]=consts.WARN,
-    [consts.DOWN]=consts.CRIT,
-    [consts.UNKW]=consts.OKAY
-}
-
 local STATUS_WEIGHTS = {
     [consts.UNKW]=0,
     [consts.OKAY]=1,
@@ -61,17 +53,6 @@ local STATUS_WEIGHTS = {
     [consts.CRIT]=3,
     [consts.DOWN]=4
 }
-
-function deepcopy(t)
-    if type(t) == 'table' then
-        local copy = {}
-        for k, v in pairs(t) do
-            copy[k] = deepcopy(v)
-        end
-        return copy
-    end
-    return t
-end
 
 local function dependency(deps, superior, subordinate)
     if not deps[superior] then
@@ -101,8 +82,9 @@ function set_status(service, value, alarms)
     }
 end
 
--- return the status of a service, the alarms associated to the level-1
--- dependencies and the alarms associated to the level-2 dependencies
+-- The service status depends on the status of the level-1 dependencies.
+-- The status of the level-2 dependencies don't modify the overall status
+-- but their alarms are returned.
 function resolve_status(name)
     local service_status = consts.UNKW
     local alarms = {}
@@ -120,7 +102,7 @@ function resolve_status(name)
             local status = STATUS_MAPPING_FOR_LEVEL_1[facts[level_1_dep].status]
             if status ~= consts.OKAY then
                 for _, v in ipairs(facts[level_1_dep].alarms) do
-                    alarms[#alarms+1] = deepcopy(v)
+                    alarms[#alarms+1] = lma.deepcopy(v)
                     if not alarms[#alarms]['tags'] then
                         alarms[#alarms]['tags'] = {}
                     end
@@ -133,10 +115,10 @@ function resolve_status(name)
 
         for _, level_2_dep in ipairs(level_2_deps[level_1_dep] or {}) do
             if facts[level_2_dep] then
-                local status = STATUS_MAPPING_FOR_LEVEL_2[facts[level_2_dep].status]
+                local status = facts[level_2_dep].status
                 if status ~= consts.OKAY then
                     for _, v in ipairs(facts[level_2_dep].alarms) do
-                        alarms[#alarms+1] = deepcopy(v)
+                        alarms[#alarms+1] = lma.deepcopy(v)
                         if not alarms[#alarms]['tags'] then
                             alarms[#alarms]['tags'] = {}
                         end
@@ -144,7 +126,6 @@ function resolve_status(name)
                         alarms[#alarms].tags['dependency_level'] = 'indirect'
                     end
                 end
-                service_status = max(status)
             end
         end
     end
