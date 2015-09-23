@@ -2,3 +2,4 @@ spec/fixtures/modules/*
 spec/fixtures/manifests/*
 Gemfile.lock
 tests/lua/mocks/date_time.lua
+.bundle
