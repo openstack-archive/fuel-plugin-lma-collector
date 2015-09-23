@@ -115,6 +115,7 @@ lma_collector:
     level_1_dependencies:
       nova:
         - nova-api
+        - keystone-api
         - nova-scheduler
         - nova-compute
         - nova-conductor
@@ -122,10 +123,12 @@ lma_collector:
         - nova-metadata
       cinder:
         - cinder-api
+        - keystone-api
         - cinder-scheduler
         - cinder-volume
       neutron:
         - neutron-api
+        - keystone-api
         - neutron-l3
         - neutron-dhcp
         - neutron-metadata
@@ -134,29 +137,33 @@ lma_collector:
         - keystone-api
       glance:
         - glance-api
+        - keystone-api
         - glance-registry
       heat:
         - heat-api
+        - keystone-api
       horizon:
         - horizon-ui
+        - keystone-api
 <% if not @storage_options["objects_ceph"] then -%>
       swift:
         - swift-api
+        - keystone-api
 <% end -%>
     level_2_dependencies:
       nova-api:
         - neutron-api
-        - keystone-api
         - cinder-api
         - glance-api
       cinder-api:
         - keystone-api
-      neutron-api:
-        - keystone-api
       glance-api:
-        - keystone-api
+        - swift-api
       heat-api:
-        - keystone-api
+        - nova-api
+        - cinder-api
+        - neutron-api
+        - glance-api
 ')
 
   lma_collector::hiera_data { 'gse_filters':

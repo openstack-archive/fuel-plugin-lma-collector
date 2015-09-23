@@ -19,6 +19,7 @@ local pairs = pairs
 local inject_message = inject_message
 local read_message = read_message
 local pcall = pcall
+local type = type
 
 local M = {}
 setfenv(1, M) -- Remove external access to contain everything in the module
@@ -179,5 +180,17 @@ end
 function chomp(s)
     return string.gsub(s, "\n$", "")
 end
+
+function deepcopy(t)
+    if type(t) == 'table' then
+        local copy = {}
+        for k, v in pairs(t) do
+            copy[k] = deepcopy(v)
+        end
+        return copy
+    end
+    return t
+end
+
 
 return M
