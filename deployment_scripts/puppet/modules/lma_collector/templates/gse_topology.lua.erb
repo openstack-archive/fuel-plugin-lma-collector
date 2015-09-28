@@ -14,6 +14,12 @@
 local M = {}
 setfenv(1, M) -- Remove external access to contain everything in the module
 
+sources = {
+<% @sources.keys().sort().each do |k| -%>
+    ['<%= k.to_s().gsub("'"){"\\'"} %>']={<%= @sources[k].collect{ |x| "'" + x.to_s().gsub("'"){"\\'"} + "'"}.join(',') %>},
+<% end -%>
+}
+
 level_1_dependencies = {
 <% @level_1_dependencies.keys().sort().each do |k| -%>
     ['<%= k.to_s().gsub("'"){"\\'"} %>']={<%= @level_1_dependencies[k].collect{ |x| "'" + x.to_s().gsub("'"){"\\'"} + "'"}.join(',') %>},

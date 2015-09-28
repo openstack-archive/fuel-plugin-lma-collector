@@ -18,6 +18,7 @@ define lma_collector::gse_cluster_filter (
   $output_message_type,
   $output_metric_name,
   $interval = 10,
+  $sources = {},
   $level_1_dependencies = {},
   $level_2_dependencies = {},
   $ensure = present,
