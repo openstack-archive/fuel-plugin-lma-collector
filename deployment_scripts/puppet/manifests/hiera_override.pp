@@ -162,4 +162,8 @@ lma_collector:
   lma_collector::hiera_data { 'gse_filters':
     content => $gse_filters
   }
+
+  lma_collector::hiera_data { 'alarming':
+    content => template('lma_collector/alarming.yaml.erb')
+  }
 }
