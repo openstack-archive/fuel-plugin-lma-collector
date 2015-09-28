@@ -21,7 +21,7 @@ local output_message_type = read_config('output_message_type') or error('output_
 local entity_field = read_config('entity_field') or error('entity_field must be specified!')
 local output_metric_name = read_config('output_metric_name') or error('output_metric_name must be specified!')
 local hostname = read_config('hostname') or error('hostname must be specified!')
-local source = read_config('source') or error('source must be specified!')
+local gse_source = read_config('source') or error('source must be specified!')
 local topology_file = read_config('topology_file') or error('topology_file must be specified!')
 local interval = (read_config('interval') or error('interval must be specified!')) + 0
 local interval_in_ns = interval * 1e9
@@ -30,6 +30,13 @@ local is_active = false
 local last_tick = 0
 local entities = {}
 local topology = require(topology_file)
+local inspect = require('inspect')
+
+for parent, sources in pairs(topology.sources) do
+    for _, s in ipairs(sources) do
+        gse.source_dependency(parent, s)
+    end
+end
 
 for parent, children in pairs(topology.level_1_dependencies) do
     entities[#entities+1] = parent
@@ -55,19 +62,24 @@ function process_message()
     end
 
     name = afd.get_entity_name(entity_field)
+
     local status = afd.get_status()
     local alarms = afd.extract_alarms()
+    local source = afd.get_entity_name('source')
     if not name then
         return -1, "Cannot find entity's name in the AFD event message"
     end
     if not status then
         return -1, "Cannot find status in the AFD event message"
     end
+    if not source then
+        return -1, "Cannot find the source of the entity " .. name
+    end
     if not alarms then
         return -1, "Cannot find alarms in the AFD event message"
     end
 
-    gse.set_status(name, status, alarms)
+    gse.set_source_status(name, source, status, alarms)
     return 0
 end
 
@@ -84,7 +96,7 @@ function timer_event(ns)
             output_metric_name,
             hostname,
             interval,
-            source
+            gse_source
         )
     end
 end
