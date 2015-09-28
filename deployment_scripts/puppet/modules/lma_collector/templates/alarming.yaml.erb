@@ -273,3 +273,29 @@ lma_collector:
       - all: ['memcached-warning']
     - haproxy:
       - alive: ['haproxy-warning']
+
+  gse_cluster_node:
+    sources:
+      controller:
+        - system
+        - fs
+      compute:
+        - system
+        - fs
+      storage:
+        - system
+        - fs
+      _default:
+        - cpu
+        - fs
+
+  gse_cluster_service:
+    sources:
+      rabbitmq:
+        - queue
+      apache:
+        - worker
+      memcached:
+        - all
+      haproxy:
+        - alive

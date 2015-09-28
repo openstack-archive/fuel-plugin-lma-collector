@@ -15,13 +15,16 @@ local cjson = require 'cjson'
 local consts = require 'gse_constants'
 local string = require 'string'
 local lma = require 'lma_utils'
+math = require 'math'
 
 local pairs = pairs
 local ipairs = ipairs
 local assert = assert
 local type = type
 local inject_message = inject_message
+local inject_payload = inject_payload
 local read_message = read_message
+local inspect = require('inspect')
 
 local M = {}
 setfenv(1, M) -- Remove external access to contain everything in the module
@@ -29,6 +32,7 @@ setfenv(1, M) -- Remove external access to contain everything in the module
 local facts = {}
 local level_1_deps = {}
 local level_2_deps = {}
+local sources = {}
 
 local VALID_STATUSES = {
     [consts.OKAY]=true,
@@ -62,6 +66,10 @@ local function dependency(deps, superior, subordinate)
     subordinates[#subordinates+1] = subordinate
 end
 
+function source_dependency(superior, subordinate)
+    return dependency(sources, superior, subordinate)
+end
+
 -- define a first degree dependency between 2 entities.
 function level_1_dependency(superior, subordinate)
     return dependency(level_1_deps, superior, subordinate)
@@ -88,6 +96,20 @@ function worst_status(current, status)
         else
             return status
         end
+end
+
+function set_source_status(service, source, value, alarms)
+    assert(VALID_STATUSES[value])
+    assert(type(alarms) == 'table')
+
+    if not facts[service] then
+        set_status(service, value, alarms)
+    else
+        facts[service].status = worst_status(facts[service].status, status)
+        for _, a in ipairs(facts[service].alarms) do
+            facts[service].alarms[#facts[service].alarms+1] = a
+        end
+    end
 end
 
 -- Return the status and alerts.
@@ -146,6 +168,8 @@ function inject_cluster_metric(msg_type, cluster_name, metric_name, hostname, in
         payload = '{"alarms":[]}'
     end
 
+    inject_payload('debug', 'debug', cjson.encode(
+    {facts=inspect(facts), level1=inspect(level_1_deps)}))
     local msg = {
         Type = msg_type,
         Payload = payload,
