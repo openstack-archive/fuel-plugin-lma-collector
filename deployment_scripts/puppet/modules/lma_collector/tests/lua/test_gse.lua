@@ -151,6 +151,17 @@ TestGse = {}
         assertEquals(metric.Payload, '{"alarms":[]}')
     end
 
+    function TestGse:test_worst_status()
+        local status = gse.worst_status(consts.DOWN, consts.WARN)
+        assertEquals(consts.DOWN, status)
+        local status = gse.worst_status(consts.OKAY, consts.WARN)
+        assertEquals(consts.WARN, status)
+        local status = gse.worst_status(consts.OKAY, consts.DOWN)
+        assertEquals(consts.DOWN, status)
+        local status = gse.worst_status(consts.UNKW, consts.DOWN)
+        assertEquals(consts.DOWN, status)
+    end
+
 lu = LuaUnit
 lu = LuaUnit
 lu:setVerbosity( 1 )
