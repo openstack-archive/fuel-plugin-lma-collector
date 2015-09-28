@@ -151,6 +151,17 @@ TestGse = {}
         assertEquals(metric.Payload, '{"alarms":[]}')
     end
 
+    function TestGse:test_max_status_severity()
+        local status = gse.max_status_severity(consts.DOWN, consts.WARN)
+        assertEquals(consts.DOWN, status)
+        local status = gse.max_status_severity(consts.OKAY, consts.WARN)
+        assertEquals(consts.WARN, status)
+        local status = gse.max_status_severity(consts.OKAY, consts.DOWN)
+        assertEquals(consts.DOWN, status)
+        local status = gse.max_status_severity(consts.UNKW, consts.DOWN)
+        assertEquals(consts.DOWN, status)
+    end
+
 lu = LuaUnit
 lu = LuaUnit
 lu:setVerbosity( 1 )
