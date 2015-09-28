@@ -28,12 +28,16 @@ define lma_collector::hiera_data (
   validate_hash($parsed_yaml)
   validate_hash($parsed_yaml['lma_collector'])
 
-  package {'ruby-deep-merge':
-    ensure  => 'installed',
+  if !defined(Package['ruby-deep-merge']){
+    package {'ruby-deep-merge':
+      ensure  => 'installed',
+    }
   }
 
-  file { $hiera_directory:
-    ensure  => directory,
+  if !defined(File[$hiera_directory]){
+    file { $hiera_directory:
+      ensure  => directory,
+    }
   }
 
   file { "${hiera_directory}/${name}.yaml":
