@@ -24,6 +24,7 @@ local type = type
 local read_message = read_message
 local lma = require 'lma_utils'
 local consts = require 'gse_constants'
+local gse = require 'gse'
 local Rule = require 'afd_rule'
 local Alarm = require 'afd_alarm'
 
@@ -80,9 +81,7 @@ function evaluate(ns)
   for _, alarm in pairs(all_alarms) do
     if alarm:can_evaluate(ns) then
       local state, alerts = alarm:evaluate()
-      if state > global_state then
-        global_state = state
-      end
+      global_state = gse.worst_status(global_state, state)
       for _, a in ipairs(alerts)do
         all_alerts[#all_alerts+1] = { state=state, alert=a }
       end
