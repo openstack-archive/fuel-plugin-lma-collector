@@ -32,16 +32,17 @@ EOF
         it { is_expected.to contain_file('/etc/hiera/override/foo.yaml') }
     end
 
-#    describe 'with invalid YAML' do
-#        yaml =<<EOF
-#lma_collector:
-#  some_parameter: "ee
-#EOF
-#        let(:params) do
-#            {:content => yaml}
-#        end
-#        it { is_expected.to raise_error(Psych::SyntaxError) }
-#    end
+    describe 'with invalid YAML' do
+        pending('needs stdlib >= 4.9.0')
+        yaml =<<EOF
+lma_collector:
+  some_parameter: "ee
+EOF
+        let(:params) do
+            {:content => yaml}
+        end
+        it { is_expected.to raise_error(Psych::SyntaxError) }
+    end
 
     describe 'with data which is not a hahs' do
         yaml =<<EOF
