@@ -15,18 +15,18 @@ def print_message(msg):
 def errback(exc, interval):
     print_message("{0}, retry in {1} seconds".format(exc, interval))
 
-# First we need to check the connection
-with Connection('amqp://<%= @rabbitmq_user %>:<%= @rabbitmq_password %>@<%= @rabbitmq_host %>:<%= @rabbitmq_port %>//') as conn:
+PAYLOAD="CheckRabbitAvailability"
+QUEUE_NAME=PAYLOAD
+EXCHANGE_NAME=PAYLOAD
 
-    conn.ensure_connection(errback, interval_start=<%= @wait_delay %>, interval_step=0)
+passed = False
 
-    # Now we need to check that we can post a message
-    PAYLOAD="CheckRabbitAvailability"
-    QUEUE_NAME=PAYLOAD
-    EXCHANGE_NAME=PAYLOAD
+while not passed:
+    with Connection('amqp://<%= @rabbitmq_user %>:<%= @rabbitmq_password %>@<%= @rabbitmq_host %>:<%= @rabbitmq_port %>//') as conn:
 
-    with conn.SimpleQueue(QUEUE_NAME) as queue:
-        while True:
+        conn.ensure_connection(errback, interval_start=<%= @wait_delay %>, interval_step=0)
+
+        with conn.SimpleQueue(QUEUE_NAME) as queue:
             try:
                 queue.put(PAYLOAD)
                 message = queue.get(timeout=<%= @wait_delay %>)
@@ -38,13 +38,13 @@ with Connection('amqp://<%= @rabbitmq_user %>:<%= @rabbitmq_password %>@<%= @rab
                 print_message("{0}. {1}".format(exc_info()[0], exc_info()[1]))
                 sleep(<%= @wait_delay %>)
             else:
-                break
+                # Delete the queue and the exchange
+                current_channel = conn.channel()
 
-    # Finally, delete the queue and the exchange
-    current_channel = conn.channel()
+                bound_queue = Queue(QUEUE_NAME, channel=current_channel)
+                bound_queue.delete()
 
-    bound_queue = Queue(QUEUE_NAME, channel=current_channel)
-    bound_queue.delete()
+                bound_exchange = Exchange(EXCHANGE_NAME, channel=current_channel)
+                bound_exchange.delete()
 
-    bound_exchange = Exchange(EXCHANGE_NAME, channel=current_channel)
-    bound_exchange.delete()
+                passed = True
