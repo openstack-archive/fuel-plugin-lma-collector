@@ -166,12 +166,9 @@ function process_message ()
                 end
             elseif metric_source == 'check_openstack_api' then
                 -- For OpenStack API metrics, plugin_instance = <service name>
-                msg['Fields']['name'] = 'openstack' .. sep .. sample['plugin_instance'] .. sep .. 'check_api'
-                -- 'service' isn't used as a tag because there is no point to
-                -- aggregate data across all services. It is stored in the
-                -- Fields table though because it simplifies the life of
-                -- downstream filters consuming this data.
+                msg['Fields']['name'] = 'openstack_check_api'
                 msg['Fields']['service'] = sample['plugin_instance']
+                msg['Fields']['tag_fields'] = { 'service' }
                 if sample['type_instance'] ~= nil and sample['type_instance'] ~= '' then
                     msg['Fields']['os_region'] = sample['type_instance']
                 end
