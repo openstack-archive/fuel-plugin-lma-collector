@@ -61,6 +61,11 @@ class lma_collector::params {
       fail("${::osfamily} not supported")
     }
   }
+
+  # Disable buffering because of a bug in Heka 0.10.0b1, see
+  # https://github.com/mozilla-services/heka/issues/1627 for details
+  $buffering_enabled = false
+
   # The maximum size of 158Kb was observed during a load test with 50 nodes,
   # this is required by elasticsearch buffered output.
   # Lets configure 192Kb by default.
