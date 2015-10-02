@@ -30,20 +30,24 @@ class APICheckPlugin(openstack.CollectdPlugin):
     OK = 1
     UNKNOWN = 2
 
-    # TODO: nova_ec2, sahara
+    # TODO: sahara, murano
     CHECK_MAP = {
-        'keystone': {'path': '/', 'expect': 300},  # 300 Multiple Choices
-        'heat': {'path': '/', 'expect': 300},      # 300 Multiple Choices
-        'heat-cfn': {'path': '/', 'expect': 300},  # 300 Multiple Choices
-        'glance': {'path': '/', 'expect': 300},    # 300 Multiple Choices
-        'cinder': {'path': '/', 'expect': 200},
-        'cinderv2': {'path': '/', 'expect': 200, 'name': 'cinder-v2'},
-        'neutron': {'path': '/', 'expect': 200},
-        'nova': {'path': '/', 'expect': 200},
+        'keystone': {
+            'path': '/', 'expect': 300, 'name': 'keystone-public-api'},
+        'heat': {'path': '/', 'expect': 300, 'name': 'heat-api'},
+        'heat-cfn': {'path': '/', 'expect': 300, 'name': 'heat-cfn-api'},
+        'glance': {'path': '/', 'expect': 300, 'name': 'glance-api'},
+        'cinder': {'path': '/', 'expect': 200, 'name': 'cinder-api'},
+        'cinderv2': {'path': '/', 'expect': 200, 'name': 'cinder-v2-api'},
+        'neutron': {'path': '/', 'expect': 200, 'name': 'neutron-api'},
+        'nova': {'path': '/', 'expect': 200, 'name': 'nova-api'},
         # Ceilometer requires authentication for all paths
-        'ceilometer': {'path': 'v2/capabilities', 'expect': 200, 'auth': True},
-        'swift': {'path': 'healthcheck', 'expect': 200},
-        'swift_s3': {'path': 'healthcheck', 'expect': 200, 'name': 'swift-s3'},
+        'ceilometer': {
+            'path': 'v2/capabilities', 'expect': 200, 'auth': True,
+            'name': 'ceilometer-api'},
+        'swift': {'path': 'healthcheck', 'expect': 200, 'name': 'swift-api'},
+        'swift_s3': {
+            'path': 'healthcheck', 'expect': 200, 'name': 'swift-s3-api'},
     }
 
     def _service_url(self, endpoint, path):

@@ -4,21 +4,22 @@ Service checks
 ^^^^^^^^^^^^^^
 .. _service_checks:
 
-* ``openstack_<api>_check_api``, the service's API status, 1 if it is responsive, 0 otherwise.
+* ``openstack_check_api``, the service's API status, 1 if it is responsive, 0 otherwise.
+    The metric contains a ``service`` field that identifies the OpenStack service being checked.
 
-``<api>`` is one of the following services with their respective resource checks:
+``<service>`` is one of the following values with their respective resource checks:
 
-* 'nova': '/'
-* 'cinder': '/'
-* 'cinder-v2': '/'
-* 'glance': '/'
-* 'heat': '/'
-* 'heat-cfn': '/'
-* 'keystone': '/'
-* 'neutron': '/'
-* 'ceilometer': '/v2/capabilities'
-* 'swift': '/healthcheck'
-* 'swift-s3': '/healthcheck'
+* 'nova-api': '/'
+* 'cinder-api': '/'
+* 'cinder-v2-api': '/'
+* 'glance-api': '/'
+* 'heat-api': '/'
+* 'heat-cfn-api': '/'
+* 'keystone-public-api': '/'
+* 'neutron-api': '/'
+* 'ceilometer-api': '/v2/capabilities'
+* 'swift-api': '/healthcheck'
+* 'swift-s3-api': '/healthcheck'
 
 .. note:: All checks are performed without authentication except for Ceilometer.
 
