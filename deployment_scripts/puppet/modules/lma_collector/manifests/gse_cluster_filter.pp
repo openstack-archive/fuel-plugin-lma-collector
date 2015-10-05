@@ -14,22 +14,30 @@
 define lma_collector::gse_cluster_filter (
   $input_message_types,
   $aggregator_flag,
-  $entity_field,
+  $member_field,
   $output_message_type,
   $output_metric_name,
   $interval = 10,
-  $level_1_dependencies = {},
-  $level_2_dependencies = {},
+  $max_inject = undef,
+  $cluster_field = undef,
+  $clusters = {},
   $ensure = present,
 ) {
   include lma_collector::params
   include heka::params
 
   validate_array($input_message_types)
-  validate_string($entity_field)
+  validate_string($cluster_field)
+  validate_string($member_field)
   validate_string($output_metric_name)
   if size($input_message_types) == 0 {
     fail('input_message_types cannot be empty')
+  }
+
+  if $max_inject == undef {
+    $real_max_inject = $lma_collector::params::max_inject
+  } else {
+    $real_max_inject = $max_inject
   }
 
   $lua_modules_dir = $heka::params::lua_modules_dir
@@ -59,7 +67,9 @@ define lma_collector::gse_cluster_filter (
       source              => "gse_${title}_filter",
       interval            => $interval,
       topology_file       => $topology_file,
-      entity_field        => $entity_field,
+      cluster_field       => $cluster_field,
+      member_field        => $member_field,
+      max_inject          => $real_max_inject,
     },
     require         => File[$topology_file],
     notify          => Class['lma_collector::service']
