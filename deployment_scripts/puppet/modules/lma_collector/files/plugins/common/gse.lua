@@ -82,20 +82,20 @@ function set_status(service, value, alarms)
     }
 end
 
+function max_status(current, status)
+        if not status or STATUS_WEIGHTS[current] > STATUS_WEIGHTS[status] then
+            return current
+        else
+            return status
+        end
+end
+
 -- The service status depends on the status of the level-1 dependencies.
 -- The status of the level-2 dependencies don't modify the overall status
 -- but their alarms are returned.
 function resolve_status(name)
     local service_status = consts.UNKW
     local alarms = {}
-
-    function max(other_status)
-        if not other_status or STATUS_WEIGHTS[service_status] >= STATUS_WEIGHTS[other_status] then
-            return service_status
-        else
-            return other_status
-        end
-    end
 
     for _, level_1_dep in ipairs(level_1_deps[name] or {}) do
         if facts[level_1_dep] then
@@ -110,7 +110,7 @@ function resolve_status(name)
                     alarms[#alarms].tags['dependency_level'] = 'direct'
                 end
             end
-            service_status = max(status)
+            service_status = max_status(service_status, status)
         end
 
         for _, level_2_dep in ipairs(level_2_deps[level_1_dep] or {}) do
