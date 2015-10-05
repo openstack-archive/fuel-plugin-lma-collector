@@ -194,16 +194,20 @@ function deepcopy(t)
     return t
 end
 
--- return true if an item is present in the list, else false
-function table_find(item, list)
+-- return the position (index) of an item in a list, nil if not found
+function table_pos(item, list)
   if type(list) == 'table' then
-    for _, v in ipairs(list) do
+    for i, v in ipairs(list) do
       if v == item then
-        return true
+        return i
       end
     end
-    return false
   end
+end
+
+-- return true if an item is present in the list, else false
+function table_find(item, list)
+    return table_pos(item, list) ~= nil
 end
 
 function table_length(T)

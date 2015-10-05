@@ -14,16 +14,14 @@
 local M = {}
 setfenv(1, M) -- Remove external access to contain everything in the module
 
-level_1_dependencies = {
-<% @level_1_dependencies.keys().sort().each do |k| -%>
-    ['<%= k.to_s().gsub("'"){"\\'"} %>']={<%= @level_1_dependencies[k].collect{ |x| "'" + x.to_s().gsub("'"){"\\'"} + "'"}.join(',') %>},
+clusters = {
+<% @clusters.keys().sort().each do |cluster_id| -%>
+    ['<%= cluster_id.to_s().gsub("'"){"\\'"} %>']={
+        ['members']={<%= @clusters[cluster_id]['members'].sort().collect{ |x| "'" + x.to_s().gsub("'"){"\\'"} + "'"}.join(',') %>},
+        ['hints']={<%= @clusters[cluster_id]['hints'].sort().collect{ |x| "'" + x.to_s().gsub("'"){"\\'"} + "'"}.join(',') %>},
+        ['group_by_hostname']=<%= @clusters[cluster_id]['group_by_hostname'] ? 'true' : 'false' %>
 <% end -%>
-}
-
-level_2_dependencies = {
-<% @level_2_dependencies.keys().sort().each do |k| -%>
-    ['<%= k.to_s().gsub("'"){"\\'"} %>']={<%= @level_2_dependencies[k].collect{ |x| "'" + x.to_s().gsub("'"){"\\'"} + "'"}.join(',') %>},
-<% end -%>
+    },
 }
 
 return M
