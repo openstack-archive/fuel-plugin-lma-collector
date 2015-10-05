@@ -24,25 +24,36 @@ describe 'lma_collector::gse_cluster_filter' do
         let(:params) do
             {:input_message_types => ['afd_service_metric'],
              :aggregator_flag => true,
-             :entity_field => 'service',
+             :cluster_field => 'service',
+             :member_field => 'source',
              :output_message_type => 'gse_service_cluster_metric',
              :output_metric_name => 'cluster_service_status'}
         end
         it { is_expected.to contain_heka__filter__sandbox('gse_service').with_message_matcher("(Fields[name] == 'pacemaker_local_resource_active' && Fields[resource] == 'vip__management') || (Fields[aggregator] != NIL && (Type =~ /afd_service_metric$/))") }
+        it { is_expected.to contain_file('gse_service_topology') }
     end
 
     describe 'with dependencies' do
         let(:params) do
             {:input_message_types => ['gse_service_cluster_metric', 'gse_node_cluster_metric'],
              :aggregator_flag => false,
-             :entity_field => 'cluster_name',
+             :member_field => 'cluster_name',
              :output_message_type => 'gse_cluster_metric',
              :output_metric_name => 'cluster_status',
-             :level_1_dependencies => {'nova' => ['nova-api','nova-scheduler'],
-                                       'cinder' => ['cinder-api']},
-             :level_2_dependencies => {'nova-api' => ['neutron-api']}
+             :clusters => {
+                'nova' => {
+                    'members' => ['nova-api', 'nova-scheduler', 'controller_nodes'],
+                    'group_by_hostname' => false,
+                    'hints' => ['keystone']
+                },
+                'keystone' => {
+                    'members' => ['keystone-public-api', 'keystone-admin-api', 'controller_nodes'],
+                    'group_by_hostname' => false,
+                }
+             }
             }
         end
         it { is_expected.to contain_heka__filter__sandbox('gse_service').with_message_matcher("(Fields[name] == 'pacemaker_local_resource_active' && Fields[resource] == 'vip__management') || (Fields[aggregator] == NIL && (Type =~ /gse_service_cluster_metric$/ || Type =~ /gse_node_cluster_metric$/))") }
+        it { is_expected.to contain_file('gse_service_topology') }
     end
 end
