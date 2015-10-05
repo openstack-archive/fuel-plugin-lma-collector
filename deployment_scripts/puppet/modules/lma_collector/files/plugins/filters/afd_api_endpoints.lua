@@ -40,11 +40,11 @@ function process_message()
                           string.format("Endpoint check for %s is failed", service))
     end
 
-    afd.inject_afd_service_metric(service .. '-endpoint',
+    afd.inject_afd_service_metric(service,
                                   state,
                                   read_message('Fields[hostname]'),
                                   0,
-                                  'afd_api_endpoint')
+                                  'endpoint')
 
     return 0
 end

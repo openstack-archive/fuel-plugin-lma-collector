@@ -77,11 +77,11 @@ function process_message()
                           string.format("At least one %s backend is down", service))
     end
 
-    afd.inject_afd_service_metric(service .. '-backends',
+    afd.inject_afd_service_metric(service,
                                   state,
                                   read_message('Fields[hostname]'),
                                   0,
-                                  'afd_api_backends')
+                                  'backends')
 
     -- reset the cache for this service
     haproxy_backend_states[service] = {}
