@@ -191,6 +191,8 @@ function process_message ()
                 if sample['type_instance'] ~= 'consumers' and
                    sample['type_instance'] ~= 'messages' and
                    sample['type_instance'] ~= 'memory' and
+                   sample['type_instance'] ~= 'memory_total' and
+                   sample['type_instance'] ~= 'unmirrored_queues' and
                    (string.match(sample['type_instance'], '%.consumers$') or
                    string.match(sample['type_instance'], '%.messages$') or
                    string.match(sample['type_instance'], '%.memory$')) then
