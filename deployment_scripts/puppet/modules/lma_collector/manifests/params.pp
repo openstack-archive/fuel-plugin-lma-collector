@@ -83,9 +83,8 @@ class lma_collector::params {
   # Heka's default value is 1
   $hekad_max_process_inject = 1
 
-  # The GSE filters can inject up to 20 messages per timer_event() call
   # Heka's default value is 10
-  $hekad_max_timer_inject = 20
+  $hekad_max_timer_inject = 10
 
   # Parameters for OpenStack notifications
   $rabbitmq_host = false

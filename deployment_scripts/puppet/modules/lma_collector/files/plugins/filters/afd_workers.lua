@@ -85,7 +85,7 @@ function process_message()
                                   state,
                                   read_message('Fields[hostname]'),
                                   0,
-                                  'afd_workers')
+                                  'workers')
 
     -- reset the cache for this worker
     worker_states[worker_key] = {}

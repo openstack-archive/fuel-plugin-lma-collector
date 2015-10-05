@@ -14,6 +14,7 @@
 local cjson = require 'cjson'
 local consts = require 'gse_constants'
 local string = require 'string'
+local table = require 'table'
 local lma = require 'lma_utils'
 
 local pairs = pairs
@@ -26,9 +27,9 @@ local read_message = read_message
 local M = {}
 setfenv(1, M) -- Remove external access to contain everything in the module
 
-local facts = {}
-local level_1_deps = {}
-local level_2_deps = {}
+local clusters = {}
+local reverse_cluster_index = {}
+local ordered_clusters = {}
 
 local VALID_STATUSES = {
     [consts.OKAY]=true,
@@ -38,7 +39,7 @@ local VALID_STATUSES = {
     [consts.UNKW]=true
 }
 
-local STATUS_MAPPING_FOR_LEVEL_1 = {
+local STATUS_MAPPING_FOR_CLUSTERS = {
     [consts.OKAY]=consts.OKAY,
     [consts.WARN]=consts.WARN,
     [consts.CRIT]=consts.CRIT,
@@ -54,87 +55,164 @@ local STATUS_WEIGHTS = {
     [consts.DOWN]=4
 }
 
-local function dependency(deps, superior, subordinate)
-    if not deps[superior] then
-        deps[superior] = {}
+function add_cluster(cluster_id, members, hints, group_by_hostname)
+    assert(type(members) == 'table')
+    assert(type(hints) == 'table')
+
+    if not clusters[cluster_id] then
+        clusters[cluster_id] = {}
     end
-    local subordinates = deps[superior]
-    subordinates[#subordinates+1] = subordinate
+    local cluster = clusters[cluster_id]
+
+    cluster.members = members
+    cluster.hints = hints
+    cluster.facts = {}
+    cluster.status = consts.UNKW
+    cluster.alarms={}
+    if group_by_hostname then
+        cluster.group_by_hostname = true
+    else
+        cluster.group_by_hostname = false
+    end
+
+    -- update the reverse index
+    for _, member in ipairs(members) do
+        if not reverse_cluster_index[member] then
+            reverse_cluster_index[member] = {}
+        end
+        local reverse_table = reverse_cluster_index[member]
+        if not lma.table_find(cluster_id, reverse_table) then
+            reverse_table[#reverse_table+1] = cluster_id
+        end
+    end
+
+    if not lma.table_find(cluster_id, ordered_clusters) then
+        local after_index = 1
+        for current_pos, id in ipairs(ordered_clusters) do
+            if lma.table_find(id, cluster.hints) then
+                after_index = current_pos + 1
+            end
+        end
+
+        local index = after_index
+        for _, item in pairs(clusters) do
+            for _, hint in pairs(item.hints) do
+                if hint == cluster_id then
+                    local pos = lma.table_pos(hint, cluster_orderings)
+                    if pos and pos <= index then
+                        index = pos
+                    elseif index > after_index then
+                        error('circular dependency between clusters!')
+                    end
+                end
+            end
+        end
+        table.insert(ordered_clusters, index, cluster_id)
+    end
 end
 
--- define a first degree dependency between 2 entities.
-function level_1_dependency(superior, subordinate)
-    return dependency(level_1_deps, superior, subordinate)
+function get_ordered_clusters()
+    return ordered_clusters
 end
 
--- define a second degree dependency between 2 entities.
-function level_2_dependency(superior, subordinate)
-    return dependency(level_2_deps, superior, subordinate)
+function cluster_exists(cluster_id)
+    return clusters[cluster_id] ~= nil
 end
 
--- store the status of a service and a list of alarms
-function set_status(service, value, alarms)
+-- return the list of clusters which depends on a given member
+function find_cluster_memberships(member_id)
+    return reverse_cluster_index[member_id] or {}
+end
+
+-- store the status of a cluster's member and its current alarms
+function set_member_status(cluster_id, member, value, alarms, hostname)
     assert(VALID_STATUSES[value])
     assert(type(alarms) == 'table')
-    facts[service] = {
+
+    local cluster = clusters[cluster_id]
+    if not cluster then
+        return
+    end
+
+    local group_key = '__all_hosts__'
+    if cluster.group_by_hostname then
+        group_key = hostname
+    else
+        hostname = ''
+    end
+
+    if not cluster.facts[member] then
+        cluster.facts[member] = {}
+    end
+    cluster.facts[member][group_key] = {
         status=value,
-        alarms=alarms
+        alarms=alarms,
+        hostname=hostname
     }
 end
 
 function max_status(current, status)
-        if not status or STATUS_WEIGHTS[current] > STATUS_WEIGHTS[status] then
-            return current
-        else
-            return status
-        end
+    if not status or STATUS_WEIGHTS[current] > STATUS_WEIGHTS[status] then
+        return current
+    else
+        return status
+    end
 end
 
--- The service status depends on the status of the level-1 dependencies.
--- The status of the level-2 dependencies don't modify the overall status
--- but their alarms are returned.
-function resolve_status(name)
-    local service_status = consts.UNKW
+-- The cluster status depends on the status of its members.
+-- The status of the related clusters (defined by cluster.hints) doesn't modify
+-- the overall status but their alarms are returned.
+function resolve_status(cluster_id)
+    local cluster = clusters[cluster_id]
+    assert(cluster)
+
+    cluster.status = consts.UNKW
     local alarms = {}
 
-    for _, level_1_dep in ipairs(level_1_deps[name] or {}) do
-        if facts[level_1_dep] then
-            local status = STATUS_MAPPING_FOR_LEVEL_1[facts[level_1_dep].status]
+    for _, member in ipairs(cluster.members) do
+        for _, fact in pairs(cluster.facts[member] or {}) do
+            local status = STATUS_MAPPING_FOR_CLUSTERS[fact.status]
             if status ~= consts.OKAY then
-                for _, v in ipairs(facts[level_1_dep].alarms) do
+                -- append alarms when member's status aren't okay
+                for _, v in ipairs(fact.alarms) do
                     alarms[#alarms+1] = lma.deepcopy(v)
                     if not alarms[#alarms]['tags'] then
                         alarms[#alarms]['tags'] = {}
                     end
-                    alarms[#alarms].tags['dependency'] = level_1_dep
+                    alarms[#alarms].tags['dependency_name'] = member
                     alarms[#alarms].tags['dependency_level'] = 'direct'
+                    if fact.hostname then
+                        alarms[#alarms].hostname = fact.hostname
+                    end
                 end
             end
-            service_status = max_status(service_status, status)
+            cluster.status = max_status(cluster.status, status)
         end
+    end
+    cluster.alarms = lma.deepcopy(alarms)
 
-        for _, level_2_dep in ipairs(level_2_deps[level_1_dep] or {}) do
-            if facts[level_2_dep] then
-                local status = facts[level_2_dep].status
-                if status ~= consts.OKAY then
-                    for _, v in ipairs(facts[level_2_dep].alarms) do
-                        alarms[#alarms+1] = lma.deepcopy(v)
-                        if not alarms[#alarms]['tags'] then
-                            alarms[#alarms]['tags'] = {}
-                        end
-                        alarms[#alarms].tags['dependency'] = level_2_dep
-                        alarms[#alarms].tags['dependency_level'] = 'indirect'
+    if cluster.status ~= consts.OKAY then
+        -- add hints if the cluster isn't healthy
+        for _, member in ipairs(cluster.hints or {}) do
+            local other_cluster = clusters[member]
+            if other_cluster and other_cluster.status ~= OKAY and #other_cluster.alarms > 0 then
+                for _, v in ipairs(other_cluster.alarms) do
+                    alarms[#alarms+1] = lma.deepcopy(v)
+                    if not alarms[#alarms]['tags'] then
+                        alarms[#alarms]['tags'] = {}
                     end
+                    alarms[#alarms].tags['dependency_name'] = member
+                    alarms[#alarms].tags['dependency_level'] = 'hint'
                 end
             end
         end
     end
 
-    return service_status, alarms
+    return cluster.status, alarms
 end
 
 -- compute the cluster metric and inject it into the Heka pipeline
--- the metric's value is computed using the status of the subordinates
+-- the metric's value is computed using the status of its members
 function inject_cluster_metric(msg_type, cluster_name, metric_name, hostname, interval, source)
     local payload
     local status, alarms = resolve_status(cluster_name)
