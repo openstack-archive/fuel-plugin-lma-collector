@@ -191,6 +191,13 @@ function process_message ()
                 if sample['type_instance'] ~= 'consumers' and
                    sample['type_instance'] ~= 'messages' and
                    sample['type_instance'] ~= 'memory' and
+                   sample['type_instance'] ~= 'used_memory' and
+                   sample['type_instance'] ~= 'unmirrored_queues' and
+                   sample['type_instance'] ~= 'vm_memory_limit' and
+                   sample['type_instance'] ~= 'disk_free_limit' and
+                   sample['type_instance'] ~= 'disk_free' and
+                   sample['type_instance'] ~= 'remaining_memory' and
+                   sample['type_instance'] ~= 'remaining_disk' and
                    (string.match(sample['type_instance'], '%.consumers$') or
                    string.match(sample['type_instance'], '%.messages$') or
                    string.match(sample['type_instance'], '%.memory$')) then
