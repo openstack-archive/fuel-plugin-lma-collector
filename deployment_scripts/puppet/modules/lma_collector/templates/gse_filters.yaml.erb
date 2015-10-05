@@ -4,135 +4,250 @@ lma_collector:
     input_message_types:
       - afd_service_metric
     aggregator_flag: true
-    entity_field: service
+    # the field in the input messages to identify the cluster
+    cluster_field: service
+    # the field in the input messages to identify the cluster's member
+    member_field: source
     output_message_type: gse_service_cluster_metric
     output_metric_name: cluster_service_status
     interval: 10
-    level_1_dependencies:
+    clusters:
       nova-api:
-        - nova-api-backends
-        - nova-ec2-api-backends
-        - nova-endpoint
-      nova-novncproxy:
-        - nova-novncproxy-websocket-backends
-      nova-metadata:
-        - nova-api-metadata-backends
+        members:
+          - backends
+          - endpoint
+      nova-ec2-api:
+        members:
+          - backends
+      nova-novncproxy-websocket:
+        members:
+          - backends
+      nova-metadata-api:
+        members:
+          - backends
       nova-scheduler:
-        - nova-scheduler
+        members:
+          - workers
+      nova-cert:
+        members:
+          - workers
+      nova-consoleauth:
+        members:
+          - workers
       nova-compute:
-        - nova-compute
+        members:
+          - workers
       nova-conductor:
-        - nova-conductor
+        members:
+          - workers
       cinder-api:
-        - cinder-api-backends
-        - cinder-endpoint
-        - cinder-v2-endpoint
+        members:
+          - backends
+          - endpoint
+      cinder-v2-api:
+        members:
+          # Cinder V2 backends are in fact the same as the Cinder backends
+          - endpoint
       cinder-scheduler:
-        - cinder-scheduler
+        members:
+          - workers
       cinder-volume:
-        - cinder-volume
+        members:
+          - workers
       neutron-api:
-        - neutron-api-backends
-        - neutron-endpoint
+        members:
+          - backends
+          - endpoint
       neutron-l3:
-        - l3
+        members:
+          - workers
       neutron-dhcp:
-        - dhcp
-      neutron-ovs:
-        - openvswitch
-      keystone-api:
-        - keystone-public-api-backends
-        - keystone-admin-api-backends
-        - keystone-endpoint
+        members:
+          - workers
+      neutron-metadata:
+        members:
+          - workers
+      neutron-openvswitch:
+        members:
+          - workers
+      keystone-public-api:
+        members:
+          - backends
+          - endpoint
+      keystone-admin-api:
+        members:
+          # TODO(pasquier-s): add a metric reporting the status of the keystone-admin-api endpoint
+          - backends
       glance-api:
-        - glance-api-backends
-        - glance-endpoint
-      glance-registry:
-        - glance-registry-api-backends
+        members:
+          - backends
+          - endpoint
+      glance-registry-api:
+        members:
+          - backends
       heat-api:
-        - heat-api-backends
-        - heat-cfn-api-backends
-        - heat-endpoint
-      horizon-ui:
+        members:
+          - backends
+          - endpoint
+      heat-cfn-api:
+        members:
+          - backends
+          - endpoint
+      heat-cloudwatch-api:
+        members:
+          - backends
 <% if @tls_enabled then -%>
-        - horizon-https-backends
+      horizon-https:
+        members:
+          - backends
 <% else -%>
-        - horizon-web-backends
+      horizon-ui:
+        members:
+          - backends
 <% end -%>
 <% if not @storage_options["objects_ceph"] then -%>
       swift-api:
-        - swift-api-backends
-        - swift-endpoint
-        - swift-s3-endpoint
+        members:
+          - backends
+          - endpoint
+      swift-s3-api:
+        members:
+          # Swift S3 backends are in fact the same as the Swift backends
+          - endpoint
 <% end -%>
 <% if @ceilometer_enabled -%>
       ceilometer-api:
-        - ceilometer-api-backends
-        - ceilometer-endpoint
+        members:
+          - backends
+          - endpoint
 <% end -%>
-    level_2_dependencies: {}
+
   gse_cluster_node:
     input_message_types:
       - afd_node_metric
     aggregator_flag: true
-    entity_field: hostname
+    # the field in the input messages to identify the cluster
+    cluster_field: hostname
+    # the field in the input messages to identify the cluster's member
+    member_field: source
     output_message_type: gse_node_cluster_metric
     output_metric_name: cluster_node_status
     interval: 10
-    level_1_dependencies: {}
-    level_2_dependencies: {}
+    clusters:
+      controller:
+        group_by_hostname: true
+        members:
+          - system
+          - fs
+      compute:
+        group_by_hostname: true
+        members:
+          - system
+          - fs
+      storage:
+        group_by_hostname: true
+        members:
+          - system
+          - fs
+
   gse_cluster_global:
     input_message_types:
       - gse_service_cluster_metric
       - gse_node_cluster_metric
     aggregator_flag: false
-    entity_field: cluster_name
+    # the field in the input messages to identify the cluster's member
+    member_field: cluster_name
     output_message_type: gse_cluster_metric
     output_metric_name: cluster_status
     interval: 10
-    level_1_dependencies:
+    clusters:
       nova:
-        - nova-api
-        - nova-scheduler
-        - nova-compute
-        - nova-conductor
-        - nova-novncproxy
-        - nova-metadata
+        members:
+          - nova-api
+          - nova-ec2-api
+          - nova-metadata-api
+          - nova-scheduler
+          - nova-compute
+          - nova-conductor
+          - nova-cert
+          - nova-consoleauth
+          - nova-novncproxy-websocket
+          - controller
+          - compute
+        hints:
+          - cinder
+          - glance
+          - keystone
+          - neutron
       cinder:
-        - cinder-api
-        - cinder-scheduler
-        - cinder-volume
+        members:
+          - cinder-api
+          - cinder-v2-api
+          - cinder-scheduler
+          - cinder-volume
+          - controller
+          - storage
+        hints:
+          - keystone
       neutron:
-        - neutron-api
-        - neutron-l3
-        - neutron-dhcp
-        - neutron-metadata
-        - neutron-ovs
+        members:
+          - neutron-api
+          - neutron-l3
+          - neutron-dhcp
+          - neutron-metadata
+          - neutron-openvswitch
+          - controller
+        hints:
+          - keystone
       keystone:
-        - keystone-api
+        members:
+          - keystone-public-api
+          - keystone-admin-api
+          - controller
+        hints: []
       glance:
-        - glance-api
-        - glance-registry
+        members:
+          - glance-api
+          - glance-registry-api
+          - controller
+        hints:
+          - keystone
       heat:
-        - heat-api
+        members:
+          - heat-api
+          - heat-cfn-api
+          - heat-cloudwatch-api
+          - controller
+        hints:
+          - cinder
+          - glance
+          - keystone
+          - neutron
+          - nova
       horizon:
-        - horizon-ui
+        members:
+<% if @tls_enabled then -%>
+          - horizon-https
+<% else -%>
+          - horizon-ui
+<% end -%>
+          - controller
+        hints:
+          - keystone
 <% if not @storage_options["objects_ceph"] then -%>
       swift:
-        - swift-api
+        members:
+          - swift-api
+          - swift-s3-api
+          - controller
+        hints:
+          - keystone
 <% end -%>
-    level_2_dependencies:
-      nova-api:
-        - neutron-api
-        - keystone-api
-        - cinder-api
-        - glance-api
-      cinder-api:
-        - keystone-api
-      neutron-api:
-        - keystone-api
-      glance-api:
-        - keystone-api
-      heat-api:
-        - keystone-api
-
+<% if @ceilometer_enabled -%>
+      ceilometer:
+        members:
+          - ceilometer-api
+          - controller
+        hints:
+          - keystone
+<% end -%>
