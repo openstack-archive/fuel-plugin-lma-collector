@@ -69,11 +69,40 @@ class RabbitMqPlugin(base.Base):
         stats = {}
         stats['messages'] = 0
         stats['memory'] = 0
+        stats['used_memory'] = 0
         stats['consumers'] = 0
         stats['queues'] = 0
+        stats['unmirrored_queues'] = 0
         stats['pmap_mapped'] = 0
         stats['pmap_used'] = 0
         stats['pmap_shared'] = 0
+        stats['vm_memory_limit'] = 0
+        stats['disk_free_limit'] = 0
+        stats['disk_free'] = 0
+
+        out, err = self.execute([self.rabbitmqctl_bin, '-q', 'status'],
+                                shell=False)
+        if not out:
+            self.logger.error('%s: Failed to get the status' %
+                              self.rabbitmqctl_bin)
+            return
+
+        for v in ('vm_memory_limit', 'disk_free_limit', 'disk_free'):
+            try:
+                stats[v] = int(re.findall('%s,([0-9]+)' % v, out)[0])
+            except:
+                self.logger.error('%s: Failed to get %s' %
+                                  (self.rabbitmqctl_bin, v))
+
+        mem_str = re.findall('{memory,\s+\[([^\]]+)\]\}', out)
+        # We are only intresting by the total of memory used
+        # TODO: Get all informations about memory usage from mem_str
+        try:
+            stats['used_memory'] = int(re.findall('total,([0-9]+)',
+                                                  mem_str[0])[0])
+        except:
+            self.logger.error('%s: Failed to get the memory used by rabbitmq' %
+                              self.rabbitmqctl_bin)
 
         out, err = self.execute([self.rabbitmqctl_bin, '-q', 'cluster_status'],
                                 shell=False)
@@ -109,14 +138,15 @@ class RabbitMqPlugin(base.Base):
 
         out, err = self.execute([self.rabbitmqctl_bin, '-q', '-p', self.vhost,
                                  'list_queues', 'name', 'messages', 'memory',
-                                 'consumers'], shell=False)
+                                 'consumers', 'policy', 'slave_pids',
+                                 'synchronised_slave_pids'], shell=False)
         if not out:
             self.logger.error('%s: Failed to get the list of queues' %
                               self.rabbitmqctl_bin)
             return
 
         for line in out.split('\n'):
-            ctl_stats = line.split()
+            ctl_stats = line.split('\t')
             try:
                 ctl_stats[1] = int(ctl_stats[1])
                 ctl_stats[2] = int(ctl_stats[2])
@@ -131,6 +161,18 @@ class RabbitMqPlugin(base.Base):
             stats['%s.messages' % queue_name] = ctl_stats[1]
             stats['%s.memory' % queue_name] = ctl_stats[2]
             stats['%s.consumers' % queue_name] = ctl_stats[3]
+            # a queue is unmirrored if its policy is not ha-all
+            if 'ha-all' not in ctl_stats[4]:
+                stats['unmirrored_queues'] += 1
+            else:
+                # we need to check if the list of synchronised slaves is
+                # equal to the list of slaves.
+                slaves = re.findall('<([a-zA-Z@\-.0-9]+)>', ctl_stats[5])
+                for s in slaves:
+                    if s not in ctl_stats[6]:
+                        stats['unmirrored_queues'] += 1
+                        break
+
 
         if not stats['memory'] > 0:
             self.logger.warning(
