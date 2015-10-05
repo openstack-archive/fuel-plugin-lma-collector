@@ -71,6 +71,7 @@ class RabbitMqPlugin(base.Base):
         stats['memory'] = 0
         stats['consumers'] = 0
         stats['queues'] = 0
+        stats['unmirrored_queues'] = 0
         stats['pmap_mapped'] = 0
         stats['pmap_used'] = 0
         stats['pmap_shared'] = 0
@@ -109,7 +110,7 @@ class RabbitMqPlugin(base.Base):
 
         out, err = self.execute([self.rabbitmqctl_bin, '-q', '-p', self.vhost,
                                  'list_queues', 'name', 'messages', 'memory',
-                                 'consumers'], shell=False)
+                                 'consumers', 'policy'], shell=False)
         if not out:
             self.logger.error('%s: Failed to get the list of queues' %
                               self.rabbitmqctl_bin)
@@ -131,6 +132,9 @@ class RabbitMqPlugin(base.Base):
             stats['%s.messages' % queue_name] = ctl_stats[1]
             stats['%s.memory' % queue_name] = ctl_stats[2]
             stats['%s.consumers' % queue_name] = ctl_stats[3]
+            # a queue is unmirrored if its policy is not ha-all
+            if 'ha-all' not in ctl_stats[4]:
+                stats['unmirrored_queues'] += 1
 
         if not stats['memory'] > 0:
             self.logger.warning(
