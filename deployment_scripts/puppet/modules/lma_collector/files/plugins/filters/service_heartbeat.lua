@@ -13,8 +13,11 @@
 -- limitations under the License.
 require 'string'
 local utils = require 'lma_utils'
+local afd = require 'afd'
+local consts = require 'gse_constants'
 
-local timeout = (read_config("timeout") or 30) * 1e9 -- in ns
+local timeout = read_config("timeout") or 30
+local timeout_ns = timeout * 1e9 -- in ns
 local hostname
 
 services = {}
@@ -38,12 +41,21 @@ end
 
 function timer_event(ns)
     for service, data in pairs(services) do
-        local status = 1
-        if ns - data.last_seen > timeout then
-            status = 0
+        local status = consts.OKAY
+        if ns - data.last_seen > timeout_ns then
+            status = consts.UNKW
+            afd.add_to_alarms(status,
+                              'last', -- function
+                              '*', -- metric
+                              {{name='service', value=service}}, -- fields
+                              {}, -- tags
+                              '==',
+                              0, -- value
+                              0, -- threshold
+                              timeout, -- window
+                              nil, -- period
+                              'No metric received from the service')
         end
-        utils.add_to_bulk_metric(service .. '_status', status)
+        afd.inject_afd_service_metric(service, status, hostname, timeout, 'heartbeat')
     end
-
-    utils.inject_bulk_metric(ns, hostname, 'service_heartbeat')
 end
