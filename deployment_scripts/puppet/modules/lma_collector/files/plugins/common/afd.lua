@@ -125,7 +125,7 @@ function inject_afd_metric(msg_type, msg_tag_name, msg_tag_value, metric_name,
             hostname=hostname,
             interval=interval,
             source=source,
-            tag_fields={msg_tag_name},
+            tag_fields={msg_tag_name, 'source'},
         }
     }
     msg.Fields[msg_tag_name] = msg_tag_value,
