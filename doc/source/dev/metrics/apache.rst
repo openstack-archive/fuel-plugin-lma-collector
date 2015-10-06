@@ -1,7 +1,5 @@
 .. _Apache_metrics:
 
-* ``apache_status``, the status of the Apache service, 1 if it is responsive, 0
-  otherwise.
 * ``apache_bytes``, the number of bytes per second transmitted by the server.
 * ``apache_requests``, the number of requests processed per second.
 * ``apache_connections``, the current number of active connections.

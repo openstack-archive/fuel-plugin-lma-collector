@@ -25,8 +25,6 @@
 Server
 ^^^^^^
 
-* ``haproxy_status``, the status of the HAProxy service, 1 if it is responsive,
-  0 otherwise.
 * ``haproxy_connections``, the number of current connections.
 * ``haproxy_ssl_connections``, the number of current SSL connections.
 * ``haproxy_pipes_free``, the number of free pipes.
