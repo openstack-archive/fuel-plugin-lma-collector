@@ -261,7 +261,7 @@ lma_collector:
     - storage:
       - system: ['cpu-critical-storage', 'cpu-warning-storage']
       - fs: ['fs-warning-storage', 'fs-critical-storage']
-    - default:
+    - _default:
       - cpu: ['cpu-critical-default']
       - fs: ['fs-warning', 'fs-critical']
   service_cluster_alarms:
