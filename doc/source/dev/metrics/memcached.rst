@@ -1,7 +1,5 @@
 .. _memcached_metrics:
 
-* ``memcached_status``, the status of the memcached service, 1 if it is
-  responsive, 0 otherwise.
 * ``memcached_command_flush``, cumulative number of flush reqs.
 * ``memcached_command_get``, cumulative number of retrieval reqs.
 * ``memcached_command_set``, cumulative number of storage reqs.

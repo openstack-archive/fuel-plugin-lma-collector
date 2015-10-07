@@ -1,11 +1,5 @@
 .. _RabbitMQ_metrics:
 
-Service
-^^^^^^^
-
-* ``rabbitmq_status``, the status of the RabbitMQ service, 1 if it is
-  responsive, 0 otherwise.
-
 Cluster
 ^^^^^^^
 
