@@ -139,36 +139,12 @@ lma_collector:
             window: 60
             periods: 0
             function: min
-          - metric: apache_status
-            relational_operator: '='
-            threshold: 0
-            window: 60
-            periods: 0
-            function: min
-    - name: 'haproxy-warning'
-      description: 'HAproxy warning'
-      severity: 'warning'
-      trigger:
-        logical_operator: 'or'
-        rules:
-          - metric: haproxy_status
-            relational_operator: '='
-            threshold: 0
-            window: 60
-            periods: 0
-            function: min
     - name: 'memcached-warning'
       description: 'Memcached warning'
       severity: 'warning'
       trigger:
         logical_operator: 'or'
         rules:
-          - metric: memcached_status
-            relational_operator: '='
-            threshold: 0
-            window: 60
-            periods: 0
-            function: min
           - metric: memcached_percent_hitratio
             relational_operator: '>='
             threshold: 50
@@ -249,7 +225,6 @@ lma_collector:
     - rabbitmq: ['primary-controller', 'controller']
     - apache: ['primary-controller', 'controller']
     - mysql: ['primary-controller', 'controller']
-    - haproxy: ['primary-controller', 'controller']
     - memcached: ['primary-controller', 'controller']
   node_cluster_alarms:
     - controller:
@@ -271,5 +246,3 @@ lma_collector:
       - worker: ['apache-warning']
     - memcached:
       - all: ['memcached-warning']
-    - haproxy:
-      - alive: ['haproxy-warning']
