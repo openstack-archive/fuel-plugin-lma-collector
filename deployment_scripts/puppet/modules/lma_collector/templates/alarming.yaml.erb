@@ -115,6 +115,54 @@ lma_collector:
             window: 120
             periods: 0
             function: avg
+    - name: 'rabbitmq-disk-limit-critical'
+      description: 'RabbitMQ has reached the free disk threshold. All producers are blocked.'
+      severity: 'critical'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: rabbitmq_remaining_disk
+            relational_operator: '<='
+            threshold: 0
+            window: 20
+            periods: 0
+            function: min
+    - name: 'rabbitmq-disk-limit-warning'
+      description: 'RabbitMQ is getting close to the free disk threshold.'
+      severity: 'warning'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: rabbitmq_remaining_disk
+            relational_operator: '<='
+            threshold: 104857600 # 100MB
+            window: 20
+            periods: 0
+            function: min
+    - name: 'rabbitmq-memory-limit-critical'
+      description: 'RabbitMQ has reached the memory threshold. All producers are blocked.'
+      severity: 'critical'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: rabbitmq_remaining_memory
+            relational_operator: '<='
+            threshold: 0
+            window: 20
+            periods: 0
+            function: min
+    - name: 'rabbitmq-memory-limit-warning'
+      description: 'RabbitMQ is getting close to the memory threshold.'
+      severity: 'warning'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: rabbitmq_remaining_memory
+            relational_operator: '<='
+            threshold: 104857600 # 100MB
+            window: 20
+            periods: 0
+            function: min
     - name: 'rabbitmq-queue-warning'
       description: 'Number of message in queues too high'
       severity: 'warning'
@@ -267,6 +315,8 @@ lma_collector:
   service_cluster_alarms:
     - rabbitmq:
       - queue: ['rabbitmq-queue-warning']
+      - memory: ['rabbitmq-memory-limit-critical', 'rabbitmq-memory-limit-warning']
+      - disk: ['rabbitmq-disk-limit-critical', 'rabbitmq-disk-limit-warning']
     - apache:
       - worker: ['apache-warning']
     - memcached:
