@@ -18,12 +18,20 @@ local afd = require 'afd'
 
 -- node or service
 local afd_type = read_config('afd_type') or error('afd_type must be specified!')
-local msg_type = string.format('afd_%s_metric', afd_type)
-local msg_field_name = string.format('%s_status', afd_type)
+local msg_type
+local msg_field_name
+local afd_entity
 
-local afd_entity = 'role'
-if afd_type == 'service' then
+if afd_type == 'node' then
+    msg_type = 'afd_node_metric'
+    msg_field_name = 'node_status'
+    afd_entity = 'node_role'
+elseif afd_type == 'service' then
+    msg_type = 'afd_service_metric'
+    msg_field_name = 'service_status'
     afd_entity = 'service'
+else
+    error('invalid afd_type value')
 end
 
 -- ie: controller for node AFD / rabbitmq for service AFD
