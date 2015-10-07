@@ -42,11 +42,11 @@ Requirements
 +-------------------------------------------------------+-----------------------------------------------------------------+
 | Requirement                                           | Version/Comment                                                 |
 +=======================================================+=================================================================+
-| Fuel                                                  | 7.0                                                             |
+| Mirantis OpenStack                                    | 7.0                                                             |
 +-------------------------------------------------------+-----------------------------------------------------------------+
 | A running Elasticsearch server (for log analytics)    | 1.4 or higher, the RESTful API must be enabled over port 9200   |
 +-------------------------------------------------------+-----------------------------------------------------------------+
-| A running InfluxDB server (for metric analytics)      | 0.9.2 or higher, the RESTful API must be enabled over port 8086 |
+| A running InfluxDB server (for metric analytics)      | 0.9.4 or higher, the RESTful API must be enabled over port 8086 |
 +-------------------------------------------------------+-----------------------------------------------------------------+
 | A running Nagios server (for infrastructure alerting) | 3.5 or higher, the command CGI must be enabled                  |
 +-------------------------------------------------------+-----------------------------------------------------------------+
