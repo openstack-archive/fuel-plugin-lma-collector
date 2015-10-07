@@ -12,7 +12,12 @@ Plugin configuration
 
 2. Click on the Settings tab of the Fuel web UI.
 
-3. Select the LMA collector plugin in the left column.
+3. Select the LMA collector plugin in the left column. The LMA Collector settings screen appears.
+
+.. image:: ../images/collector_settings_large.png 
+   :scale: 50 %
+   :alt: The LMA Collector settings 
+   :align: center
 
 4. Select the LMA collector plugin checkbox and fill-in the required fields.
 
