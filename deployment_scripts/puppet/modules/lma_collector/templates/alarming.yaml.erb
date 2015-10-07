@@ -254,16 +254,16 @@ lma_collector:
   node_cluster_alarms:
     - controller:
       - system: ['cpu-critical-controller', 'cpu-warning-controller']
-      - fs: ['fs-warning', 'fs-critical']
+      - fs: ['fs-critical', 'fs-warning']
     - compute:
       - system: ['cpu-critical-compute', 'cpu-warning-compute']
-      - fs: ['fs-warning', 'fs-critical-compute']
+      - fs: ['fs-critical-compute', 'fs-warning']
     - storage:
       - system: ['cpu-critical-storage', 'cpu-warning-storage']
-      - fs: ['fs-warning-storage', 'fs-critical-storage']
+      - fs: ['fs-critical-storage', 'fs-warning-storage']
     - _default:
       - cpu: ['cpu-critical-default']
-      - fs: ['fs-warning', 'fs-critical']
+      - fs: ['fs-critical', 'fs-warning']
   service_cluster_alarms:
     - rabbitmq:
       - queue: ['rabbitmq-queue-warning']
