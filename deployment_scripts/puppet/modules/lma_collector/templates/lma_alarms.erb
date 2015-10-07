@@ -1,0 +1,38 @@
+local M = {}
+setfenv(1, M) -- Remove external access to contain everything in the module
+
+local alarms = {
+<% @alarms.each do |alarm_name| -%>
+<% @alarms_definitions.each do |alarm| -%>
+<% if alarm_name == alarm["name"] -%>
+  {
+    ['name'] = '<%= alarm_name %>',
+    ['description'] = '<%= alarm["description"] %>',
+    ['severity'] = '<%= alarm["severity"] %>',
+    ['trigger'] = {
+      ['logical_operator'] = '<%= alarm["trigger"]["logical_operator"] || 'or' %>',
+      ['rules'] = {
+<% alarm["trigger"]["rules"].each do |rule|  -%>
+        {
+          ['metric'] = '<%= rule["metric"] %>',
+          ['fields'] = {
+<% (rule["fields"] || []).each do |k, v| -%>
+            ['<%= k %>'] = '<%= v %>',
+<% end -%>
+          },
+          ['relational_operator'] = '<%= rule["relational_operator"] %>',
+          ['threshold'] = '<%= rule["threshold"] %>',
+          ['window'] = '<%= rule["window"] %>',
+          ['periods'] = '<%= rule["periods"] || 0 %>',
+          ['function'] = '<%= rule["function"] %>',
+        },
+<% end -%>
+      },
+    },
+  },
+<% end -%>
+<% end -%>
+<% end -%>
+}
+
+return alarms
