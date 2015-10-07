@@ -12,6 +12,9 @@ lma_collector:
     output_metric_name: cluster_service_status
     interval: 10
     clusters:
+      mysqld-tcp:
+        members:
+          - backends
       nova-api:
         members:
           - backends
@@ -161,6 +164,10 @@ lma_collector:
     output_metric_name: cluster_status
     interval: 10
     clusters:
+      mysql:
+        members:
+          - mysqld-tcp
+          - controller
       nova:
         members:
           - nova-api
