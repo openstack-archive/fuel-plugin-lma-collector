@@ -4,18 +4,58 @@ Logging, Monitoring and Alerting (LMA) Collector Plugin for Fuel
 
 Overview
 --------
+The Logging, Monitoring & Alerting (LMA) *Collector* is a kind of advanced
+monitoring agent that should be installed on each of the OpenStack nodes
+you want to monitor.
+The Collector is a key component of the LMA Toolchain since it is
+individually responsible for supporting all the sensing, measurement,
+collection, analysis and computation functions for the node it is running on.
 
-The Logging, Monitoring & Alerting (LMA) collector is a service running on each
-OpenStack node that collects logs, OpenStack notifications and metrics. It is
-also able to detect anomalous events and generate alerts to external monitoring
-systems.
+A wealth of  operational data are collected from a variety of sources including
+the log files, collectd and RabbitMQ for the OpenStack notifications.
+The Collector, which runs on the active controller of the control plane cluster, is
+called the *Aggregator* because it performs additional aggregation and
+multivariate correlation functions to compute service healthiness metrics at
+the cluster level.
+An important function of the Collector is to sanitize and transform the ingested
+raw operational data into internal messages which uses the Heka
+message structure. This structure is used to match, filter and route certain
+types of messages to plugins written in Lua which perform the analysis and
+computation functions of the toolchain.
 
-* Logs and notifications are sent to an Elasticsearch server for diagnostic,
-troubleshooting and alerting purposes.
-* Metrics are sent to an InfluxDB server for usage and performance analysis as
-well as alerting purposes.
-* Alerts are sent to a Nagios server or directly to a SMTP server.
+It’s main building blocks are:
 
+* collectd which is bundled with a collection of standard and purpose-built
+plugins for OpenStack.
+* Heka which is the swiss army knife we use for data processing.
+* A collection of Heka plugins written in Lua.
+
+There are three types of Lua plugins running in the LMA Collector / Aggregator:
+
+* The input plugins to collect, decode, and sanitize the operational data that
+  are transformed into internal messages which in turn are injected into the
+  Heka pipeline.
+* The filter plugins to execute the alarms, the anomaly detection logic
+  and the correlation functions.
+* The output plugins to encode and transmit the messages to external systems like
+  Elasticsearch, InfluxDB or Nagios where the information is persisted or further processed.
+
+The output of the Collector / Aggregator is of four kinds:
+
+* The logs and notifications that are sent to Elasticsearch for indexing.
+  Elasticsearch combined with Kibana provides an insightful log analytic dashboards.
+* The metrics which are sent to InfluxDB.
+  InfluxDB combined with Grafana provides insightful time-series analytic dashboards.
+* The health status checks that are sent to Nagios (or through SMTP) for all the OpenStack
+  services and clusters of nodes.
+* The annotation messages that are sent to InfluxDB. The annotation messages contain
+  information about what caused a cluster of services or a cluster of nodes to change a state.
+  The annotation messages provide root cause analysis hints whenever possible.
+  The annotation messages are also used to construct the alert notifications sent via SMTP.
+
+Please check the [LMA Collector Plugin for Fuel
+](http://fuel-plugin-lma-collector.readthedocs.org/en/latest/index.html)
+documentation for additional details.
 
 Requirements
 ------------
@@ -25,7 +65,7 @@ Requirements
 | -------------------------------------------------------- | --------------------------------------------------------------- |
 | Mirantis OpenStack compatility                           | 6.1 or higher                                                   |
 | A running Elasticsearch server<br>(for log analytics)    | 1.4 or higher, the RESTful API must be enabled over port 9200   |
-| A running InfluxDB server<br>(for metric analytics)      | 0.9.2 or higher, the RESTful API must be enabled over port 8086 |
+| A running InfluxDB server<br>(for metric analytics)      | 0.9.4 or higher, the RESTful API must be enabled over port 8086 |
 | A running Nagios server<br>(for infrastructure alerting) | 3.5 or higher, the command CGI must be enabled                  |
 
 
@@ -197,13 +237,15 @@ Release Notes
 
 **0.8.0**
 
-* Support for alerting with 2 modes:
+* Support for alerting in two different modes:
   * Email notifications.
   * Integration with Nagios.
-* Support of InfluxDB 0.9.2 and higher.
+* Upgrade to InfluxDB 0.9.4.
+* Upgrade to Grafana 2.1
 * Management of the LMA collector service by Pacemaker on the controller nodes
   for improved reliability.
-* Monitoring of the LMA toolchain components.
+* Monitoring of the LMA toolchain components (self-monitoring).
+* Support for configurable alarm rules in the Collector.
 
 **0.7.0**
 
@@ -250,5 +292,6 @@ Contributors
 ------------
 
 * Guillaume Thouvenin <gthouvenin@mirantis.com>
+* Patrick Petit <ppetit@mirantis.com>
 * Simon Pasquier <spasquier@mirantis.com>
 * Swann Croiset <scroiset@mirantis.com>
