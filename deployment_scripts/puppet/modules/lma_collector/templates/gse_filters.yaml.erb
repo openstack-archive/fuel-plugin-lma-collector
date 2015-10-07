@@ -127,7 +127,7 @@ lma_collector:
       - afd_node_metric
     aggregator_flag: true
     # the field in the input messages to identify the cluster
-    cluster_field: hostname
+    cluster_field: node_role
     # the field in the input messages to identify the cluster's member
     member_field: source
     output_message_type: gse_node_cluster_metric
