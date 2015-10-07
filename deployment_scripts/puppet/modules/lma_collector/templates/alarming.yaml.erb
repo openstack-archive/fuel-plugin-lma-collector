@@ -32,7 +32,7 @@ lma_collector:
             periods: 0
             function: avg
           - metric: cpu_wait
-            relational_operator: '<='
+            relational_operator: '>='
             threshold: 25
             window: 120
             periods: 0
@@ -46,11 +46,11 @@ lma_collector:
           - metric: cpu_wait
             relational_operator: '>='
             threshold: 30
-            window: 300
+            window: 120
             periods: 0
             function: avg
     - name: 'cpu-warning-compute'
-      description: 'CPU critical on compute'
+      description: 'CPU warning on compute'
       severity: 'warning'
       trigger:
         logical_operator: 'or'
@@ -164,7 +164,7 @@ lma_collector:
             periods: 0
             function: min
     - name: 'rabbitmq-queue-warning'
-      description: 'Number of message in queues too high'
+      description: 'Number of messages sitting in queues is too high'
       severity: 'warning'
       trigger:
         logical_operator: 'or'
@@ -224,7 +224,7 @@ lma_collector:
             periods: 0
             function: avg
     - name: 'fs-warning'
-      description: 'Filesystem usage'
+      description: 'Filesystem free space is low'
       severity: 'warning'
       trigger:
         rules:
@@ -235,9 +235,9 @@ lma_collector:
             threshold: 5
             window: 60
             periods: 0
-            function: avg
+            function: min
     - name: 'fs-warning-storage'
-      description: 'Filesystem usage'
+      description: 'Filesystem free space is low'
       severity: 'warning'
       trigger:
         rules:
@@ -248,9 +248,9 @@ lma_collector:
             threshold: 10
             window: 60
             periods: 0
-            function: avg
+            function: min
     - name: 'fs-critical-storage'
-      description: 'Filesystem usage'
+      description: 'Filesystem free space is low'
       severity: 'critical'
       trigger:
         rules:
@@ -261,9 +261,9 @@ lma_collector:
             threshold: 5
             window: 60
             periods: 0
-            function: avg
+            function: min
     - name: 'fs-critical-compute'
-      description: 'Filesystem usage'
+      description: 'Filesystem free space is low'
       severity: 'critical'
       trigger:
         rules:
@@ -274,9 +274,9 @@ lma_collector:
             threshold: 7
             window: 60
             periods: 0
-            function: avg
+            function: min
     - name: 'fs-critical'
-      description: 'Filesystem usage'
+      description: 'Filesystem free space is low'
       severity: 'critical'
       trigger:
         rules:
@@ -285,9 +285,9 @@ lma_collector:
               fs: '*'
             relational_operator: '<'
             threshold: 2
-            window: 30
+            window: 60
             periods: 0
-            function: avg
+            function: min
   node_cluster_roles:
     - controller: ['primary-controller', 'controller']
     - compute: ['compute']
@@ -302,16 +302,16 @@ lma_collector:
   node_cluster_alarms:
     - controller:
       - system: ['cpu-critical-controller', 'cpu-warning-controller']
-      - fs: ['fs-warning', 'fs-critical']
+      - fs: ['fs-critical', 'fs-warning']
     - compute:
       - system: ['cpu-critical-compute', 'cpu-warning-compute']
-      - fs: ['fs-warning', 'fs-critical-compute']
+      - fs: ['fs-critical', 'fs-critical-compute', 'fs-warning']
     - storage:
       - system: ['cpu-critical-storage', 'cpu-warning-storage']
-      - fs: ['fs-warning-storage', 'fs-critical-storage']
-    - _default:
+      - fs: ['fs-critical-storage', 'fs-warning-storage']
+    - default:
       - cpu: ['cpu-critical-default']
-      - fs: ['fs-warning', 'fs-critical']
+      - fs: ['fs-critical', 'fs-warning']
   service_cluster_alarms:
     - rabbitmq:
       - queue: ['rabbitmq-queue-warning']
