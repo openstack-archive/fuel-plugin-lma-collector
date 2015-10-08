@@ -24,9 +24,15 @@ Metrics have a ``service`` field with the name of the service it applies to. Val
 Heka pipeline
 ^^^^^^^^^^^^^
 
-Metrics have a ``name`` field that contains the name of the decoder or filter as defined by *Heka*.
+Metrics have two tags, with ``name`` contains the name of the decoder or filter as defined by *Heka* and ``type`` is either *decoder* or *filter*.
 
-* ``hekad_decoder_count``, the total number of messages processed by the decoder. This will reset to 0 when the process is restarted.
-* ``hekad_decoder_duration``, the average time for processing the message (in nanoseconds).
-* ``hekad_filter_count``, the total number of messages processed by the filter. This will reset to 0 when the process is restarted.
-* ``hekad_filter_duration``, the average time for processing the message (in nanoseconds).
+Metrics for both types:
+
+* ``hekad_msg_avg_duration``, the average time for processing the message (in nanoseconds).
+* ``hekad_msg_count``, the total number of messages processed by the decoder. This will reset to 0 when the process is restarted.
+* ``hekad_memory``, the total memory used by the Sandbox (in bytes).
+
+Additional metrics for *filter* type:
+
+* ``heakd_timer_event_avg_duration``, the average time for executing the *timer_event* function (in nanoseconds).
+* ``hekad_timer_event_count``, the total number of executions of the *timer_event* function. This will reset to 0 when the process is restarted.
