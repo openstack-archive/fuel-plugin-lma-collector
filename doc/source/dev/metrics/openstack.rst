@@ -10,7 +10,6 @@ Service checks
 ``<service>`` is one of the following values with their respective resource checks:
 
 * 'nova-api': '/'
-* 'nova-ec2-api': '/'
 * 'cinder-api': '/'
 * 'cinder-v2-api': '/'
 * 'glance-api': '/'
