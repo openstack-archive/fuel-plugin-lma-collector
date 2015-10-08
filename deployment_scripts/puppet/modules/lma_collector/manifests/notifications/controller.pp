@@ -30,6 +30,8 @@ class lma_collector::notifications::controller (
   # exchange ("") doesn't work because Heka would fail to create the queue in
   # case it doesn't exist yet.
   $exchange = 'nova'
+  # Workaround for bug #1503251
+  $plugin_can_exit = true
 
   heka::decoder::sandbox { 'notification':
     config_dir => $lma_collector::params::config_dir,
@@ -54,6 +56,7 @@ class lma_collector::notifications::controller (
     exchange_type        => 'topic',
     queue                => "${lma_collector::params::lma_topic}.info",
     routing_key          => "${lma_collector::params::lma_topic}.info",
+    can_exit             => $plugin_can_exit,
     notify               => Class['lma_collector::service'],
   }
 
@@ -71,6 +74,7 @@ class lma_collector::notifications::controller (
     exchange_type        => 'topic',
     queue                => "${lma_collector::params::lma_topic}.error",
     routing_key          => "${lma_collector::params::lma_topic}.error",
+    can_exit             => $plugin_can_exit,
     notify               => Class['lma_collector::service'],
   }
 
@@ -88,6 +92,7 @@ class lma_collector::notifications::controller (
     exchange_type        => 'topic',
     queue                => "${lma_collector::params::lma_topic}.warn",
     routing_key          => "${lma_collector::params::lma_topic}.warn",
+    can_exit             => $plugin_can_exit,
     notify               => Class['lma_collector::service'],
   }
 
