@@ -65,12 +65,12 @@ task :lib_cbuf => ['./circular_buffer.so']
 file './circular_buffer.so' do |t|
     sh %{cd /tmp && rm -rf lua_circular_buffer && git clone https://github.com/mozilla-services/lua_circular_buffer.git && cd lua_circular_buffer && mkdir release && cd release && cmake -DCMAKE_BUILD_TYPE=release .. && make} do |ok, res|
         if ! ok then
-            raise "failed to compile circular_buffer!"
+            raise "Failed to compile circular_buffer.so!"
         end
     end
     sh %{cp /tmp/lua_circular_buffer/release/circular_buffer.so .} do |ok, res|
         if ! ok then
-            raise "failed bloom_filter to compule!"
+            raise "Failed to copy circular_buffer.so"
         end
     end
 end
