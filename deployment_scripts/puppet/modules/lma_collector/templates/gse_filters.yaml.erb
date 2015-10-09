@@ -15,6 +15,26 @@ lma_collector:
       mysqld-tcp:
         members:
           - backends
+      mysql-heartbeat:
+        group_by_hostname: true
+        members:
+          - heartbeat
+      haproxy-heartbeat:
+        group_by_hostname: true
+        members:
+          - heartbeat
+      apache-heartbeat:
+        group_by_hostname: true
+        members:
+          - heartbeat
+      memcache-heartbeat:
+        group_by_hostname: true
+        members:
+          - heartbeat
+      rabbitmq-heartbeat:
+        group_by_hostname: true
+        members:
+          - heartbeat
       nova-api:
         members:
           - backends
@@ -167,7 +187,20 @@ lma_collector:
       mysql:
         members:
           - mysqld-tcp
+          - mysqld-heartbeat
           - controller
+      haproxy:
+        members:
+          - haproxy-heartbeat
+      apache:
+        members:
+          - apache-heartbeat
+      memcache:
+        members:
+          - memcache-heartbeat
+      rabbitmq:
+        members:
+          - rabbitmq-heartbeat
       nova:
         members:
           - nova-api
