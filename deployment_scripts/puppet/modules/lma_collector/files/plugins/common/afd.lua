@@ -44,32 +44,57 @@ function extract_alarms()
     return payload.alarms
 end
 
--- return a list of alarm objects as a list of human-readable messages
+-- return a human-readable message from an alarm table
 -- for instance: "CPU load too high (WARNING, rule='last(load_midterm)>=5', current=7)"
+function get_alarm_for_human(alarm)
+    local metric
+    if #(alarm.fields) > 0 then
+        local fields = {}
+        for _, field in ipairs(alarm.fields) do
+            fields[#fields+1] = field.name .. '="' .. field.value .. '"'
+        end
+        metric = string.format('%s[%s]', alarm.metric, table.concat(fields, ','))
+    else
+        metric = alarm.metric
+    end
+
+    local host = ''
+    if alarm.hostname then
+        host = string.format(', host=%s', alarm.hostname)
+    end
+
+    return string.format(
+        "%s (%s, rule='%s(%s)%s%s', current=%s%s)",
+        alarm.message,
+        alarm.severity,
+        alarm['function'],
+        metric,
+        alarm.operator,
+        alarm.threshold,
+        alarm.value,
+        host
+    )
+end
+
 function alarms_for_human(alarms)
     local alarm_messages = {}
+    local hint_messages = {}
+
     for _, v in ipairs(alarms) do
-        local metric
-        if #(v.fields) > 0 then
-            local fields = {}
-            for _, field in ipairs(v.fields) do
-                fields[#fields+1] = field.name .. '="' .. field.value .. '"'
-            end
-            metric = string.format('%s[%s]', v.metric, table.concat(fields, ','))
+        if v.tags and v.tags.dependency_level and v.tags.dependency_level == 'hint' then
+            hint_messages[#hint_messages+1] = get_alarm_for_human(v)
         else
-            metric = v.metric
+            alarm_messages[#alarm_messages+1] = get_alarm_for_human(v)
         end
-        alarm_messages[#alarm_messages+1] = string.format(
-            "%s (%s, rule='%s(%s)%s%s', current=%s)",
-            v.message,
-            v.severity,
-            v['function'],
-            metric,
-            v.operator,
-            v.threshold,
-            v.value
-        )
     end
+
+    if #hint_messages > 0 then
+        alarm_messages[#alarm_messages+1] = "Other related errors:"
+    end
+    for _, v in ipairs(hint_messages) do
+        alarm_messages[#alarm_messages+1] = v
+    end
+
     return alarm_messages
 end
 

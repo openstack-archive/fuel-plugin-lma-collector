@@ -108,6 +108,47 @@ TestAfd = {}
         assertEquals(alarms[1], 'free disk space too low (CRITICAL, rule=\'avg(fs_space_percent_free[fs="/"])<=5\', current=2)')
     end
 
+    function TestAfd:test_alarms_for_human_with_hostname()
+        local alarms = afd.alarms_for_human({{
+            severity='WARNING',
+            ['function']='avg',
+            metric='load_longterm',
+            fields={},
+            tags={},
+            operator='>',
+            value=7,
+            threshold=5,
+            window=600,
+            periods=0,
+            message='load too high',
+            hostname='node-1'
+        }})
+
+        assertEquals(#alarms, 1)
+        assertEquals(alarms[1], 'load too high (WARNING, rule=\'avg(load_longterm)>5\', current=7, host=node-1)')
+    end
+
+    function TestAfd:test_alarms_for_human_with_hints()
+        local alarms = afd.alarms_for_human({{
+            severity='WARNING',
+            ['function']='avg',
+            metric='load_longterm',
+            fields={},
+            tags={dependency_level='hint',dependency_name='controller'},
+            operator='>',
+            value=7,
+            threshold=5,
+            window=600,
+            periods=0,
+            message='load too high',
+            hostname='node-1'
+        }})
+
+        assertEquals(#alarms, 2)
+        assertEquals(alarms[1], 'Other related errors:')
+        assertEquals(alarms[2], 'load too high (WARNING, rule=\'avg(load_longterm)>5\', current=7, host=node-1)')
+    end
+
 lu = LuaUnit
 lu:setVerbosity( 1 )
 os.exit( lu:run() )
