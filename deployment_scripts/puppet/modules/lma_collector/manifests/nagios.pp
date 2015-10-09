@@ -18,6 +18,8 @@ class lma_collector::nagios (
   $user      = $lma_collector::params::nagios_user,
   $password  = $lma_collector::params::nagios_password,
   $ensure = present,
+  $cluster_nodes = [],
+  $cluster_services = [],
 ) inherits lma_collector::params {
   include lma_collector::service
 
@@ -26,31 +28,63 @@ class lma_collector::nagios (
   }
   validate_string($url)
 
-  # This must be identical logic than in lma-infra-alerting-plugin
-  $nagios_host = $lma_collector::params::nagios_hostname_service_status
-  $_nagios_host = "${nagios_host}-env${openstack_deployment_name}"
-  $config = $lma_collector::params::nagios_event_status_name_to_service_name_map
-  $config['nagios_host'] = $_nagios_host
+  $suffix = $lma_collector::params::nagios_cluster_status_suffix
 
-  heka::encoder::sandbox { 'nagios':
+  # This must be identical logic than in lma-infra-alerting-plugin
+
+  $prefix = $lma_collector::params::nagios_global_cluster_status_prefix
+  $nagios_host_services = $lma_collector::params::nagios_hostname_for_cluster_global
+  $_nagios_host_for_services = "${nagios_host_services}-env${openstack_deployment_name}"
+  $config_for_services = hash(zip($cluster_services, suffix(prefix($cluster_services, $prefix), $suffix)))
+  $_config_for_services = merge($config_for_services, {'nagios_host' => $_nagios_host_for_services})
+
+  $nagios_host_nodes = $lma_collector::params::nagios_hostname_for_cluster_nodes
+  $_nagios_host_for_nodes = "${nagios_host_nodes}-env${openstack_deployment_name}"
+  $config_for_nodes = hash(zip($cluster_nodes, suffix($cluster_nodes, $suffix)))
+  $_config_for_nodes = merge($config_for_nodes, {'nagios_host' => $_nagios_host_for_nodes})
+
+  heka::encoder::sandbox { 'nagios_cluster_services':
     config_dir => $lma_collector::params::config_dir,
     filename   => "${lma_collector::params::plugins_dir}/encoders/status_nagios.lua",
-    config     => $config,
+    config     => $_config_for_services,
     notify     => Class['lma_collector::service'],
   }
 
-  heka::output::http { 'nagios':
+  heka::encoder::sandbox { 'nagios_cluster_nodes':
+    config_dir => $lma_collector::params::config_dir,
+    filename   => "${lma_collector::params::plugins_dir}/encoders/status_nagios.lua",
+    config     => $_config_for_nodes,
+    notify     => Class['lma_collector::service'],
+  }
+
+
+  heka::output::http { 'nagios_cluster_services':
     config_dir      => $lma_collector::params::config_dir,
     url             => $url,
     message_matcher => 'Type == \'heka.sandbox.gse_cluster_metric\'',
     username        => $user,
     password        => $password,
-    encoder         => 'nagios',
+    encoder         => 'nagios_cluster_services',
     timeout         => $lma_collector::params::nagios_timeout,
     headers         => {
       'Content-Type' => 'application/x-www-form-urlencoded'
     },
-    require         => Heka::Encoder::Sandbox['nagios'],
+    require         => Heka::Encoder::Sandbox['nagios_cluster_services'],
+    notify          => Class['lma_collector::service'],
+  }
+
+  heka::output::http { 'nagios_cluster_nodes':
+    config_dir      => $lma_collector::params::config_dir,
+    url             => $url,
+    message_matcher => 'Type == \'heka.sandbox.gse_node_cluster_metric\'',
+    username        => $user,
+    password        => $password,
+    encoder         => 'nagios_cluster_nodes',
+    timeout         => $lma_collector::params::nagios_timeout,
+    headers         => {
+      'Content-Type' => 'application/x-www-form-urlencoded'
+    },
+    require         => Heka::Encoder::Sandbox['nagios_cluster_nodes'],
     notify          => Class['lma_collector::service'],
   }
 }

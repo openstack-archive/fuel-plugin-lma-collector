@@ -221,6 +221,8 @@ if $alerting_mode != 'disabled' {
       url                       => $nagios_url,
       user                      => $nagios_user,
       password                  => $nagios_password,
+      cluster_services          => keys($lma_collector['gse_cluster_global']['clusters']),
+      cluster_nodes             => keys($lma_collector['gse_cluster_node']['clusters']),
     }
   }
 }
