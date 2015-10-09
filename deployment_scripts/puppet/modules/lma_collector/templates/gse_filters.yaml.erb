@@ -31,10 +31,13 @@ lma_collector:
         group_by_hostname: true
         members:
           - heartbeat
-      rabbitmq-heartbeat:
+      rabbitmq:
         group_by_hostname: true
         members:
           - heartbeat
+          - memory
+          - disk
+          - queue
       nova-api:
         members:
           - backends
@@ -200,7 +203,8 @@ lma_collector:
           - memcache-heartbeat
       rabbitmq:
         members:
-          - rabbitmq-heartbeat
+          - rabbitmq
+          - controller
       nova:
         members:
           - nova-api
