@@ -45,11 +45,18 @@ function process_table(typ, array)
                 ['type'] = typ,
                 ['name'] = name,
             }
-            msgCount = v['ProcessMessageCount']['value']
-            avgDuration = v['ProcessMessageAvgDuration']['value']
 
-            utils.add_to_bulk_metric('hekad_msg_count', v['ProcessMessageCount']['value'], tags)
-            utils.add_to_bulk_metric('hekad_msg_avg_duration', v['ProcessMessageAvgDuration']['value'], tags)
+            utils.add_to_bulk_metric('hekad_msg_count', v.ProcessMessageCount.value, tags)
+            utils.add_to_bulk_metric('hekad_msg_avg_duration', v.ProcessMessageAvgDuration.value, tags)
+            if v.Memory then
+                utils.add_to_bulk_metric('hekad_memory', v.Memory.value, tags)
+             end
+            if v.TimerEventAvgDuration then
+                utils.add_to_bulk_metric('hekad_timer_event_avg_duration', v.TimerEventAvgDuration.value, tags)
+            end
+            if v.TimerEventSamples then
+                utils.add_to_bulk_metric('hekad_timer_event_count', v.TimerEventSamples.value, tags)
+            end
         end
     end
 end
