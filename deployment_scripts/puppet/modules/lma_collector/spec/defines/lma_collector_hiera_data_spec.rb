@@ -33,7 +33,6 @@ EOF
     end
 
     describe 'with invalid YAML' do
-        pending('needs stdlib >= 4.9.0')
         yaml =<<EOF
 lma_collector:
   some_parameter: "ee
@@ -41,10 +40,13 @@ EOF
         let(:params) do
             {:content => yaml}
         end
-        it { is_expected.to raise_error(Psych::SyntaxError) }
+        it do
+            pending('needs stdlib >= 4.9.0')
+            is_expected.to raise_error(Psych::SyntaxError)
+        end
     end
 
-    describe 'with data which is not a hahs' do
+    describe 'with data which is not a hash' do
         yaml =<<EOF
 lma_collector
 EOF
