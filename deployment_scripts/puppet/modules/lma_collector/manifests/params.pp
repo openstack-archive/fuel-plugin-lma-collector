@@ -186,20 +186,9 @@ class lma_collector::params {
   $nagios_timeout = 2
 
   # Following parameter must match the lma_infrastructure_alerting::params::nagios_openstack_dummy_hostname
-  $nagios_hostname_service_status = '00-openstack-services'
-  # Following parameter must match the lma_infrastructure_alerting::params::openstack_core_services
-  $nagios_event_status_name_to_service_name_map = {
-    'nova'       => 'openstack.nova.status',
-    'keystone'   => 'openstack.keystone.status',
-    'glance'     => 'openstack.glance.status',
-    'cinder'     => 'openstack.cinder.status',
-    'neutron'    => 'openstack.neutron.status',
-    'heat'       => 'openstack.heat.status',
-    'horizon'    => 'openstack.horizon.status',
-    'swift'      => 'openstack.swift.status',
-    'ceilometer' => 'openstack.ceilometer.status',
-    'radosgw'    => 'openstack.radosgw.status',
-  }
+  $nagios_cluster_status_suffix = '.status'
+  $nagios_hostname_for_cluster_global = '00-global-clusters'
+  $nagios_hostname_for_cluster_nodes = '00-node-clusters'
 
   # Parameters for SMTP alert of service status
   $smtp_from = 'lma-alert@localhost.localdomain'
