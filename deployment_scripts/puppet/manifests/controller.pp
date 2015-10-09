@@ -216,11 +216,23 @@ if $alerting_mode != 'disabled' {
   }
 
   if $use_nagios {
-    class { 'lma_collector::nagios':
+    lma_collector::nagios { 'global_clusters':
       openstack_deployment_name => $deployment_id,
       url                       => $nagios_url,
       user                      => $nagios_user,
       password                  => $nagios_password,
+      clusters                  => keys($lma_collector['gse_cluster_global']['clusters']),
+      prefix                    => $lma_collector::params::nagios_global_cluster_status_prefix,
+      virtual_hostname          => $lma_collector::params::nagios_hostname_for_cluster_global,
+    }
+
+    lma_collector::nagios{ 'node_clusters':
+      openstack_deployment_name => $deployment_id,
+      url                       => $nagios_url,
+      user                      => $nagios_user,
+      password                  => $nagios_password,
+      clusters                  => keys($lma_collector['gse_cluster_node']['clusters']),
+      virtual_hostname          => $lma_collector::params::nagios_hostname_for_cluster_nodes,
     }
   }
 }
