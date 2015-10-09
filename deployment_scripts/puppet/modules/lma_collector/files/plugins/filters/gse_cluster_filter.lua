@@ -26,10 +26,12 @@ local hostname = read_config('hostname') or error('hostname must be specified!')
 local source = read_config('source') or error('source must be specified!')
 local topology_file = read_config('topology_file') or error('topology_file must be specified!')
 local interval = (read_config('interval') or error('interval must be specified!')) + 0
-local max_inject = (read_config('max_inject') or 10) + 0
 local interval_in_ns = interval * 1e9
+local max_inject = (read_config('max_inject') or 10) + 0
+local warm_up_period = ((read_config('warm_up_period') or 0) + 0) * 1e9
 
 local is_active = false
+local first_tick
 local last_tick = 0
 local last_index = nil
 local topology = require(topology_file)
@@ -87,7 +89,17 @@ function process_message()
 end
 
 function timer_event(ns)
-    if not is_active or (last_index == nil and (ns - last_tick) < interval_in_ns) then
+    if not is_active then
+        -- not running as the aggregator
+        return
+    elseif not first_tick then
+        first_tick = ns
+        return
+    elseif ns - first_tick <= warm_up_period then
+        -- not started for a long enough period
+        return
+    elseif last_index == nil and (ns - last_tick) < interval_in_ns then
+        -- nothing to send it
         return
     end
     last_tick = ns

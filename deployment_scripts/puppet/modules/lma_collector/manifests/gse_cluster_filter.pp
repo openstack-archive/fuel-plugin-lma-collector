@@ -20,6 +20,7 @@ define lma_collector::gse_cluster_filter (
   $interval = 10,
   $cluster_field = undef,
   $clusters = {},
+  $warm_up_period = undef,
   $ensure = present,
 ) {
   include lma_collector::params
@@ -63,6 +64,7 @@ define lma_collector::gse_cluster_filter (
       cluster_field       => $cluster_field,
       member_field        => $member_field,
       max_inject          => $lma_collector::params::hekad_max_timer_inject,
+      warm_up_period      => $warm_up_period,
     },
     require         => File[$topology_file],
     notify          => Class['lma_collector::service']
