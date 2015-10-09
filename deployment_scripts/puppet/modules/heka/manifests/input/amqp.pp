@@ -26,6 +26,7 @@ define heka::input::amqp (
   $queue_auto_delete = true,
   $exchange_type = 'topic',
   $routing_key = '*',
+  $can_exit = false,
   $ensure = present,
 ) {
 
