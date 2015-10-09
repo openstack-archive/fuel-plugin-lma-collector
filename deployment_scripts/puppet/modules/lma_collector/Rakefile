@@ -21,22 +21,21 @@ task :test => [
   :metadata_lint,
   :lint,
   :syntax,
-  :spec,
+  :spec
 ]
+
+# Check for the presence of Lua 5.1
+lua_version = %x( lua -v 2>&1 )
+lua_present = $?.to_i == 0 ? (lua_version =~ /^Lua 5\.1/) : false
+if lua_present then
+    task :test => :lua_tests
+end
 
 LUA_TESTS = Rake::FileList.new("tests/**/test_*.lua")
 desc "Run Lua unit tests."
-task :lua_tests => [:lua_5_1, :lua_libraries, :lib_cbuf] do |t|
+task :lua_tests => [:lua_libraries, :lib_cbuf] do |t|
     LUA_TESTS.each do |f|
-        sh "lua5.1 #{f}"
-    end
-end
-
-task :lua_5_1 do |t|
-    sh "lua5.1", "-v", {:verbose => false} do |ok, res|
-        if ! ok then
-            raise "lua5.1 needs to be installed!"
-        end
+        sh "lua #{f}"
     end
 end
 

@@ -331,16 +331,16 @@ function TestLMAAlarm:test_rules_logical_missing_datapoint__op_and()
     assertEquals(state, consts.UNKW)
     assertEquals(#result, 1)
     assertEquals(result[1].alert.metric, 'cpu_wait')
-    assertStrContains(result[1].alert.message, 'No datapoint have been received over the last')
+    assert(result[1].alert.message:match('No datapoint have been received over the last'))
 
     --  both cpu_idle and cpu_wait have no data within their observation periods
     local state, result = lma_alarm.evaluate(next_time(180)) -- 241s w/o datapoint
     assertEquals(state, consts.UNKW)
     assertEquals(#result, 2)
     assertEquals(result[1].alert.metric, 'cpu_idle')
-    assertStrContains(result[1].alert.message, 'No datapoint have been received over the last')
+    assert(result[1].alert.message:match('No datapoint have been received over the last'))
     assertEquals(result[2].alert.metric, 'cpu_wait')
-    assertStrContains(result[2].alert.message, 'No datapoint have been received over the last')
+    assert(result[2].alert.message:match('No datapoint have been received over the last'))
 
     -- datapoints come back for both metrics
     lma_alarm.add_value(next_time(), 'cpu_idle', 20)
@@ -377,7 +377,7 @@ function TestLMAAlarm:test_rules_logical_missing_datapoint__op_and_2()
     assertEquals(state, consts.UNKW)
     assertEquals(#result, 1)
     assertEquals(result[1].alert.metric, 'cpu_wait')
-    assertStrContains(result[1].alert.message, 'No datapoint have been received over the last')
+    assert(result[1].alert.message:match('No datapoint have been received over the last'))
 
     lma_alarm.add_value(next_time(170), 'cpu_wait', 20)
     --  cpu_idle have no data within its observation period
@@ -385,7 +385,7 @@ function TestLMAAlarm:test_rules_logical_missing_datapoint__op_and_2()
     assertEquals(state, consts.UNKW)
     assertEquals(#result, 1)
     assertEquals(result[1].alert.metric, 'cpu_idle')
-    assertStrContains(result[1].alert.message, 'No datapoint have been received over the last')
+    assert(result[1].alert.message:match('No datapoint have been received over the last'))
 
     -- datapoints come back for both metrics
     lma_alarm.add_value(next_time(), 'cpu_idle', 20)
