@@ -15,19 +15,19 @@ lma_collector:
       mysqld-tcp:
         members:
           - backends
-      mysql-heartbeat:
+      mysql:
         group_by_hostname: true
         members:
           - heartbeat
-      haproxy-heartbeat:
+      haproxy:
         group_by_hostname: true
         members:
           - heartbeat
-      apache-heartbeat:
+      apache:
         group_by_hostname: true
         members:
           - heartbeat
-      memcache-heartbeat:
+      memcache:
         group_by_hostname: true
         members:
           - heartbeat
@@ -190,17 +190,17 @@ lma_collector:
       mysql:
         members:
           - mysqld-tcp
-          - mysqld-heartbeat
+          - mysqld
           - controller
       haproxy:
         members:
-          - haproxy-heartbeat
+          - haproxy
       apache:
         members:
-          - apache-heartbeat
+          - apache
       memcache:
         members:
-          - memcache-heartbeat
+          - memcache
       rabbitmq:
         members:
           - rabbitmq
