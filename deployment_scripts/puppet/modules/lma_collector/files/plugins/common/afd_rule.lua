@@ -200,7 +200,7 @@ function Rule:evaluate(ns)
                 if result then
                     match = compare_threshold(result, self.relational_operator, self.threshold)
                 end
-                if match then
+                if match == afd.MATCH then
                     fields[#fields+1] = {value=result, fields=data.fields}
                 end
             end
