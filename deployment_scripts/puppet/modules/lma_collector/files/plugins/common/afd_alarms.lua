@@ -70,7 +70,7 @@ function evaluate(ns)
         if alarm:is_evaluation_time(ns) then
             local state, alerts = alarm:evaluate(ns)
             global_state = gse.max_status(state, global_state)
-            for _, a in ipairs(alerts)do
+            for _, a in ipairs(alerts) do
                 all_alerts[#all_alerts+1] = { state=state, alert=a }
             end
             -- raise the first triggered alarm except for OKAY/UNKW states
