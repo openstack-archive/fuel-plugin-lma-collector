@@ -168,11 +168,13 @@ function resolve_status(cluster_id)
 
     cluster.status = consts.UNKW
     local alarms = {}
+    local members_with_alarms = {}
 
     for _, member in ipairs(cluster.members) do
         for _, fact in pairs(cluster.facts[member] or {}) do
             local status = STATUS_MAPPING_FOR_CLUSTERS[fact.status]
             if status ~= consts.OKAY then
+                members_with_alarms[member] = true
                 -- append alarms when member's status aren't okay
                 for _, v in ipairs(fact.alarms) do
                     alarms[#alarms+1] = lma.deepcopy(v)
@@ -197,12 +199,15 @@ function resolve_status(cluster_id)
             local other_cluster = clusters[member]
             if other_cluster and other_cluster.status ~= OKAY and #other_cluster.alarms > 0 then
                 for _, v in ipairs(other_cluster.alarms) do
-                    alarms[#alarms+1] = lma.deepcopy(v)
-                    if not alarms[#alarms]['tags'] then
-                        alarms[#alarms]['tags'] = {}
+                    if not (v.tags and v.tags.dependency_name and members_with_alarms[v.tags.dependency_name]) then
+                        -- this isn't an alarm related to a member of the cluster itself
+                        alarms[#alarms+1] = lma.deepcopy(v)
+                        if not alarms[#alarms]['tags'] then
+                            alarms[#alarms]['tags'] = {}
+                        end
+                        alarms[#alarms].tags['dependency_name'] = member
+                        alarms[#alarms].tags['dependency_level'] = 'hint'
                     end
-                    alarms[#alarms].tags['dependency_name'] = member
-                    alarms[#alarms].tags['dependency_level'] = 'hint'
                 end
             end
         end

@@ -21,18 +21,18 @@ function inject_message(msg)
     last_injected_msg = msg
 end
 
---local gse = require('gse')
+local cjson = require('cjson')
 local consts = require('gse_constants')
 
 local gse = require('gse')
 
 -- define clusters
-gse.add_cluster("heat", {'heat-api'}, {'nova', 'glance', 'neutron', 'keystone', 'rabbitmq'}, false)
+gse.add_cluster("heat", {'heat-api', 'controller'}, {'nova', 'glance', 'neutron', 'keystone', 'rabbitmq'}, false)
 gse.add_cluster("nova", {'nova-api', 'nova-ec2-api', 'nova-scheduler'}, {'glance', 'neutron', 'keystone', 'rabbitmq'}, false)
 gse.add_cluster("neutron", {'neutron-api'}, {'keystone', 'rabbitmq'}, false)
 gse.add_cluster("keystone", {'keystone-admin-api', 'keystone-public-api'}, {}, false)
-gse.add_cluster("glance", {'glance-api', 'glance-registry-api', 'foobar'}, {'keystone'}, false)
-gse.add_cluster("rabbitmq", {'rabbitmq-cluster', 'foobar'}, {}, true)
+gse.add_cluster("glance", {'glance-api', 'glance-registry-api'}, {'keystone'}, false)
+gse.add_cluster("rabbitmq", {'rabbitmq-cluster', 'controller'}, {}, true)
 
 -- provision facts
 gse.set_member_status("neutron", "neutron-api", consts.DOWN, {{message="All neutron endpoints are down"}}, 'node-1')
@@ -46,6 +46,12 @@ gse.set_member_status('heat', "heat-api", consts.WARN, {{message='5xx errors det
 gse.set_member_status('nova', "nova-api", consts.OKAY, {}, 'node-1')
 gse.set_member_status('nova', "nova-ec2_api", consts.OKAY, {}, 'node-1')
 gse.set_member_status('nova', "nova-scheduler", consts.OKAY, {}, 'node-1')
+gse.set_member_status('rabbitmq', "controller", consts.WARN, {{message='no space left'}}, 'node-1')
+gse.set_member_status('heat', "controller", consts.WARN, {{message='no space left'}}, 'node-1')
+
+for _, v in ipairs({'rabbitmq', 'keystone', 'glance', 'neutron', 'nova', 'heat'}) do
+    gse.resolve_status(v)
+end
 
 TestGse = {}
 
@@ -60,14 +66,16 @@ TestGse = {}
         assertEquals(ordered_clusters[6], 'heat')
     end
 
-
     function TestGse:test_01_rabbitmq_is_warning()
         local status, alarms = gse.resolve_status('rabbitmq')
         assertEquals(status, consts.WARN)
-        assertEquals(#alarms, 1)
+        assertEquals(#alarms, 2)
         assertEquals(alarms[1].hostname, 'node-2')
         assertEquals(alarms[1].tags.dependency_name, 'rabbitmq-cluster')
         assertEquals(alarms[1].tags.dependency_level, 'direct')
+        assertEquals(alarms[2].hostname, 'node-1')
+        assertEquals(alarms[2].tags.dependency_name, 'controller')
+        assertEquals(alarms[2].tags.dependency_level, 'direct')
     end
 
     function TestGse:test_02_keystone_is_okay()
@@ -91,11 +99,13 @@ TestGse = {}
     function TestGse:test_04_neutron_is_down()
         local status, alarms = gse.resolve_status('neutron')
         assertEquals(status, consts.DOWN)
-        assertEquals(#alarms, 2)
+        assertEquals(#alarms, 3)
         assertEquals(alarms[1].tags.dependency_name, 'neutron-api')
         assertEquals(alarms[1].tags.dependency_level, 'direct')
         assertEquals(alarms[2].tags.dependency_name, 'rabbitmq')
         assertEquals(alarms[2].tags.dependency_level, 'hint')
+        assertEquals(alarms[3].tags.dependency_name, 'rabbitmq')
+        assertEquals(alarms[3].tags.dependency_level, 'hint')
     end
 
     function TestGse:test_05_nova_is_okay()
@@ -107,17 +117,19 @@ TestGse = {}
     function TestGse:test_06_heat_is_warning_with_hints()
         local status, alarms = gse.resolve_status('heat')
         assertEquals(status, consts.WARN)
-        assertEquals(#alarms, 5)
+        assertEquals(#alarms, 6)
         assertEquals(alarms[1].tags.dependency_name, 'heat-api')
         assertEquals(alarms[1].tags.dependency_level, 'direct')
-        assertEquals(alarms[2].tags.dependency_name, 'glance')
-        assertEquals(alarms[2].tags.dependency_level, 'hint')
+        assertEquals(alarms[2].tags.dependency_name, 'controller')
+        assertEquals(alarms[2].tags.dependency_level, 'direct')
         assertEquals(alarms[3].tags.dependency_name, 'glance')
         assertEquals(alarms[3].tags.dependency_level, 'hint')
-        assertEquals(alarms[4].tags.dependency_name, 'neutron')
+        assertEquals(alarms[4].tags.dependency_name, 'glance')
         assertEquals(alarms[4].tags.dependency_level, 'hint')
-        assertEquals(alarms[5].tags.dependency_name, 'rabbitmq')
+        assertEquals(alarms[5].tags.dependency_name, 'neutron')
         assertEquals(alarms[5].tags.dependency_level, 'hint')
+        assertEquals(alarms[6].tags.dependency_name, 'rabbitmq')
+        assertEquals(alarms[6].tags.dependency_level, 'hint')
     end
 
     function TestGse:test_inject_cluster_metric_for_nova()
@@ -191,9 +203,9 @@ TestGse = {}
     end
 
     function TestGse:test_reverse_index()
-        local clusters = gse.find_cluster_memberships('foobar')
+        local clusters = gse.find_cluster_memberships('controller')
         assertEquals(#clusters, 2)
-        assertEquals(clusters[1], 'glance')
+        assertEquals(clusters[1], 'heat')
         assertEquals(clusters[2], 'rabbitmq')
     end
 
