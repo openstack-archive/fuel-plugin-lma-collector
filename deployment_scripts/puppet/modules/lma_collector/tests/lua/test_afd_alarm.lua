@@ -479,19 +479,23 @@ function TestLMAAlarm:test_max()
 end
 
 function TestLMAAlarm:test_alarm_first_match()
-    lma_alarm.load_alarm(alarms[1]) -- FS_all_no_field
-    lma_alarm.load_alarm(alarms[7]) -- FS_root
-    lma_alarm.load_alarm(alarms[8]) -- FS_all
+    lma_alarm.load_alarm(alarms[4]) --  cpu critical
+    lma_alarm.load_alarm(alarms[5]) --  cpu warning
     lma_alarm.set_start_time(current_time)
 
     local t = next_time() -- 10s
-    lma_alarm.add_value(t, 'fs_space_percent_free', 6, {fs = '/'})
-    lma_alarm.add_value(t, 'fs_space_percent_free', 6 )
-    lma_alarm.add_value(t, 'fs_space_percent_free', 6, {fs = '/'})
-    lma_alarm.add_value(next_time(40), 'fs_space_percent_free', 6, {fs = '/'}) -- 50s
-    lma_alarm.add_value(next_time(40), 'fs_space_percent_free', 6, {fs = 'foo'}) -- 90s
-    local state, result = lma_alarm.evaluate(next_time(30)) -- 120s
-    assertEquals(state, consts.WARN) -- FS_all_no_field severity, the first of the alarm list
+    lma_alarm.add_value(t, 'cpu_idle', 15)
+    lma_alarm.add_value(next_time(), 'cpu_idle', 15)
+    lma_alarm.add_value(next_time(), 'cpu_idle', 15)
+    local state, result = lma_alarm.evaluate(next_time(210)) -- 240s
+    assertEquals(state, consts.WARN) -- 2nd alarm raised
+
+    local t = next_time() -- 10s
+    lma_alarm.add_value(t, 'cpu_idle', 5)
+    lma_alarm.add_value(next_time(90), 'cpu_idle', 4)
+    lma_alarm.add_value(next_time(100), 'cpu_idle', 5)
+    local state, result = lma_alarm.evaluate(next_time(40)) -- 240s
+    assertEquals(state, consts.CRIT) -- first alarm raised
 end
 
 function TestLMAAlarm:test_rules_fields()
