@@ -103,7 +103,6 @@ local alarms = {
                     metric = 'cpu_wait',
                     window = 120,
                     periods = 1,
-                    fields = { hostname = '*' },
                     ['function'] = 'avg',
                     relational_operator = '>=',
                     threshold = 20,
@@ -250,8 +249,8 @@ function TestLMAAlarm:test_lookup_empty_fields_for_metric()
     lma_alarm.load_alarms(alarms)
     local fields_required = lma_alarm.get_metric_fields('cpu_idle')
     assertItemsEquals(fields_required, {})
-    local fields_required = lma_alarm.get_metric_fields('cpu_wait')
-    assertItemsEquals(fields_required, {'hostname'})
+    local fields_required = lma_alarm.get_metric_fields('fs_space_percent_free')
+    assertItemsEquals(fields_required, {'fs'})
 end
 
 function TestLMAAlarm:test_lookup_interested_alarms()
@@ -479,23 +478,23 @@ function TestLMAAlarm:test_max()
 end
 
 function TestLMAAlarm:test_alarm_first_match()
-    lma_alarm.load_alarm(alarms[4]) --  cpu critical
-    lma_alarm.load_alarm(alarms[5]) --  cpu warning
+    lma_alarm.load_alarm(alarms[4]) --  cpu critical (window 240s)
+    lma_alarm.load_alarm(alarms[5]) --  cpu warning (window 120s)
     lma_alarm.set_start_time(current_time)
 
-    local t = next_time() -- 10s
-    lma_alarm.add_value(t, 'cpu_idle', 15)
+    next_time(240) -- both alarms can now be evaluated
     lma_alarm.add_value(next_time(), 'cpu_idle', 15)
-    lma_alarm.add_value(next_time(), 'cpu_idle', 15)
-    local state, result = lma_alarm.evaluate(next_time(210)) -- 240s
+    lma_alarm.add_value(next_time(), 'cpu_wait', 9)
+    local state, result = lma_alarm.evaluate(next_time())
     assertEquals(state, consts.WARN) -- 2nd alarm raised
+    assertEquals(#result, 1) -- cpu_idle match (<= 15) and cpu_wait don't match (>= 25)
 
-    local t = next_time() -- 10s
-    lma_alarm.add_value(t, 'cpu_idle', 5)
-    lma_alarm.add_value(next_time(90), 'cpu_idle', 4)
-    lma_alarm.add_value(next_time(100), 'cpu_idle', 5)
-    local state, result = lma_alarm.evaluate(next_time(40)) -- 240s
+    next_time(240) -- both alarms can now be evaluated with new datapoints
+    lma_alarm.add_value(next_time(), 'cpu_wait', 15)
+    lma_alarm.add_value(next_time(), 'cpu_idle', 4)
+    local state, result = lma_alarm.evaluate(next_time())
     assertEquals(state, consts.CRIT) -- first alarm raised
+    assertEquals(#result, 1) -- cpu_idle match (<= 5) and cpu_wait don't match (>= 20)
 end
 
 function TestLMAAlarm:test_rules_fields()
