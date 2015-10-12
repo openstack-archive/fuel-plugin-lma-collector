@@ -145,7 +145,7 @@ TestAfd = {}
         }})
 
         assertEquals(#alarms, 2)
-        assertEquals(alarms[1], 'Other related errors:')
+        assertEquals(alarms[1], 'Other related alarms:')
         assertEquals(alarms[2], 'load too high (WARNING, rule=\'avg(load_longterm)>5\', current=7, host=node-1)')
     end
 
