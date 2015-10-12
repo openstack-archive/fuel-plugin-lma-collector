@@ -74,7 +74,7 @@ function evaluate(ns)
                 all_alerts[#all_alerts+1] = { state=state, alert=a }
             end
             -- raise the first triggered alarm except for OKAY/UNKW states
-            if global_state ~= consts.UNKW or global_state ~= consts.OKAY then
+            if global_state ~= consts.UNKW and global_state ~= consts.OKAY then
                 break
             end
         end
