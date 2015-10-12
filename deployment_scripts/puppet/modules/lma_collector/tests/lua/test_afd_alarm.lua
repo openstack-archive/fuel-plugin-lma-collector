@@ -204,6 +204,24 @@ local alarms = {
         },
         severity = 'warning',
     },
+    { -- 9
+        name = 'backend_error_5xx',
+        description = 'Errors 5xx on backends',
+        enabled = true,
+        trigger = {
+            rules = {
+                {
+                    metric = 'haproxy_backend_response_5xx',
+                    window = 30,
+                    ['function'] = 'diff',
+                    relational_operator = '>=',
+                    threshold = 0,
+                },
+            },
+            logical_operator = 'or',
+        },
+        severity = 'warning',
+    },
 }
 
 TestLMAAlarm = {}
@@ -269,7 +287,7 @@ function TestLMAAlarm:test_get_alarms()
     for _, _ in pairs(all_alarms) do
         num = num + 1
     end
-    assertEquals(num, 8)
+    assertEquals(num, 9)
 end
 
 function TestLMAAlarm:test_no_datapoint()
@@ -476,6 +494,20 @@ function TestLMAAlarm:test_max()
     assertEquals(result[3].value, 532) -- max() > 250 for queue=nova
 
 end
+
+--function TestLMAAlarm:test_diff()
+--    lma_alarm.load_alarms(alarms[9]) -- backend_error_5xx  -- window == 30
+--    lma_alarm.add_value(next_time(), 'haproxy_backend_response_5xx', 50)
+--    lma_alarm.add_value(next_time(10), 'haproxy_backend_response_5xx', 56)
+--    lma_alarm.add_value(next_time(20), 'haproxy_backend_response_5xx', 75)
+--    lma_alarm.add_value(next_time(30), 'haproxy_backend_response_5xx', 80)
+--    local errors_5xx = lma_alarm.get_alarm('backend_error_5xx')
+--    --assertEquals(errors_5xx.severity, consts.WARN)
+--    local state_crit, result = errors_5xx:evaluate(current_time)
+--    assertEquals(state_crit, consts.WARN)
+--    assertEquals(#result, 1)
+--    assertEquals(result[1].value, 30)
+--end
 
 function TestLMAAlarm:test_alarm_first_match()
     lma_alarm.load_alarm(alarms[4]) --  cpu critical (window 240s)

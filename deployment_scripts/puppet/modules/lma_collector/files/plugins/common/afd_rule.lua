@@ -92,15 +92,13 @@ end
 
 function Rule:get_circular_buffer()
     local cbuf
+    cbuf = circular_buffer.new(self.cbuf_size, 2, SECONDS_PER_ROW)
     if self.fct == 'avg' then
-        cbuf = circular_buffer.new(self.cbuf_size, 2, SECONDS_PER_ROW)
         cbuf:set_header(1, self.metric, 'sum', 'sum')
         cbuf:set_header(2, self.metric, 'count', 'sum')
     elseif self.fct == 'min' or self.fct == 'max' then
-        cbuf = circular_buffer.new(self.cbuf_size, 2, SECONDS_PER_ROW)
         cbuf:set_header(1, self.metric, self.fct)
     else
-        cbuf = circular_buffer.new(self.cbuf_size, 2, SECONDS_PER_ROW)
         cbuf:set_header(1, self.metric)
     end
     return cbuf
@@ -176,6 +174,8 @@ end
 function Rule:evaluate(ns)
     local fields = {}
     local match = afd.NO_DATA
+    local available_rules = {avg=true, max=true, min=true, sum=true,
+                             variance=true, sd=true, diff=true}
     for _, id in ipairs(self.ids_datastore) do
         local data = self.datastore[id]
         if data then
@@ -186,16 +186,23 @@ function Rule:evaluate(ns)
                 return afd.MISSING_DATA, {value = -1, fields = data.fields}
             end
 
-            if self.fct == 'avg' or self.fct == 'max' or self.fct == 'min' or self.fct == 'sum' or self.fct == 'sd' or self.fct == 'variance' then
+            if available_rules[self.fct] then
                 local result
-                local num_row = -1
                 if self.fct == 'avg' then
-                    local total
-                    total, num_row = data.cbuf:compute('sum', 1)
+                    local total = data.cbuf:compute('sum', 1)
                     local count = data.cbuf:compute('sum', 2)
                     result = total/count
+                elseif self.fct == 'diff' then
+                    local first = data.cbuf:get(cbuf_time - r.window, 1)
+                    local last = data.cbuf:get(cbuf_time, 1)
+                    if last and first then
+                        local wdiff = last - first
+                        if wdiff > 0 then
+                            result = wdiff
+                        end
+                    end
                 else
-                    result, num_row = data.cbuf:compute(self.fct, 1)
+                    result = data.cbuf:compute(self.fct, 1)
                 end
                 if result then
                     match = compare_threshold(result, self.relational_operator, self.threshold)
