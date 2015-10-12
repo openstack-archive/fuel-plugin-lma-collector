@@ -195,12 +195,15 @@ lma_collector:
       haproxy:
         members:
           - haproxy
+          - controller
       apache:
         members:
           - apache
+          - controller
       memcached:
         members:
           - memcached
+          - controller
       rabbitmq:
         members:
           - rabbitmq
