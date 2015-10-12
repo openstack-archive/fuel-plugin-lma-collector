@@ -204,6 +204,25 @@ local alarms = {
         },
         severity = 'warning',
     },
+    { -- 9
+        name = 'Backend_errors_5xx',
+        description = 'Errors 5xx on backends',
+        enabled = true,
+        trigger = {
+            rules = {
+                {
+                    metric = 'haproxy_backend_response_5xx',
+                    window = 30,
+                    periods = 1,
+                    ['function'] = 'diff',
+                    relational_operator = '>',
+                    threshold = 0,
+                },
+            },
+            logical_operator = 'or',
+        },
+        severity = 'warning',
+    },
 }
 
 TestLMAAlarm = {}
@@ -269,7 +288,7 @@ function TestLMAAlarm:test_get_alarms()
     for _, _ in pairs(all_alarms) do
         num = num + 1
     end
-    assertEquals(num, 8)
+    assertEquals(num, 9)
 end
 
 function TestLMAAlarm:test_no_datapoint()
@@ -475,6 +494,33 @@ function TestLMAAlarm:test_max()
     assertEquals(result[3]['function'], 'max')
     assertEquals(result[3].value, 532) -- max() > 250 for queue=nova
 
+end
+
+function TestLMAAlarm:test_diff()
+    lma_alarm.load_alarms(alarms)
+    local errors_5xx = lma_alarm.get_alarm('Backend_errors_5xx')
+    assertEquals(errors_5xx.severity, consts.WARN)
+
+    -- with 5xx errors
+    lma_alarm.add_value(next_time(), 'haproxy_backend_response_5xx', 1)
+    lma_alarm.add_value(next_time(), 'haproxy_backend_response_5xx', 11) -- +10s
+    lma_alarm.add_value(next_time(), 'haproxy_backend_response_5xx', 21) -- +10s
+    local state, result = errors_5xx:evaluate(current_time)
+    assertEquals(state, consts.WARN)
+    assertEquals(#result, 1)
+    assertEquals(result[1].value, 20)
+
+    -- without 5xx errors
+    lma_alarm.add_value(next_time(), 'haproxy_backend_response_5xx', 21)
+    lma_alarm.add_value(next_time(), 'haproxy_backend_response_5xx', 21) -- +10s
+    lma_alarm.add_value(next_time(), 'haproxy_backend_response_5xx', 21) -- +10s
+    local state, result = errors_5xx:evaluate(current_time)
+    assertEquals(state, consts.OKAY)
+    assertEquals(#result, 0)
+
+    -- missing data
+    local state, result = errors_5xx:evaluate(next_time(60))
+    assertEquals(state, consts.UNKW)
 end
 
 function TestLMAAlarm:test_alarm_first_match()
