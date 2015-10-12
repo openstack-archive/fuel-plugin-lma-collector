@@ -97,10 +97,10 @@ function Rule:get_circular_buffer()
         cbuf:set_header(1, self.metric, 'sum', 'sum')
         cbuf:set_header(2, self.metric, 'count', 'sum')
     elseif self.fct == 'min' or self.fct == 'max' then
-        cbuf = circular_buffer.new(self.cbuf_size, 2, SECONDS_PER_ROW)
+        cbuf = circular_buffer.new(self.cbuf_size, 1, SECONDS_PER_ROW)
         cbuf:set_header(1, self.metric, self.fct)
     else
-        cbuf = circular_buffer.new(self.cbuf_size, 2, SECONDS_PER_ROW)
+        cbuf = circular_buffer.new(self.cbuf_size, 1, SECONDS_PER_ROW)
         cbuf:set_header(1, self.metric)
     end
     return cbuf
@@ -159,6 +159,13 @@ local function compare_threshold(value, op, threshold)
     return afd.NO_MATCH
 end
 
+local function isnumber(value)
+    return value ~= nil and not (value ~= value)
+end
+
+local available_functions = {avg=true, max=true, min=true, sum=true,
+                             variance=true, sd=true, diff=true}
+
 -- evaluate the rule against datapoints
 -- return a list: match (bool or string), context ({value=v, fields=list of field table})
 --
@@ -186,16 +193,36 @@ function Rule:evaluate(ns)
                 return afd.MISSING_DATA, {value = -1, fields = data.fields}
             end
 
-            if self.fct == 'avg' or self.fct == 'max' or self.fct == 'min' or self.fct == 'sum' or self.fct == 'sd' or self.fct == 'variance' then
+            if available_functions[self.fct] then
                 local result
-                local num_row = -1
                 if self.fct == 'avg' then
-                    local total
-                    total, num_row = data.cbuf:compute('sum', 1)
+                    local total = data.cbuf:compute('sum', 1)
                     local count = data.cbuf:compute('sum', 2)
                     result = total/count
+                elseif self.fct == 'diff' then
+                    local first, last
+
+                    local t = ns
+                    while (not isnumber(last)) and t >= ns - self.observation_window * 1e9 do
+                        last = data.cbuf:get(t, 1)
+                        t = t - SECONDS_PER_ROW * 1e9
+                    end
+
+                    if isnumber(last) then
+                        t = ns - self.observation_window * 1e9
+                        while (not isnumber(first)) and t <= ns do
+                            first = data.cbuf:get(t, 1)
+                            t = t + SECONDS_PER_ROW * 1e9
+                        end
+                    end
+
+                    if not isnumber(last) or not isnumber(first) then
+                        return afd.MISSING_DATA, {value = -1, fields = data.fields}
+                    end
+
+                    result = last - first
                 else
-                    result, num_row = data.cbuf:compute(self.fct, 1)
+                    result = data.cbuf:compute(self.fct, 1)
                 end
                 if result then
                     match = compare_threshold(result, self.relational_operator, self.threshold)
