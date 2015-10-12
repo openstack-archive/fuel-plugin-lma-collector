@@ -137,8 +137,6 @@ function set_member_status(cluster_id, member, value, alarms, hostname)
     local group_key = '__all_hosts__'
     if cluster.group_by_hostname then
         group_key = hostname
-    else
-        hostname = ''
     end
 
     if not cluster.facts[member] then
@@ -146,9 +144,11 @@ function set_member_status(cluster_id, member, value, alarms, hostname)
     end
     cluster.facts[member][group_key] = {
         status=value,
-        alarms=alarms,
-        hostname=hostname
+        alarms=alarms
     }
+    if cluster.group_by_hostname then
+        cluster.facts[member][group_key].hostname = hostname
+    end
 end
 
 function max_status(current, status)
@@ -175,7 +175,8 @@ function resolve_status(cluster_id)
             local status = STATUS_MAPPING_FOR_CLUSTERS[fact.status]
             if status ~= consts.OKAY then
                 members_with_alarms[member] = true
-                -- append alarms when member's status aren't okay
+                -- append alarms only if the member affects the healthiness
+                -- of the cluster
                 for _, v in ipairs(fact.alarms) do
                     alarms[#alarms+1] = lma.deepcopy(v)
                     if not alarms[#alarms]['tags'] then
