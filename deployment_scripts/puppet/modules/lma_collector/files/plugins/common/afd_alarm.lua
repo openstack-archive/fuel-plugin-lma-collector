@@ -39,7 +39,6 @@ function Alarm.new(alarm)
     local a = {}
     setmetatable(a, Alarm)
     a._metrics_list = nil
-    a.alarm = alarm
     a.name = alarm.name
     a.description = alarm.description
     if alarm.trigger.logical_operator then
