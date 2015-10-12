@@ -11,6 +11,7 @@ lma_collector:
     output_message_type: gse_service_cluster_metric
     output_metric_name: cluster_service_status
     interval: 10
+    warm_up_period: 20
     clusters:
       mysqld-tcp:
         members:
@@ -159,6 +160,7 @@ lma_collector:
     output_message_type: gse_node_cluster_metric
     output_metric_name: cluster_node_status
     interval: 10
+    warm_up_period: 80
     clusters:
       controller:
         group_by_hostname: true
@@ -186,6 +188,7 @@ lma_collector:
     output_message_type: gse_cluster_metric
     output_metric_name: cluster_status
     interval: 10
+    warm_up_period: 30
     clusters:
       mysql:
         members:

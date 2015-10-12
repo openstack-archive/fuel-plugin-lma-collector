@@ -40,6 +40,7 @@ describe 'lma_collector::gse_cluster_filter' do
              :member_field => 'cluster_name',
              :output_message_type => 'gse_cluster_metric',
              :output_metric_name => 'cluster_status',
+             :warm_up_period => 30,
              :clusters => {
                 'nova' => {
                     'members' => ['nova-api', 'nova-scheduler', 'controller_nodes'],
