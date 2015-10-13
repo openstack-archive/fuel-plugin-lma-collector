@@ -136,7 +136,9 @@ function Rule:add_datastore(id)
     end
 end
 
-local function compare_threshold(value, op, threshold)
+function Rule:compare_threshold(value)
+    local op = self.relational_operator
+    local threshold = self.threshold
     local rule_matches = false
     if op == '==' or op == 'eq' then
         rule_matches = value == threshold
@@ -151,10 +153,7 @@ local function compare_threshold(value, op, threshold)
     elseif op == '<' or op == 'lt' then
         rule_matches = value < threshold
     end
-    if rule_matches then
-        return afd.MATCH
-    end
-    return afd.NO_MATCH
+    return rule_matches
 end
 
 local function isnumber(value)
@@ -168,8 +167,8 @@ local available_functions = {avg=true, max=true, min=true, sum=true,
 -- return a list: match (bool or string), context ({value=v, fields=list of field table})
 --
 -- examples:
---   true, { value=100, fields={{queue='nova'}, {queue='neutron'}}
---   false, { value=10, fields={}}
+--   true, { {value=100, fields={{queue='nova'}, {queue='neutron'}}, ..}
+--   false, { {value=10, fields={}}, ..}
 -- with 2 special cases:
 --   - never receive one datapoint
 --      'nodata', {}
@@ -180,7 +179,7 @@ local available_functions = {avg=true, max=true, min=true, sum=true,
 -- it's normal to don't receive datapoint anymore .. for example a filesystem.
 function Rule:evaluate(ns)
     local fields = {}
-    local match = afd.NO_DATA
+    local one_match, one_no_match, one_missing_data = false, false, false
     for _, id in ipairs(self.ids_datastore) do
         local data = self.datastore[id]
         if data then
@@ -188,50 +187,64 @@ function Rule:evaluate(ns)
             -- if we didn't receive datapoint within the observation window this means
             -- we don't receive anymore data and cannot compute the rule.
             if ns - cbuf_time > self.observation_window * 1e9 then
-                return afd.MISSING_DATA, {value = -1, fields = data.fields}
-            end
+                one_missing_data = true
+                fields[#fields+1] = {value = -1, fields = data.fields}
+            else
+                if available_functions[self.fct] then
+                    local result
+                    if self.fct == 'avg' then
+                        local total
+                        total = data.cbuf:compute('sum', 1)
+                        local count = data.cbuf:compute('sum', 2)
+                        result = total/count
+                    elseif self.fct == 'diff' then
+                        local first, last
 
-            if available_functions[self.fct] then
-                local result
-                if self.fct == 'avg' then
-                    local total = data.cbuf:compute('sum', 1)
-                    local count = data.cbuf:compute('sum', 2)
-                    result = total/count
-                elseif self.fct == 'diff' then
-                    local first, last
+                        local t = ns
+                        while (not isnumber(last)) and t >= ns - self.observation_window * 1e9 do
+                            last = data.cbuf:get(t, 1)
+                            t = t - SECONDS_PER_ROW * 1e9
+                        end
 
-                    local t = ns
-                    while (not isnumber(last)) and t >= ns - self.observation_window * 1e9 do
-                        last = data.cbuf:get(t, 1)
-                        t = t - SECONDS_PER_ROW * 1e9
+                        if isnumber(last) then
+                            t = ns - self.observation_window * 1e9
+                            while (not isnumber(first)) and t <= ns do
+                                first = data.cbuf:get(t, 1)
+                                t = t + SECONDS_PER_ROW * 1e9
+                            end
+                        end
+
+                        if not isnumber(last) or not isnumber(first) then
+                            one_missing_data = true
+                            fields[#fields+1] = {value = -1, fields = data.fields}
+                        else
+                            result = last - first
+                        end
+                    else
+                        result = data.cbuf:compute(self.fct, 1)
                     end
-
-                    if isnumber(last) then
-                        t = ns - self.observation_window * 1e9
-                        while (not isnumber(first)) and t <= ns do
-                            first = data.cbuf:get(t, 1)
-                            t = t + SECONDS_PER_ROW * 1e9
+                    if result then
+                        local m = self:compare_threshold(result)
+                        if m then
+                            one_match = true
+                            fields[#fields+1] = {value=result, fields=data.fields}
+                        else
+                            one_no_match = true
                         end
                     end
-
-                    if not isnumber(last) or not isnumber(first) then
-                        return afd.MISSING_DATA, {value = -1, fields = data.fields}
-                    end
-
-                    result = last - first
-                else
-                    result = data.cbuf:compute(self.fct, 1)
-                end
-                if result then
-                    match = compare_threshold(result, self.relational_operator, self.threshold)
-                end
-                if match == afd.MATCH then
-                    fields[#fields+1] = {value=result, fields=data.fields}
                 end
             end
         end
     end
-    return match, fields
+    if one_match then
+        return afd.MATCH, fields
+    elseif one_missing_data then
+        return afd.MISSING_DATA, fields
+    elseif one_no_match then
+        return afd.NO_MATCH, {}
+    else
+        return afd.NO_DATA, {{value=-1, fields=self.fields}}
+    end
 end
 
 return Rule
