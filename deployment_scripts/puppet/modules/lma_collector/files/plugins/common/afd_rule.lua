@@ -153,10 +153,7 @@ local function compare_threshold(value, op, threshold)
     elseif op == '<' or op == 'lt' then
         rule_matches = value < threshold
     end
-    if rule_matches then
-        return afd.MATCH
-    end
-    return afd.NO_MATCH
+    return rule_matches
 end
 
 -- evaluate the rule against datapoints
@@ -175,7 +172,7 @@ end
 -- it's normal to don't receive datapoint anymore .. for example a filesystem.
 function Rule:evaluate(ns)
     local fields = {}
-    local match = afd.NO_DATA
+    local one_match, one_no_match, one_missing_data = false, false, false
     for _, id in ipairs(self.ids_datastore) do
         local data = self.datastore[id]
         if data then
@@ -183,30 +180,42 @@ function Rule:evaluate(ns)
             -- if we didn't receive datapoint within the observation window this means
             -- we don't receive anymore data and cannot compute the rule.
             if ns - cbuf_time > self.observation_window * 1e9 then
-                return afd.MISSING_DATA, {value = -1, fields = data.fields}
-            end
-
-            if self.fct == 'avg' or self.fct == 'max' or self.fct == 'min' or self.fct == 'sum' or self.fct == 'sd' or self.fct == 'variance' then
-                local result
-                local num_row = -1
-                if self.fct == 'avg' then
-                    local total
-                    total, num_row = data.cbuf:compute('sum', 1)
-                    local count = data.cbuf:compute('sum', 2)
-                    result = total/count
-                else
-                    result, num_row = data.cbuf:compute(self.fct, 1)
-                end
-                if result then
-                    match = compare_threshold(result, self.relational_operator, self.threshold)
-                end
-                if match == afd.MATCH then
-                    fields[#fields+1] = {value=result, fields=data.fields}
+                one_missing_data = true
+                fields[#fields+1] = {value = -1, fields = data.fields}
+            else
+                if self.fct == 'avg' or self.fct == 'max' or self.fct == 'min' or self.fct == 'sum' or self.fct == 'sd' or self.fct == 'variance' then
+                    local result
+                    local num_row = -1
+                    if self.fct == 'avg' then
+                        local total
+                        total, num_row = data.cbuf:compute('sum', 1)
+                        local count = data.cbuf:compute('sum', 2)
+                        result = total/count
+                    else
+                        result, num_row = data.cbuf:compute(self.fct, 1)
+                    end
+                    if result and num_row > 0 then
+                        local m = compare_threshold(result, self.relational_operator, self.threshold)
+                        if m then
+                            one_match = true
+                            fields[#fields+1] = {value=result, fields=data.fields}
+                        else
+                            one_no_match = true
+                        end
+                    end
                 end
             end
         end
     end
-    return match, fields
+    if one_match then
+        return afd.MATCH, fields
+    elseif one_missing_data then
+        return afd.MISSING_DATA, fields
+    elseif one_no_match then
+        return afd.NO_MATCH, {}
+    else
+        return afd.NO_DATA, {{value=-1, fields=self.fields}}
+    end
 end
 
 return Rule
