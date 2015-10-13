@@ -278,6 +278,7 @@ function TestLMAAlarm:test_no_datapoint()
     local t = next_time(300) -- at this time all alarms can be evaluated
     local state, results = lma_alarm.evaluate(t)
     assertEquals(state, consts.UNKW)
+    assert(#results > 0)
     for _, result in ipairs(results) do
         assertEquals(result.alert.message, 'No datapoint have been received ever')
         assertNotEquals(result.alert.fields, nil)
@@ -538,6 +539,40 @@ function TestLMAAlarm:test_rules_fields()
 
     assertItemsEquals(result[3].fields, {{name='fs', value='foo'}})
     assertEquals(result[3].value, 4.5)
+end
+
+function TestLMAAlarm:test_rule_with_multiple_fields()
+    lma_alarm.load_alarm(alarms[8]) -- FS_all
+    lma_alarm.set_start_time(current_time)
+
+    next_time(120)
+    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 2, {fs = '/'})
+    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 2, {fs = '/'})
+    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 2, {fs = '/root'})
+    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 2, {fs = '/root'})
+    local state, result = lma_alarm.evaluate(next_time())
+    assertEquals(state, consts.WARN) -- both rule match
+
+    next_time(120)
+    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 2, {fs = '/'})
+    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 2, {fs = '/'})
+    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 50, {fs = '/root'})
+    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 50, {fs = '/root'})
+    local state, result = lma_alarm.evaluate(next_time())
+    assertEquals(#result, 1)
+    assertEquals(state, consts.WARN) -- one rule matches
+
+    next_time(120)
+    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 2, {fs = '/'})
+    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 2, {fs = '/'})
+    local state, result = lma_alarm.evaluate(next_time())
+    assertEquals(state, consts.WARN) -- one rule matches and one have missing datapoint
+    assertEquals(#result, 2)
+
+    next_time(120)
+    local state, result = lma_alarm.evaluate(next_time())
+    assertEquals(state, consts.UNKW) -- both have missing datapoint
+    assertEquals(#result, 2)
 end
 
 lu = LuaUnit

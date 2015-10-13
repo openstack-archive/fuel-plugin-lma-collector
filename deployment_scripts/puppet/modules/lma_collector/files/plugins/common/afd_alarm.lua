@@ -146,21 +146,21 @@ function Alarm:evaluate(ns)
         }
     end
     local one_unknown = false
+    local msg
     for _, rule in ipairs(self.rules) do
         local eval, context_list = rule:evaluate(ns)
         if eval == afd.MATCH then
             state = self.severity
-            for _, context in ipairs(context_list) do
-                add_alarm(rule, context.value, self.description,
-                          convert_field_list(context.fields))
-            end
         elseif eval == afd.MISSING_DATA then
-           local msg = 'No datapoint have been received over the last ' .. rule.observation_window .. ' seconds'
-           add_alarm(rule, -2, msg, convert_field_list(rule.fields))
+           msg = 'No datapoint have been received over the last ' .. rule.observation_window .. ' seconds'
            one_unknown = true
         elseif eval == afd.NO_DATA then
-           add_alarm(rule, -1, 'No datapoint have been received ever', convert_field_list(rule.fields))
+           msg = 'No datapoint have been received ever'
            one_unknown = true
+        end
+        for _, context in pairs(context_list) do
+            add_alarm(rule, context.value, msg,
+                      convert_field_list(context.fields))
         end
     end
     if self.logical_operator == 'and' and one_unknown then
