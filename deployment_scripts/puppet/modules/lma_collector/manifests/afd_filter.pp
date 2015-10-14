@@ -26,7 +26,9 @@ define lma_collector::afd_filter (
     include heka::params
 
     $alarms_dir = $heka::params::lua_modules_dir
-    $afd_file   = "${alarms_dir}/lma_alarms_${name}.lua"
+    # name cannot contain '-'
+    $newname = regsubst($name, '-', '_', 'G')
+    $afd_file   = "${alarms_dir}/lma_alarms_${newname}.lua"
 
 
     # Create the Lua structures that describe alarms
@@ -44,7 +46,7 @@ define lma_collector::afd_filter (
       config          => {
         hostname         => $::hostname,
         afd_type         => $type,
-        afd_file         => "lma_alarms_${name}",
+        afd_file         => "lma_alarms_${newname}",
         afd_cluster_name => $cluster_name,
         afd_logical_name => $logical_name,
       },
