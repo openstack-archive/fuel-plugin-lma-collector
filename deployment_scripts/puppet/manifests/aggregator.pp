@@ -18,6 +18,7 @@ $is_controller  = member($roles, 'controller') or member($roles, 'primary-contro
 
 $aggregator_address = hiera('management_vip')
 $internal_address   = hiera('internal_address')
+$management_network = hiera('management_network_range')
 $aggregator_port    = 5565
 $check_port         = 5566
 
@@ -60,7 +61,7 @@ if $is_controller {
   # Allow traffic from HAProxy to the local LMA collector
   firewall { '998 lma':
     port        => [$aggregator_port, $check_port],
-    source      => $aggregator_address,
+    source      => $management_network,
     destination => $internal_address,
     proto       => 'tcp',
     action      => 'accept',
