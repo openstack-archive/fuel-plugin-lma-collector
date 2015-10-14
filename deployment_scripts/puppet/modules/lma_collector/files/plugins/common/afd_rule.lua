@@ -126,7 +126,7 @@ function Rule:add_value(ts, value, fields)
         data.cbuf:add(ts, 1, value)
         data.cbuf:add(ts, 2, 1)
     elseif self.fct == 'min' or self.fct == 'max' then
-        data.cbuf:add(ts, 1, value)
+        data.cbuf:set(ts, 1, value)
     else
         data.cbuf:set(ts, 1, value)
     end
