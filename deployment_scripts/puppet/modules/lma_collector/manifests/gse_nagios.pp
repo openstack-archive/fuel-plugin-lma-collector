@@ -12,18 +12,19 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-define lma_collector::nagios (
+define lma_collector::gse_nagios (
   $ensure = present,
   $openstack_deployment_name = '',
   $url       = undef,
   $user      = $lma_collector::params::nagios_user,
   $password  = $lma_collector::params::nagios_password,
+  $service_template  = '%{cluster_name}',
   $clusters = [],
   $message_type = undef,
   $virtual_hostname = undef,
 ) {
-  include lma_collector::service
   include lma_collector::params
+  include lma_collector::service
 
   if $url == undef {
     fail('url parameter is undef!')
@@ -39,22 +40,17 @@ define lma_collector::nagios (
   }
   validate_string($url)
 
-  $suffix = $lma_collector::params::nagios_cluster_status_suffix
-
   # This must be identical logic than in lma-infra-alerting-plugin
-
   $_nagios_host = "${virtual_hostname}-env${openstack_deployment_name}"
-  $config = hash(zip($clusters, suffix($clusters, $suffix)))
-  $_config = merge($config, {'nagios_host' => $_nagios_host})
 
+  $config = {'nagios_host' => $_nagios_host, 'service_template' => $service_template}
   heka::encoder::sandbox { "nagios_${title}":
     ensure     => $ensure,
     config_dir => $lma_collector::params::config_dir,
     filename   => "${lma_collector::params::plugins_dir}/encoders/status_nagios.lua",
-    config     => $_config,
+    config     => $config,
     notify     => Class['lma_collector::service'],
   }
-
 
   heka::output::http { "nagios_${title}":
     ensure          => $ensure,
