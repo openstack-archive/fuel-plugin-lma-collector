@@ -4,6 +4,7 @@ lma_collector:
     - name: 'cpu-critical-controller'
       description: 'CPU critical on controller'
       severity: 'critical'
+      enabled: 'true'
       trigger:
         logical_operator: 'or'
         rules:
@@ -22,6 +23,7 @@ lma_collector:
     - name: 'cpu-warning-controller'
       description: 'CPU warning on controller'
       severity: 'warning'
+      enabled: 'true'
       trigger:
         logical_operator: 'or'
         rules:
@@ -40,6 +42,7 @@ lma_collector:
     - name: 'cpu-critical-compute'
       description: 'CPU critical on compute'
       severity: 'critical'
+      enabled: 'true'
       trigger:
         logical_operator: 'or'
         rules:
@@ -52,6 +55,7 @@ lma_collector:
     - name: 'cpu-warning-compute'
       description: 'CPU warning on compute'
       severity: 'warning'
+      enabled: 'true'
       trigger:
         logical_operator: 'or'
         rules:
@@ -64,6 +68,7 @@ lma_collector:
     - name: 'cpu-critical-storage'
       description: 'CPU critical on storage'
       severity: 'critical'
+      enabled: 'true'
       trigger:
         logical_operator: 'or'
         rules:
@@ -82,6 +87,7 @@ lma_collector:
     - name: 'cpu-warning-storage'
       description: 'CPU warning on storage'
       severity: 'warning'
+      enabled: 'true'
       trigger:
         logical_operator: 'or'
         rules:
@@ -100,6 +106,7 @@ lma_collector:
     - name: 'cpu-critical-default'
       description: 'CPU critical'
       severity: 'critical'
+      enabled: 'true'
       trigger:
         logical_operator: 'or'
         rules:
@@ -118,6 +125,7 @@ lma_collector:
     - name: 'rabbitmq-disk-limit-critical'
       description: 'RabbitMQ has reached the free disk threshold. All producers are blocked.'
       severity: 'critical'
+      enabled: 'true'
       trigger:
         logical_operator: 'or'
         rules:
@@ -130,6 +138,7 @@ lma_collector:
     - name: 'rabbitmq-disk-limit-warning'
       description: 'RabbitMQ is getting close to the free disk threshold.'
       severity: 'warning'
+      enabled: 'true'
       trigger:
         logical_operator: 'or'
         rules:
@@ -142,6 +151,7 @@ lma_collector:
     - name: 'rabbitmq-memory-limit-critical'
       description: 'RabbitMQ has reached the memory threshold. All producers are blocked.'
       severity: 'critical'
+      enabled: 'true'
       trigger:
         logical_operator: 'or'
         rules:
@@ -154,6 +164,7 @@ lma_collector:
     - name: 'rabbitmq-memory-limit-warning'
       description: 'RabbitMQ is getting close to the memory threshold.'
       severity: 'warning'
+      enabled: 'true'
       trigger:
         logical_operator: 'or'
         rules:
@@ -166,6 +177,7 @@ lma_collector:
     - name: 'rabbitmq-queue-warning'
       description: 'Number of messages sitting in queues is too high'
       severity: 'warning'
+      enabled: 'true'
       trigger:
         logical_operator: 'or'
         rules:
@@ -178,6 +190,7 @@ lma_collector:
     - name: 'apache-warning'
       description: 'Number of idle workers is too low'
       severity: 'warning'
+      enabled: 'true'
       trigger:
         logical_operator: 'or'
         rules:
@@ -190,6 +203,7 @@ lma_collector:
     - name: 'fs-warning'
       description: 'Filesystem free space is low'
       severity: 'warning'
+      enabled: 'true'
       trigger:
         rules:
           - metric: fs_space_percent_free
@@ -203,6 +217,7 @@ lma_collector:
     - name: 'fs-warning-storage'
       description: 'Filesystem free space is low'
       severity: 'warning'
+      enabled: 'true'
       trigger:
         rules:
           - metric: fs_space_percent_free
@@ -216,6 +231,7 @@ lma_collector:
     - name: 'fs-critical-storage'
       description: 'Filesystem free space is low'
       severity: 'critical'
+      enabled: 'true'
       trigger:
         rules:
           - metric: fs_space_percent_free
@@ -229,6 +245,7 @@ lma_collector:
     - name: 'fs-critical-compute'
       description: 'Filesystem free space is low'
       severity: 'critical'
+      enabled: 'true'
       trigger:
         rules:
           - metric: fs_space_percent_free
@@ -242,6 +259,7 @@ lma_collector:
     - name: 'fs-critical'
       description: 'Filesystem free space is low'
       severity: 'critical'
+      enabled: 'true'
       trigger:
         rules:
           - metric: fs_space_percent_free
