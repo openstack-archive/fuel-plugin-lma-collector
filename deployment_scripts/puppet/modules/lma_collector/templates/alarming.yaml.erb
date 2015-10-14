@@ -261,13 +261,13 @@ lma_collector:
     - apache: ['primary-controller', 'controller']
   node_cluster_alarms:
     - controller:
-      - system: ['cpu-critical-controller', 'cpu-warning-controller']
+      - cpu: ['cpu-critical-controller', 'cpu-warning-controller']
       - fs: ['fs-critical', 'fs-warning']
     - compute:
-      - system: ['cpu-critical-compute', 'cpu-warning-compute']
+      - cpu: ['cpu-critical-compute', 'cpu-warning-compute']
       - fs: ['fs-critical', 'fs-critical-compute', 'fs-warning']
     - storage:
-      - system: ['cpu-critical-storage', 'cpu-warning-storage']
+      - cpu: ['cpu-critical-storage', 'cpu-warning-storage']
       - fs: ['fs-critical-storage', 'fs-warning-storage']
     - default:
       - cpu: ['cpu-critical-default']
