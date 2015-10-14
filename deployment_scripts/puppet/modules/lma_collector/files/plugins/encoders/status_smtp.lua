@@ -57,10 +57,12 @@ function process_message()
                               cluster,
                               consts.status_label(previous.status),
                               consts.status_label(status))
-    elseif previous.text ~= text then
-        title = string.format('%s status remains %s',
-                              cluster,
-                              consts.status_label(status))
+-- TODO(scroiset): avoid spam
+-- This code has the same issue than annotations, see filters/influxdb_annotation.lua
+--    elseif previous.text ~= text then
+--        title = string.format('%s status remains %s',
+--                              cluster,
+--                              consts.status_label(status))
     else
         -- nothing has changed since the last message
         return 0
