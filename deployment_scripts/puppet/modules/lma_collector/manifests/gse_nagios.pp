@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-define lma_collector::nagios (
+define lma_collector::gse_nagios (
   $ensure = present,
   $openstack_deployment_name = '',
   $url       = undef,
@@ -22,8 +22,8 @@ define lma_collector::nagios (
   $message_type = undef,
   $virtual_hostname = undef,
 ) {
-  include lma_collector::service
   include lma_collector::params
+  include lma_collector::service
 
   if $url == undef {
     fail('url parameter is undef!')
@@ -45,7 +45,10 @@ define lma_collector::nagios (
 
   $_nagios_host = "${virtual_hostname}-env${openstack_deployment_name}"
   $config = hash(zip($clusters, suffix($clusters, $suffix)))
-  $_config = merge($config, {'nagios_host' => $_nagios_host})
+  $_config = merge($config, {
+                              'nagios_host' => $_nagios_host,
+                              'field_service_1' => 'cluster_name',
+                            })
 
   heka::encoder::sandbox { "nagios_${title}":
     ensure     => $ensure,

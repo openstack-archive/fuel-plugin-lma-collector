@@ -18,6 +18,9 @@ local afd = require 'afd'
 local consts = require 'gse_constants'
 
 local host = read_config('nagios_host')
+local field_service_1 = read_config('field_service_1') or error('field_service_1 is required!')
+local field_service_2 = read_config('field_service_2')
+
 local data = {
    cmd_typ = '30',
    cmd_mod = '2',
@@ -47,7 +50,10 @@ function url_encode(str)
 end
 
 function process_message()
-    local service = afd.get_entity_name('cluster_name')
+    local service = afd.get_entity_name(field_service_1)
+    if field_service_2 then
+        service = service .. '.' .. afd.get_entity_name(field_service_2)
+    end
     local service_name = read_config(service)
     local status = afd.get_status()
     local alarms = afd.alarms_for_human(afd.extract_alarms())
