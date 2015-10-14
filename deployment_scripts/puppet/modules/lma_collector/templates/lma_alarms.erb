@@ -4,6 +4,7 @@ setfenv(1, M) -- Remove external access to contain everything in the module
 local alarms = {
 <% @alarms.each do |alarm_name| -%>
 <% @alarms_definitions.each do |alarm| -%>
+<% if alarm["enabled"].to_s != 'false' -%>
 <% if alarm_name == alarm["name"] -%>
   {
     ['name'] = '<%= alarm_name %>',
@@ -30,6 +31,7 @@ local alarms = {
       },
     },
   },
+<% end -%>
 <% end -%>
 <% end -%>
 <% end -%>
