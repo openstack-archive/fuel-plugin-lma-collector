@@ -216,7 +216,7 @@ if $alerting_mode != 'disabled' {
   }
 
   if $use_nagios {
-    lma_collector::nagios { 'global_clusters':
+    lma_collector::gse_nagios { 'global_clusters':
       openstack_deployment_name => $deployment_id,
       url                       => $nagios_url,
       user                      => $nagios_user,
@@ -226,7 +226,7 @@ if $alerting_mode != 'disabled' {
       virtual_hostname          => $lma_collector::params::nagios_hostname_for_cluster_global,
     }
 
-    lma_collector::nagios{ 'node_clusters':
+    lma_collector::gse_nagios { 'node_clusters':
       openstack_deployment_name => $deployment_id,
       url                       => $nagios_url,
       user                      => $nagios_user,
