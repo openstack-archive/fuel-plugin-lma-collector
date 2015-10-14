@@ -54,9 +54,13 @@ function process_message ()
         title = string.format('General status %s -> %s',
                               consts.status_label(previous.status),
                               consts.status_label(status))
-    elseif previous.text ~= text then
-        title = string.format('General status remains %s',
-                              consts.status_label(status))
+-- TODO(pasquier-s): generate an annotation when the set of alarms has changed.
+-- the following code generated an annotation whenever at least one value
+-- associated to an alarm was changing. This led to way too many annotations
+-- with alarms monitoring the CPU usage for instance.
+--    elseif previous.text ~= text then
+--        title = string.format('General status remains %s',
+--                              consts.status_label(status))
     else
         -- nothing has changed since the last message
         return 0
