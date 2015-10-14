@@ -12,6 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
+include lma_collector::params
 
 $lma = hiera_hash('lma_collector', {})
 
@@ -27,4 +28,39 @@ class { 'lma_collector::afds':
     node_cluster_alarms    => $lma['node_cluster_alarms'],
     service_cluster_alarms => $lma['service_cluster_alarms'],
     alarms                 => $alarms_definitions,
+}
+
+# Forward AFD status to Nagios
+$alerting_mode = $lma['alerting_mode']
+if $alerting_mode != 'disabled' and $alerting_mode != 'standalone'{
+
+  if $alerting_mode == 'remote' {
+    $nagios_enabled = true
+    $nagios_url = $lma['nagios_url']
+    $nagios_user = $lma['nagios_user']
+    $nagios_password = $lma['nagios_password']
+  } elsif $alerting_mode == 'local' {
+    $nagios_enabled = true
+    $lma_infra_alerting = hiera_hash('lma_infrastructure_alerting', false)
+    $nagios_nodes = filter_nodes(hiera('nodes'), 'role', 'infrastructure_alerting')
+    $nagios_server = $nagios_nodes[0]['internal_address']
+    $nagios_user = $lma_infra_alerting['nagios_user']
+    $nagios_password = $lma_infra_alerting['nagios_password']
+    $http_port = $lma_collector::params::nagios_http_port
+    $http_path = $lma_collector::params::nagios_http_path
+    $nagios_url = "http://${nagios_server}:${http_port}/${http_path}"
+  }
+
+  if $nagios_enabled {
+    lma_collector::afd_nagios { 'nodes':
+      ensure        => present,
+      hostname      => $::hostname,
+      url           => $nagios_url,
+      user          => $nagios_user,
+      password      => $nagios_password,
+      roles         => hiera('roles'),
+      cluster_roles => $lma['node_cluster_roles'],
+      alarms        => $lma['node_cluster_alarms'],
+    }
+  }
 }
