@@ -64,7 +64,7 @@ function get_alarm_for_human(alarm)
     end
 
     return string.format(
-        "%s (%s, rule='%s(%s)%s%s', current=%s%s)",
+        "%s (%s, rule='%s(%s)%s%s', current=%.2f%s)",
         alarm.message,
         alarm.severity,
         alarm['function'],

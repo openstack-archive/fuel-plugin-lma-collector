@@ -86,7 +86,7 @@ TestAfd = {}
         }})
 
         assertEquals(#alarms, 1)
-        assertEquals(alarms[1], 'load too high (WARNING, rule=\'avg(load_longterm)>5\', current=7)')
+        assertEquals(alarms[1], 'load too high (WARNING, rule=\'avg(load_longterm)>5\', current=7.00)')
     end
 
     function TestAfd:test_alarms_for_human_with_fields()
@@ -105,7 +105,7 @@ TestAfd = {}
         }})
 
         assertEquals(#alarms, 1)
-        assertEquals(alarms[1], 'free disk space too low (CRITICAL, rule=\'avg(fs_space_percent_free[fs="/"])<=5\', current=2)')
+        assertEquals(alarms[1], 'free disk space too low (CRITICAL, rule=\'avg(fs_space_percent_free[fs="/"])<=5\', current=2.00)')
     end
 
     function TestAfd:test_alarms_for_human_with_hostname()
@@ -125,7 +125,7 @@ TestAfd = {}
         }})
 
         assertEquals(#alarms, 1)
-        assertEquals(alarms[1], 'load too high (WARNING, rule=\'avg(load_longterm)>5\', current=7, host=node-1)')
+        assertEquals(alarms[1], 'load too high (WARNING, rule=\'avg(load_longterm)>5\', current=7.00, host=node-1)')
     end
 
     function TestAfd:test_alarms_for_human_with_hints()
@@ -146,7 +146,7 @@ TestAfd = {}
 
         assertEquals(#alarms, 2)
         assertEquals(alarms[1], 'Other related alarms:')
-        assertEquals(alarms[2], 'load too high (WARNING, rule=\'avg(load_longterm)>5\', current=7, host=node-1)')
+        assertEquals(alarms[2], 'load too high (WARNING, rule=\'avg(load_longterm)>5\', current=7.00, host=node-1)')
     end
 
 lu = LuaUnit
