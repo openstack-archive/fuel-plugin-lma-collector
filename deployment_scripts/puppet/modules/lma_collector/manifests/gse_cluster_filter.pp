@@ -35,7 +35,7 @@ define lma_collector::gse_cluster_filter (
   }
 
   $lua_modules_dir = $heka::params::lua_modules_dir
-  $topology_file = "gse_${title}_topology"
+  $topology_file = sanitize_name_for_lua("gse_${title}_topology")
   if $aggregator_flag {
     $aggregator_flag_operator = '!='
   } else {
