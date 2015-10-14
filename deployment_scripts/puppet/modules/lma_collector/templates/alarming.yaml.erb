@@ -2,7 +2,7 @@
 lma_collector:
   alarms:
     - name: 'cpu-critical-controller'
-      description: 'CPU critical on controller'
+      description: 'The CPU usage is too high (controller node).'
       severity: 'critical'
       trigger:
         logical_operator: 'or'
@@ -20,7 +20,7 @@ lma_collector:
             periods: 0
             function: avg
     - name: 'cpu-warning-controller'
-      description: 'CPU warning on controller'
+      description: 'The CPU usage is high (controller node).'
       severity: 'warning'
       trigger:
         logical_operator: 'or'
@@ -38,7 +38,7 @@ lma_collector:
             periods: 0
             function: avg
     - name: 'cpu-critical-compute'
-      description: 'CPU critical on compute'
+      description: 'The CPU usage is too high (compute node).'
       severity: 'critical'
       trigger:
         logical_operator: 'or'
@@ -50,7 +50,7 @@ lma_collector:
             periods: 0
             function: avg
     - name: 'cpu-warning-compute'
-      description: 'CPU warning on compute'
+      description: 'The CPU usage is high (compute node).'
       severity: 'warning'
       trigger:
         logical_operator: 'or'
@@ -62,7 +62,7 @@ lma_collector:
             periods: 0
             function: avg
     - name: 'cpu-critical-storage'
-      description: 'CPU critical on storage'
+      description: 'The CPU usage is too high (storage node).'
       severity: 'critical'
       trigger:
         logical_operator: 'or'
@@ -80,7 +80,7 @@ lma_collector:
             periods: 0
             function: avg
     - name: 'cpu-warning-storage'
-      description: 'CPU warning on storage'
+      description: 'The CPU usage is high (storage node).'
       severity: 'warning'
       trigger:
         logical_operator: 'or'
@@ -164,7 +164,7 @@ lma_collector:
             periods: 0
             function: min
     - name: 'rabbitmq-queue-warning'
-      description: 'Number of messages sitting in queues is too high'
+      description: 'The number of outstanding messages is too high.'
       severity: 'warning'
       trigger:
         logical_operator: 'or'
@@ -176,7 +176,7 @@ lma_collector:
             periods: 0
             function: avg
     - name: 'apache-warning'
-      description: 'Number of idle workers is too low'
+      description: 'There is no Apache idle workers available.'
       severity: 'warning'
       trigger:
         logical_operator: 'or'
@@ -188,7 +188,7 @@ lma_collector:
             periods: 0
             function: min
     - name: 'fs-warning'
-      description: 'Filesystem free space is low'
+      description: "The filesystem's free space is low."
       severity: 'warning'
       trigger:
         rules:
@@ -201,7 +201,7 @@ lma_collector:
             periods: 0
             function: min
     - name: 'fs-warning-storage'
-      description: 'Filesystem free space is low'
+      description: "The filesystem's free space is low (storage node)."
       severity: 'warning'
       trigger:
         rules:
@@ -214,7 +214,7 @@ lma_collector:
             periods: 0
             function: min
     - name: 'fs-critical-storage'
-      description: 'Filesystem free space is low'
+      description: "The filesystem's free space is too low (storage node)."
       severity: 'critical'
       trigger:
         rules:
@@ -227,7 +227,7 @@ lma_collector:
             periods: 0
             function: min
     - name: 'fs-critical-compute'
-      description: 'Filesystem free space is low'
+      description: "The filesystem's free space is too low (compute node)."
       severity: 'critical'
       trigger:
         rules:
@@ -240,7 +240,7 @@ lma_collector:
             periods: 0
             function: min
     - name: 'fs-critical'
-      description: 'Filesystem free space is low'
+      description: "The filesystem's free space is too low."
       severity: 'critical'
       trigger:
         rules:
