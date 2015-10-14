@@ -46,7 +46,7 @@ class lma_collector::smtp_alert (
     config_dir      => $lma_collector::params::config_dir,
     send_from       => $send_from,
     send_to         => $send_to,
-    message_matcher => 'Type == \'heka.sandbox.gse_cluster_metric\'',
+    message_matcher => 'Type == \'heka.sandbox.gse_cluster_metric\' || Type == \'heka.sandbox.gse_node_cluster_metric\'',
     encoder         => 'smtp_alert',
     subject         => $subject,
     host            => $host_address_port,
