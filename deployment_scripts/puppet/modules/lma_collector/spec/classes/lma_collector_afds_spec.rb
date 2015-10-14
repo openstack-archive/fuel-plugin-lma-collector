@@ -59,4 +59,31 @@ describe 'lma_collector::afds' do
         it { is_expected.to contain_heka__filter__sandbox('afd_service_mysql_all') }
         it { is_expected.to contain_file('/usr/share/heka/lua_modules/lma_alarms_mysql_all.lua') }
     end
+
+    describe 'with enabled false' do
+        let(:params) do
+            {:roles => ['primary-controller'],
+             :node_cluster_roles => [{'controller' => ['primary-controller']}],
+             :service_cluster_roles => [],
+             :node_cluster_alarms => [{'controller' => [{'cpu' => ['cpu_warning']}]}],
+             :service_cluster_alarms => [],
+             :alarms => [
+                 {"name"=>"cpu_warning",
+                  "description"=>"Fake alarm",
+                  "severity"=>"warning",
+                  "enabled"=>"false",
+                  "trigger"=>
+                   {"logical_operator"=>"or",
+                    "rules"=>
+                     [{"metric"=>"fake_cpu",
+                       "relational_operator"=>">=",
+                       "threshold"=>200,
+                       "window"=>120,
+                       "periods"=>0,
+                       "function"=>"avg"}]}}]}
+        end
+
+        it { is_expected.to contain_file('/usr/share/heka/lua_modules/lma_alarms_controller_cpu.lua').with_content(/local alarms = {\n}/) }
+
+    end
 end
