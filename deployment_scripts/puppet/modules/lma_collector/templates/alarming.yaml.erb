@@ -270,13 +270,148 @@ lma_collector:
             window: 60
             periods: 0
             function: min
+    - name: 'nova-api-http-errors'
+      description: 'Some 5xx HTTP errors have been detected on nova-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: haproxy_backend_response_5xx
+            fields:
+              backend: 'nova-api'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 1
+            function: diff
+    - name: 'heat-api-http-errors'
+      description: 'Some 5xx HTTP errors have been detected on heat-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: haproxy_backend_response_5xx
+            fields:
+              backend: 'heat-api'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 1
+            function: diff
+<% if not @storage_options["objects_ceph"] then -%>
+    - name: 'swift-api-http-errors'
+      description: 'Some 5xx HTTP errors have been detected on swift-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: haproxy_backend_response_5xx
+            fields:
+              backend: 'swift-api'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 1
+            function: diff
+<% end -%>
+    - name: 'cinder-api-http-errors'
+      description: 'Some 5xx HTTP errors have been detected on cinder-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: haproxy_backend_response_5xx
+            fields:
+              backend: 'cinder-api'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 1
+            function: diff
+    - name: 'glance-api-http-errors'
+      description: 'Some 5xx HTTP errors have been detected on glance-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: haproxy_backend_response_5xx
+            fields:
+              backend: 'glance-api'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 1
+            function: diff
+    - name: 'neutron-api-http-errors'
+      description: 'Some 5xx HTTP errors have been detected on neutron-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: haproxy_backend_response_5xx
+            fields:
+              backend: 'neutron-api'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 1
+            function: diff
+    - name: 'keystone-public-api-http-errors'
+      description: 'Some 5xx HTTP errors have been detected on keystone-public-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: haproxy_backend_response_5xx
+            fields:
+              backend: 'keystone-public-api'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 1
+            function: diff
+    - name: 'keystone-admin-api-http-errors'
+      description: 'Some 5xx HTTP errors have been detected on keystone-admin-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: haproxy_backend_response_5xx
+            fields:
+              backend: 'keystone-admin-api'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 1
+            function: diff
+
   node_cluster_roles:
     - controller: ['primary-controller', 'controller']
     - compute: ['compute']
     - storage: ['cinder', 'ceph-osd']
+
   service_cluster_roles:
     - rabbitmq: ['primary-controller', 'controller']
     - apache: ['primary-controller', 'controller']
+    - nova-api: ['primary-controller', 'controller']
+    - heat-api: ['primary-controller', 'controller']
+<% if not @storage_options["objects_ceph"] then -%>
+    - swift-api: ['primary-controller', 'controller']
+<% end -%>
+    - cinder-api: ['primary-controller', 'controller']
+    - glance-api: ['primary-controller', 'controller']
+    - neutron-api: ['primary-controller', 'controller']
+    - keystone-public-api: ['primary-controller', 'controller']
+    - keystone-admin-api: ['primary-controller', 'controller']
+
   node_cluster_alarms:
     - controller:
       - system: ['cpu-critical-controller', 'cpu-warning-controller']
@@ -290,6 +425,7 @@ lma_collector:
     - default:
       - cpu: ['cpu-critical-default']
       - fs: ['fs-critical', 'fs-warning']
+
   service_cluster_alarms:
     - rabbitmq:
       - queue: ['rabbitmq-queue-warning']
@@ -297,3 +433,21 @@ lma_collector:
       - disk: ['rabbitmq-disk-limit-critical', 'rabbitmq-disk-limit-warning']
     - apache:
       - worker: ['apache-warning']
+    - nova-api:
+      - http_errors: ['nova-api-http-errors']
+    - heat-api:
+      - http_errors: ['heat-api-http-errors']
+<% if not @storage_options["objects_ceph"] then -%>
+    - swift-api:
+      - http_errors: ['swift-api-http-errors']
+<% end -%>
+    - cinder-api:
+      - http_errors: ['cinder-api-http-errors']
+    - glance-api:
+      - http_errors: ['glance-api-http-errors']
+    - neutron-api:
+      - http_errors: ['neutron-api-http-errors']
+    - keystone-public-api:
+      - http_errors: ['keystone-public-api-http-errors']
+    - keystone-admin-api:
+      - http_errors: ['keystone-admin-api-http-errors']

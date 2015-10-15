@@ -43,6 +43,7 @@ lma_collector:
         members:
           - backends
           - endpoint
+          - http_errors
       nova-ec2-api:
         members:
           - backends
@@ -71,6 +72,7 @@ lma_collector:
         members:
           - backends
           - endpoint
+          - http_errors
       cinder-v2-api:
         members:
           # Cinder V2 backends are in fact the same as the Cinder backends
@@ -85,6 +87,7 @@ lma_collector:
         members:
           - backends
           - endpoint
+          - http_errors
       neutron-l3:
         members:
           - workers
@@ -101,14 +104,17 @@ lma_collector:
         members:
           - backends
           - endpoint
+          - http_errors
       keystone-admin-api:
         members:
           # TODO(pasquier-s): add a metric reporting the status of the keystone-admin-api endpoint
           - backends
+          - http_errors
       glance-api:
         members:
           - backends
           - endpoint
+          - http_errors
       glance-registry-api:
         members:
           - backends
@@ -116,6 +122,7 @@ lma_collector:
         members:
           - backends
           - endpoint
+          - http_errors
       heat-cfn-api:
         members:
           - backends
@@ -137,6 +144,7 @@ lma_collector:
         members:
           - backends
           - endpoint
+          - http_errors
       swift-s3-api:
         members:
           # Swift S3 backends are in fact the same as the Swift backends
