@@ -139,7 +139,7 @@ class RabbitMqPlugin(base.Base):
 
         out, err = self.execute([self.rabbitmqctl_bin, '-q', '-p', self.vhost,
                                  'list_queues', 'name', 'messages', 'memory',
-                                 'consumers', 'policy', 'slave_pids',
+                                 'consumers', 'slave_pids',
                                  'synchronised_slave_pids'], shell=False)
         if not out:
             self.logger.error('%s: Failed to get the list of queues' %
@@ -162,18 +162,16 @@ class RabbitMqPlugin(base.Base):
             stats['%s.messages' % queue_name] = ctl_stats[1]
             stats['%s.memory' % queue_name] = ctl_stats[2]
             stats['%s.consumers' % queue_name] = ctl_stats[3]
-            # a queue is unmirrored if its policy is not ha-all
-            if 'ha-all' not in ctl_stats[4]:
-                stats['unmirrored_queues'] += 1
-            else:
-                # we need to check if the list of synchronised slaves is
-                # equal to the list of slaves.
-                slaves = re.findall('<([a-zA-Z@\-.0-9]+)>', ctl_stats[5])
+            # we need to check if the list of synchronised slaves is
+            # equal to the list of slaves.
+            try:
+                slaves = re.findall('<([a-zA-Z@\-.0-9]+)>', ctl_stats[4])
                 for s in slaves:
-                    if s not in ctl_stats[6]:
+                    if s not in ctl_stats[5]:
                         stats['unmirrored_queues'] += 1
                         break
-
+            except IndexError:
+                pass
 
         if not stats['memory'] > 0:
             self.logger.warning(
