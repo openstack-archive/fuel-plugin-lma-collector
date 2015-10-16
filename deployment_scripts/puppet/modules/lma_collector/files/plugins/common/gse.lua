@@ -11,7 +11,6 @@
 -- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
-local cjson = require 'cjson'
 local consts = require 'gse_constants'
 local string = require 'string'
 local table = require 'table'
@@ -21,7 +20,6 @@ local pairs = pairs
 local ipairs = ipairs
 local assert = assert
 local type = type
-local inject_message = inject_message
 local read_message = read_message
 
 local M = {}
@@ -224,7 +222,10 @@ function inject_cluster_metric(msg_type, cluster_name, metric_name, hostname, in
     local status, alarms = resolve_status(cluster_name)
 
     if #alarms > 0 then
-        payload = cjson.encode({alarms=alarms})
+        payload = lma.safe_json_encode({alarms=alarms})
+        if not payload then
+            return
+        end
     else
         -- because cjson encodes empty tables as objects instead of arrays
         payload = '{"alarms":[]}'
@@ -244,8 +245,7 @@ function inject_cluster_metric(msg_type, cluster_name, metric_name, hostname, in
         }
     }
     lma.inject_tags(msg)
-
-    inject_message(msg)
+    lma.safe_inject_message(msg)
 end
 
 return M

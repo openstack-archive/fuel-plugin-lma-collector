@@ -53,8 +53,7 @@ function process_message ()
     local log = read_message("Payload")
 
     if utils.parse_syslog_message(syslog_grammar, log, msg) then
-        inject_message(msg)
-        return 0
+        return utils.safe_inject_message(msg)
     else
         local m = fallback_grammar:match(log)
         if m then
@@ -68,8 +67,7 @@ function process_message ()
             msg.Fields.programname = m.programname
             utils.inject_tags(msg)
 
-            inject_message(msg)
-            return 0
+            return utils.safe_inject_message(msg)
         end
     end
 

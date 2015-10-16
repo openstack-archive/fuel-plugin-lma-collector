@@ -114,7 +114,7 @@ function process_message ()
     if include_full_notification then
         msg.Payload = data
     else
-        msg.Payload = cjson.encode(notif.payload)
+        msg.Payload = utils.safe_json_encode(notif.payload) or '{}'
     end
 
     msg.Fields = {}
@@ -144,6 +144,5 @@ function process_message ()
     end
     utils.inject_tags(msg)
 
-    inject_message(msg)
-    return 0
+    return utils.safe_inject_message(msg)
 end
