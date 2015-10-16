@@ -57,6 +57,5 @@ function process_message ()
     }
     utils.inject_tags(msg)
 
-    inject_message(msg)
-    return 0
+    return utils.safe_inject_message(msg)
 end

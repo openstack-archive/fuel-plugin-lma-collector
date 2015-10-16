@@ -69,7 +69,7 @@ function process_message ()
                 Timestamp = sample['time'] * 1e9, -- Heka expects nanoseconds
                 Hostname = sample['host'],
                 Logger = "collectd",
-                Payload = cjson.encode(sample),
+                Payload = utils.safe_json_encode(sample) or '',
                 Severity = 6,
                 Type = "metric",
                 Fields = {
@@ -331,7 +331,7 @@ function process_message ()
 
             if not skip_it then
                 utils.inject_tags(msg)
-                inject_message(msg)
+                utils.safe_inject_message(msg)
             end
         end
     end

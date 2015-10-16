@@ -54,15 +54,6 @@ function flush ()
     end
 end
 
-function process_message()
-    local msg_type = read_message("Type")
-    if msg_type:match('bulk_metric$') then
-        return process_bulk_metric()
-    else
-        return process_single_metric()
-    end
-end
-
 function process_single_metric()
     local tags = {}
     local name = read_message("Fields[name]")
@@ -186,18 +177,13 @@ function encode_datapoint(name, value, tags)
     datapoints[#datapoints+1] = point
 end
 
-function process_bulk_metric()
-    -- the list of datapoints is encoded in the message payload, each point
-    -- is a hash table formatted like this:
-    -- {name='foo',value=1,tags={k1=v1,...}}
-    local datapoints = utils.decode_json_payload()
-
-    for _, point in ipairs(datapoints) do
-        encode_datapoint(point.name, point.value, point.tags or {})
+function process_message()
+    local msg_type = read_message("Type")
+    if msg_type:match('bulk_metric$') then
+        return process_bulk_metric()
+    else
+        return process_single_metric()
     end
-
-    flush()
-    return 0
 end
 
 function timer_event(ns)

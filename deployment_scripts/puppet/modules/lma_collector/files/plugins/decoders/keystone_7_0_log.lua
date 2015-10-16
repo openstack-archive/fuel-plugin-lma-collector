@@ -107,6 +107,5 @@ function process_message ()
     -- Make programname consistent
     msg.Fields.programname = pgname[msg.Fields.programname] or msg.Fields.programname
 
-    inject_message(msg)
-    return 0
+    return utils.safe_inject_message(msg)
 end
