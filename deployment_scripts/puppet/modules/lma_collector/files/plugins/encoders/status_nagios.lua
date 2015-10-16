@@ -16,6 +16,7 @@ require 'string'
 
 local afd = require 'afd'
 local consts = require 'gse_constants'
+local lma = require 'lma_utils'
 
 local host = read_config('nagios_host')
 local data = {
@@ -75,8 +76,6 @@ function process_message()
     for k, v in pairs(data) do
         params[#params+1] = string.format("%s=%s", k, url_encode(v))
     end
-    local p = table.concat(params, '&')
-    inject_payload('txt', 'nagios', p)
 
-   return 0
+    return lma.safe_inject_payload('txt', 'nagios', table.concat(params, '&'))
 end

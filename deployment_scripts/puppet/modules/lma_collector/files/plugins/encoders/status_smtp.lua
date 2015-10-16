@@ -16,6 +16,7 @@ require 'table'
 require 'string'
 
 local afd = require 'afd'
+local lma = require 'lma_utils'
 
 local statuses = {}
 
@@ -68,11 +69,9 @@ function process_message()
         return 0
     end
 
-    inject_payload('txt', '', table.concat({title, text}, concat_string))
-
     -- store the last status and text for future messages
     previous.status = status
     previous.text = text
 
-    return 0
+    return lma.safe_inject_payload('txt', '', table.concat({title, text}, concat_string))
 end
