@@ -18,7 +18,6 @@ local string = require 'string'
 local lma = require 'lma_utils'
 local consts = require 'gse_constants'
 
-local inject_message = inject_message
 local read_message = read_message
 local assert = assert
 local ipairs = ipairs
@@ -134,8 +133,11 @@ function inject_afd_metric(msg_type, msg_tag_name, msg_tag_value, metric_name,
     local payload
 
     if #alarms > 0 then
-        payload = cjson.encode({alarms=alarms})
+        payload = lma.safe_json_encode({alarms=alarms})
         reset_alarms()
+        if not payload then
+            return
+        end
     else
         -- because cjson encodes empty tables as objects instead of arrays
         payload = '{"alarms":[]}'
@@ -155,8 +157,7 @@ function inject_afd_metric(msg_type, msg_tag_name, msg_tag_value, metric_name,
     }
     msg.Fields[msg_tag_name] = msg_tag_value,
     lma.inject_tags(msg)
-
-    inject_message(msg)
+    lma.safe_inject_message(msg)
 end
 
 -- inject an AFD service event into the Heka pipeline

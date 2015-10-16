@@ -48,7 +48,5 @@ function process_message ()
         tag_fields = {'http_method', 'http_status'},
     }
     utils.inject_tags(msg)
-    inject_message(msg)
-
-    return 0
+    return utils.safe_inject_message(msg)
 end
