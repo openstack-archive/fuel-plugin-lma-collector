@@ -54,19 +54,36 @@ function flush ()
     end
 end
 
+-- Return the Payload field decoded as JSON data, nil if the payload isn't a
+-- valid JSON string
+function decode_json_payload()
+    local ok, data = pcall(cjson.decode, read_message("Payload"))
+    if not ok then
+        return
+    end
+
+    return data
+end
+
 function process_single_metric()
     local tags = {}
     local name = read_message("Fields[name]")
     local value
 
-    if read_message('Type'):match('multivalue_metric$') then
-        value = utils.decode_json_payload()
-    else
-        value = read_message("Fields[value]")
+    if not name then
+        return 'Fields[name] is missing'
     end
 
-    if value == nil or name == nil then
-        return -1
+    if read_message('Type'):match('multivalue_metric$') then
+        value = decode_json_payload()
+        if not value then
+            return 'Invalid payload value'
+        end
+    else
+        value = read_message("Fields[value]")
+        if not value then
+            return 'Fields[value] is missing'
+        end
     end
 
     -- collect Fields[tag_fields]
@@ -81,22 +98,19 @@ function process_single_metric()
     end
 
     encode_datapoint(name, value, tags)
-    flush()
-
-    return 0
 end
 
 function process_bulk_metric()
     -- The payload contains a list of datapoints, each point being formatted
     -- like this: {name='foo',value=1,tags={k1=v1,...}}
-    local datapoints = utils.decode_json_payload() or {}
+    local datapoints = decode_json_payload()
+    if not datapoints then
+        return 'Invalid payload value'
+    end
 
     for _, point in ipairs(datapoints) do
         encode_datapoint(point.name, point.value, point.tags or {})
     end
-
-    flush()
-    return 0
 end
 
 function encode_scalar_value(value)
@@ -178,11 +192,20 @@ function encode_datapoint(name, value, tags)
 end
 
 function process_message()
+    local err_msg
     local msg_type = read_message("Type")
     if msg_type:match('bulk_metric$') then
-        return process_bulk_metric()
+        err_msg = process_bulk_metric()
     else
-        return process_single_metric()
+        err_msg = process_single_metric()
+    end
+
+    flush()
+
+    if err_msg then
+        return -1, err_msg
+    else
+        return 0
     end
 end
 
