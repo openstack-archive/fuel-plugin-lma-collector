@@ -37,7 +37,7 @@ end
 -- ie: controller for node AFD / rabbitmq for service AFD
 local afd_entity_value = read_config('afd_cluster_name') or error('afd_cluster_name must be specified!')
 
--- ie: system for node AFD / queue for service AFD
+-- ie: cpu for node AFD / queue for service AFD
 local msg_field_source = read_config('afd_logical_name') or error('afd_logical_name must be specified!')
 
 local hostname = read_config('hostname') or error('hostname must be specified')
