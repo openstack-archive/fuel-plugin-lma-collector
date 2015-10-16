@@ -8,7 +8,7 @@ local alarms = {
 <% if alarm_name == alarm["name"] -%>
   {
     ['name'] = '<%= alarm_name %>',
-    ['description'] = '<%= alarm["description"] %>',
+    ['description'] = '<%= alarm["description"].to_s().gsub("'"){"\\'"} %>',
     ['severity'] = '<%= alarm["severity"] %>',
     ['trigger'] = {
       ['logical_operator'] = '<%= alarm["trigger"]["logical_operator"] || 'or' %>',
