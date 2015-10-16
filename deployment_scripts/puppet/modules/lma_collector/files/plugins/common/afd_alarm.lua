@@ -20,6 +20,7 @@ local setmetatable = setmetatable
 
 -- LMA libs
 local utils = require 'lma_utils'
+local table_utils = require 'table_utils'
 local consts = require 'gse_constants'
 local afd = require 'afd'
 local Rule = require 'afd_rule'
@@ -69,7 +70,7 @@ function Alarm:get_metrics()
     if not self._metrics_list then
         self._metrics_list = {}
         for _, rule in ipairs(self.rules) do
-            if not utils.table_find(rule.metric, metrics) then
+            if not table_utils.item_find(rule.metric, metrics) then
                 self._metrics_list[#self._metrics_list+1] = rule.metric
             end
         end
@@ -92,10 +93,7 @@ function Alarm:get_metric_fields(metric_name)
 end
 
 function Alarm:has_metric(metric)
-    if utils.table_find(metric, self:get_metrics()) then
-        return true
-    end
-    return false
+    return table_utils.item_find(metric, self:get_metrics())
 end
 
 -- dispatch datapoint in datastores

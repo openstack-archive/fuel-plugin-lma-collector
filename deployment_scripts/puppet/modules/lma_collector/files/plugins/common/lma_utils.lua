@@ -15,13 +15,11 @@ local cjson = require 'cjson'
 local string = require 'string'
 local extra = require 'extra_fields'
 local patt  = require 'patterns'
-local table = require 'table'
+
 local pairs = pairs
-local ipairs = ipairs
 local inject_message = inject_message
 local read_message = read_message
 local pcall = pcall
-local type = type
 
 local M = {}
 setfenv(1, M) -- Remove external access to contain everything in the module
@@ -181,77 +179,6 @@ end
 
 function chomp(s)
     return string.gsub(s, "\n$", "")
-end
-
-function deepcopy(t)
-    if type(t) == 'table' then
-        local copy = {}
-        for k, v in pairs(t) do
-            copy[k] = deepcopy(v)
-        end
-        return copy
-    end
-    return t
-end
-
--- return the position (index) of an item in a list, nil if not found
-function table_pos(item, list)
-  if type(list) == 'table' then
-    for i, v in ipairs(list) do
-      if v == item then
-        return i
-      end
-    end
-  end
-end
-
--- return true if an item is present in the list, else false
-function table_find(item, list)
-    return table_pos(item, list) ~= nil
-end
-
--- from http://lua-users.org/wiki/SortedIteration
-function __genOrderedIndex( t )
-    local orderedIndex = {}
-    for key in pairs(t) do
-        table.insert( orderedIndex, key )
-    end
-    table.sort( orderedIndex )
-    return orderedIndex
-end
-
-function orderedNext(t, state)
-    -- Equivalent of the next function, but returns the keys in the alphabetic
-    -- order. We use a temporary ordered key table that is stored in the
-    -- table being iterated.
-
-    key = nil
-    if state == nil then
-        -- the first time, generate the index
-        t.__orderedIndex = __genOrderedIndex( t )
-        key = t.__orderedIndex[1]
-    else
-        -- fetch the next value
-        for i = 1,table.getn(t.__orderedIndex) do
-            if t.__orderedIndex[i] == state then
-                key = t.__orderedIndex[i+1]
-            end
-        end
-    end
-
-    if key then
-        return key, t[key]
-    end
-
-    -- no more value to return, cleanup
-    t.__orderedIndex = nil
-    return
-end
-
-function orderedPairs(t)
-    -- Equivalent of the pairs() function on tables. Allows to iterate
-    -- in order
-    return orderedNext, t, nil
 end
 
 return M
