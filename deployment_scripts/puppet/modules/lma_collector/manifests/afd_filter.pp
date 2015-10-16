@@ -34,7 +34,7 @@ define lma_collector::afd_filter (
     # Create the Lua structures that describe alarms
     file { $afd_filename:
       ensure  => present,
-      content => template('lma_collector/lma_alarms.erb'),
+      content => template('lma_collector/lma_alarms.lua.erb'),
     }
 
     # Create the confguration file for Heka
