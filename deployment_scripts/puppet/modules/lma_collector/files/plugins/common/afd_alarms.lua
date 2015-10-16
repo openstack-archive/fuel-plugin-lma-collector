@@ -15,6 +15,7 @@
 local pairs = pairs
 local ipairs = ipairs
 local lma = require 'lma_utils'
+local table_utils = require 'table_utils'
 local consts = require 'gse_constants'
 local gse = require 'gse'
 local Alarm = require 'afd_alarm'
@@ -31,7 +32,7 @@ function get_metric_fields(metric_name)
         local mf = alarm:get_metric_fields(metric_name)
         if mf then
             for _, field in pairs(mf) do
-                if not lma.table_find(field, fields) then
+                if not table_utils.item_find(field, fields) then
                     fields[#fields+1] = field
                 end
             end
