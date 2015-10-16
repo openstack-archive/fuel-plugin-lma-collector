@@ -53,6 +53,5 @@ function process_message ()
         msg.Payload = m.Message
     end
 
-    inject_message(msg)
-    return 0
+    return utils.safe_inject_message(msg)
 end

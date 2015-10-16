@@ -43,7 +43,5 @@ function process_message ()
 
     msg.Fields.name= string.format('pacemaker.resource.%s.active', m.resource)
     msg.Fields.value = tonumber(m.active)
-    inject_message(msg)
-
-    return 0
+    return utils.safe_inject_message(msg)
 end
