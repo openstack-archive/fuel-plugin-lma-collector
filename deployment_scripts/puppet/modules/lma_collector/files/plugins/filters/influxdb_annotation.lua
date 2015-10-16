@@ -71,7 +71,7 @@ function process_message ()
         Type = 'multivalue_metric',
         Severity = utils.label_to_severity_map.INFO,
         Hostname = read_message('Hostname'),
-        Payload = cjson.encode({title=title, tags=cluster, text=text}),
+        Payload = utils.safe_json_encode({title=title, tags=cluster, text=text}) or '',
         Fields = {
             name = measurement_name,
             tag_fields = { 'cluster' },
@@ -80,11 +80,10 @@ function process_message ()
       }
     }
     utils.inject_tags(msg)
-    inject_message(msg)
 
     -- store the last status and alarm text for future messages
     previous.status = status
     previous.text = text
 
-    return 0
+    return utils.safe_inject_message(msg)
 end
