@@ -17,8 +17,10 @@ require 'string'
 local afd = require 'afd'
 local consts = require 'gse_constants'
 local lma = require 'lma_utils'
+local interp = require "msg_interpolate"
 
 local host = read_config('nagios_host')
+local service_template = read_config('service_template') or error('service_template is required!')
 local data = {
    cmd_typ = '30',
    cmd_mod = '2',
@@ -48,8 +50,7 @@ function url_encode(str)
 end
 
 function process_message()
-    local service = afd.get_entity_name('cluster_name')
-    local service_name = read_config(service)
+    local service_name = interp.interpolate_from_msg(service_template)
     local status = afd.get_status()
     local alarms = afd.alarms_for_human(afd.extract_alarms())
 
