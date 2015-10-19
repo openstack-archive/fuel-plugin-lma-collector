@@ -1,5 +1,103 @@
 ---
 lma_collector:
+
+  # GSE policies describe how the GSE cluster filters compute the status of a cluster
+  #
+  # A policy consists of a list of rules which are evaluated against the
+  # current status of the cluster's members. When one rule matches, the cluster's
+  # status gets the value associated with the rule and the evaluation stops.
+  # The last rule of the list is usually a catch-all rule that defines the
+  # default status in case no other rule matched.
+  #
+  # The declaration of policy rules is similar to the alarm rules except that:
+  # - there are no 'metric', 'window' and 'period' parameter.
+  # - there are only 2 supported functions:
+  #   - 'count' which returns the number of members that match the passed value(s)
+  #   - 'percent' which returns the percentage of members that match the passed value(s)
+  gse_policies:
+    # A policy defining that the cluster's status depends on the member with the
+    # highest severity, typically used for a cluster of services.
+    highest_severity:
+      - status: down
+        trigger:
+          logical_operator: or
+          rules:
+            - function: count
+              arguments: [ down ]
+              relational_operator: '>'
+              threshold: 0
+      - status: critical
+        trigger:
+          logical_operator: or
+          rules:
+            - function: count
+              arguments: [ critical ]
+              relational_operator: '>'
+              threshold: 0
+      - status: warning
+        trigger:
+          logical_operator: or
+          rules:
+            - function: count
+              arguments: [ warning ]
+              relational_operator: '>'
+              threshold: 0
+      - status: okay
+        trigger:
+          logical_operator: or
+          rules:
+            - function: count
+              arguments: [ okay ]
+              relational_operator: '>'
+              threshold: 0
+      - status: unknown
+
+    # A policy defining that the cluster's status depends on the majority of its
+    # members, typically used for clusters of nodes.
+    majority:
+      - status: down
+        trigger:
+          logical_operator: or
+          rules:
+            - function: percent
+              arguments: [ down ]
+              relational_operator: '>'
+              threshold: 50
+      - status: critical
+        trigger:
+          logical_operator: or
+          rules:
+            - function: percent
+              arguments: [ critical ]
+              relational_operator: '>'
+              threshold: 50
+      - status: critical
+        trigger:
+          logical_operator: or
+          rules:
+            - function: percent
+              arguments: [ warning, critical ]
+              relational_operator: '>'
+              threshold: 50
+      - status: warning
+        trigger:
+          logical_operator: or
+          rules:
+            - function: percent
+              arguments: [ warning ]
+              relational_operator: '>'
+              threshold: 50
+      - status: warning
+        trigger:
+          logical_operator: or
+          rules:
+            - function: percent
+              arguments: [ okay ]
+              relational_operator: '<'
+              threshold: 50
+              function: percent
+      - status: okay
+
   gse_cluster_service:
     input_message_types:
       - afd_service_metric
@@ -14,25 +112,31 @@ lma_collector:
     warm_up_period: 20
     clusters:
       mysqld-tcp:
+        policy: highest_severity
         members:
           - backends
       mysql:
+        policy: majority
         group_by_hostname: true
         members:
           - heartbeat
       haproxy:
+        policy: majority
         group_by_hostname: true
         members:
           - heartbeat
       apache:
+        policy: majority
         group_by_hostname: true
         members:
           - heartbeat
       memcached:
+        policy: majority
         group_by_hostname: true
         members:
           - heartbeat
       rabbitmq:
+        policy: majority
         group_by_hostname: true
         members:
           - heartbeat
@@ -40,118 +144,148 @@ lma_collector:
           - disk
           - queue
       nova-api:
+        policy: highest_severity
         members:
           - backends
           - endpoint
           - http_errors
       nova-ec2-api:
+        policy: highest_severity
         members:
           - backends
       nova-novncproxy-websocket:
+        policy: highest_severity
         members:
           - backends
       nova-metadata-api:
+        policy: highest_severity
         members:
           - backends
       nova-scheduler:
+        policy: highest_severity
         members:
           - workers
       nova-cert:
+        policy: highest_severity
         members:
           - workers
       nova-consoleauth:
+        policy: highest_severity
         members:
           - workers
       nova-compute:
+        policy: highest_severity
         members:
           - workers
       nova-conductor:
+        policy: highest_severity
         members:
           - workers
       cinder-api:
+        policy: highest_severity
         members:
           - backends
           - endpoint
           - http_errors
       cinder-v2-api:
+        policy: highest_severity
         members:
           # Cinder V2 backends are in fact the same as the Cinder backends
           - endpoint
       cinder-scheduler:
+        policy: highest_severity
         members:
           - workers
       cinder-volume:
+        policy: highest_severity
         members:
           - workers
       neutron-api:
+        policy: highest_severity
         members:
           - backends
           - endpoint
           - http_errors
       neutron-l3:
+        policy: highest_severity
         members:
           - workers
       neutron-dhcp:
+        policy: highest_severity
         members:
           - workers
       neutron-metadata:
+        policy: highest_severity
         members:
           - workers
       neutron-openvswitch:
+        policy: highest_severity
         members:
           - workers
       keystone-public-api:
+        policy: highest_severity
         members:
           - backends
           - endpoint
           - http_errors
       keystone-admin-api:
+        policy: highest_severity
         members:
           # TODO(pasquier-s): add a metric reporting the status of the keystone-admin-api endpoint
           - backends
           - http_errors
       glance-api:
+        policy: highest_severity
         members:
           - backends
           - endpoint
           - http_errors
       glance-registry-api:
+        policy: highest_severity
         members:
           - backends
       heat-api:
+        policy: highest_severity
         members:
           - backends
           - endpoint
           - http_errors
       heat-cfn-api:
+        policy: highest_severity
         members:
           - backends
           - endpoint
       heat-cloudwatch-api:
+        policy: highest_severity
         members:
           - backends
 <% if @tls_enabled then -%>
       horizon-https:
+        policy: highest_severity
         members:
           - backends
 <% else -%>
       horizon-ui:
+        policy: highest_severity
         members:
           - backends
 <% end -%>
 <% if not @storage_options["objects_ceph"] then -%>
       swift-api:
+        policy: highest_severity
         members:
           - backends
           - endpoint
           - http_errors
       swift-s3-api:
+        policy: highest_severity
         members:
           # Swift S3 backends are in fact the same as the Swift backends
           - endpoint
 <% end -%>
 <% if @ceilometer_enabled -%>
       ceilometer-api:
+        policy: highest_severity
         members:
           - backends
           - endpoint
@@ -171,16 +305,19 @@ lma_collector:
     warm_up_period: 80
     clusters:
       controller:
+        policy: majority
         group_by_hostname: true
         members:
           - cpu
           - fs
       compute:
+        policy: majority
         group_by_hostname: true
         members:
           - cpu
           - fs
       storage:
+        policy: majority
         group_by_hostname: true
         members:
           - cpu
@@ -199,27 +336,33 @@ lma_collector:
     warm_up_period: 30
     clusters:
       mysql:
+        policy: highest_severity
         members:
           - mysqld-tcp
           - mysqld
           - controller
       haproxy:
+        policy: highest_severity
         members:
           - haproxy
           - controller
       apache:
+        policy: highest_severity
         members:
           - apache
           - controller
       memcached:
+        policy: highest_severity
         members:
           - memcached
           - controller
       rabbitmq:
+        policy: highest_severity
         members:
           - rabbitmq
           - controller
       nova:
+        policy: highest_severity
         members:
           - nova-api
           - nova-ec2-api
@@ -238,6 +381,7 @@ lma_collector:
           - keystone
           - neutron
       cinder:
+        policy: highest_severity
         members:
           - cinder-api
           - cinder-v2-api
@@ -248,6 +392,7 @@ lma_collector:
         hints:
           - keystone
       neutron:
+        policy: highest_severity
         members:
           - neutron-api
           - neutron-l3
@@ -258,12 +403,14 @@ lma_collector:
         hints:
           - keystone
       keystone:
+        policy: highest_severity
         members:
           - keystone-public-api
           - keystone-admin-api
           - controller
         hints: []
       glance:
+        policy: highest_severity
         members:
           - glance-api
           - glance-registry-api
@@ -271,6 +418,7 @@ lma_collector:
         hints:
           - keystone
       heat:
+        policy: highest_severity
         members:
           - heat-api
           - heat-cfn-api
@@ -283,6 +431,7 @@ lma_collector:
           - neutron
           - nova
       horizon:
+        policy: highest_severity
         members:
 <% if @tls_enabled then -%>
           - horizon-https
@@ -294,6 +443,7 @@ lma_collector:
           - keystone
 <% if not @storage_options["objects_ceph"] then -%>
       swift:
+        policy: highest_severity
         members:
           - swift-api
           - swift-s3-api
@@ -303,6 +453,7 @@ lma_collector:
 <% end -%>
 <% if @ceilometer_enabled -%>
       ceilometer:
+        policy: highest_severity
         members:
           - ceilometer-api
           - controller
