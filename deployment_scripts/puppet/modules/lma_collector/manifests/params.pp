@@ -186,7 +186,6 @@ class lma_collector::params {
   $nagios_timeout = 2
 
   # Following parameter must match the lma_infrastructure_alerting::params::nagios_openstack_dummy_hostname
-  $nagios_cluster_status_suffix = '.status'
   $nagios_hostname_for_cluster_global = '00-global-clusters'
   $nagios_hostname_for_cluster_nodes = '00-node-clusters'
 
