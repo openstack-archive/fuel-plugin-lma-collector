@@ -25,17 +25,18 @@ function process_message()
     local previous
     local text
     local cluster = afd.get_entity_name('cluster_name')
+    local msg_type = read_message("Type")
     local status = afd.get_status()
     local alarms = afd.extract_alarms()
 
     if not cluster or not status or not alarms then
         return -1
     end
-
-    if not statuses[cluster] then
-        statuses[cluster] = {}
+    local key = string.format('%s.%s', msg_type, cluster)
+    if not statuses[key] then
+        statuses[key] = {}
     end
-    previous = statuses[cluster]
+    previous = statuses[key]
 
     local text
     if #alarms == 0 then
