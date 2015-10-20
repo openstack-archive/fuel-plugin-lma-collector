@@ -22,6 +22,7 @@ local table = table
 
 -- LMA libs
 local utils = require 'lma_utils'
+local table_utils = require 'table_utils'
 local consts = require 'gse_constants'
 local afd = require 'afd'
 
@@ -36,7 +37,7 @@ setfenv(1, Rule) -- Remove external access to contain everything in the module
 
 local function get_datastore_id(metric, fields, fct, window, periods)
     local arr = {metric, fct, window, periods}
-    for f, v in utils.orderedPairs(fields or {}) do
+    for f, v in table_utils.orderedPairs(fields or {}) do
         arr[#arr+1] = string.format('(%s=%s)', f, v)
     end
     return table.concat(arr, '/')
@@ -131,7 +132,7 @@ function Rule:add_value(ts, value, fields)
 end
 
 function Rule:add_datastore(id)
-    if not utils.table_find(id, self.ids_datastore) then
+    if not table_utils.item_find(id, self.ids_datastore) then
         self.ids_datastore[#self.ids_datastore+1] = id
     end
 end

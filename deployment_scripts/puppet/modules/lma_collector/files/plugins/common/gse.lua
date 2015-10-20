@@ -15,6 +15,7 @@ local consts = require 'gse_constants'
 local string = require 'string'
 local table = require 'table'
 local lma = require 'lma_utils'
+local table_utils = require 'table_utils'
 
 local pairs = pairs
 local ipairs = ipairs
@@ -79,15 +80,15 @@ function add_cluster(cluster_id, members, hints, group_by_hostname)
             reverse_cluster_index[member] = {}
         end
         local reverse_table = reverse_cluster_index[member]
-        if not lma.table_find(cluster_id, reverse_table) then
+        if not table_utils.item_find(cluster_id, reverse_table) then
             reverse_table[#reverse_table+1] = cluster_id
         end
     end
 
-    if not lma.table_find(cluster_id, ordered_clusters) then
+    if not table_utils.item_find(cluster_id, ordered_clusters) then
         local after_index = 1
         for current_pos, id in ipairs(ordered_clusters) do
-            if lma.table_find(id, cluster.hints) then
+            if table_utils.item_find(id, cluster.hints) then
                 after_index = current_pos + 1
             end
         end
@@ -96,7 +97,7 @@ function add_cluster(cluster_id, members, hints, group_by_hostname)
         for _, item in pairs(clusters) do
             for _, hint in pairs(item.hints) do
                 if hint == cluster_id then
-                    local pos = lma.table_pos(hint, cluster_orderings)
+                    local pos = table_utils.item_pos(hint, cluster_orderings)
                     if pos and pos <= index then
                         index = pos
                     elseif index > after_index then
@@ -176,7 +177,7 @@ function resolve_status(cluster_id)
                 -- append alarms only if the member affects the healthiness
                 -- of the cluster
                 for _, v in ipairs(fact.alarms) do
-                    alarms[#alarms+1] = lma.deepcopy(v)
+                    alarms[#alarms+1] = table_utils.deepcopy(v)
                     if not alarms[#alarms]['tags'] then
                         alarms[#alarms]['tags'] = {}
                     end
@@ -190,7 +191,7 @@ function resolve_status(cluster_id)
             cluster.status = max_status(cluster.status, status)
         end
     end
-    cluster.alarms = lma.deepcopy(alarms)
+    cluster.alarms = table_utils.deepcopy(alarms)
 
     if cluster.status ~= consts.OKAY then
         -- add hints if the cluster isn't healthy
@@ -200,7 +201,7 @@ function resolve_status(cluster_id)
                 for _, v in ipairs(other_cluster.alarms) do
                     if not (v.tags and v.tags.dependency_name and members_with_alarms[v.tags.dependency_name]) then
                         -- this isn't an alarm related to a member of the cluster itself
-                        alarms[#alarms+1] = lma.deepcopy(v)
+                        alarms[#alarms+1] = table_utils.deepcopy(v)
                         if not alarms[#alarms]['tags'] then
                             alarms[#alarms]['tags'] = {}
                         end
