@@ -87,11 +87,11 @@ dependencies:
 
 To install them automatically using Fuel, you can refer to the
 [Elasticsearch-Kibana Fuel Plugin
-](https://github.com/stackforge/fuel-plugin-elasticsearch-kibana)
+](https://github.com/openstack/fuel-plugin-elasticsearch-kibana)
 , [InfluxDB-Grafana Fuel Plugin
-](https://github.com/stackforge/fuel-plugin-influxdb-grafana) and [LMA
+](https://github.com/openstack/fuel-plugin-influxdb-grafana) and [LMA
 Infrastructure Alerting Fuel Plugin
-](https://github.com/stackforge/fuel-plugin-lma-infrastructure-alerting).
+](https://github.com/openstack/fuel-plugin-lma-infrastructure-alerting).
 
 You can install Elasticsearch/Kibana, InfluxDB/Grafana and Nagios outside of
 Fuel as long as your installation meets the LMA Collector Plugin's requirements
@@ -161,7 +161,7 @@ need further instructions about how to build the Fuel Plugin Builder.*
 4. Clone the LMA Collector Plugin git repository:
 
     ```
-    # git clone git@github.com:stackforge/fuel-plugin-lma-collector.git
+    # git clone git@github.com:openstack/fuel-plugin-lma-collector.git
     ```
 
 5. Check that the plugin is valid:
@@ -198,10 +198,10 @@ Exploring the data
 ------------------
 
 Refer to the [Elasticsearch/Kibana
-plugin](https://github.com/stackforge/fuel-plugin-elasticsearch-kibana) for
+plugin](https://github.com/openstack/fuel-plugin-elasticsearch-kibana) for
 exploring and visualizing the collected logs and notifications and refer to the
 [InfluxDB-Grafana Fuel Plugin
-](https://github.com/stackforge/fuel-plugin-influxdb-grafana) for monitoring
+](https://github.com/openstack/fuel-plugin-influxdb-grafana) for monitoring
 your cloud.
 
 Troubleshooting
@@ -285,7 +285,7 @@ follow the [OpenStack development workflow](
 http://docs.openstack.org/infra/manual/developers.html#development-workflow).
 
 Patch reviews take place on the [OpenStack gerrit](
-https://review.openstack.org/#/q/status:open+project:stackforge/fuel-plugin-lma-collector,n,z)
+https://review.openstack.org/#/q/status:open+project:openstack/fuel-plugin-lma-collector,n,z)
 system.
 
 Contributors
