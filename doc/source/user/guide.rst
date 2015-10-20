@@ -8,11 +8,18 @@ User Guide
 Plugin configuration
 --------------------
 
+To configure your plugin, you need to follow the folling steps:
+
 1. `Create a new environment <http://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#launch-wizard-to-create-new-environment>`_ with the Fuel web user interface.
 
 2. Click on the Settings tab of the Fuel web UI.
 
-3. Select the LMA collector plugin in the left column.
+3. Select the LMA collector plugin in the left column. The LMA Collector settings screen appears.
+
+.. image:: ../../images/collector_settings.png 
+   :scale: 50 %
+   :alt: The LMA Collector settings 
+   :align: center
 
 4. Select the LMA collector plugin checkbox and fill-in the required fields.
 
@@ -40,9 +47,9 @@ Plugin installation verification
 Once the OpenStack environment is ready, you may want to check that both
 collectd and hekad processes are running on the controller nodes::
 
-    root@node-1 ~# pidof lma_collector
+    [root@node-1 ~]# pidof lma_collector
     5568
-    root@node-1 ~# pidof collectd
+    [root@node-1 ~]# pidof collectd
     5684
 
 Please refer to the :ref:`user_troubleshooting` section otherwise.
@@ -67,18 +74,18 @@ If you see no data in the Kibana and/or Grafana dashboards, use the instructions
 1. Check if the LMA collector service is up and running::
 
     # On the controller nodes
-    crm resource status lma_collector
+    [root@node-1 ~]# crm resource status lma_collector
 
     # On nodes which are not controllers
-    status lma_collector
+    [root@node-1 ~]# status lma_collector
 
-2. If the LMA Collector is down, start it again::
+2. If the LMA Collector is down, restart it::
 
     # On the controller nodes
-    crm resource start lma_collector
+    [root@node-1 ~]# crm resource start lma_collector
 
     # On nodes which are not controllers
-    status lma_collector
+    [root@node-1 ~]# status lma_collector
 
 3. Look for errors in the LMA Collector log file (located at /var/log/lma_collector.log) on the different nodes.
 
