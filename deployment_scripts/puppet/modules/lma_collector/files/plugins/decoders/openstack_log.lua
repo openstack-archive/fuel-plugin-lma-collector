@@ -113,6 +113,5 @@ function process_message ()
         end
     end
 
-    inject_message(msg)
-    return 0
+    return utils.safe_inject_message(msg)
 end

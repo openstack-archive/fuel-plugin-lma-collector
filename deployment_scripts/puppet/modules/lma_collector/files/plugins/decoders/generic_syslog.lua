@@ -43,8 +43,7 @@ function process_message ()
     if utils.parse_syslog_message(syslog_grammar, log, msg) or
        (fallback_syslog_grammar and utils.parse_syslog_message(fallback_syslog_grammar, log, msg)) then
         msg.Logger = string.gsub(read_message('Logger'), '%.log$', '')
-        inject_message(msg)
-        return 0
+        return utils.safe_inject_message(msg)
     end
 
     return -1

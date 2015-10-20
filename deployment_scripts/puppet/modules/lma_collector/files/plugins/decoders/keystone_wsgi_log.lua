@@ -66,10 +66,12 @@ function process_message ()
                 msg.Fields.severity_label = m.SeverityLabel
             end
 
-            inject_message(msg)
+            return utils.safe_inject_message(msg)
+        else
+            -- not a Keystone log
+            return 0
         end
-        return 0
     end
 
-    return -1
+    return -1, "Failed to parse Keystone WSGI log: " .. string.sub(log, 1, 64)
 end

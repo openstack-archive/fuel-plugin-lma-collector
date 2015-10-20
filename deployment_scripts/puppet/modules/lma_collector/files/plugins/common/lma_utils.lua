@@ -16,9 +16,11 @@ local string = require 'string'
 local extra = require 'extra_fields'
 local patt  = require 'patterns'
 local table = require 'table'
+
 local pairs = pairs
 local ipairs = ipairs
 local inject_message = inject_message
+local inject_payload = inject_payload
 local read_message = read_message
 local pcall = pcall
 local type = type
@@ -73,10 +75,15 @@ function inject_bulk_metric(ts, hostname, source)
         return
     end
 
+    local payload = safe_json_encode(bulk_datapoints)
+    if not payload then
+        return
+    end
+
     local msg = {
         Hostname = hostname,
         Timestamp = ts,
-        Payload = cjson.encode(bulk_datapoints),
+        Payload = payload,
         Type = 'bulk_metric', -- prepended with 'heka.sandbox'
         Severity = label_to_severity_map.INFO,
         Fields = {
@@ -88,13 +95,50 @@ function inject_bulk_metric(ts, hostname, source)
     bulk_datapoints = {}
 
     inject_tags(msg)
-    inject_message(msg)
+    safe_inject_message(msg)
 end
 
-function decode_json_payload()
-    local ok, data = pcall(cjson.decode, read_message("Payload"))
+-- Encode a Lua variable as JSON without raising an exception if the encoding
+-- fails for some reason (for instance, the encoded buffer exceeds the sandbox
+-- limit)
+function safe_json_encode(v)
+    local ok, data = pcall(cjson.encode, v)
+
+    if not ok then
+        return
+    end
 
     return data
+end
+
+--  Decode the Payload field as JSON data
+function decode_json_payload()
+    local ok, data = pcall(cjson.decode, read_message("Payload"))
+    if not ok then
+        return
+    end
+
+    return data
+end
+
+-- Call inject_payload() wrapped by pcall()
+function safe_inject_payload(payload_type, payload_name, data)
+    local ok, err_msg = pcall(inject_payload, payload_type, payload_name, data)
+    if not ok then
+        return -1, err_msg
+    else
+        return 0
+    end
+end
+
+-- Call inject_message() wrapped by pcall()
+function safe_inject_message(msg)
+    local ok, err_msg = pcall(inject_message, msg)
+    if not ok then
+        return -1, err_msg
+    else
+        return 0
+    end
 end
 
 -- Parse a Syslog-based payload and update the Heka message
