@@ -46,4 +46,4 @@ To install the LMA Collector plugin, follow these steps:
 Alternatively, you may want to build the rpm file of the plugin yourself if,
 for example, you want to modify some configuration elements. But note that this
 is at your own risk. Detailed instructions to build the LMA Collector plugin
-are provided in the README.md file of the `project <https://github.com/stackforge/fuel-plugin-lma-collector>`_.
+are provided in the README.md file of the `project <https://github.com/openstack/fuel-plugin-lma-collector>`_.
