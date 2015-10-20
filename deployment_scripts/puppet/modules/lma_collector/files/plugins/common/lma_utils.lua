@@ -111,16 +111,6 @@ function safe_json_encode(v)
     return data
 end
 
---  Decode the Payload field as JSON data
-function decode_json_payload()
-    local ok, data = pcall(cjson.decode, read_message("Payload"))
-    if not ok then
-        return
-    end
-
-    return data
-end
-
 -- Call inject_payload() wrapped by pcall()
 function safe_inject_payload(payload_type, payload_name, data)
     local ok, err_msg = pcall(inject_payload, payload_type, payload_name, data)
