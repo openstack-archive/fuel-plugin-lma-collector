@@ -12,7 +12,7 @@ dependencies:
 
 To install them automatically you can refer to the:
 
-1. `LMA Collector Fuel Plugin Installation Guide <http://fuel-plugin-lma_collector.readthedocs.org/en/latest/installation.html#installation-guide>`_.
+1. `Elasticsearch-Kibana Fuel Plugin Installation Guide <http://fuel-plugin-lma_collector.readthedocs.org/en/latest/installation.html#installation-guide>`_.
 2. `InfluxDB-Grafana Fuel Plugin Installation Guide <http://fuel-plugin-influxdb-grafana.readthedocs.org/en/latest/installation.html#installation-guide>`_.
 3. `Infrastructure Alerting Fuel Plugin Installation Guide <http://fuel-plugin-lma-infrastructure-alerting.readthedocs.org/en/latest/installation.html#installation-guide>`_.
 
