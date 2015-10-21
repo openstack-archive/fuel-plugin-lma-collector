@@ -16,17 +16,19 @@ To configure your plugin, you need to follow the folling steps:
 
 3. Select the LMA collector plugin in the left column. The LMA Collector settings screen appears.
 
-.. image:: ../../images/collector_settings.png 
+.. image:: ../../images/collector_settings.png
    :scale: 50 %
-   :alt: The LMA Collector settings 
+   :alt: The LMA Collector settings
    :align: center
 
 4. Select the LMA collector plugin checkbox and fill-in the required fields.
 
   a. Select "Local node" for Events analytics if you deploy the Elasticsearch-Kibana plugin on a dedicated node in the same environment.
-  b. Select "Remote server" for Events analytics if you have an Elasticsearch-Kibana server already deployed and running. In that case, you have to enter the IP address or the fully qualified name of the server.
+  b. Select "Remote server" for Events analytics if you have an Elasticsearch-Kibana server already deployed and running.
+     In that case, you have to enter the IP address or the fully qualified name of the server.
   c. Select "Local node" for Metrics analytics if you deploy the InfluxDB-Grafana plugin on a dedicated node in the same environment.
-  d. Select "Remote server" for Metrics analytics if you have an InfluxDB-Grafana server already deployed and running. In that case, you have to enter the IP address or the fully qualified name of the server as well as the credentials and database to store the metrics.
+  d. Select "Remote server" for Metrics analytics if you have an InfluxDB-Grafana server already deployed and running.
+     In that case, you have to enter the IP address or the fully qualified name of the server as well as the credentials and database to store the metrics.
   e. Select "Alerts sent by email" for Alerting if you wish to receive alerts by email.
   f. Select "Alerts sent to a local node" for Alerting if you deploy the LMA Infrastructure Alerting plugin on a dedicated node in the same environment.
   g. Select "Alerts sent to a remote Nagios server" for Alerting if you have a Nagios server already deployed and running.
