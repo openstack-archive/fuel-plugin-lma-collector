@@ -392,6 +392,30 @@ lma_collector:
             window: 60
             periods: 1
             function: diff
+<% if @storage_options["volumes_ceph"] then -%>
+    - name: 'ceph-health-critical'
+      description: 'Ceph health is critical'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: ceph_health
+            relational_operator: '=='
+            threshold: 3 # HEALTH_ERR
+            window: 60
+            function: max
+    - name: 'ceph-health-warning'
+      description: 'Ceph health is warning'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: ceph_health
+            relational_operator: '=='
+            threshold: 2 # HEALTH_WARN
+            window: 60
+            function: max
+<% end -%>
 
   node_cluster_roles:
     - controller: ['primary-controller', 'controller']
@@ -411,6 +435,9 @@ lma_collector:
     - neutron-api: ['primary-controller', 'controller']
     - keystone-public-api: ['primary-controller', 'controller']
     - keystone-admin-api: ['primary-controller', 'controller']
+<% if @storage_options["volumes_ceph"] then -%>
+    - ceph-mon: ['primary-controller', 'controller']
+<% end -%>
 
   node_cluster_alarms:
     - controller:
@@ -451,3 +478,7 @@ lma_collector:
       - http_errors: ['keystone-public-api-http-errors']
     - keystone-admin-api:
       - http_errors: ['keystone-admin-api-http-errors']
+<% if @storage_options["volumes_ceph"] then -%>
+    - ceph-mon:
+      - health: ['ceph-health-critical', 'ceph-health-warning']
+<% end -%>
