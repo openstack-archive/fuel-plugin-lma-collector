@@ -44,33 +44,57 @@ end
 task :lua_libraries => ['tests/lua/mocks/date_time.lua', 'tests/lua/mocks/inspect.lua']
 
 file 'tests/lua/mocks/date_time.lua' do |t|
-    sh "curl", "-s", "-o", t.name, "https://raw.githubusercontent.com/mozilla-services/lua_sandbox/master/modules/date_time.lua" do |ok, res|
-        if ! ok then
-            raise "Fail to download date_time.lua from lua_sandbox repository!"
+    verbose(false) do
+        sh "curl", "-s", "-o", t.name, "https://raw.githubusercontent.com/mozilla-services/lua_sandbox/master/modules/date_time.lua" do |ok, res|
+            if ! ok then
+                raise "Fail to download date_time.lua from lua_sandbox repository!"
+            end
         end
     end
 end
 
 file 'tests/lua/mocks/inspect.lua' do |t|
-    sh "curl", "-s", "-o", t.name, "https://raw.githubusercontent.com/kikito/inspect.lua/master/inspect.lua" do |ok, res|
-        if ! ok then
-            raise "Fail to download inspect.lua from gitub repository!"
+    verbose(false) do
+        sh "curl", "-s", "-o", t.name, "https://raw.githubusercontent.com/kikito/inspect.lua/master/inspect.lua" do |ok, res|
+            if ! ok then
+                raise "Fail to download inspect.lua from gitub repository!"
+            end
         end
     end
 end
 
-# Need to pull circular_buffer library from mozilla Github and compile it
 task :lib_cbuf => ['./circular_buffer.so']
 
+cbuf_commit = 'bb6dd9f88f148813315b5a660b7e2ba47f958b31'
+cbuf_tarball_url = "https://github.com/mozilla-services/lua_circular_buffer/archive/#{ cbuf_commit }.tar.gz"
+
 file './circular_buffer.so' do |t|
-    sh %{cd /tmp && rm -rf lua_circular_buffer && git clone https://github.com/mozilla-services/lua_circular_buffer.git && cd lua_circular_buffer && mkdir release && cd release && cmake -DCMAKE_BUILD_TYPE=release .. && make} do |ok, res|
-        if ! ok then
-            raise "Failed to compile circular_buffer.so!"
+    tmp_directory = File.join('/tmp', "lua_circular_buffer-#{ cbuf_commit }")
+    cbuf_shared_library = File.join(tmp_directory, 'release', 'circular_buffer.so')
+    unless File.exists?(cbuf_shared_library) then
+        # Download the archive from Github and build the library
+        sh "rm -rf #{ tmp_directory } && wget -qO - #{ cbuf_tarball_url } | tar -zxvf - -C /tmp" do |ok, res|
+            unless ok then
+                raise "Failed to download the lua_circular_buffer archive!"
+            end
+        end
+
+        sh "cd #{ tmp_directory } && mkdir release && cd release && cmake -DCMAKE_BUILD_TYPE=release .. && make" do |ok, res|
+            unless ok then
+                raise "Failed to compile circular_buffer.so!"
+            end
         end
     end
-    sh %{cp /tmp/lua_circular_buffer/release/circular_buffer.so .} do |ok, res|
-        if ! ok then
-            raise "Failed to copy circular_buffer.so"
-        end
+
+    FileUtils.cp(cbuf_shared_library, '.')
+end
+
+task :remove_cbuf_library do |t|
+    verbose(false) do
+        sh 'rm -f ./circular_buffer.so'
     end
+end
+
+Kernel.trap("EXIT") do
+      Rake::Task[:remove_cbuf_library].invoke
 end
