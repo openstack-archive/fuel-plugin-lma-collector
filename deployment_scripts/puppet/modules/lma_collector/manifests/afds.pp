@@ -23,10 +23,10 @@ class lma_collector::afds (
 ){
 
     validate_array($roles)
-    validate_array($node_cluster_roles)
-    validate_array($service_cluster_roles)
-    validate_array($node_cluster_alarms)
-    validate_array($service_cluster_alarms)
+    validate_hash($node_cluster_roles)
+    validate_hash($service_cluster_roles)
+    validate_hash($node_cluster_alarms)
+    validate_hash($service_cluster_alarms)
     validate_array($alarms)
 
     $node_cluster_names = get_cluster_names($node_cluster_roles, $roles)

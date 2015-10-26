@@ -12,22 +12,23 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-
-# This returns a hash that contains the filename of the alarm as key and
-# list of alarms associated.
 #
-# ARG0: The hash table with all information
-# ARG1: The hash with the list of cluster nodes and cluster services
+# Returns a hash describing the AFD filter resources for the given inputs.
+#
+# ARG0: Hash table mapping AFD profiles to alarms
+# ARG1: Array of alarm definitions
+# ARG2: Array of AFD profiles
+# ARG3: Type of AFD (either 'node' or 'service')
 #
 # Ex:
 #
-# ARG0: cluster alarms
-#  [{"rabbitmq"=>[{"queue"=>["rabbitmq-queue-warning"]}]},
-#   {"apache"=>[{"worker"=>["apache-warning"]}]},
-#   {"memcached"=>[{"all"=>["memcached-warning"]}]},
-#   {"haproxy"=>[{"alive"=>["haproxy-warning"]}]}]
+# ARG0:
+#  {"rabbitmq"=>{"queue"=>["rabbitmq-queue-warning"]},
+#   "apache"=>{"worker"=>["apache-warning"]},
+#   "memcached"=>{"all"=>["memcached-warning"]},
+#   "haproxy"=>{"alive"=>["haproxy-warning"]}}
 #
-# ARG1: array of alarms
+# ARG1:
 #
 #  [
 #    {"name"=>"rabbitmq-queue-warning",
@@ -88,59 +89,39 @@
 module Puppet::Parser::Functions
   newfunction(:get_afd_filters, :type => :rvalue) do |args|
 
-    cluster_alarms = args[0]
-    alarms_definitions = args[1]
-    cluster_names = args[2]
+    afd_alarms = args[0]
+    alarm_definitions = args[1]
+    afd_profiles = args[2]
     type = args[3]
     afd_filters = {}
 
-    cluster_names.each do |cluster_name|
-      # find alarms that belongs to the cluster_name
-      cluster_alarms.each do |cluster_alarm|
-        cluster_alarm.each do |name, alarms_list|
-          if name == cluster_name
-            # We need to get the list of metrics associated to alarms
-            alarms_list.each do |alarm|
-              alarm.each do |alarm_name, alarm_list|
+    afd_profiles.each do |afd_profile|
+        next unless afd_alarms.has_key?(afd_profile)
 
-                # Get the list of metrics associated to alarm_list to
-                # build the message matcher
-                metrics = [].to_set
-                alarm_list.each do |a_name|
-                  alarms_definitions.each do |definition|
-                    if definition['name'] == a_name
-                      rules = definition['trigger']['rules']
-                      rules.each do |r|
-                        metrics.add(r['metric'])
-                      end
+        afd_alarms[afd_profile].each do |afd_name, alarms|
+            # Collect the metrics which are required by this AFD filter
+            metrics = Set.new([])
+            alarms.each do |a_name|
+                alarm_definitions.each do |alarm_def|
+                    if alarm_def['name'] == a_name
+                        alarm_def['trigger']['rules'].each do |r|
+                            metrics << r['metric']
+                        end
                     end
-                  end
                 end
-
-                message_matcher = ""
-                metrics.each do |m|
-                  if message_matcher.empty?
-                    message_matcher = "Fields[name] == \'#{m}\'"
-                  else
-                    message_matcher = message_matcher + " || Fields[name] == \'#{m}\'"
-                  end
-                end
-
-                afd_filters["#{name}_#{alarm_name}"] = {
-                    'type' => type,
-                    'cluster_name' => cluster_name,
-                    'logical_name' => alarm_name,
-                    'alarms' => alarm_list,
-                    'alarms_definitions' => alarms_definitions,
-                    'message_matcher' => message_matcher
-                }
-              end
             end
 
-            break
-          end
+            message_matcher = metrics.collect{|x| "Fields[name] == \'#{x}\'" }.join(' || ')
+
+            afd_filters["#{afd_profile}_#{afd_name}"] = {
+                'type' => type,
+                'cluster_name' => afd_profile,
+                'logical_name' => afd_name,
+                'alarms' => alarms,
+                'alarms_definitions' => alarm_definitions,
+                'message_matcher' => message_matcher
+            }
         end
-      end
     end
 
     return afd_filters
