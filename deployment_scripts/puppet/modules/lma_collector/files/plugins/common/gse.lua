@@ -14,6 +14,7 @@
 local consts = require 'gse_constants'
 local string = require 'string'
 local table = require 'table'
+local GseCluster = require 'gse_cluster'
 local lma = require 'lma_utils'
 local table_utils = require 'table_utils'
 
@@ -26,53 +27,19 @@ local read_message = read_message
 local M = {}
 setfenv(1, M) -- Remove external access to contain everything in the module
 
+-- Hash of GseCluster instances organized by name
 local clusters = {}
+-- Reverse index table to map cluster's members to clusters
 local reverse_cluster_index = {}
+-- Array of cluster names ordered by dependency
 local ordered_clusters = {}
 
-local VALID_STATUSES = {
-    [consts.OKAY]=true,
-    [consts.WARN]=true,
-    [consts.CRIT]=true,
-    [consts.DOWN]=true,
-    [consts.UNKW]=true
-}
-
-local STATUS_MAPPING_FOR_CLUSTERS = {
-    [consts.OKAY]=consts.OKAY,
-    [consts.WARN]=consts.WARN,
-    [consts.CRIT]=consts.CRIT,
-    [consts.DOWN]=consts.DOWN,
-    [consts.UNKW]=consts.UNKW
-}
-
-local STATUS_WEIGHTS = {
-    [consts.UNKW]=0,
-    [consts.OKAY]=1,
-    [consts.WARN]=2,
-    [consts.CRIT]=3,
-    [consts.DOWN]=4
-}
-
-function add_cluster(cluster_id, members, hints, group_by_hostname)
+function add_cluster(cluster_id, members, hints, group_by)
     assert(type(members) == 'table')
     assert(type(hints) == 'table')
 
-    if not clusters[cluster_id] then
-        clusters[cluster_id] = {}
-    end
-    local cluster = clusters[cluster_id]
-
-    cluster.members = members
-    cluster.hints = hints
-    cluster.facts = {}
-    cluster.status = consts.UNKW
-    cluster.alarms={}
-    if group_by_hostname then
-        cluster.group_by_hostname = true
-    else
-        cluster.group_by_hostname = false
-    end
+    local cluster = GseCluster.new(members, hints, group_by)
+    clusters[cluster_id] = cluster
 
     -- update the reverse index
     for _, member in ipairs(members) do
@@ -125,36 +92,9 @@ end
 
 -- store the status of a cluster's member and its current alarms
 function set_member_status(cluster_id, member, value, alarms, hostname)
-    assert(VALID_STATUSES[value])
-    assert(type(alarms) == 'table')
-
     local cluster = clusters[cluster_id]
-    if not cluster then
-        return
-    end
-
-    local group_key = '__all_hosts__'
-    if cluster.group_by_hostname then
-        group_key = hostname
-    end
-
-    if not cluster.facts[member] then
-        cluster.facts[member] = {}
-    end
-    cluster.facts[member][group_key] = {
-        status=value,
-        alarms=alarms
-    }
-    if cluster.group_by_hostname then
-        cluster.facts[member][group_key].hostname = hostname
-    end
-end
-
-function max_status(current, status)
-    if not status or STATUS_WEIGHTS[current] > STATUS_WEIGHTS[status] then
-        return current
-    else
-        return status
+    if cluster then
+        cluster:update_fact(member, hostname, value, alarms)
     end
 end
 
@@ -165,50 +105,16 @@ function resolve_status(cluster_id)
     local cluster = clusters[cluster_id]
     assert(cluster)
 
-    cluster.status = consts.UNKW
-    local alarms = {}
-    local members_with_alarms = {}
-
-    for _, member in ipairs(cluster.members) do
-        for _, fact in pairs(cluster.facts[member] or {}) do
-            local status = STATUS_MAPPING_FOR_CLUSTERS[fact.status]
-            if status ~= consts.OKAY then
-                members_with_alarms[member] = true
-                -- append alarms only if the member affects the healthiness
-                -- of the cluster
-                for _, v in ipairs(fact.alarms) do
-                    alarms[#alarms+1] = table_utils.deepcopy(v)
-                    if not alarms[#alarms]['tags'] then
-                        alarms[#alarms]['tags'] = {}
-                    end
-                    alarms[#alarms].tags['dependency_name'] = member
-                    alarms[#alarms].tags['dependency_level'] = 'direct'
-                    if fact.hostname then
-                        alarms[#alarms].hostname = fact.hostname
-                    end
-                end
-            end
-            cluster.status = max_status(cluster.status, status)
-        end
-    end
-    cluster.alarms = table_utils.deepcopy(alarms)
+    cluster:refresh_status()
+    local alarms = table_utils.deepcopy(cluster.alarms)
 
     if cluster.status ~= consts.OKAY then
         -- add hints if the cluster isn't healthy
-        for _, member in ipairs(cluster.hints or {}) do
-            local other_cluster = clusters[member]
-            if other_cluster and other_cluster.status ~= OKAY and #other_cluster.alarms > 0 then
-                for _, v in ipairs(other_cluster.alarms) do
-                    if not (v.tags and v.tags.dependency_name and members_with_alarms[v.tags.dependency_name]) then
-                        -- this isn't an alarm related to a member of the cluster itself
-                        alarms[#alarms+1] = table_utils.deepcopy(v)
-                        if not alarms[#alarms]['tags'] then
-                            alarms[#alarms]['tags'] = {}
-                        end
-                        alarms[#alarms].tags['dependency_name'] = member
-                        alarms[#alarms].tags['dependency_level'] = 'hint'
-                    end
-                end
+        for _, other_id in ipairs(cluster.hints or {}) do
+            for _, v in pairs(cluster:subtract_alarms(clusters[other_id])) do
+                alarms[#alarms+1] = table_utils.deepcopy(v)
+                alarms[#alarms].tags['dependency_name'] = other_id
+                alarms[#alarms].tags['dependency_level'] = 'hint'
             end
         end
     end
