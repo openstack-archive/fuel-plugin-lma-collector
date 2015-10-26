@@ -118,31 +118,32 @@ lma_collector:
     clusters:
       mysqld-tcp:
         policy: highest_severity
+        group_by: member
         members:
           - backends
       mysql:
         policy: majority_of_members
-        group_by_hostname: true
+        group_by: hostname
         members:
           - heartbeat
       haproxy:
         policy: majority_of_members
-        group_by_hostname: true
+        group_by: hostname
         members:
           - heartbeat
       apache:
         policy: majority_of_members
-        group_by_hostname: true
+        group_by: hostname
         members:
           - heartbeat
       memcached:
         policy: majority_of_members
-        group_by_hostname: true
+        group_by: hostname
         members:
           - heartbeat
       rabbitmq:
         policy: highest_severity
-        group_by_hostname: true
+        group_by: member
         members:
           - heartbeat
           - memory
@@ -150,63 +151,77 @@ lma_collector:
           - queue
       nova-api:
         policy: highest_severity
+        group_by: member
         members:
           - backends
           - endpoint
           - http_errors
       nova-ec2-api:
         policy: highest_severity
+        group_by: member
         members:
           - backends
       nova-novncproxy-websocket:
         policy: highest_severity
+        group_by: member
         members:
           - backends
       nova-metadata-api:
         policy: highest_severity
+        group_by: member
         members:
           - backends
       nova-scheduler:
         policy: highest_severity
+        group_by: member
         members:
           - workers
       nova-cert:
         policy: highest_severity
+        group_by: member
         members:
           - workers
       nova-consoleauth:
         policy: highest_severity
+        group_by: member
         members:
           - workers
       nova-compute:
         policy: highest_severity
+        group_by: member
         members:
           - workers
       nova-conductor:
         policy: highest_severity
+        group_by: member
         members:
           - workers
       cinder-api:
         policy: highest_severity
+        group_by: member
         members:
           - backends
           - endpoint
           - http_errors
       cinder-v2-api:
         policy: highest_severity
+        group_by: member
         members:
           # Cinder V2 backends are in fact the same as the Cinder backends
           - endpoint
       cinder-scheduler:
         policy: highest_severity
+        group_by: member
         members:
           - workers
       cinder-volume:
         policy: highest_severity
+        group_by: member
         members:
           - workers
       neutron-api:
         policy: highest_severity
+        group_by: member
         members:
           - backends
           - endpoint
@@ -311,19 +326,19 @@ lma_collector:
     clusters:
       controller:
         policy: majority_of_members
-        group_by_hostname: true
+        group_by: hostname
         members:
           - cpu
           - fs
       compute:
         policy: majority_of_members
-        group_by_hostname: true
+        group_by: hostname
         members:
           - cpu
           - fs
       storage:
         policy: majority_of_members
-        group_by_hostname: true
+        group_by: hostname
         members:
           - cpu
           - fs
@@ -344,7 +359,7 @@ lma_collector:
         policy: highest_severity
         members:
           - mysqld-tcp
-          - mysqld
+          - mysql
           - controller
       haproxy:
         policy: highest_severity
