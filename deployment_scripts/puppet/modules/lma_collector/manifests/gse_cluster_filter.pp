@@ -57,7 +57,6 @@ define lma_collector::gse_cluster_filter (
     config          => {
       output_message_type => $output_message_type,
       output_metric_name  => $output_metric_name,
-      hostname            => $::hostname,
       source              => "gse_${title}_filter",
       interval            => $interval,
       topology_file       => $topology_file,

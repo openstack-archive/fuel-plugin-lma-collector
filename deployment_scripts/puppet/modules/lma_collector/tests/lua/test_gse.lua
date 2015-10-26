@@ -146,7 +146,6 @@ TestGse = {}
             'gse_service_cluster_metric',
             'nova',
             'service_cluster_status',
-            'node-1',
             10,
             'gse_service_cluster_plugin'
         )
@@ -155,7 +154,6 @@ TestGse = {}
         assertEquals(metric.Fields.cluster_name, 'nova')
         assertEquals(metric.Fields.name, 'service_cluster_status')
         assertEquals(metric.Fields.value, consts.OKAY)
-        assertEquals(metric.Fields.hostname, 'node-1')
         assertEquals(metric.Fields.interval, 10)
         assertEquals(metric.Payload, '{"alarms":[]}')
     end
@@ -165,7 +163,6 @@ TestGse = {}
             'gse_service_cluster_metric',
             'glance',
             'service_cluster_status',
-            'node-1',
             10,
             'gse_service_cluster_plugin'
         )
@@ -174,7 +171,6 @@ TestGse = {}
         assertEquals(metric.Fields.cluster_name, 'glance')
         assertEquals(metric.Fields.name, 'service_cluster_status')
         assertEquals(metric.Fields.value, consts.DOWN)
-        assertEquals(metric.Fields.hostname, 'node-1')
         assertEquals(metric.Fields.interval, 10)
         assert(metric.Payload:match("glance%-registry endpoints are down"))
         assert(metric.Payload:match("glance%-api endpoint is down on node%-1"))
@@ -185,7 +181,6 @@ TestGse = {}
             'gse_service_cluster_metric',
             'heat',
             'service_cluster_status',
-            'node-1',
             10,
             'gse_service_cluster_plugin'
         )
@@ -194,7 +189,6 @@ TestGse = {}
         assertEquals(metric.Fields.cluster_name, 'heat')
         assertEquals(metric.Fields.name, 'service_cluster_status')
         assertEquals(metric.Fields.value, consts.WARN)
-        assertEquals(metric.Fields.hostname, 'node-1')
         assertEquals(metric.Fields.interval, 10)
         assert(metric.Payload:match("5xx errors detected"))
         assert(metric.Payload:match("1 RabbitMQ node out of 3 is down"))

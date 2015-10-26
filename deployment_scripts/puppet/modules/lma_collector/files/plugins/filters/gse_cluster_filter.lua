@@ -22,7 +22,6 @@ local output_message_type = read_config('output_message_type') or error('output_
 local cluster_field = read_config('cluster_field')
 local member_field = read_config('member_field') or error('member_field must be specified!')
 local output_metric_name = read_config('output_metric_name') or error('output_metric_name must be specified!')
-local hostname = read_config('hostname') or error('hostname must be specified!')
 local source = read_config('source') or error('source must be specified!')
 local topology_file = read_config('topology_file') or error('topology_file must be specified!')
 local interval = (read_config('interval') or error('interval must be specified!')) + 0
@@ -111,7 +110,6 @@ function timer_event(ns)
                 output_message_type,
                 cluster_name,
                 output_metric_name,
-                hostname,
                 interval,
                 source
             )
