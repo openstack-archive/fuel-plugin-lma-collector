@@ -27,12 +27,12 @@ local consts = require('gse_constants')
 local gse = require('gse')
 
 -- define clusters
-gse.add_cluster("heat", {'heat-api', 'controller'}, {'nova', 'glance', 'neutron', 'keystone', 'rabbitmq'}, false)
-gse.add_cluster("nova", {'nova-api', 'nova-ec2-api', 'nova-scheduler'}, {'glance', 'neutron', 'keystone', 'rabbitmq'}, false)
-gse.add_cluster("neutron", {'neutron-api'}, {'keystone', 'rabbitmq'}, false)
-gse.add_cluster("keystone", {'keystone-admin-api', 'keystone-public-api'}, {}, false)
-gse.add_cluster("glance", {'glance-api', 'glance-registry-api'}, {'keystone'}, false)
-gse.add_cluster("rabbitmq", {'rabbitmq-cluster', 'controller'}, {}, true)
+gse.add_cluster("heat", {'heat-api', 'controller'}, {'nova', 'glance', 'neutron', 'keystone', 'rabbitmq'}, 'member')
+gse.add_cluster("nova", {'nova-api', 'nova-ec2-api', 'nova-scheduler'}, {'glance', 'neutron', 'keystone', 'rabbitmq'}, 'member')
+gse.add_cluster("neutron", {'neutron-api'}, {'keystone', 'rabbitmq'}, 'member')
+gse.add_cluster("keystone", {'keystone-admin-api', 'keystone-public-api'}, {}, 'member')
+gse.add_cluster("glance", {'glance-api', 'glance-registry-api'}, {'keystone'}, 'member')
+gse.add_cluster("rabbitmq", {'rabbitmq-cluster', 'controller'}, {}, 'hostname')
 
 -- provision facts
 gse.set_member_status("neutron", "neutron-api", consts.DOWN, {{message="All neutron endpoints are down"}}, 'node-1')
@@ -70,11 +70,11 @@ TestGse = {}
         local status, alarms = gse.resolve_status('rabbitmq')
         assertEquals(status, consts.WARN)
         assertEquals(#alarms, 2)
-        assertEquals(alarms[1].hostname, 'node-2')
-        assertEquals(alarms[1].tags.dependency_name, 'rabbitmq-cluster')
+        assertEquals(alarms[1].hostname, 'node-1')
+        assertEquals(alarms[1].tags.dependency_name, 'controller')
         assertEquals(alarms[1].tags.dependency_level, 'direct')
-        assertEquals(alarms[2].hostname, 'node-1')
-        assertEquals(alarms[2].tags.dependency_name, 'controller')
+        assertEquals(alarms[2].hostname, 'node-2')
+        assertEquals(alarms[2].tags.dependency_name, 'rabbitmq-cluster')
         assertEquals(alarms[2].tags.dependency_level, 'direct')
     end
 
@@ -105,10 +105,10 @@ TestGse = {}
         assert(alarms[1].hostname == nil)
         assertEquals(alarms[2].tags.dependency_name, 'rabbitmq')
         assertEquals(alarms[2].tags.dependency_level, 'hint')
-        assertEquals(alarms[2].hostname, 'node-2')
+        assertEquals(alarms[2].hostname, 'node-1')
         assertEquals(alarms[3].tags.dependency_name, 'rabbitmq')
         assertEquals(alarms[3].tags.dependency_level, 'hint')
-        assertEquals(alarms[3].hostname, 'node-1')
+        assertEquals(alarms[3].hostname, 'node-2')
     end
 
     function TestGse:test_05_nova_is_okay()
@@ -121,10 +121,10 @@ TestGse = {}
         local status, alarms = gse.resolve_status('heat')
         assertEquals(status, consts.WARN)
         assertEquals(#alarms, 6)
-        assertEquals(alarms[1].tags.dependency_name, 'heat-api')
+        assertEquals(alarms[1].tags.dependency_name, 'controller')
         assertEquals(alarms[1].tags.dependency_level, 'direct')
         assert(alarms[1].hostname == nil)
-        assertEquals(alarms[2].tags.dependency_name, 'controller')
+        assertEquals(alarms[2].tags.dependency_name, 'heat-api')
         assertEquals(alarms[2].tags.dependency_level, 'direct')
         assert(alarms[2].hostname == nil)
         assertEquals(alarms[3].tags.dependency_name, 'glance')
@@ -192,17 +192,6 @@ TestGse = {}
         assertEquals(metric.Fields.interval, 10)
         assert(metric.Payload:match("5xx errors detected"))
         assert(metric.Payload:match("1 RabbitMQ node out of 3 is down"))
-    end
-
-    function TestGse:test_max_status()
-        local status = gse.max_status(consts.DOWN, consts.WARN)
-        assertEquals(consts.DOWN, status)
-        local status = gse.max_status(consts.OKAY, consts.WARN)
-        assertEquals(consts.WARN, status)
-        local status = gse.max_status(consts.OKAY, consts.DOWN)
-        assertEquals(consts.DOWN, status)
-        local status = gse.max_status(consts.UNKW, consts.DOWN)
-        assertEquals(consts.DOWN, status)
     end
 
     function TestGse:test_reverse_index()

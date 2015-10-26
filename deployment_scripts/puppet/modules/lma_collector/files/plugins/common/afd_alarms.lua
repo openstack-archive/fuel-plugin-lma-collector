@@ -17,7 +17,7 @@ local ipairs = ipairs
 local lma = require 'lma_utils'
 local table_utils = require 'table_utils'
 local consts = require 'gse_constants'
-local gse = require 'gse'
+local gse_utils = require 'gse_utils'
 local Alarm = require 'afd_alarm'
 
 local all_alarms = {}
@@ -70,7 +70,7 @@ function evaluate(ns)
     for _, alarm in pairs(all_alarms) do
         if alarm:is_evaluation_time(ns) then
             local state, alerts = alarm:evaluate(ns)
-            global_state = gse.max_status(state, global_state)
+            global_state = gse_utils.max_status(state, global_state)
             for _, a in ipairs(alerts) do
                 all_alerts[#all_alerts+1] = { state=state, alert=a }
             end
