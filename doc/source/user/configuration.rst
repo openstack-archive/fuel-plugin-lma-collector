@@ -1,7 +1,7 @@
-.. _user_guide:
+.. _config_guide:
 
-User Guide
-==========
+Configuration Guide
+===================
 
 .. _plugin_configuration:
 
@@ -41,10 +41,10 @@ To configure your plugin, you need to follow the folling steps:
 
 8. `Deploy <http://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#deploy-changes>`_ your changes.
 
-.. _plugin_install_verification:
+.. _plugin_verification:
 
-Plugin installation verification
---------------------------------
+Plugin verification
+-------------------
 
 Once the OpenStack environment is ready, you may want to check that both
 collectd and hekad processes are running on the controller nodes::
@@ -54,19 +54,9 @@ collectd and hekad processes are running on the controller nodes::
     [root@node-1 ~]# pidof collectd
     5684
 
-Please refer to the :ref:`user_troubleshooting` section otherwise.
+Please refer to the :ref:`troubleshooting` section otherwise.
 
-.. _exploring_the_data:
-
-Exploring the data
-------------------
-
-Refer to the user guide of the `Elasticsearch/Kibana plugin <https://software.mirantis.com/download-mirantis-openstack-fuel-plug-ins/>`_
-for exploring and visualizing the collected logs and notifications and to the
-user guide of the `InfluxDB-Grafana Fuel Plugin <https://software.mirantis.com/download-mirantis-openstack-fuel-plug-ins/>`_
-for monitoring your cloud.
-
-.. _user_troubleshooting:
+.. _troubleshooting:
 
 Troubleshooting
 ---------------
