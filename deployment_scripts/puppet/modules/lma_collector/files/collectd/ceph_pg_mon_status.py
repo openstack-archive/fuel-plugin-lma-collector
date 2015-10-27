@@ -17,7 +17,7 @@ import base
 import collectd
 
 
-INTERVAL = 60
+INTERVAL = 30
 HEALTH_MAP = {
     'HEALTH_OK': 1,
     'HEALTH_WARN': 2,

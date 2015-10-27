@@ -156,6 +156,11 @@ lma_collector:
           - backends
           - endpoint
 <% end -%>
+<% if @storage_options["volumes_ceph"] then -%>
+      ceph-mon:
+        members:
+          - health
+<% end -%>
 
   gse_cluster_node:
     input_message_types:
@@ -308,4 +313,11 @@ lma_collector:
           - controller
         hints:
           - keystone
+<% end -%>
+<% if @storage_options["volumes_ceph"] then -%>
+      ceph:
+        members:
+          - ceph-mon
+          - controller
+          - storage
 <% end -%>
