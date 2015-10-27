@@ -24,6 +24,7 @@ local table = table
 local utils = require 'lma_utils'
 local table_utils = require 'table_utils'
 local consts = require 'gse_constants'
+local gse_utils = require 'gse_utils'
 local afd = require 'afd'
 
 local MIN_WINDOW = 10
@@ -138,23 +139,7 @@ function Rule:add_datastore(id)
 end
 
 function Rule:compare_threshold(value)
-    local op = self.relational_operator
-    local threshold = self.threshold
-    local rule_matches = false
-    if op == '==' or op == 'eq' then
-        rule_matches = value == threshold
-    elseif op == '!=' or op == 'ne' then
-        rule_matches = value ~= threshold
-    elseif op == '>=' or op == 'gte' then
-        rule_matches = value >= threshold
-    elseif op == '>' or op == 'gt' then
-        rule_matches = value > threshold
-    elseif op == '<=' or op == 'lte' then
-        rule_matches = value <= threshold
-    elseif op == '<' or op == 'lt' then
-        rule_matches = value < threshold
-    end
-    return rule_matches
+    return gse_utils.compare_threshold(value, self.relational_operator, self.threshold)
 end
 
 local function isnumber(value)

@@ -12,6 +12,8 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
+local string = string
+
 local M = {}
 setfenv(1, M) -- Remove external access to contain everything in the module
 
