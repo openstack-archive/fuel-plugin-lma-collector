@@ -34,4 +34,22 @@ function max_status(val1, val2)
     end
 end
 
+function compare_threshold(value, op, threshold)
+    local rule_matches = false
+    if op == '==' or op == 'eq' then
+        rule_matches = value == threshold
+    elseif op == '!=' or op == 'ne' then
+        rule_matches = value ~= threshold
+    elseif op == '>=' or op == 'gte' then
+        rule_matches = value >= threshold
+    elseif op == '>' or op == 'gt' then
+        rule_matches = value > threshold
+    elseif op == '<=' or op == 'lte' then
+        rule_matches = value <= threshold
+    elseif op == '<' or op == 'lt' then
+        rule_matches = value < threshold
+    end
+    return rule_matches
+end
+
 return M
