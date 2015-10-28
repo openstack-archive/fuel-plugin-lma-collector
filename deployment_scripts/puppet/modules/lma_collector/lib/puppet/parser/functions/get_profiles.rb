@@ -13,10 +13,10 @@
 #    under the License.
 #
 
-# This returns an array that contains the list of services or nodes related
-# to a role.
+# This returns an array that contains the list of profiles related to a role
+# and an empty array if nothing matches.
 #
-# ARG0: An array of hash table that contains relation between node/service and
+# ARG0: An array of hash table that contains relation between profiles and
 #       roles.
 # ARG1: An array of roles
 #
@@ -34,31 +34,24 @@
 #
 
 module Puppet::Parser::Functions
-  newfunction(:get_cluster_names, :type => :rvalue) do |args|
+  newfunction(:get_profiles, :type => :rvalue) do |args|
 
     data = args[0]
     roles = args[1]
 
-    raise Puppet::ParseError, "data passed to get_cluster_names is not a list" unless data.is_a?(Array)
-    raise Puppet::ParseError, "roles passed to get_cluster_names is not a list" unless roles.is_a?(Array)
+    raise Puppet::ParseError, "data passed to get_profiles is not a list" unless data.is_a?(Array)
+    raise Puppet::ParseError, "roles passed to get_profiles is not a list" unless roles.is_a?(Array)
 
-    cluster_names = [].to_set
-    has_default = false
+    profiles = [].to_set
 
     roles.each do |role|
       data.each do |v|
         v.each { |name, t|
-            cluster_names.add(name) if t.include?(role)
-            has_default = (name == 'default')
+            profiles.add(name) if t.include?(role)
         }
       end
-
-      # if cluster_names["node"] is empty, it means that we didn't find a cluster
-      # name that matches with role. So add "default" name if there is a default
-      # value
-      cluster_names.add("default") if cluster_names.empty? and has_default
     end
 
-    return cluster_names.to_a()
+    return profiles.to_a()
   end
 end

@@ -29,17 +29,24 @@ class lma_collector::afds (
     validate_array($service_cluster_alarms)
     validate_array($alarms)
 
-    $node_cluster_names = get_cluster_names($node_cluster_roles, $roles)
-    $service_cluster_names = get_cluster_names($service_cluster_roles, $roles)
+    $node_profiles_temp = get_profiles($node_cluster_roles, $roles)
+    $service_profiles = get_profiles($service_cluster_roles, $roles)
+
+    # For node, if no profiles are found then set it to "default"
+    if $node_profiles_temp == [] {
+        $node_profiles = ['default']
+    } else {
+        $node_profiles = $node_profiles_temp
+    }
 
     $node_afd_filters = get_afd_filters($node_cluster_alarms,
                                         $alarms,
-                                        $node_cluster_names,
+                                        $node_profiles,
                                         'node')
 
     $service_afd_filters = get_afd_filters($service_cluster_alarms,
                                             $alarms,
-                                            $service_cluster_names,
+                                            $service_profiles,
                                             'service')
 
     create_resources(lma_collector::afd_filter, $node_afd_filters)
