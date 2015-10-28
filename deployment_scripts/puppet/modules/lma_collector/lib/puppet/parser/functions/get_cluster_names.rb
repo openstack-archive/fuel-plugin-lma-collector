@@ -41,20 +41,11 @@ module Puppet::Parser::Functions
     raise Puppet::ParseError, "arg[1] isn't an array" unless roles.is_a?(Array)
 
     cluster_names = Set.new([])
-    has_default = false
 
     roles.each do |role|
         data.each do |k,v|
-            if k == 'default' then
-                has_default = true
-            end
             cluster_names << k if v.include?(role)
         end
-
-        # if cluster_names["node"] is empty, it means that we didn't find a cluster
-        # name that matches with role. So add "default" name if there is a default
-        # value
-        cluster_names << "default" if cluster_names.empty? and has_default
     end
 
     return cluster_names.to_a()

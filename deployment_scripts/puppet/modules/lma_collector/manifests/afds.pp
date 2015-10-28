@@ -29,8 +29,14 @@ class lma_collector::afds (
     validate_hash($service_cluster_alarms)
     validate_array($alarms)
 
-    $node_cluster_names = get_cluster_names($node_cluster_roles, $roles)
+    $node_cluster_names_tmp = get_cluster_names($node_cluster_roles, $roles)
     $service_cluster_names = get_cluster_names($service_cluster_roles, $roles)
+
+    if size($node_cluster_names_tmp) == 0 and $node_cluster_alarms['default'] {
+        $node_cluster_names = ['default']
+    } else {
+        $node_cluster_names = $node_cluster_names_tmp
+    }
 
     $node_afd_filters = get_afd_filters($node_cluster_alarms,
                                         $alarms,
