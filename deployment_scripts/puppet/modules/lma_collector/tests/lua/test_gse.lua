@@ -25,14 +25,55 @@ local cjson = require('cjson')
 local consts = require('gse_constants')
 
 local gse = require('gse')
+local gse_policy = require('gse_policy')
+
+highest_policy = {
+    gse_policy.new({
+        status='down',
+        trigger={
+            logical_operator='or',
+            rules={{
+                ['function']='count',
+                arguments={'down'},
+                relational_operator='>',
+                threshold=0
+            }}
+        }
+    }),
+    gse_policy.new({
+        status='critical',
+        trigger={
+            logical_operator='or',
+            rules={{
+                ['function']='count',
+                arguments={'critical'},
+                relational_operator='>',
+                threshold=0
+            }}
+        }
+    }),
+    gse_policy.new({
+        status='warning',
+        trigger={
+            logical_operator='or',
+            rules={{
+                ['function']='count',
+                arguments={'warning'},
+                relational_operator='>',
+                threshold=0
+            }}
+        }
+    }),
+    gse_policy.new({status='okay'})
+}
 
 -- define clusters
-gse.add_cluster("heat", {'heat-api', 'controller'}, {'nova', 'glance', 'neutron', 'keystone', 'rabbitmq'}, 'member')
-gse.add_cluster("nova", {'nova-api', 'nova-ec2-api', 'nova-scheduler'}, {'glance', 'neutron', 'keystone', 'rabbitmq'}, 'member')
-gse.add_cluster("neutron", {'neutron-api'}, {'keystone', 'rabbitmq'}, 'member')
-gse.add_cluster("keystone", {'keystone-admin-api', 'keystone-public-api'}, {}, 'member')
-gse.add_cluster("glance", {'glance-api', 'glance-registry-api'}, {'keystone'}, 'member')
-gse.add_cluster("rabbitmq", {'rabbitmq-cluster', 'controller'}, {}, 'hostname')
+gse.add_cluster("heat", {'heat-api', 'controller'}, {'nova', 'glance', 'neutron', 'keystone', 'rabbitmq'}, 'member', highest_policy)
+gse.add_cluster("nova", {'nova-api', 'nova-ec2-api', 'nova-scheduler'}, {'glance', 'neutron', 'keystone', 'rabbitmq'}, 'member', highest_policy)
+gse.add_cluster("neutron", {'neutron-api'}, {'keystone', 'rabbitmq'}, 'member', highest_policy)
+gse.add_cluster("keystone", {'keystone-admin-api', 'keystone-public-api'}, {}, 'member', highest_policy)
+gse.add_cluster("glance", {'glance-api', 'glance-registry-api'}, {'keystone'}, 'member', highest_policy)
+gse.add_cluster("rabbitmq", {'rabbitmq-cluster', 'controller'}, {}, 'hostname', highest_policy)
 
 -- provision facts
 gse.set_member_status("neutron", "neutron-api", consts.DOWN, {{message="All neutron endpoints are down"}}, 'node-1')

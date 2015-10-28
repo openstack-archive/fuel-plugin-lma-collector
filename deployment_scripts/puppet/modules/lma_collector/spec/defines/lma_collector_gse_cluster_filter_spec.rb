@@ -44,12 +44,14 @@ describe 'lma_collector::gse_cluster_filter' do
              :clusters => {
                 'nova' => {
                     'members' => ['nova-api', 'nova-scheduler', 'controller_nodes'],
-                    'group_by_hostname' => false,
-                    'hints' => ['keystone']
+                    'group_by' => 'member',
+                    'hints' => ['keystone'],
+                    'policy' => 'some_policy'
                 },
                 'keystone' => {
                     'members' => ['keystone-public-api', 'keystone-admin-api', 'controller_nodes'],
-                    'group_by_hostname' => false,
+                    'group_by' => 'member',
+                    'policy' => 'some_policy'
                 }
              }
             }

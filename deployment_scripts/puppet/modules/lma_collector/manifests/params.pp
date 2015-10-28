@@ -176,6 +176,8 @@ class lma_collector::params {
     'swift'               => 'swift-api',
   }
 
+  $gse_policies_module = 'gse_policies'
+
   # Nagios parameters
   #
   $nagios_server = 'localhost'
