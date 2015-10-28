@@ -29,7 +29,7 @@ class lma_collector::afds (
     validate_array($service_cluster_alarms)
     validate_array($alarms)
 
-    $node_cluster_names = get_cluster_names($node_cluster_roles, $roles)
+    $node_cluster_names = get_cluster_names($node_cluster_roles, $roles, true)
     $service_cluster_names = get_cluster_names($service_cluster_roles, $roles)
 
     $node_afd_filters = get_afd_filters($node_cluster_alarms,

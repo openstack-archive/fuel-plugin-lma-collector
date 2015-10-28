@@ -38,18 +38,17 @@ module Puppet::Parser::Functions
 
     data = args[0]
     roles = args[1]
+    has_default = args[2] or false
 
     raise Puppet::ParseError, "data passed to get_cluster_names is not a list" unless data.is_a?(Array)
     raise Puppet::ParseError, "roles passed to get_cluster_names is not a list" unless roles.is_a?(Array)
 
     cluster_names = [].to_set
-    has_default = false
 
     roles.each do |role|
       data.each do |v|
         v.each { |name, t|
             cluster_names.add(name) if t.include?(role)
-            has_default = (name == 'default')
         }
       end
 
