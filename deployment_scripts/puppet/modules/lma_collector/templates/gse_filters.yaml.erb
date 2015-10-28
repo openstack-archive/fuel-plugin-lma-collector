@@ -179,17 +179,23 @@ lma_collector:
         group_by_hostname: true
         members:
           - cpu
-          - fs
+          - root-fs
+          - log-fs
+      mysql-nodes:
+        group_by_hostname: true
+        members:
+          - mysql-fs
       compute:
         group_by_hostname: true
         members:
           - cpu
-          - fs
+          - root-fs
+          - nova-fs
       storage:
         group_by_hostname: true
         members:
           - cpu
-          - fs
+          - root-fs
 
   gse_cluster_global:
     input_message_types:
@@ -207,7 +213,7 @@ lma_collector:
         members:
           - mysqld-tcp
           - mysqld
-          - controller
+          - mysql-nodes
       haproxy:
         members:
           - haproxy
