@@ -200,21 +200,65 @@ lma_collector:
             window: 60
             periods: 0
             function: min
-    - name: 'fs-warning'
-      description: "The filesystem's free space is low."
+    - name: 'root-fs-warning'
+      description: "The root filesystem's free space is low."
       severity: 'warning'
       enabled: 'true'
       trigger:
         rules:
           - metric: fs_space_percent_free
             fields:
-              fs: '*'
+              fs: '/'
             relational_operator: '<'
             threshold: 5
             window: 60
             periods: 0
             function: min
-    - name: 'fs-warning-storage'
+    - name: 'root-fs-critical'
+      description: "The root filesystem's free space is too low."
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: fs_space_percent_free
+            fields:
+              fs: '/'
+            relational_operator: '<'
+            threshold: 2
+            window: 60
+            periods: 0
+            function: min
+    - name: 'mysql-fs-warning'
+      description: "The MySQL filesystem's free space is low."
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: fs_space_percent_free
+            fields:
+              fs: '/var/lib/mysql'
+            relational_operator: '<'
+            threshold: 5
+            window: 60
+            periods: 0
+            function: min
+    - name: 'mysql-fs-critical'
+      description: "The MySQL filesystem's free space is too low."
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: fs_space_percent_free
+            fields:
+              fs: '/var/lib/mysql'
+            relational_operator: '<'
+            threshold: 2
+            window: 60
+            periods: 0
+            function: min
+    # TODO(pasquier-s): enable the storage alarms only when Cinder LVM is
+    # deployed
+    - name: 'storage-fs-warning'
       description: "The filesystem's free space is low (storage node)."
       severity: 'warning'
       enabled: 'true'
@@ -228,7 +272,7 @@ lma_collector:
             window: 60
             periods: 0
             function: min
-    - name: 'fs-critical-storage'
+    - name: 'storage-fs-critical'
       description: "The filesystem's free space is too low (storage node)."
       severity: 'critical'
       enabled: 'true'
@@ -242,7 +286,21 @@ lma_collector:
             window: 60
             periods: 0
             function: min
-    - name: 'fs-critical-compute'
+    - name: 'compute-fs-warning'
+      description: "The filesystem's free space is low (compute node)."
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: fs_space_percent_free
+            fields:
+              fs: '/var/lib/nova'
+            relational_operator: '<'
+            threshold: 10
+            window: 60
+            periods: 0
+            function: min
+    - name: 'compute-fs-critical'
       description: "The filesystem's free space is too low (compute node)."
       severity: 'critical'
       enabled: 'true'
@@ -252,21 +310,7 @@ lma_collector:
             fields:
               fs: '/var/lib/nova'
             relational_operator: '<'
-            threshold: 7
-            window: 60
-            periods: 0
-            function: min
-    - name: 'fs-critical'
-      description: "The filesystem's free space is too low."
-      severity: 'critical'
-      enabled: 'true'
-      trigger:
-        rules:
-          - metric: fs_space_percent_free
-            fields:
-              fs: '*'
-            relational_operator: '<'
-            threshold: 2
+            threshold: 5
             window: 60
             periods: 0
             function: min
@@ -419,6 +463,7 @@ lma_collector:
 
   node_cluster_roles:
     controller: ['primary-controller', 'controller']
+    mysql-nodes: ['primary-controller', 'controller']
     compute: ['compute']
     storage: ['cinder', 'ceph-osd']
 
@@ -442,16 +487,20 @@ lma_collector:
   node_cluster_alarms:
     controller:
       cpu: ['cpu-critical-controller', 'cpu-warning-controller']
-      fs: ['fs-critical', 'fs-warning']
+      root-fs: ['root-fs-critical', 'root-fs-warning']
+    mysql-nodes:
+      mysql-fs: ['mysql-fs-critical', 'mysql-fs-warning']
     compute:
       cpu: ['cpu-critical-compute', 'cpu-warning-compute']
-      fs: ['fs-critical', 'fs-critical-compute', 'fs-warning']
+      root-fs: ['root-fs-critical', 'root-fs-warning']
+      compute-fs: ['compute-fs-critical']
     storage:
       cpu: ['cpu-critical-storage', 'cpu-warning-storage']
-      fs: ['fs-critical-storage', 'fs-warning-storage']
+      root-fs: ['root-fs-critical', 'root-fs-warning']
+      storage-fs: ['storage-fs-critical', 'storage-fs-warning']
     default:
       cpu: ['cpu-critical-default']
-      fs: ['fs-critical', 'fs-warning']
+      root-fs: ['root-fs-critical', 'root-fs-warning']
 
   service_cluster_alarms:
     rabbitmq:
