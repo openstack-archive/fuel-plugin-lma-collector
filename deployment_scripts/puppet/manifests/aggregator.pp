@@ -75,5 +75,11 @@ if $is_controller {
     'service' => $lma_collector['gse_cluster_service'],
     'node'    => $lma_collector['gse_cluster_node'],
     'global'  => $lma_collector['gse_cluster_global'],
+  }, {
+    require => Class['lma_collector::gse_policies']
   })
+
+  class { 'lma_collector::gse_policies':
+    policies => $lma_collector['gse_policies']
+  }
 }

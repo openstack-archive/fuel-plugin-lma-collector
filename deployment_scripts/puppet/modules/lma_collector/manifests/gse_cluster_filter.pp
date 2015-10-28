@@ -24,6 +24,7 @@ define lma_collector::gse_cluster_filter (
   $ensure = present,
 ) {
   include lma_collector::params
+  include lma_collector::service
   include heka::params
 
   validate_array($input_message_types)
@@ -60,6 +61,7 @@ define lma_collector::gse_cluster_filter (
       source              => "gse_${title}_filter",
       interval            => $interval,
       topology_file       => $topology_file,
+      policies_file       => $lma_collector::params::gse_policies_module,
       cluster_field       => $cluster_field,
       member_field        => $member_field,
       max_inject          => $lma_collector::params::hekad_max_timer_inject,

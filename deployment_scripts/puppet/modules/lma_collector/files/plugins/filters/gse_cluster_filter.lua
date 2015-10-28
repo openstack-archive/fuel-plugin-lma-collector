@@ -24,6 +24,7 @@ local member_field = read_config('member_field') or error('member_field must be 
 local output_metric_name = read_config('output_metric_name') or error('output_metric_name must be specified!')
 local source = read_config('source') or error('source must be specified!')
 local topology_file = read_config('topology_file') or error('topology_file must be specified!')
+local policies_file = read_config('policies_file') or error('policies_file must be specified!')
 local interval = (read_config('interval') or error('interval must be specified!')) + 0
 local interval_in_ns = interval * 1e9
 local max_inject = (read_config('max_inject') or 10) + 0
@@ -33,10 +34,16 @@ local is_active = false
 local first_tick
 local last_tick = 0
 local last_index = nil
+
 local topology = require(topology_file)
+local policies = require(policies_file)
 
 for cluster_name, attributes in pairs(topology.clusters) do
-    gse.add_cluster(cluster_name, attributes.members, attributes.hints, attributes.group_by_hostname)
+    local policy = policies.find(attributes.policy)
+    if not policy then
+        error('Cannot find ' .. attributes.policy .. ' policy!')
+    end
+    gse.add_cluster(cluster_name, attributes.members, attributes.hints, attributes.group_by, policy)
 end
 
 function process_message()

@@ -22,8 +22,6 @@ local string = string
 local tonumber = tonumber
 local type = type
 
-local print = print
-local inspect = require 'inspect'
 local GsePolicy = {}
 GsePolicy.__index = GsePolicy
 
