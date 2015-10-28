@@ -352,19 +352,26 @@ lma_collector:
         group_by: hostname
         members:
           - cpu
-          - fs
+          - root-fs
+          - log-fs
+      mysql-nodes:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - mysql-fs
       compute:
         policy: majority_of_members
         group_by: hostname
         members:
           - cpu
-          - fs
+          - root-fs
+          - nova-fs
       storage:
         policy: majority_of_members
         group_by: hostname
         members:
           - cpu
-          - fs
+          - root-fs
 
   gse_cluster_global:
     input_message_types:
@@ -384,7 +391,7 @@ lma_collector:
         members:
           - mysqld-tcp
           - mysql
-          - controller
+          - mysql-nodes
       haproxy:
         policy: highest_severity
         group_by: member
