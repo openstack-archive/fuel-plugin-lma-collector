@@ -34,11 +34,12 @@ local reverse_cluster_index = {}
 -- Array of cluster names ordered by dependency
 local ordered_clusters = {}
 
-function add_cluster(cluster_id, members, hints, group_by)
+function add_cluster(cluster_id, members, hints, group_by, policy_rules)
     assert(type(members) == 'table')
     assert(type(hints) == 'table')
+    assert(type(policy_rules) == 'table')
 
-    local cluster = GseCluster.new(members, hints, group_by)
+    local cluster = GseCluster.new(members, hints, group_by, policy_rules)
     clusters[cluster_id] = cluster
 
     -- update the reverse index
