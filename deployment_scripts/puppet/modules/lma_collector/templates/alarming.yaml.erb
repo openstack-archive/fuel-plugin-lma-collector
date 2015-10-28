@@ -418,67 +418,67 @@ lma_collector:
 <% end -%>
 
   node_cluster_roles:
-    - controller: ['primary-controller', 'controller']
-    - compute: ['compute']
-    - storage: ['cinder', 'ceph-osd']
+    controller: ['primary-controller', 'controller']
+    compute: ['compute']
+    storage: ['cinder', 'ceph-osd']
 
   service_cluster_roles:
-    - rabbitmq: ['primary-controller', 'controller']
-    - apache: ['primary-controller', 'controller']
-    - nova-api: ['primary-controller', 'controller']
-    - heat-api: ['primary-controller', 'controller']
+    rabbitmq: ['primary-controller', 'controller']
+    apache: ['primary-controller', 'controller']
+    nova-api: ['primary-controller', 'controller']
+    heat-api: ['primary-controller', 'controller']
 <% if not @storage_options["objects_ceph"] then -%>
-    - swift-api: ['primary-controller', 'controller']
+    swift-api: ['primary-controller', 'controller']
 <% end -%>
-    - cinder-api: ['primary-controller', 'controller']
-    - glance-api: ['primary-controller', 'controller']
-    - neutron-api: ['primary-controller', 'controller']
-    - keystone-public-api: ['primary-controller', 'controller']
-    - keystone-admin-api: ['primary-controller', 'controller']
+    cinder-api: ['primary-controller', 'controller']
+    glance-api: ['primary-controller', 'controller']
+    neutron-api: ['primary-controller', 'controller']
+    keystone-public-api: ['primary-controller', 'controller']
+    keystone-admin-api: ['primary-controller', 'controller']
 <% if @storage_options["volumes_ceph"] then -%>
-    - ceph-mon: ['primary-controller', 'controller']
+    ceph-mon: ['primary-controller', 'controller']
 <% end -%>
 
   node_cluster_alarms:
-    - controller:
-      - cpu: ['cpu-critical-controller', 'cpu-warning-controller']
-      - fs: ['fs-critical', 'fs-warning']
-    - compute:
-      - cpu: ['cpu-critical-compute', 'cpu-warning-compute']
-      - fs: ['fs-critical', 'fs-critical-compute', 'fs-warning']
-    - storage:
-      - cpu: ['cpu-critical-storage', 'cpu-warning-storage']
-      - fs: ['fs-critical-storage', 'fs-warning-storage']
-    - default:
-      - cpu: ['cpu-critical-default']
-      - fs: ['fs-critical', 'fs-warning']
+    controller:
+      cpu: ['cpu-critical-controller', 'cpu-warning-controller']
+      fs: ['fs-critical', 'fs-warning']
+    compute:
+      cpu: ['cpu-critical-compute', 'cpu-warning-compute']
+      fs: ['fs-critical', 'fs-critical-compute', 'fs-warning']
+    storage:
+      cpu: ['cpu-critical-storage', 'cpu-warning-storage']
+      fs: ['fs-critical-storage', 'fs-warning-storage']
+    default:
+      cpu: ['cpu-critical-default']
+      fs: ['fs-critical', 'fs-warning']
 
   service_cluster_alarms:
-    - rabbitmq:
-      - queue: ['rabbitmq-queue-warning']
-      - memory: ['rabbitmq-memory-limit-critical', 'rabbitmq-memory-limit-warning']
-      - disk: ['rabbitmq-disk-limit-critical', 'rabbitmq-disk-limit-warning']
-    - apache:
-      - worker: ['apache-warning']
-    - nova-api:
-      - http_errors: ['nova-api-http-errors']
-    - heat-api:
-      - http_errors: ['heat-api-http-errors']
+    rabbitmq:
+      queue: ['rabbitmq-queue-warning']
+      memory: ['rabbitmq-memory-limit-critical', 'rabbitmq-memory-limit-warning']
+      disk: ['rabbitmq-disk-limit-critical', 'rabbitmq-disk-limit-warning']
+    apache:
+      worker: ['apache-warning']
+    nova-api:
+      http_errors: ['nova-api-http-errors']
+    heat-api:
+      http_errors: ['heat-api-http-errors']
 <% if not @storage_options["objects_ceph"] then -%>
-    - swift-api:
-      - http_errors: ['swift-api-http-errors']
+    swift-api:
+      http_errors: ['swift-api-http-errors']
 <% end -%>
-    - cinder-api:
-      - http_errors: ['cinder-api-http-errors']
-    - glance-api:
-      - http_errors: ['glance-api-http-errors']
-    - neutron-api:
-      - http_errors: ['neutron-api-http-errors']
-    - keystone-public-api:
-      - http_errors: ['keystone-public-api-http-errors']
-    - keystone-admin-api:
-      - http_errors: ['keystone-admin-api-http-errors']
+    cinder-api:
+      http_errors: ['cinder-api-http-errors']
+    glance-api:
+      http_errors: ['glance-api-http-errors']
+    neutron-api:
+      http_errors: ['neutron-api-http-errors']
+    keystone-public-api:
+      http_errors: ['keystone-public-api-http-errors']
+    keystone-admin-api:
+      http_errors: ['keystone-admin-api-http-errors']
 <% if @storage_options["volumes_ceph"] then -%>
-    - ceph-mon:
-      - health: ['ceph-health-critical', 'ceph-health-warning']
+    ceph-mon:
+      health: ['ceph-health-critical', 'ceph-health-warning']
 <% end -%>

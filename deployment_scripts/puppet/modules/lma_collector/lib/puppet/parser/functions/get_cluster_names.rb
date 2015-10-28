@@ -12,21 +12,19 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-
-# This returns an array that contains the list of services or nodes related
-# to a role.
 #
-# ARG0: An array of hash table that contains relation between node/service and
-#       roles.
-# ARG1: An array of roles
+# Returns an array containing the AFD profiles associated to a MOS role.
+#
+# ARG0: Hash of arrays that contains relation between AFD profile and node's roles.
+# ARG1: Array of node's roles
 #
 # Ex:
 #
 #     ARG0:
-#       [{"controller"=>["primary-controller", "controller"]},
-#        {"compute"=>["compute"]},
-#        {"storage"=>["cinder", "ceph-osd"]},
-#        {"influxdb"=>["influxdb-grafana"]}]
+#        {"controller"=>["primary-controller", "controller"],
+#         "compute"=>["compute"],
+#         "storage"=>["cinder", "ceph-osd"],
+#         "influxdb"=>["influxdb-grafana"]}
 #
 #     ARG1: ['primary-controller']
 #
@@ -39,24 +37,24 @@ module Puppet::Parser::Functions
     data = args[0]
     roles = args[1]
 
-    raise Puppet::ParseError, "data passed to get_cluster_names is not a list" unless data.is_a?(Array)
-    raise Puppet::ParseError, "roles passed to get_cluster_names is not a list" unless roles.is_a?(Array)
+    raise Puppet::ParseError, "arg[0] isn't a hash" unless data.is_a?(Hash)
+    raise Puppet::ParseError, "arg[1] isn't an array" unless roles.is_a?(Array)
 
-    cluster_names = [].to_set
+    cluster_names = Set.new([])
     has_default = false
 
     roles.each do |role|
-      data.each do |v|
-        v.each { |name, t|
-            cluster_names.add(name) if t.include?(role)
-            has_default = (name == 'default')
-        }
-      end
+        data.each do |k,v|
+            if k == 'default' then
+                has_default = true
+            end
+            cluster_names << k if v.include?(role)
+        end
 
-      # if cluster_names["node"] is empty, it means that we didn't find a cluster
-      # name that matches with role. So add "default" name if there is a default
-      # value
-      cluster_names.add("default") if cluster_names.empty? and has_default
+        # if cluster_names["node"] is empty, it means that we didn't find a cluster
+        # name that matches with role. So add "default" name if there is a default
+        # value
+        cluster_names << "default" if cluster_names.empty? and has_default
     end
 
     return cluster_names.to_a()
