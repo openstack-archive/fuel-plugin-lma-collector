@@ -19,7 +19,8 @@ describe 'lma_collector::elasticsearch' do
          :osfamily => 'Debian'}
     end
 
-    describe 'with defaults' do
+    describe 'with localhost server' do
+        let(:params) {{ :server => 'localhost' }}
         it { is_expected.to contain_heka__output__elasticsearch('elasticsearch') }
         it { is_expected.to contain_heka__encoder__es_json('elasticsearch') }
     end
