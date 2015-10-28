@@ -60,6 +60,7 @@ define lma_collector::gse_cluster_filter (
       source              => "gse_${title}_filter",
       interval            => $interval,
       topology_file       => $topology_file,
+      policies_file       => $lma_collector::params::gse_policies_module,
       cluster_field       => $cluster_field,
       member_field        => $member_field,
       max_inject          => $lma_collector::params::hekad_max_timer_inject,

@@ -34,16 +34,17 @@ local VALID_STATUSES = {
     [consts.UNKW]=true
 }
 
--- TODO(pasquier-s): pass the cluster's policy
-function GseCluster.new(members, hints, group_by)
+function GseCluster.new(members, hints, group_by, policy_rules)
     assert(type(members) == 'table')
     assert(type(hints) == 'table')
+    assert(type(policy_rules) == 'table')
 
     local cluster = {}
     setmetatable(cluster, GseCluster)
 
     cluster.members = members
     cluster.hints = hints
+    cluster.policy_rules = policy_rules
     -- when group_by is 'hostname', facts are stored by hostname then member
     -- when group_by is 'member', facts are stored by member only
     -- otherwise facts are stored by member then hostname
@@ -97,11 +98,15 @@ end
 -- Compute the status and alarms of the cluster according to the current facts
 -- and the cluster's policy
 function GseCluster:refresh_status()
-    local status = consts.UNKW
     local alarms = {}
+    local status_breakdown = {}
+
+    self.status = consts.UNKW
 
     for group_key, _ in table_utils.orderedPairs(self.facts) do
+        local group_status = consts.UNKW
         for sub_key, fact in table_utils.orderedPairs(self.facts[group_key]) do
+            group_status = gse_utils.max_status(group_status, fact.status)
             if fact.status ~= consts.OKAY then
                 for _, v in ipairs(fact.alarms) do
                     alarms[#alarms+1] = table_utils.deepcopy(v)
@@ -115,11 +120,18 @@ function GseCluster:refresh_status()
                     end
                 end
             end
-            status = gse_utils.max_status(status, fact.status)
+        end
+        status_breakdown[group_status] = (status_breakdown[group_status] or 0) + 1
+    end
+    for _, policy_rule in ipairs(self.policy_rules) do
+        if policy_rule:evaluate(status_breakdown) then
+            self.status = policy_rule.status
+            break
         end
     end
-    self.status = status
-    self.alarms = alarms
+    if self.status ~= consts.OKAY then
+        self.alarms = alarms
+    end
 
     return self.status
 end
