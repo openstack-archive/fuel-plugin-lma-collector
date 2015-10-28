@@ -21,8 +21,6 @@ local setmetatable = setmetatable
 local string = string
 local tonumber = tonumber
 
-local print = print
-local inspect = require 'inspect'
 local GsePolicy = {}
 GsePolicy.__index = GsePolicy
 

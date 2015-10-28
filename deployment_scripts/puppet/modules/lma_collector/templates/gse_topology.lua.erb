@@ -19,7 +19,8 @@ clusters = {
     ['<%= cluster_id.to_s().gsub("'"){"\\'"} %>']={
         ['members']={<%= @clusters[cluster_id]['members'].sort().collect{ |x| "'" + x.to_s().gsub("'"){"\\'"} + "'"}.join(',') %>},
         ['hints']={<%= (@clusters[cluster_id]['hints'] || []).sort().collect{ |x| "'" + x.to_s().gsub("'"){"\\'"} + "'"}.join(',') %>},
-        ['group_by_hostname']=<%= @clusters[cluster_id]['group_by_hostname'] ? 'true' : 'false' %>
+        ['group_by']='<%= @clusters[cluster_id]['group_by'] %>',
+        ['policy']='<%= @clusters[cluster_id]['policy'].gsub("'"){"\\'"} %>'
     },
 <% end -%>
 }
