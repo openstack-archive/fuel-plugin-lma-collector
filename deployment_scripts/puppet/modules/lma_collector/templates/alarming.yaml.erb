@@ -415,6 +415,28 @@ lma_collector:
             threshold: 2 # HEALTH_WARN
             window: 60
             function: max
+    - name: 'ceph-capacity-critical'
+      description: 'Ceph free capacity is too low.'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: ceph_pool_total_percent_free
+            relational_operator: '<'
+            threshold: 2
+            window: 60
+            function: max
+    - name: 'ceph-capacity-warning'
+      description: 'Ceph free capacity is low.'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: ceph_pool_total_percent_free
+            relational_operator: '<'
+            threshold: 5
+            window: 60
+            function: max
 <% end -%>
 
   node_cluster_roles:
@@ -481,4 +503,5 @@ lma_collector:
 <% if @storage_options["volumes_ceph"] then -%>
     ceph-mon:
       health: ['ceph-health-critical', 'ceph-health-warning']
+      capacity: ['ceph-capacity-critical', 'ceph-capacity-warning']
 <% end -%>
