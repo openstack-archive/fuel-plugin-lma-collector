@@ -41,7 +41,7 @@ define lma_collector::afd_nagios(
     ensure          => $ensure,
     config_dir      => $lma_collector::params::config_dir,
     url             => $url,
-    message_matcher => "Type == 'heka.sandbox.${message_type}'",
+    message_matcher => "Fields[${lma_collector::params::aggregator_flag}] == NIL && Type == 'heka.sandbox.${message_type}'",
     username        => $user,
     password        => $password,
     encoder         => "nagios_afd_${title}",
