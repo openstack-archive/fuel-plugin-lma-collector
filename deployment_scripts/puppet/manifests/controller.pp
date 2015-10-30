@@ -168,7 +168,7 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
 
   # Enable service heartbeat metrics
   class { 'lma_collector::metrics::service_heartbeat':
-    services => ['mysql', 'rabbitmq', 'haproxy', 'memcached', 'apache']
+    services => ['haproxy', 'memcached', 'apache']
   }
 
   # AFD filters
