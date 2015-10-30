@@ -126,6 +126,7 @@ lma_collector:
         group_by: hostname
         members:
           - heartbeat
+          - node-status
       haproxy:
         policy: majority_of_members
         group_by: hostname
