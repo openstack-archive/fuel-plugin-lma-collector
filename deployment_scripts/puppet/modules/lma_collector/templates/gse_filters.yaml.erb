@@ -118,31 +118,32 @@ lma_collector:
     clusters:
       mysqld-tcp:
         policy: highest_severity
+        group_by: member
         members:
           - backends
       mysql:
         policy: majority_of_members
-        group_by_hostname: true
+        group_by: hostname
         members:
           - heartbeat
       haproxy:
         policy: majority_of_members
-        group_by_hostname: true
+        group_by: hostname
         members:
           - heartbeat
       apache:
         policy: majority_of_members
-        group_by_hostname: true
+        group_by: hostname
         members:
           - heartbeat
       memcached:
         policy: majority_of_members
-        group_by_hostname: true
+        group_by: hostname
         members:
           - heartbeat
       rabbitmq:
         policy: highest_severity
-        group_by_hostname: true
+        group_by: member
         members:
           - heartbeat
           - memory
@@ -150,140 +151,169 @@ lma_collector:
           - queue
       nova-api:
         policy: highest_severity
+        group_by: member
         members:
           - backends
           - endpoint
           - http_errors
       nova-ec2-api:
         policy: highest_severity
+        group_by: member
         members:
           - backends
       nova-novncproxy-websocket:
         policy: highest_severity
+        group_by: member
         members:
           - backends
       nova-metadata-api:
         policy: highest_severity
+        group_by: member
         members:
           - backends
       nova-scheduler:
         policy: highest_severity
+        group_by: member
         members:
           - workers
       nova-cert:
         policy: highest_severity
+        group_by: member
         members:
           - workers
       nova-consoleauth:
         policy: highest_severity
+        group_by: member
         members:
           - workers
       nova-compute:
         policy: highest_severity
+        group_by: member
         members:
           - workers
       nova-conductor:
         policy: highest_severity
+        group_by: member
         members:
           - workers
       cinder-api:
         policy: highest_severity
+        group_by: member
         members:
           - backends
           - endpoint
           - http_errors
       cinder-v2-api:
         policy: highest_severity
+        group_by: member
         members:
           # Cinder V2 backends are in fact the same as the Cinder backends
           - endpoint
       cinder-scheduler:
         policy: highest_severity
+        group_by: member
         members:
           - workers
       cinder-volume:
         policy: highest_severity
+        group_by: member
         members:
           - workers
       neutron-api:
         policy: highest_severity
+        group_by: member
         members:
           - backends
           - endpoint
           - http_errors
       neutron-l3:
         policy: highest_severity
+        group_by: member
         members:
           - workers
       neutron-dhcp:
         policy: highest_severity
+        group_by: member
         members:
           - workers
       neutron-metadata:
         policy: highest_severity
+        group_by: member
         members:
           - workers
       neutron-openvswitch:
         policy: highest_severity
+        group_by: member
         members:
           - workers
       keystone-public-api:
         policy: highest_severity
+        group_by: member
         members:
           - backends
           - endpoint
           - http_errors
       keystone-admin-api:
         policy: highest_severity
+        group_by: member
         members:
           # TODO(pasquier-s): add a metric reporting the status of the keystone-admin-api endpoint
           - backends
           - http_errors
       glance-api:
         policy: highest_severity
+        group_by: member
         members:
           - backends
           - endpoint
           - http_errors
       glance-registry-api:
         policy: highest_severity
+        group_by: member
         members:
           - backends
       heat-api:
         policy: highest_severity
+        group_by: member
         members:
           - backends
           - endpoint
           - http_errors
       heat-cfn-api:
         policy: highest_severity
+        group_by: member
         members:
           - backends
           - endpoint
       heat-cloudwatch-api:
         policy: highest_severity
+        group_by: member
         members:
           - backends
 <% if @tls_enabled then -%>
       horizon-https:
         policy: highest_severity
+        group_by: member
         members:
           - backends
 <% else -%>
       horizon-ui:
         policy: highest_severity
+        group_by: member
         members:
           - backends
 <% end -%>
 <% if not @storage_options["objects_ceph"] then -%>
       swift-api:
         policy: highest_severity
+        group_by: member
         members:
           - backends
           - endpoint
           - http_errors
       swift-s3-api:
         policy: highest_severity
+        group_by: member
         members:
           # Swift S3 backends are in fact the same as the Swift backends
           - endpoint
@@ -291,6 +321,7 @@ lma_collector:
 <% if @ceilometer_enabled -%>
       ceilometer-api:
         policy: highest_severity
+        group_by: member
         members:
           - backends
           - endpoint
@@ -298,6 +329,7 @@ lma_collector:
 <% if @storage_options["volumes_ceph"] then -%>
       ceph-mon:
         policy: highest_severity
+        group_by: member
         members:
           - health
 <% end -%>
@@ -317,19 +349,19 @@ lma_collector:
     clusters:
       controller:
         policy: majority_of_members
-        group_by_hostname: true
+        group_by: hostname
         members:
           - cpu
           - fs
       compute:
         policy: majority_of_members
-        group_by_hostname: true
+        group_by: hostname
         members:
           - cpu
           - fs
       storage:
         policy: majority_of_members
-        group_by_hostname: true
+        group_by: hostname
         members:
           - cpu
           - fs
@@ -348,32 +380,38 @@ lma_collector:
     clusters:
       mysql:
         policy: highest_severity
+        group_by: member
         members:
           - mysqld-tcp
-          - mysqld
+          - mysql
           - controller
       haproxy:
         policy: highest_severity
+        group_by: member
         members:
           - haproxy
           - controller
       apache:
         policy: highest_severity
+        group_by: member
         members:
           - apache
           - controller
       memcached:
         policy: highest_severity
+        group_by: member
         members:
           - memcached
           - controller
       rabbitmq:
         policy: highest_severity
+        group_by: member
         members:
           - rabbitmq
           - controller
       nova:
         policy: highest_severity
+        group_by: member
         members:
           - nova-api
           - nova-ec2-api
@@ -393,6 +431,7 @@ lma_collector:
           - neutron
       cinder:
         policy: highest_severity
+        group_by: member
         members:
           - cinder-api
           - cinder-v2-api
@@ -404,6 +443,7 @@ lma_collector:
           - keystone
       neutron:
         policy: highest_severity
+        group_by: member
         members:
           - neutron-api
           - neutron-l3
@@ -415,6 +455,7 @@ lma_collector:
           - keystone
       keystone:
         policy: highest_severity
+        group_by: member
         members:
           - keystone-public-api
           - keystone-admin-api
@@ -422,6 +463,7 @@ lma_collector:
         hints: []
       glance:
         policy: highest_severity
+        group_by: member
         members:
           - glance-api
           - glance-registry-api
@@ -430,6 +472,7 @@ lma_collector:
           - keystone
       heat:
         policy: highest_severity
+        group_by: member
         members:
           - heat-api
           - heat-cfn-api
@@ -443,6 +486,7 @@ lma_collector:
           - nova
       horizon:
         policy: highest_severity
+        group_by: member
         members:
 <% if @tls_enabled then -%>
           - horizon-https
@@ -455,6 +499,7 @@ lma_collector:
 <% if not @storage_options["objects_ceph"] then -%>
       swift:
         policy: highest_severity
+        group_by: member
         members:
           - swift-api
           - swift-s3-api
@@ -465,6 +510,7 @@ lma_collector:
 <% if @ceilometer_enabled -%>
       ceilometer:
         policy: highest_severity
+        group_by: member
         members:
           - ceilometer-api
           - controller
@@ -474,6 +520,7 @@ lma_collector:
 <% if @storage_options["volumes_ceph"] then -%>
       ceph:
         policy: highest_severity
+        group_by: member
         members:
           - ceph-mon
           - controller
