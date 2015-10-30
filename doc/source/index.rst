@@ -10,7 +10,7 @@ User documentation
 
    user/overview
    user/installation
-   user/guide
+   user/configuration
    user/licenses
    user/appendix
 
