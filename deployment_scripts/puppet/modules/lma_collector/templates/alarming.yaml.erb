@@ -392,6 +392,32 @@ lma_collector:
             window: 60
             periods: 1
             function: diff
+    - name: 'mysql-node-connected'
+      description: 'The MySQL service has lost connectivity with the other nodes.'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: mysql_cluster_connected
+            relational_operator: '=='
+            threshold: 0
+            window: 30
+            periods: 1
+            function: min
+    - name: 'mysql-node-ready'
+      description: "The MySQL service isn't ready to serve queries."
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: mysql_cluster_ready
+            relational_operator: '=='
+            threshold: 0
+            window: 30
+            periods: 1
+            function: min
 <% if @storage_options["volumes_ceph"] then -%>
     - name: 'ceph-health-critical'
       description: 'Ceph health is critical'
@@ -424,6 +450,7 @@ lma_collector:
 
   service_cluster_roles:
     rabbitmq: ['primary-controller', 'controller']
+    mysql: ['primary-controller', 'controller']
     apache: ['primary-controller', 'controller']
     nova-api: ['primary-controller', 'controller']
     heat-api: ['primary-controller', 'controller']
@@ -458,6 +485,8 @@ lma_collector:
       queue: ['rabbitmq-queue-warning']
       memory: ['rabbitmq-memory-limit-critical', 'rabbitmq-memory-limit-warning']
       disk: ['rabbitmq-disk-limit-critical', 'rabbitmq-disk-limit-warning']
+    mysql:
+      node-status: ['mysql-node-connected', 'mysql-node-ready']
     apache:
       worker: ['apache-warning']
     nova-api:
