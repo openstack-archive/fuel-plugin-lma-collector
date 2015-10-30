@@ -125,7 +125,6 @@ lma_collector:
         policy: majority_of_members
         group_by: hostname
         members:
-          - heartbeat
           - node-status
       haproxy:
         policy: majority_of_members
@@ -146,7 +145,6 @@ lma_collector:
         policy: highest_severity
         group_by: member
         members:
-          - heartbeat
           - memory
           - disk
           - queue
