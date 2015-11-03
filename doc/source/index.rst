@@ -28,6 +28,15 @@ Developer documentation
    dev/metrics
    dev/outputs
 
+QA documentation
+================
+
+.. toctree::
+   :maxdepth: 2
+
+   qa/plan
+   qa/report
+
 Indices and Tables
 ==================
 
