@@ -436,6 +436,8 @@ lma_collector:
           - glance
           - keystone
           - neutron
+          - mysql
+          - rabbitmq
       cinder:
         policy: highest_severity
         group_by: member
@@ -448,6 +450,8 @@ lma_collector:
           - storage
         hints:
           - keystone
+          - mysql
+          - rabbitmq
       neutron:
         policy: highest_severity
         group_by: member
@@ -460,6 +464,8 @@ lma_collector:
           - controller
         hints:
           - keystone
+          - mysql
+          - rabbitmq
       keystone:
         policy: highest_severity
         group_by: member
@@ -467,7 +473,9 @@ lma_collector:
           - keystone-public-api
           - keystone-admin-api
           - controller
-        hints: []
+        hints:
+          - mysql
+          - apache
       glance:
         policy: highest_severity
         group_by: member
@@ -477,6 +485,7 @@ lma_collector:
           - controller
         hints:
           - keystone
+          - mysql
       heat:
         policy: highest_severity
         group_by: member
@@ -491,6 +500,8 @@ lma_collector:
           - keystone
           - neutron
           - nova
+          - mysql
+          - rabbitmq
       horizon:
         policy: highest_severity
         group_by: member
@@ -503,6 +514,7 @@ lma_collector:
           - controller
         hints:
           - keystone
+          - apache
 <% if not @storage_options["objects_ceph"] then -%>
       swift:
         policy: highest_severity
@@ -523,6 +535,8 @@ lma_collector:
           - controller
         hints:
           - keystone
+          - mysql
+          - rabbitmq
 <% end -%>
 <% if @storage_options["volumes_ceph"] then -%>
       ceph:
