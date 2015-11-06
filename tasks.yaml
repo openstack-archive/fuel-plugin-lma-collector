@@ -1,3 +1,13 @@
+# This task is needed to avoid a segmentation fault that occurs when apt
+# resizes the memory mapped cache
+# See https://bugs.launchpad.net/lma-toolchain/+bug/1513539
+- role: '*'
+  stage: pre_deployment/-100
+  type: shell
+  parameters:
+    cmd: mkdir -p /etc/apt/apt.conf.d; echo "APT::Cache-Start 50331648;" > /etc/apt/apt.conf.d/98cache-start
+    timeout: 300
+
 # This task is executed before any real deployment task
 - role: ['primary-controller']
   stage: post_deployment/8000
