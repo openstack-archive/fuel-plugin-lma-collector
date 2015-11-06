@@ -1,3 +1,11 @@
+- role: '*'
+  stage: pre_deployment
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/set-apt-cache-size.pp
+    puppet_modules: puppet/modules
+    timeout: 300
+
 # This task is executed before any real deployment task
 - role: ['primary-controller']
   stage: post_deployment/8000
