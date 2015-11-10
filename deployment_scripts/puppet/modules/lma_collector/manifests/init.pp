@@ -91,11 +91,9 @@ class lma_collector (
         'failure-timeout'     => '120',
       },
       parameters      => {
-        'config'           => $config_dir,
-        'log_file'         => "/var/log/${service_name}.log",
-        'user'             => $heka_user,
-        'watchdog_file'    => $lma_collector::params::watchdog_file,
-        'watchdog_timeout' => $lma_collector::params::watchdog_timeout,
+        'config'   => $config_dir,
+        'log_file' => "/var/log/${service_name}.log",
+        'user'     => $heka_user,
       },
       operations      => {
         'monitor' => {
@@ -139,24 +137,6 @@ class lma_collector (
       require  => Cs_rsc_order[$service_name]
     }
 
-    heka::filter::sandbox { 'watchdog':
-        config_dir      => $config_dir,
-        filename        => "${plugins_dir}/filters/watchdog.lua",
-        message_matcher => 'FALSE',
-        ticker_interval => $lma_collector::params::watchdog_interval,
-        config          => {
-          payload_name => $lma_collector::params::watchdog_payload_name
-        }
-    }
-
-    heka::output::sandbox { 'watchdog':
-        config_dir      => $config_dir,
-        filename        => "${plugins_dir}/outputs/lastfile.lua",
-        message_matcher => "Fields[payload_name] == '${lma_collector::params::watchdog_payload_name}'",
-        config          => {
-          path => $lma_collector::params::watchdog_file,
-        }
-    }
   } else {
     # Use the default service class
     include lma_collector::service
