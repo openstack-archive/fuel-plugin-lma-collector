@@ -9,6 +9,7 @@ User documentation
    :maxdepth: 2
 
    user/overview
+   user/releases
    user/installation
    user/configuration
    user/alarms
