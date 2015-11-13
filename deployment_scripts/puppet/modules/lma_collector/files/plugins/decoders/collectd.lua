@@ -162,7 +162,7 @@ function process_message ()
                     msg['Fields']['handler'] = sample['type_instance']
                     msg['Fields']['tag_fields'] = { 'handler' }
                 else
-                    msg['Fields']['name'] = metric_name
+                    msg['Fields']['name'] = 'mysql' .. metric_name
                 end
             elseif metric_source == 'check_openstack_api' then
                 -- For OpenStack API metrics, plugin_instance = <service name>
