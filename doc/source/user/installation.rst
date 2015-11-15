@@ -91,14 +91,3 @@ if you need further instructions about how to build the Fuel Plugin Builder.
 7. Now that you have created the RPM file, you can install the plugin using the `fuel plugins --install` command::
 
     [root@fuel ~] fuel plugins --install ./fuel-plugin-lma_collector/lma_collector-0.8-0.8.0-1.noarch.rpm
-
-Running tests
--------------
-
-You need to have `tox` and `bundler` installed for running the tests.
-
-Quickstart for Ubuntu Trusty::
-
-    apt-get install tox ruby
-    gem install bundler
-    tox
