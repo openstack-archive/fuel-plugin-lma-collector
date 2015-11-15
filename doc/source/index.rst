@@ -28,6 +28,7 @@ Developer documentation
    dev/notifications
    dev/metrics
    dev/outputs
+   dev/tests
 
 Indices and Tables
 ==================
