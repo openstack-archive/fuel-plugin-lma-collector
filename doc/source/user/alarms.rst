@@ -34,6 +34,14 @@ and the *GSE plugins* for Global Status Evaluation plugins.
 Both the AFD and GSE plugins in turn create metrics called the *AFD metrics*
 and the *GSE metrics* respectively.
 
+
+.. figure:: ../../images/AFD_and_GSE_message_flow.*
+   :width: 800
+   :alt: Message flow for the AFD and GSE metrics
+   :align: center
+
+   Message flow for the AFD and GSE metrics
+
 The *AFD metrics* contain information about the health status of a
 resource like a device, a system component like a filesystem, or service
 like an API endpoint, at the node level.
@@ -49,7 +57,29 @@ The health status of a cluster is inferred by the GSE plugins using
 aggregation and correlation rules and facts contained in the
 *AFD metrics* it receives from the Collectors.
 
-The *AFD and GSE metrics* are consumed by other groups
+In the current version of the LMA toolchain, 3 GSE plugins are configured:
+
+* The Service Cluster GSE which receives metrics from the AFD plugins monitoring the services and emits health status for the clusters of services (nova-api, nova-scheduler and so on).
+* The Node Cluster GSE which receives metrics from the AFD plugins monitoring the system and emits health status for the clusters of nodes (controllers, computes and so on).
+* The Global Cluster GSE which receives metrics from the 2 other GSE plugins and emits health status for the top-level clusters (Nova, MySQL and so on).
+
+The meaning associated with a health status is the following:
+
+* **Down**: One or several primary functions of a cluster are failed. For example,
+  the API service for Nova or Cinder isn't accessible.
+* **Critical**: One or several primary functions of a
+  cluster are severely degraded. The quality
+  of service delivered to the end-user should be severely
+  impacted.
+* **Warning**: One or several primary functions of the
+  cluster are slightly degraded. The quality
+  of service delivered to the end-user should be slightly
+  impacted.
+* **Unknown**: There is not enough data to infer the actual
+  health state of the cluster.
+* **Okay**: None of the above was found to be true.
+
+The *AFD and GSE metrics* are also consumed by other groups
 of Heka plugins we call the *Persisters*.
 
 * There is a *Persister* for InfluxDB which turns the *GSE metric*
@@ -331,3 +361,101 @@ need to re-apply the Puppet module::
     /etc/fuel/plugins/lma_collector-0.8/puppet/manifests/configure_afd_filters.pp
 
 This will restart the LMA Collector with your change.
+
+Cluster policies
+----------------
+
+The GSE plugins are driven by policies that describe how the the GSE plugin
+determines the cluster's health status.
+
+By default, 2 policies are defined:
+
+* *highest_severity*, it defines that the cluster's status depends on the
+  member with the highest severity, typically used for a cluster of services.
+* *majority_of_members*, it is typically used for clusters managed by
+  Pacemaker with the no-quorum-policy set to 'stop'.
+
+The GSE policies are defined declaratively in the */etc/hiera/override/gse_filters.yaml*
+file at the *gse_policies* entry.
+
+A policy consists of a list of rules which are evaluated against the
+current status of the cluster's members. When one of the rules matches, the
+cluster's status gets the value associated with the rule and the evaluation
+stops here. The last rule of the list is usually a catch-all rule that
+defines the default status in case no other rule matched.
+
+The declaration of a policy rule is similar to an alarm rule except that:
+
+#. There are no 'metric', 'window' and 'period' parameters.
+
+#. There are only 2 supported functions:
+
+  * 'count' which returns the *number of members* that match the passed value(s).
+
+  * 'percent' which returns the *percentage of members* that match the passed value(s).
+
+For instance, the following rule definition reads as "the cluster's status is
+critical if more than 50% of its members are either down or criticial"::
+
+   - status: critical
+     trigger:
+       logical_operator: or
+       rules:
+         - function: percent
+           arguments: [ down, critical ]
+           relational_operator: '>'
+           threshold: 50
+
+Lets now take a more detailed look at the policy called *highest_severity*::
+
+  gse_policies:
+
+    highest_severity:
+      - status: down
+        trigger:
+          logical_operator: or
+          rules:
+            - function: count
+              arguments: [ down ]
+              relational_operator: '>'
+              threshold: 0
+      - status: critical
+        trigger:
+          logical_operator: or
+          rules:
+            - function: count
+              arguments: [ critical ]
+              relational_operator: '>'
+              threshold: 0
+      - status: warning
+        trigger:
+          logical_operator: or
+          rules:
+            - function: count
+              arguments: [ warning ]
+              relational_operator: '>'
+              threshold: 0
+      - status: okay
+        trigger:
+          logical_operator: or
+          rules:
+            - function: count
+              arguments: [ okay ]
+              relational_operator: '>'
+              threshold: 0
+      - status: unknown
+
+The policy definition reads as:
+
+* The status of the cluster is *Down* if the status of at least one cluster's member is *Down*.
+
+* Otherwise the status of the cluster is *Critical* if the status of at least one cluster's member is *Critical*.
+
+* Otherwise the status of the cluster is *Warning* if the status of at least one cluster's member is *Warning*.
+
+* Otherwise the status of the cluster is *Okay* if the status of at least one cluster's entity is *Okay*.
+
+* Otherwise the status of the cluster is *Unknown*.
+
+The GSE policies are defined declaratively in the */etc/hiera/override/gse_filters.yaml*
+file at the *gse_policies* entry.
