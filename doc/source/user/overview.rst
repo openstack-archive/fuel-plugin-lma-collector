@@ -9,28 +9,10 @@ OpenStack nodes you want to monitor.
 
 The LMA Collector (or Collector for short) is a key component
 of the `LMA Toolchain project <https://launchpad.net/lma-toolchain>`_
-as shown in the figure below::
+as shown in the figure below:
 
-                            +=====================================================+
-                            ||               LMA Collector Plugin                ||
-                            ||                                                   ||
-                            || measurement / collection / analysis / persistence ||
-                            +=====================================================+
-                                           |          |          |
-                                           |          |          |
-                                           |          |          |
-    ...................................    |          |          |    ................................
-   |      InfluxDB Grafana Plugin      |   |          |          |   |  Elasticsearch Kibana Plugin   |
-   |                                   |<--'          |          '-->|                                |
-   |  metrics / annotations analytics  |              |              | logs / notifications analytics |
-   '...................................'              |              '................................'
-                                                      v
-                                      ................................
-                                     | Infrastructure Alerting Plugin |
-                                     |                                |
-                                     |     alerting / escalation      |
-                                     '................................'
-
+.. image:: ../../images/toolchain_map.png
+   :align: center
 
 Each Collector is individually responsible for supporting the sensing,
 measurement, collection, analysis and alarm functions for the node
