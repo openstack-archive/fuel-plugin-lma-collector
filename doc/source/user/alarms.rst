@@ -69,7 +69,7 @@ The *AFD metrics* and *GSE metrics* are new types of metrics introduced
 in LMA v 0.8. They contain detailed information about the entities
 being monitored.
 Please refer to the `Metrics section of the Developer Guide
-<http://fuel-plugin-lma-collector.readthedocs.org/en/latest/dev/metrics.html>`_.
+<http://fuel-plugin-lma-collector.readthedocs.org/en/latest/dev/metrics.html>`_
 for further information about the structure of those messages.
 
 Any backend system that has a *Persister* plugged
@@ -87,7 +87,7 @@ rules. We have tried to make the alarm rules comprehensive and relevant enough
 to cover the most common use cases, but it is possible that your mileage varies
 depending on the specifics of your environment and monitoring requirements.
 It is obviously possible to modify the alarm rules or even create new ones.
-In this case, you will be required to modify the alarmn rules configuration
+In this case, you will be required to modify the alarm rules configuration
 file and reapply the Puppet module that will turn the alarm rules into Lua code
 on each of the nodes you want the change to take effect. This procedure is
 explained below but first you need to know how the alarm rule structure is
