@@ -71,7 +71,9 @@ function process_message()
             details[#details+1] = alarm
         end
     end
-    data['plugin_output'] = table.concat(details, nagios_break_line)
+    -- Nagios cannot accept 'plugin_output' parameter greater than 1024 bytes
+    -- See bug #1517917 for details
+    data['plugin_output'] = lma.truncate(table.concat(details, nagios_break_line), 1024, nagios_break_line)
 
     local params = {}
     for k, v in pairs(data) do

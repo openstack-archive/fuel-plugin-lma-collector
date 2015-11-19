@@ -214,4 +214,25 @@ function chomp(s)
     return string.gsub(s, "\n$", "")
 end
 
+function truncate(str, max_length, delimiter)
+    if string.len(str) <= max_length then
+        return str
+    end
+
+    local pos = 1
+    while true do
+        local next_pos1, next_pos2 = string.find(str, delimiter, pos)
+        if not next_pos1 or next_pos1 - 1 > max_length then
+            pos = pos - string.len(delimiter) - 1
+            if pos < 1 then
+                pos = max_length
+            end
+            break
+        end
+        pos = next_pos2 + 1
+    end
+
+    return string.sub(str, 1, pos)
+end
+
 return M
