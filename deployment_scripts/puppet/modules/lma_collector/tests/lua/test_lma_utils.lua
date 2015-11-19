@@ -60,6 +60,36 @@ TestLmaUtils = {}
         assert(msg:match(': fail'))
     end
 
+    function TestLmaUtils:test_truncate_with_small_string()
+        local ret = lma_utils.truncate('foo', 10, '<BR/>')
+        assertEquals(ret, 'foo')
+    end
+
+    function TestLmaUtils:test_truncate_with_large_string()
+        local ret = lma_utils.truncate('foo and long string', 10, '<BR/>')
+        assertEquals(ret, 'foo and lo')
+    end
+
+    function TestLmaUtils:test_truncate_with_one_delimiter()
+        local ret = lma_utils.truncate('foo<BR/>longstring', 10, '<BR/>')
+        assertEquals(ret, 'foo')
+    end
+
+    function TestLmaUtils:test_truncate_with_several_delimiters_1()
+        local ret = lma_utils.truncate('foo<BR/>bar<BR/>longstring', 10, '<BR/>')
+        assertEquals(ret, 'foo')
+    end
+
+    function TestLmaUtils:test_truncate_with_several_delimiters_2()
+        local ret = lma_utils.truncate('foo<BR/>ba<BR/>longstring', 10, '<BR/>')
+        assertEquals(ret, 'foo<BR/>ba')
+    end
+
+    function TestLmaUtils:test_truncate_with_several_delimiters_3()
+        local ret = lma_utils.truncate('foo<BR/>ba<BR/>long<BR/>string', 12, '<BR/>')
+        assertEquals(ret, 'foo<BR/>ba')
+    end
+
 lu = LuaUnit
 lu:setVerbosity( 1 )
 os.exit( lu:run() )
