@@ -49,7 +49,7 @@ Plugin verification
 Once the OpenStack environment is ready, you may want to check that both
 collectd and hekad processes are running on the controller nodes::
 
-    [root@node-1 ~]# pidof lma_collector
+    [root@node-1 ~]# pidof hekad
     5568
     [root@node-1 ~]# pidof collectd
     5684
