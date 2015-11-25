@@ -12,6 +12,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
+prepare_network_config(hiera('network_scheme', {}))
+$messaging_address = get_network_role_property('mgmt/messaging', 'ipaddr')
+$memcache_address  = get_network_role_property('mgmt/memcache', 'ipaddr')
+
 include lma_collector::params
 
 $ceilometer      = hiera_hash('ceilometer', {})
@@ -42,7 +46,7 @@ if hiera('deployment_mode') =~ /^ha_/ {
 
 # OpenStack notifications are always useful for indexation and metrics collection
 class { 'lma_collector::notifications::controller':
-  host     => hiera('internal_address'),
+  host     => $messaging_address,
   port     => hiera('amqp_port', '5673'),
   user     => $rabbitmq_user,
   password => $rabbit['password'],
@@ -105,7 +109,7 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     keystone_url              => "http://${management_vip}:5000/v2.0",
     haproxy_socket            => $haproxy_socket,
     ceph_enabled              => $ceph_enabled,
-    memcached_host            => hiera('internal_address'),
+    memcached_host            => $memcache_address,
     pacemaker_resources       => [
         'vip__public',
         'vip__management',

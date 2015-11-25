@@ -14,6 +14,8 @@
 #
 # TODO(spasquier): fail if Neutron isn't used
 
+prepare_network_config(hiera('network_scheme', {}))
+$messaging_address = get_network_role_property('mgmt/messaging', 'ipaddr')
 $lma_collector     = hiera_hash('lma_collector')
 $roles             = node_roles(hiera('nodes'), hiera('uid'))
 $is_controller     = member($roles, 'controller') or member($roles, 'primary-controller')
@@ -76,7 +78,7 @@ if $is_controller{
   # Params used by the script.
   $rabbit            = hiera('rabbit')
   $rabbitmq_port     = hiera('amqp_port', '5673')
-  $rabbitmq_host     = hiera('internal_address')
+  $rabbitmq_host     = $messaging_address
   $rabbitmq_user     = 'nova'
   $rabbitmq_password = $rabbit['password']
   $wait_delay        = 30
