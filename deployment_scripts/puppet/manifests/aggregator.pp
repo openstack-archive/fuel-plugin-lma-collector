@@ -12,12 +12,13 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
+prepare_network_config(hiera('network_scheme', {}))
+$mgmt_address   = get_network_role_property('management', 'ipaddr')
 $lma_collector  = hiera_hash('lma_collector')
 $roles          = node_roles(hiera('nodes'), hiera('uid'))
 $is_controller  = member($roles, 'controller') or member($roles, 'primary-controller')
 
 $aggregator_address = hiera('management_vip')
-$internal_address   = hiera('internal_address')
 $management_network = hiera('management_network_range')
 $aggregator_port    = 5565
 $check_port         = 5566
@@ -29,7 +30,7 @@ class { 'lma_collector::aggregator::client':
 
 if $is_controller {
   class { 'lma_collector::aggregator::server':
-    listen_address  => $internal_address,
+    listen_address  => $mgmt_address,
     listen_port     => $aggregator_port,
     http_check_port => $check_port,
   }
@@ -54,7 +55,7 @@ if $is_controller {
     internal_virtual_ip    => $aggregator_address,
     public                 => false,
     public_virtual_ip      => undef,
-    ipaddresses            => [ $internal_address ],
+    ipaddresses            => [ $mgmt_address ],
     server_names           => [ $::hostname ],
   }
 
@@ -62,7 +63,7 @@ if $is_controller {
   firewall { '998 lma':
     port        => [$aggregator_port, $check_port],
     source      => $management_network,
-    destination => $internal_address,
+    destination => $mgmt_address,
     proto       => 'tcp',
     action      => 'accept',
   }
