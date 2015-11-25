@@ -30,5 +30,6 @@ class lma_collector::metrics::heka_monitoring (
     config_dir        => $lma_collector::params::config_dir,
     dashboard_address => $dashboard_address,
     dashboard_port    => $dashboard_port,
+    notify            => Class['lma_collector::service'],
   }
 }

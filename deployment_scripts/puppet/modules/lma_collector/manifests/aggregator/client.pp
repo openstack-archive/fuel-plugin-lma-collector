@@ -16,6 +16,8 @@ class lma_collector::aggregator::client (
   $port                = $lma_collector::params::aggregator_port,
 ) inherits lma_collector::params {
 
+  include lma_collector::service
+
   if $address == undef {
     fail('address parameter should be defined!')
   }
@@ -31,5 +33,6 @@ class lma_collector::aggregator::client (
     use_buffering   => $lma_collector::params::buffering_enabled,
     max_file_size   => $lma_collector::params::buffering_max_file_size,
     message_matcher => $lma_collector::params::aggregator_client_message_matcher,
+    notify          => Class['lma_collector::service'],
   }
 }

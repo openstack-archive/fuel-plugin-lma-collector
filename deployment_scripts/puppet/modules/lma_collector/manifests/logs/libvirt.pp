@@ -44,6 +44,7 @@ class lma_collector::logs::libvirt {
   heka::decoder::sandbox { 'libvirt':
     config_dir => $lma_collector::params::config_dir,
     filename   => "${lma_collector::params::plugins_dir}/decoders/libvirt_log.lua",
+    notify     => Class['lma_collector::service'],
   }
 
   heka::input::logstreamer { 'libvirt':
