@@ -14,11 +14,14 @@
 #
 include lma_collector::params
 
-$ceilometer      = hiera_hash('ceilometer', {})
-$lma_collector   = hiera_hash('lma_collector')
-$rabbit          = hiera_hash('rabbit')
-$management_vip  = hiera('management_vip')
-$storage_options = hiera_hash('storage', {})
+$ceilometer        = hiera_hash('ceilometer', {})
+$lma_collector     = hiera_hash('lma_collector')
+$rabbit            = hiera_hash('rabbit')
+$management_vip    = hiera('management_vip')
+$storage_options   = hiera_hash('storage', {})
+$nodes             = hiera('nodes')
+$_node             = filter_nodes($nodes, 'fqdn', $::fqdn)
+$internal_address  = $_node[0]['internal_address']
 
 if $ceilometer['enabled'] {
   $notification_topics = [$lma_collector::params::openstack_topic, $lma_collector::params::lma_topic]
@@ -42,7 +45,7 @@ if hiera('deployment_mode') =~ /^ha_/ {
 
 # OpenStack notifications are always useful for indexation and metrics collection
 class { 'lma_collector::notifications::controller':
-  host     => hiera('internal_address'),
+  host     => $internal_address,
   port     => hiera('amqp_port', '5673'),
   user     => $rabbitmq_user,
   password => $rabbit['password'],
@@ -105,7 +108,7 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     keystone_url              => "http://${management_vip}:5000/v2.0",
     haproxy_socket            => $haproxy_socket,
     ceph_enabled              => $ceph_enabled,
-    memcached_host            => hiera('internal_address'),
+    memcached_host            => $internal_address,
     pacemaker_resources       => [
         'vip__public',
         'vip__management',
@@ -189,7 +192,7 @@ if $alerting_mode != 'disabled' {
   } elsif $alerting_mode == 'local' {
     $use_nagios = true
     $lma_infra_alerting = hiera_hash('lma_infrastructure_alerting', false)
-    $nagios_nodes = filter_nodes(hiera('nodes'), 'role', 'infrastructure_alerting')
+    $nagios_nodes = filter_nodes($nodes, 'role', 'infrastructure_alerting')
     $nagios_server = $nagios_nodes[0]['internal_address']
     $nagios_user = $lma_infra_alerting['nagios_user']
     $nagios_password = $lma_infra_alerting['nagios_password']

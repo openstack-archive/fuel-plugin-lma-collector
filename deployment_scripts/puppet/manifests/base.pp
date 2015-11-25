@@ -14,18 +14,21 @@
 #
 # TODO(spasquier): fail if Neutron isn't used
 
+$nodes             = hiera('nodes')
+$_node             = filter_nodes($nodes, 'fqdn', $::fqdn)
+$internal_address  = $_node[0]['internal_address']
 $lma_collector     = hiera_hash('lma_collector')
-$roles             = node_roles(hiera('nodes'), hiera('uid'))
+$roles             = node_roles($nodes, hiera('uid'))
 $is_controller     = member($roles, 'controller') or member($roles, 'primary-controller')
 $is_base_os        = member($roles, 'base-os')
 $current_node_name = hiera('user_node_name')
 $current_roles     = hiera('roles')
 
 $elasticsearch_kibana = hiera_hash('elasticsearch_kibana', {})
-$es_nodes = filter_nodes(hiera('nodes'), 'role', 'elasticsearch_kibana')
+$es_nodes = filter_nodes($nodes, 'role', 'elasticsearch_kibana')
 
 $influxdb_grafana = hiera_hash('influxdb_grafana', {})
-$influxdb_nodes = filter_nodes(hiera('nodes'), 'role', 'influxdb_grafana')
+$influxdb_nodes = filter_nodes($nodes, 'role', 'influxdb_grafana')
 
 $tags = {
   deployment_id => hiera('deployment_id'),
@@ -76,7 +79,7 @@ if $is_controller{
   # Params used by the script.
   $rabbit            = hiera('rabbit')
   $rabbitmq_port     = hiera('amqp_port', '5673')
-  $rabbitmq_host     = hiera('internal_address')
+  $rabbitmq_host     = $internal_address
   $rabbitmq_user     = 'nova'
   $rabbitmq_password = $rabbit['password']
   $wait_delay        = 30

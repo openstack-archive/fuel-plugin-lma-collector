@@ -13,11 +13,13 @@
 #    under the License.
 #
 $lma_collector  = hiera_hash('lma_collector')
-$roles          = node_roles(hiera('nodes'), hiera('uid'))
+$nodes          = hiera('nodes')
+$roles          = node_roles($nodes, hiera('uid'))
 $is_controller  = member($roles, 'controller') or member($roles, 'primary-controller')
 
 $aggregator_address = hiera('management_vip')
-$internal_address   = hiera('internal_address')
+$_node              = filter_nodes($nodes, 'fqdn', $::fqdn)
+$internal_address   = $_node[0]['internal_address']
 $management_network = hiera('management_network_range')
 $aggregator_port    = 5565
 $check_port         = 5566
