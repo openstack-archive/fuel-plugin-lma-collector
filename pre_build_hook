@@ -48,10 +48,10 @@ download_packages \
 
 
 # Extract dependent manifests from fuel-library
-rm -rf "${MODULES_DIR:?}"/{cinder,glance,haproxy,heat,keystone,neutron,nova,openstack,osnailyfacter,pacemaker}
+rm -rf "${MODULES_DIR:?}"/{cinder,glance,haproxy,heat,keystone,neutron,nova,openstack,osnailyfacter,pacemaker,l23network}
 wget -qO- "${FUEL_LIB_TARBALL_URL}" | \
     tar -C "${MODULES_DIR}" --strip-components=3 -zxvf - \
-    fuel-library-${FUEL_LIB_COMMIT}/deployment/puppet/{cinder,glance,haproxy,heat,keystone,neutron,nova,openstack,osnailyfacter,pacemaker}
+    fuel-library-${FUEL_LIB_COMMIT}/deployment/puppet/{cinder,glance,haproxy,heat,keystone,neutron,nova,openstack,osnailyfacter,pacemaker,l23network}
 
 download_puppet_module "collectd" "${COLLECTD_TARBALL_URL}"
 download_puppet_module "apache" "${APACHE_TARBALL_URL}"
