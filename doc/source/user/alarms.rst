@@ -236,7 +236,7 @@ Where:
 |       returns the result (true, false) of the Mann-Whitney-Wilcoxon
 |       test function of Heka that can be used with non-normal distributions (not implemented yet)
 |     diff:
-|       returns [TBC]
+|       returns the difference between the last value and the first one
 
 | threshold
 |   Type: float
