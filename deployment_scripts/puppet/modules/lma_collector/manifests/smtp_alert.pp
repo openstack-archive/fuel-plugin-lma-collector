@@ -54,5 +54,6 @@ class lma_collector::smtp_alert (
     user            => $user,
     password        => $password,
     send_interval   => $send_interval,
+    notify          => Class['lma_collector::service'],
   }
 }
