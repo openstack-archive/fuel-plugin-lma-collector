@@ -2,7 +2,7 @@
 set -eux
 
 . "$(dirname "$(readlink -f "$0")")"/functions.sh
-HEKA_VERSION="0.10.0b1"
+HEKA_VERSION="0.10.0b2"
 FUEL_LIB_COMMIT="7.0"
 FUEL_LIB_TARBALL_URL="https://github.com/openstack/fuel-library/archive/${FUEL_LIB_COMMIT}.tar.gz"
 COLLECTD_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppet-collectd-4.1.2.tar.gz"
