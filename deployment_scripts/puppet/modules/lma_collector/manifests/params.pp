@@ -62,9 +62,7 @@ class lma_collector::params {
     }
   }
 
-  # Disable buffering because of a bug in Heka 0.10.0b1, see
-  # https://github.com/mozilla-services/heka/issues/1627 for details
-  $buffering_enabled = false
+  $buffering_enabled = true
 
   # The maximum size of 158Kb was observed during a load test with 50 nodes,
   # this is required by elasticsearch buffered output.
@@ -72,11 +70,10 @@ class lma_collector::params {
   # see https://github.com/mozilla-services/heka/issues/1389
   $hekad_max_message_size = 192*1024
 
-  # max_file_size must be greater than maximum record size of
-  # max_message_size otherwise it will fail to initialize buffer.
-  $buffering_max_file_size = 256*1024
+  # Lets use the default Heka value
+  $buffering_max_file_size = 0
 
-  if $buffering_max_file_size < $hekad_max_message_size {
+  if $buffering_max_file_size != 0 and $buffering_max_file_size < $hekad_max_message_size {
       fail('max_message_size setting must be greater than max_file_size')
   }
 
