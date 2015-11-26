@@ -24,15 +24,30 @@ Attributes in **bold** are always present in the messages while attributes in
 * **Logger** (string), the datasource from the Heka's standpoint, it can be
   ``collectd``, ``notification_processor`` or ``http_log_parser``.
 
-* **Type** (string), either ``metric`` or ``heka.sandbox.metric`` (for metrics
-  derived from other messages).
+* **Type** (string)
 
-* **Severity** (number), it is always equal to 6 (eg INFO).
+ * ``metric`` or ``heka.sandbox.metric`` for the single-value metrics.
+
+ * ``heka.sandbox.multivalue_metric`` for the multi-valued metrics (eg annotations).
+
+ * ``heka.sandbox.bulk_metric`` for the metrics sent by bulk.
+
+ * ``heka.sandbox.afd_service_metric`` for the AFD service metrics.
+
+ * ``heka.sandbox.afd_node_metric`` for the AFD node metrics.
+
+ * ``heka.sandbox.gse_service_cluster_metric`` for the GSE service cluster metrics.
+
+ * ``heka.sandbox.gse_node_cluster_metric`` for the GSE node cluster metrics.
+
+ * ``heka.sandbox.gse_cluster_metric`` for the GSE global cluster metrics.
+
+* **Severity** (number), it is always equal to 6 (INFO).
 
 * **Fields**
 
  * **name** (string), the name of the metric. See :ref:`metric_list` for the
-   current metrics names that are emitted.
+   current metric names that are emitted.
 
  * **value** (number), the value associated to the metric.
 
@@ -115,6 +130,11 @@ Pacemaker
 ---------
 
 .. include:: metrics/pacemaker.rst
+
+Clusters
+--------
+
+.. include:: metrics/clusters.rst
 
 LMA self-monitoring
 -------------------
