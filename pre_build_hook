@@ -14,7 +14,6 @@ FIREWALL_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppetlabs-firewa
 
 download_packages \
     https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka_${HEKA_VERSION}_amd64.deb \
-    https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka-${HEKA_VERSION//./_}-linux-amd64.rpm \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fonts-dejavu/fonts-dejavu-core_2.34-1ubuntu1_all.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fontconfig/fontconfig-config_2.11.0-0ubuntu4.1_all.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fontconfig/libfontconfig1_2.11.0-0ubuntu4.1_amd64.deb \
@@ -37,15 +36,7 @@ download_packages \
     http://mirrors.kernel.org/ubuntu/pool/main/libd/libdbi/libdbi1_0.9.0-1_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/r/rrdtool/librrd4_1.4.7-2ubuntu5_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/universe/c/collectd/collectd_5.4.0-3ubuntu2_amd64.deb \
-    http://mirrors.kernel.org/ubuntu/pool/main/libd/libdbi-drivers/libdbd-mysql_0.9.0-2ubuntu2_amd64.deb \
-    http://mirror.centos.org/centos/6/os/x86_64/Packages/libdbi-0.8.3-4.el6.x86_64.rpm \
-    http://mirror.centos.org/centos/6/os/x86_64/Packages/libdbi-drivers-0.8.3-5.1.el6.x86_64.rpm \
-    http://mirror.centos.org/centos/6/os/x86_64/Packages/libdbi-dbd-mysql-0.8.3-5.1.el6.x86_64.rpm \
-    http://fuel-repository.mirantis.com/fuel-plugins/fuel-plugin-lma-collector/centos/collectd-5.4.1-5.mira1.mira1.x86_64.rpm \
-    http://fuel-repository.mirantis.com/fuel-plugins/fuel-plugin-lma-collector/centos/collectd-apache-5.4.1-5.mira1.mira1.x86_64.rpm \
-    http://fuel-repository.mirantis.com/fuel-plugins/fuel-plugin-lma-collector/centos/collectd-dbi-5.4.1-5.mira1.mira1.x86_64.rpm \
-    http://fuel-repository.mirantis.com/fuel-plugins/fuel-plugin-lma-collector/centos/collectd-mysql-5.4.1-5.mira1.mira1.x86_64.rpm
-
+    http://mirrors.kernel.org/ubuntu/pool/main/libd/libdbi-drivers/libdbd-mysql_0.9.0-2ubuntu2_amd64.deb
 
 # Extract dependent manifests from fuel-library
 rm -rf "${MODULES_DIR:?}"/{cinder,glance,haproxy,heat,keystone,neutron,nova,openstack,osnailyfacter,pacemaker,l23network}
