@@ -47,9 +47,10 @@ Catalog, you need to follow these steps:
 LMA Collector Fuel Plugin install from source
 ---------------------------------------------
 
-Alternatively, you may want to build the RPM file of the plugin from the
-lastest stable release if, for example, you want to modify some built-in
-configuration parameters. But note that this is at your own risk.
+Alternatively, you may want to build the RPM file of the plugin from source
+if, for example, you want to test the latest features, modify some built-in
+configuration or implement your own customization.
+But note that running a Fuel plugin that you have built yourself is at your own risk.
 
 To install LMA Collector Plugin from source, you first need to prepare an
 environement to build the RPM file.
