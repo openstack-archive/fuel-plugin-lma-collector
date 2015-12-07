@@ -55,7 +55,9 @@ For instance, lets take the following Heka message::
     :Pid: 15595
     :Uuid: e67f91c5-259b-489f-adfa-8eea0b389eb2
     :Logger: collectd
-    :Payload: {"type":"cpu","values":[0],"type_instance":"idle","dsnames":["value"],"plugin":"cpu","time":1442333737.646,"interval":10,"host":"node-1","dstypes":["derive"],"plugin_instance":"0"}
+    :Payload: {"type":"cpu","values":[0],"type_instance":"idle","dsnames":["value"],
+              "plugin":"cpu","time":1442333737.646,"interval":10,"host":"node-1",
+              "dstypes":["derive"],"plugin_instance":"0"}
     :EnvVersion:
     :Severity: 6
     :Fields:

@@ -261,3 +261,8 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+# make latex stop printing blank pages between sections
+# http://stackoverflow.com/questions/5422997/sphinx-docs-remove-blank-pages-from-generated-pdfs
+latex_elements = {'classoptions': ',openany,oneside', 'babel':
+                  '\\usepackage[english]{babel}'}
