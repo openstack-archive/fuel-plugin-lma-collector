@@ -19,7 +19,15 @@ describe 'lma_collector::logs::swift' do
          :osfamily => 'Debian'}
     end
 
-    describe 'with defaults' do
-        it { is_expected.to contain_heka__input__logstreamer('swift') }
+    describe 'without file_match' do
+        it { is_expected.to raise_error(Puppet::Error, /must pass file_match/i) }
+    end
+
+    describe 'with file_match => "swift\.log$"' do
+        let(:params) do
+            {:file_match => 'swift\.log$'}
+        end
+        it {is_expected.to contain_heka__input__logstreamer('swift') \
+            .with_file_match('swift\.log$') }
     end
 end

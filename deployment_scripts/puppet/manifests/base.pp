@@ -45,10 +45,14 @@ else {
   $additional_tags = {}
 }
 
-if hiera('deployment_mode') =~ /^ha_/ and $is_controller {
-  $additional_groups = ['haclient']
-  $pacemaker_managed = true
-  $rabbitmq_resource = 'master_p_rabbitmq-server'
+if $is_controller {
+  if hiera('deployment_mode') =~ /^ha_/ {
+    $additional_groups = ['haclient', 'keystone']
+    $pacemaker_managed = true
+    $rabbitmq_resource = 'master_p_rabbitmq-server'
+  } else {
+    $additional_groups = ['keystone']
+  }
 }else{
   $additional_groups = []
   $pacemaker_managed = false

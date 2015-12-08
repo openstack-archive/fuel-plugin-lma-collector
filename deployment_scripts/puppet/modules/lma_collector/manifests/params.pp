@@ -41,6 +41,7 @@ class lma_collector::params {
 
   $tags = {}
 
+  $log_directory = '/var/log'
   $syslog_pattern = '<%PRI%>%TIMESTAMP% %HOSTNAME% %syslogtag%%msg:::sp-if-no-1st-sp%%msg%\n'
   # same pattern except the <PRI> tag
   $fallback_syslog_pattern = '%TIMESTAMP% %HOSTNAME% %syslogtag%%msg:::sp-if-no-1st-sp%%msg%\n'
@@ -48,6 +49,8 @@ class lma_collector::params {
   # required to read the log files
   case $::osfamily {
     'Debian': {
+      # "keystone" group required to be able to read log files located
+      # in /var/log/keystone
       $run_as_root = false
       $groups = ['syslog', 'adm']
     }

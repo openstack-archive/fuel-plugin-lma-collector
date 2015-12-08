@@ -18,9 +18,8 @@ $ceilometer    = hiera_hash('ceilometer', {})
 $lma_collector = hiera_hash('lma_collector')
 
 if $lma_collector['elasticsearch_mode'] != 'disabled' {
-
-  class { 'lma_collector::logs::openstack_7_0': }
-
+  lma_collector::logs::openstack { 'nova': }
+  lma_collector::logs::openstack { 'neutron': }
   class { 'lma_collector::logs::libvirt': }
 }
 
