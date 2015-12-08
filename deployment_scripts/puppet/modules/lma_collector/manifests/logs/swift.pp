@@ -12,13 +12,39 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-class lma_collector::logs::swift {
-  include lma_collector::params
+
+#
+# == Class lma_collector::logs::swift
+#
+# Class that configures Heka for reading Swift logs.
+#
+# The following rsyslog pattern is assumed:
+#
+# <%PRI%>%TIMESTAMP% %HOSTNAME% %syslogtag%%msg:::sp-if-no-1st-sp%%msg%\n
+#
+# Swift only uses syslog and doesn't add its logs to log files located in a
+# /var/log/swift/ directory as other OpenStack services do. So we make Swift a
+# special case and assume rsyslog is used.
+#
+# === Parameters:
+#
+# [*file_match*]
+#   (mandatory) The log file name pattern. Example: 'swift\.log$'.
+#
+# [*log_directory*]
+#   (optional) The log directory. Default is /var/log.
+#
+class lma_collector::logs::swift (
+  $file_match,
+  $log_directory = $lma_collector::params::log_directory,
+) inherits lma_collector::params {
   include lma_collector::service
+
+  # Note: syslog_pattern could be made configurable in the future.
 
   heka::decoder::sandbox { 'swift':
     config_dir => $lma_collector::params::config_dir,
-    filename   => "${lma_collector::params::plugins_dir}/decoders/generic_syslog.lua" ,
+    filename   => "${lma_collector::params::plugins_dir}/decoders/generic_syslog.lua",
     config     => {
       syslog_pattern          => $lma_collector::params::syslog_pattern,
       fallback_syslog_pattern => $lma_collector::params::fallback_syslog_pattern
@@ -29,8 +55,9 @@ class lma_collector::logs::swift {
   heka::input::logstreamer { 'swift':
     config_dir     => $lma_collector::params::config_dir,
     decoder        => 'swift',
-    file_match     => 'swift-all\.log$',
-    differentiator => '[ \'openstack.swift\' ]',
+    log_directory  => $log_directory,
+    file_match     => $file_match,
+    differentiator => '[\'openstack.swift\']',
     require        => Heka::Decoder::Sandbox['swift'],
     notify         => Class['lma_collector::service'],
   }
