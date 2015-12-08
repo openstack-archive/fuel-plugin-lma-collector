@@ -11,23 +11,19 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+#
+
 require 'spec_helper'
 
-describe 'lma_collector::logs::swift' do
+describe 'lma_collector::logs::openstack_decoder_splitter' do
     let(:facts) do
         {:kernel => 'Linux', :operatingsystem => 'Ubuntu',
          :osfamily => 'Debian'}
     end
 
     describe 'without file_match' do
-        it { is_expected.to raise_error(Puppet::Error, /must pass file_match/i) }
-    end
-
-    describe 'with file_match => "swift\.log$"' do
-        let(:params) do
-            {:file_match => 'swift\.log$'}
-        end
-        it {is_expected.to contain_heka__input__logstreamer('swift') \
-            .with_file_match('swift\.log$') }
+        it { is_expected.to contain_heka__decoder__sandbox('openstack') }
+        it { is_expected.to contain_heka__splitter__token('openstack') \
+            .with_delimiter('\n') }
     end
 end

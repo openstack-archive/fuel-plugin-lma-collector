@@ -12,12 +12,10 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 require "string"
-local dt     = require "date_time"
 local l      = require 'lpeg'
 l.locale(l)
 
-local syslog = require "syslog"
-local patt   = require 'patterns'
+local patt = require 'patterns'
 local utils  = require 'lma_utils'
 
 local msg = {
@@ -30,27 +28,35 @@ local msg = {
     Severity    = nil,
 }
 
-local syslog_pattern = read_config("syslog_pattern") or error("syslog_pattern configuration must be specified")
-local syslog_grammar = syslog.build_rsyslog_grammar(syslog_pattern)
-
-local sp    = l.space
-local colon = l.P":"
+local sp   = patt.sp
+local dash = patt.dash
 local dot   = l.P'.'
 local quote = l.P'"'
+
+-- OpenStack log messages are of this form:
+-- 2015-11-30 08:38:59.306 3434 INFO oslo_service.periodic_task [-] Blabla...
+--
+-- [-] is the "request" part, it can take multiple forms, see below.
 
 local timestamp = l.Cg(patt.Timestamp, "Timestamp")
 local pid       = l.Cg(patt.Pid, "Pid")
 local severity  = l.Cg(patt.SeverityLabel, "SeverityLabel")
 local message   = l.Cg(patt.Message, "Message")
 
--- Horizon logs have no colon after the severity level
-local openstack_grammar = l.Ct(timestamp * sp * pid * sp * severity * colon^-1 * sp * message)
+local openstack_grammar = l.Ct(timestamp * sp * pid * sp * severity * sp *
+    patt.programname * sp * message)
 
--- the RequestId string is enclosed between square brackets and it may be
--- prefixed by other stuff like the Python module name.
--- RequestId may be formatted as 'req-xxx' or 'xxx' depending on the project.
--- UserId and TenantId may not be present depending on the OpenStack release.
-local request_grammar = (l.P(1) - "[" )^0 * "[" * l.P"req-"^-1 * l.Ct(l.Cg(patt.Uuid, "RequestId") * sp * ((l.Cg(patt.Uuid, "UserId") * sp * l.Cg(patt.Uuid, "TenantId")) + l.P(1)^0)) - "]"
+-- The OpenStack Request context is enclosed between square brackets. It takes one of these forms:
+--
+-- [-]
+-- [req-0fd2a9ba-448d-40f5-995e-33e32ac5a6ba - - - - -]
+-- [req-4db318af-54c9-466d-b365-fe17fe4adeed 8206d40abcc3452d8a9c1ea629b4a8d0 - - - -]
+-- [req-4db318af-54c9-466d-b365-fe17fe4adeed 8206d40abcc3452d8a9c1ea629b4a8d0 112245730b1f4858ab62e3673e1ee9e2 - - -]
+--
+-- The request id  may be formatted as 'req-xxx' or 'xxx' depending on the project.
+-- The user id and tenant id may not be present depending on the OpenStack release.
+local request_grammar = (l.P(1) - "[" )^0 * "[" * l.P"req-"^-1 * l.Ct(l.Cg(patt.Uuid, "RequestId") *
+    sp * ((l.Cg(patt.Uuid, "UserId") * sp * l.Cg(patt.Uuid, "TenantId")) + l.P(1)^0)) - "]"
 
 -- Grammar for parsing HTTP response attributes from OpenStack logs
 local http_method = l.Cg(l.R"AZ"^3, "http_method")
@@ -76,27 +82,40 @@ local ip_address_grammar = patt.anywhere(l.Ct(
 ))
 
 function process_message ()
+
+    -- Logger is of form "<service>/<program>" (e.g. "nova/nova-api",
+    -- "neutron/l3-agent").
+    local logger = read_message("Logger")
+    local service, program = string.match(logger, '([^/]+)/(.+)')
+
     local log = read_message("Payload")
     local m
 
-    msg.Fields = {}
-    if utils.parse_syslog_message(syslog_grammar, log, msg) then
-        m = openstack_grammar:match(msg.Payload)
-        if m then
-            if m.Pid then msg.Pid = m.Pid end
-            if m.Timestamp then msg.Timestamp = m.Timestamp end
-            msg.Payload = m.Message
-            msg.Fields.severity_label = m.SeverityLabel
-        end
-    else
-        return -1
+    m = openstack_grammar:match(log)
+    if not m then
+        return -1, string.format("Failed to parse %s log: %s", program, string.sub(log, 1, 64))
     end
+
+    -- Change Logger to the form "openstack.<service>" (e.g. "openstack.nova")
+    msg.Logger = 'openstack.' .. service
+
+    msg.Timestamp = m.Timestamp
+    msg.Payload = m.Message
+    msg.Pid = m.Pid
+    msg.Severity = utils.label_to_severity_map[m.SeverityLabel] or 7
+    msg.Fields = {}
+    msg.Fields.severity_label = m.SeverityLabel
+    msg.Fields.programname = program
 
     m = request_grammar:match(msg.Payload)
     if m then
         msg.Fields.request_id = m.RequestId
-        if m.UserId then msg.Fields.user_id = m.UserId end
-        if m.TenantId then msg.Fields.tenant_id = m.TenantId end
+        if m.UserId then
+          msg.Fields.user_id = m.UserId
+        end
+        if m.TenantId then
+          msg.Fields.tenant_id = m.TenantId
+        end
     end
 
     m = http_grammar:match(msg.Payload)
@@ -113,5 +132,6 @@ function process_message ()
         end
     end
 
+    utils.inject_tags(msg)
     return utils.safe_inject_message(msg)
 end
