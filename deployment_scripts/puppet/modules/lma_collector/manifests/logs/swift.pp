@@ -12,7 +12,25 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-class lma_collector::logs::swift {
+# Class lma_collector::logs::swift
+#
+# Class that configures Heka for reading Swift logs.
+#
+# The following rsyslog pattern is used:
+#
+# <%PRI%>%TIMESTAMP% %HOSTNAME% %syslogtag%%msg:::sp-if-no-1st-sp%%msg%\n
+#
+# Swift doesn't add its logs to log files located in /var/log/swift/ as other
+# OpenStack services. So we make Swift a special case and assume rsyslog is used.
+#
+# == Parameters:
+#
+# [*file_match*]
+#   (optional) The log file name pattern. Default is 'swift\.log$'.
+#
+class lma_collector::logs::swift (
+  $file_match = 'swift\.log$',
+) {
   include lma_collector::params
   include lma_collector::service
 
@@ -29,7 +47,7 @@ class lma_collector::logs::swift {
   heka::input::logstreamer { 'swift':
     config_dir     => $lma_collector::params::config_dir,
     decoder        => 'swift',
-    file_match     => 'swift-all\.log$',
+    file_match     => $file_match,
     differentiator => '[ \'openstack.swift\' ]',
     require        => Heka::Decoder::Sandbox['swift'],
     notify         => Class['lma_collector::service'],

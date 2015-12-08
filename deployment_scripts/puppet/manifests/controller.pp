@@ -23,6 +23,7 @@ $lma_collector   = hiera_hash('lma_collector')
 $rabbit          = hiera_hash('rabbit')
 $management_vip  = hiera('management_vip')
 $storage_options = hiera_hash('storage', {})
+$murano          = hiera_hash('murano')
 
 if $ceilometer['enabled'] {
   $notification_topics = [$lma_collector::params::openstack_topic, $lma_collector::params::lma_topic]
@@ -54,10 +55,21 @@ class { 'lma_collector::notifications::controller':
 }
 
 # OpenStack logs are always useful for indexation and metrics collection
-class { 'lma_collector::logs::openstack_7_0': }
+#class { 'lma_collector::logs::openstack_7_0': }
 
+lma_collector::logs::openstack { 'nova': }
+lma_collector::logs::openstack { 'neutron': }
+lma_collector::logs::openstack { 'keystone': }
+lma_collector::logs::openstack { 'cinder': }
+lma_collector::logs::openstack { 'glance': }
+lma_collector::logs::openstack { 'heat': }
+if $murano['enabled'] {
+  lma_collector::logs::openstack { 'murano': }
+}
 if ! $storage_options['objects_ceph'] {
-  class { 'lma_collector::logs::swift': }
+  class { 'lma_collector::logs::swift':
+    file_match => 'swift-all\.log$',
+  }
 }
 
 # Logs
