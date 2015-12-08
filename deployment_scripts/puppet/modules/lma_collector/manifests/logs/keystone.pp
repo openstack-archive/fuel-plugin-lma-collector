@@ -14,49 +14,47 @@
 #
 
 #
-# == Class lma_collector::logs::swift
+# == Class lma_collector::logs::keystone
 #
-# Class that configures Heka for reading Swift logs.
+# Class that configures Heka for reading Keystone logs.
 #
 # The following rsyslog pattern is assumed:
 #
 # <%PRI%>%TIMESTAMP% %HOSTNAME% %syslogtag%%msg:::sp-if-no-1st-sp%%msg%\n
 #
-# Swift only uses syslog and doesn't add its logs to log files located in a
-# /var/log/swift/ directory as other OpenStack services do. So we make Swift a
-# special case and assume rsyslog is used.
+# We rely on syslog for Keystone because /var/log/keystone is owned by the
+# keystone user and we do not have permission to read from that file.
 #
 # === Parameters:
 #
 # [*file_match*]
-#   (mandatory) The log file name pattern. Example: 'swift\.log$'.
+#   (mandatory) The log file name pattern. Example: 'keystone\.log$'.
 #
 # [*log_directory*]
 #   (optional) The log directory. Default is /var/log.
 #
-class lma_collector::logs::swift (
+class lma_collector::logs::keystone (
   $file_match,
   $log_directory = $lma_collector::params::log_directory,
 ) inherits lma_collector::params {
+
   include lma_collector::service
 
-  heka::decoder::sandbox { 'swift':
+  heka::decoder::sandbox { 'keystone':
     config_dir => $lma_collector::params::config_dir,
-    filename   => "${lma_collector::params::plugins_dir}/decoders/generic_syslog.lua",
+    filename   => "${lma_collector::params::plugins_dir}/decoders/keystone_7_0_log.lua" ,
     config     => {
-      syslog_pattern          => $lma_collector::params::syslog_pattern,
-      fallback_syslog_pattern => $lma_collector::params::fallback_syslog_pattern
+      syslog_pattern => $lma_collector::params::syslog_pattern
     },
     notify     => Class['lma_collector::service'],
   }
 
-  heka::input::logstreamer { 'swift':
+  heka::input::logstreamer { 'keystone':
     config_dir     => $lma_collector::params::config_dir,
-    decoder        => 'swift',
-    log_directory  => $log_directory,
+    decoder        => 'keystone',
     file_match     => $file_match,
-    differentiator => '[\'openstack.swift\']',
-    require        => Heka::Decoder::Sandbox['swift'],
+    differentiator => '[\'openstack.keystone\']',
+    require        => Heka::Decoder::Sandbox['keystone'],
     notify         => Class['lma_collector::service'],
   }
 }
