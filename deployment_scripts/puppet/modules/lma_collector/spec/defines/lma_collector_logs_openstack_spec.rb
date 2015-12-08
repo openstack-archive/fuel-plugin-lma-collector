@@ -12,23 +12,17 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-include lma_collector::params
 
-$ceilometer    = hiera_hash('ceilometer', {})
-$lma_collector = hiera_hash('lma_collector')
+require 'spec_helper'
 
-if $lma_collector['elasticsearch_mode'] != 'disabled' {
-  lma_collector::logs::openstack { 'cinder': }
-}
+describe "lma_collector::logs::openstack" do
+    let(:facts) do
+        {:kernel => 'Linux', :operatingsystem => 'Ubuntu',
+         :osfamily => 'Debian'}
+    end
 
-if $ceilometer['enabled'] {
-  $notification_topics = [$lma_collector::params::openstack_topic, $lma_collector::params::lma_topic]
-}
-else {
-  $notification_topics = [$lma_collector::params::lma_topic]
-}
-
-# OpenStack notifcations are always useful for indexation and metrics collection
-class { 'lma_collector::notifications::cinder':
-  topics  => $notification_topics,
-}
+    describe "with title" do
+        let(:title) { :nova }
+        it { is_expected.to contain_heka__input__logstreamer('nova') }
+    end
+end
