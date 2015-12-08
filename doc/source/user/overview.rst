@@ -96,3 +96,9 @@ Limitations
 
 The plugin is only compatible with OpenStack environments deployed with Neutron
 as the networking configuration.
+
+The log and notification messages aren't buffered anymore by the LMA collector service
+before being sent to Elasticsearch (see `#1488717
+<https://bugs.launchpad.net/fuel-plugins/+bug/1488717>`_ for details). This
+means that the data may be lost when the Elasticsearch server is
+unreachable. It will be fixed in a future maintenance release of the plugin.
