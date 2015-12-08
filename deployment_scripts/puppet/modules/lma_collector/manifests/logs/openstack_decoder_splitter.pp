@@ -11,23 +11,20 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-require 'spec_helper'
+#
+class lma_collector::logs::openstack_decoder_splitter {
+  include lma_collector::params
+  include lma_collector::service
 
-describe 'lma_collector::logs::swift' do
-    let(:facts) do
-        {:kernel => 'Linux', :operatingsystem => 'Ubuntu',
-         :osfamily => 'Debian'}
-    end
+  heka::decoder::sandbox { 'openstack':
+    config_dir => $lma_collector::params::config_dir,
+    filename   => "${lma_collector::params::plugins_dir}/decoders/_openstack_log.lua",
+    notify     => Class['lma_collector::service'],
+  }
 
-    describe 'without file_match' do
-        it { is_expected.to raise_error(Puppet::Error, /must pass file_match/i) }
-    end
-
-    describe 'with file_match => "swift\.log$"' do
-        let(:params) do
-            {:file_match => 'swift\.log$'}
-        end
-        it {is_expected.to contain_heka__input__logstreamer('swift') \
-            .with_file_match('swift\.log$') }
-    end
-end
+  heka::splitter::token { 'openstack':
+    config_dir => $lma_collector::params::config_dir,
+    delimiter  => '\n',
+    notify     => Class['lma_collector::service'],
+  }
+}
