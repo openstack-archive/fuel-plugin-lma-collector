@@ -13,7 +13,7 @@
 #    under the License.
 require 'spec_helper'
 
-describe 'lma_collector::logs::swift' do
+describe 'lma_collector::logs::keystone' do
     let(:facts) do
         {:kernel => 'Linux', :operatingsystem => 'Ubuntu',
          :osfamily => 'Debian'}
@@ -23,11 +23,11 @@ describe 'lma_collector::logs::swift' do
         it { is_expected.to raise_error(Puppet::Error, /must pass file_match/i) }
     end
 
-    describe 'with file_match => "swift\.log$"' do
+    describe 'with file_match => "keystone\.log$"' do
         let(:params) do
-            {:file_match => 'swift\.log$'}
+            {:file_match => 'keystone\.log$'}
         end
-        it {is_expected.to contain_heka__input__logstreamer('swift') \
-            .with_file_match('swift\.log$') }
+        it {is_expected.to contain_heka__input__logstreamer('keystone') \
+            .with_file_match('keystone\.log$') }
     end
 end
