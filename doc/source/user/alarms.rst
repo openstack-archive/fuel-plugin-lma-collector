@@ -387,7 +387,8 @@ defines the default status in case none of the previous rules could be matched.
 
 A policy rule is defined as shown in the example below::
 
-   # The following rule definition reads as: "the cluster's status is critical if more than 50% of its members are either down or criticial"
+   # The following rule definition reads as: "the cluster's status is critical
+   # if more than 50% of its members are either down or criticial"
    - status: critical
      trigger:
        logical_operator: or
