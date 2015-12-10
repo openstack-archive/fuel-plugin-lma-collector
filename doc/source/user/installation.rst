@@ -30,19 +30,19 @@ Catalog, you need to follow these steps:
 
 2. Copy the RPM file to the Fuel Master node::
 
-    [root@home ~]# scp lma_collector-0.8-0.8.0-1.noarch.rpm \
+    [root@home ~]# scp lma_collector-0.9-0.9.0-1.noarch.rpm \
     root@<Fuel Master node IP address>:
 
 3. Install the plugin using the `Fuel CLI <http://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#using-fuel-cli>`_::
 
-    [root@fuel ~]# fuel plugins --install lma_collector-0.8-0.8.0-1.noarch.rpm
+    [root@fuel ~]# fuel plugins --install lma_collector-0.9-0.9.0-1.noarch.rpm
 
 4. Verify that the plugin is installed correctly::
 
     [root@fuel ~]# fuel plugins --list
     id | name                 | version | package_version
     ---|----------------------|---------|----------------
-    1  | lma_collector        | 0.8.0   | 2.0.0
+    1  | lma_collector        | 0.9.0   | 2.0.0
 
 
 LMA Collector Fuel Plugin install from source
