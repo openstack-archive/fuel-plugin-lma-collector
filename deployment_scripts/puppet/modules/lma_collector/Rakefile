@@ -34,8 +34,15 @@ end
 LUA_TESTS = Rake::FileList.new("tests/**/test_*.lua")
 desc "Run Lua unit tests."
 task :lua_tests => [:lua_libraries, :lib_cbuf] do |t|
+    verbose(false) do
+        sh "lua5.1", "-e", "require('lpeg')" do |ok, res|
+            if ! ok then
+                raise "Please install the Lua LPEG package by running: apt-get install lua-lpeg"
+            end
+        end
+    end
     LUA_TESTS.each do |f|
-        sh "lua5.1 #{f}"
+        sh "lua5.1", f
     end
 end
 
