@@ -17,6 +17,7 @@ class lma_collector::collectd::base (
   $process_matches = undef,
   $queue_limit = $lma_collector::params::collectd_queue_limit,
   $read_threads = $lma_collector::params::collectd_read_threads,
+  $hostname = undef,
 ){
   include lma_collector::params
   include lma_collector::service
@@ -109,9 +110,18 @@ class lma_collector::collectd::base (
     content => "${lma_collector::params::collectd_logfile} {\n  daily\n  missingok\n}"
   }
 
+  if $hostname {
+    $real_hostname = $hostname
+  }
+  else {
+    $real_hostname = $::hostname
+  }
   heka::decoder::sandbox { 'collectd':
     config_dir => $lma_collector::params::config_dir,
     filename   => "${lma_collector::params::plugins_dir}/decoders/collectd.lua" ,
+    config     => {
+      hostname => $real_hostname
+    },
     notify     => Class['lma_collector::service'],
   }
 
