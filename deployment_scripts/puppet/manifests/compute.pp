@@ -19,7 +19,7 @@ $lma_collector = hiera_hash('lma_collector')
 
 if $lma_collector['elasticsearch_mode'] != 'disabled' {
 
-  class { 'lma_collector::logs::openstack': }
+  class { 'lma_collector::logs::openstack_7_0': }
 
   class { 'lma_collector::logs::libvirt': }
 }
