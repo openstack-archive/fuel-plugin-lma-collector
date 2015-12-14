@@ -31,6 +31,10 @@ local processes_map = {
     ps_vm = 'memory_virtual',
 }
 
+-- this is needed for the libvirt metrics because in that case, collectd sends
+-- the instance's ID instead of the hostname in the 'host' attribute
+local hostname = read_config('hostname') or error('hostname must be specified')
+
 function replace_dot_by_sep (str)
     return string.gsub(str, '%.', sep)
 end
@@ -325,6 +329,29 @@ function process_message ()
             elseif metric_source ==  'users' then
                 -- 'users' is a reserved name for InfluxDB v0.9
                 msg['Fields']['name'] = 'logged_users'
+            elseif metric_source ==  'libvirt' then
+                -- collectd sends the instance's ID in the 'host' field
+                msg['Fields']['instance_id'] = sample['host']
+                msg['Fields']['tag_fields'] = { 'instance_id' }
+                msg['Fields']['hostname'] = hostname
+                msg['Hostname'] = hostname
+                if string.match(sample['type'], '^disk_') then
+                    msg['Fields']['name'] = 'virt' .. sep .. sample['type'] .. sep .. sample['dsnames'][i]
+                    msg['Fields']['device'] = sample['type_instance']
+                    msg['Fields']['tag_fields'][2] = 'device'
+                elseif string.match(sample['type'], '^if_') then
+                    msg['Fields']['name'] = 'virt' .. sep .. sample['type'] .. sep .. sample['dsnames'][i]
+                    msg['Fields']['interface'] = sample['type_instance']
+                    msg['Fields']['tag_fields'][2] = 'interface'
+                elseif sample['type'] == 'virt_cpu_total' then
+                    msg['Fields']['name'] = 'virt_cpu_time'
+                elseif sample['type'] == 'virt_vcpu' then
+                    msg['Fields']['name'] = 'virt_vcpu_time'
+                    msg['Fields']['vcpu_number'] = sample['type_instance']
+                    msg['Fields']['tag_fields'][2] = 'vcpu_number'
+                else
+                    msg['Fields']['name'] = 'virt' .. sep .. metric_name
+                end
             else
                 msg['Fields']['name'] = replace_dot_by_sep(metric_name)
             end

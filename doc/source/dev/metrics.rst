@@ -115,6 +115,12 @@ Memcached
 
 .. include:: metrics/memcached.rst
 
+Libvirt
+-------
+
+.. include:: metrics/libvirt.rst
+
+
 OpenStack
 ---------
 
