@@ -133,4 +133,7 @@ ip_address = anywhere(l.Ct(
     l.Cg(l.digit^-3 * dot * l.digit^-3 * dot * l.digit^-3 * dot * l.digit^-3, "ip_address")
 ))
 
+-- Pattern used to match the beginning of a Python Traceback
+traceback = l.P'Traceback (most recent call last):'
+
 return M
