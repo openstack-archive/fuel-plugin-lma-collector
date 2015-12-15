@@ -12,11 +12,13 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 require "string"
+require "table"
 local l      = require 'lpeg'
 l.locale(l)
 
 local patt = require 'patterns'
 local utils  = require 'lma_utils'
+local table_utils = require 'table_utils'
 
 local msg = {
     Timestamp   = nil,
@@ -27,6 +29,27 @@ local msg = {
     Fields      = nil,
     Severity    = nil,
 }
+
+-- traceback_lines is a reference to a table used to accumulate lines of
+-- a Traceback. traceback_key represent the key of the Traceback lines
+-- being accumulated in traceback_lines. This is used to know when to
+-- stop accumulating and inject the Heka message.
+local traceback_key = nil
+local traceback_lines = nil
+
+function prepare_message (service, timestamp, pid, severity_label,
+        python_module, programname, payload)
+    msg.Logger = 'openstack.' .. service
+    msg.Timestamp = timestamp
+    msg.Payload = payload
+    msg.Pid = pid
+    msg.Severity = utils.label_to_severity_map[severity_label] or 7
+    msg.Fields = {}
+    msg.Fields.severity_label = severity_label
+    msg.Fields.python_module = python_module
+    msg.Fields.programname = programname
+    msg.Payload = payload
+end
 
 -- OpenStack log messages are of this form:
 -- 2015-11-30 08:38:59.306 3434 INFO oslo_service.periodic_task [-] Blabla...
@@ -48,17 +71,48 @@ function process_message ()
         return -1, string.format("Failed to parse %s log: %s", logger, string.sub(log, 1, 64))
     end
 
-    -- Change Logger to the form "openstack.<service>" (e.g. "openstack.nova")
-    msg.Logger = 'openstack.' .. service
+    local key = {
+        Timestamp     = m.Timestamp,
+        Pid           = m.Pid,
+        SeverityLabel = m.SeverityLabel,
+        PythonModule  = m.PythonModule,
+        service       = service,
+        program       = program,
+    }
 
-    msg.Timestamp = m.Timestamp
-    msg.Payload = m.Message
-    msg.Pid = m.Pid
-    msg.Severity = utils.label_to_severity_map[m.SeverityLabel] or 7
-    msg.Fields = {}
-    msg.Fields.severity_label = m.SeverityLabel
-    msg.Fields.python_module = m.PythonModule
-    msg.Fields.programname = program
+    if traceback_key ~= nil then
+        -- If traceback_key is not nil then it means we've started accumulated
+        -- lines of a Python traceback. We keep accumulating the traceback
+        -- lines util we get a different log key.
+        if table_utils.table_equal(traceback_key, key) then
+            table.insert(traceback_lines, m.Message)
+            return 0
+        else
+            prepare_message(traceback_key.service, traceback_key.Timestamp,
+                traceback_key.Pid, traceback_key.SeverityLabel,
+                traceback_key.PythonModule, traceback_key.program,
+                table.concat(traceback_lines, ''))
+            traceback_key = nil
+            traceback_lines = nil
+            utils.inject_tags(msg)
+            local ret_val, err_msg = utils.safe_inject_message(msg)
+            if ret_val == -1 then
+                return ret_val, err_msg
+            end
+        end
+    end
+
+    if patt.traceback:match(m.Message) then
+        -- Python traceback detected, begin accumulating the lines making
+        -- up the traceback.
+        traceback_key = key
+        traceback_lines = {}
+        table.insert(traceback_lines, m.Message)
+        return 0
+    end
+
+    prepare_message(service, m.Timestamp, m.Pid, m.SeverityLabel, m.PythonModule,
+        program, m.Message)
 
     m = patt.openstack_request_context:match(msg.Payload)
     if m then
