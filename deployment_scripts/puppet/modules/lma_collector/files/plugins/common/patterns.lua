@@ -16,6 +16,8 @@ local dt     = require "date_time"
 local l      = require 'lpeg'
 l.locale(l)
 
+local tonumber = tonumber
+
 local M = {}
 setfenv(1, M) -- Remove external access to contain everything in the module
 
@@ -32,6 +34,8 @@ end
 sp = l.space
 colon = l.P":"
 dash = l.P"-"
+dot = l.P'.'
+quote = l.P'"'
 
 local x4digit = l.xdigit * l.xdigit * l.xdigit * l.xdigit
 local uuid_dash = l.C(x4digit * x4digit * dash * x4digit * dash * x4digit * dash * x4digit * dash * x4digit * x4digit * x4digit)
@@ -63,5 +67,74 @@ programname   = (l.R("az", "AZ", "09") + l.P"." + dash + l.P"_")^1
 Pid           = l.digit^1
 SeverityLabel = l.P"CRITICAL" + l.P"ERROR" + l.P"WARNING" + l.P"INFO" + l.P"AUDIT" + l.P"DEBUG"
 Message       = l.P(1)^0
+
+local timestamp = l.Cg(Timestamp, "Timestamp")
+local pid       = l.Cg(Pid, "Pid")
+local severity  = l.Cg(SeverityLabel, "SeverityLabel")
+local message   = l.Cg(Message, "Message")
+
+-- Capture for OpenStack logs producing four values: Timestamp, Pid,
+-- SeverityLabel and Message.
+--
+-- OpenStack log messages are of this form:
+-- 2015-11-30 08:38:59.306 3434 INFO oslo_service.periodic_task [-] Blabla...
+--
+-- [-] is the "request" part, it can take multiple forms. See below.
+openstack = l.Ct(timestamp * sp * pid * sp * severity * sp * programname
+    * sp * message)
+
+-- Capture for OpenStack request context producing three values: RequestId,
+-- UserId and TenantId.
+--
+-- Notes:
+--
+-- OpenStack logs include a request context, enclosed between square brackets.
+-- It takes one of these forms:
+--
+-- [-]
+-- [req-0fd2a9ba-448d-40f5-995e-33e32ac5a6ba - - - - -]
+-- [req-4db318af-54c9-466d-b365-fe17fe4adeed 8206d40abcc3452d8a9c1ea629b4a8d0 112245730b1f4858ab62e3673e1ee9e2 - - -]
+--
+-- In the 1st case the capture produces nil.
+-- In the 2nd case the capture produces one value: RequestId.
+-- In the 3rd case the capture produces three values: RequestId, UserId, TenantId.
+--
+-- The request id  may be formatted as 'req-xxx' or 'xxx' depending on the project.
+-- The user id and tenant id may not be present depending on the OpenStack release.
+openstack_request_context = (l.P(1) - "[" )^0 * "[" * l.P"req-"^-1 *
+    l.Ct(l.Cg(Uuid, "RequestId") * sp * ((l.Cg(Uuid, "UserId") * sp *
+    l.Cg(Uuid, "TenantId")) + l.P(1)^0)) - "]"
+
+local http_method = l.Cg(l.R"AZ"^3, "http_method")
+local url = l.Cg( (1 - sp)^1, "http_url")
+local http_version = l.Cg(l.digit * dot * l.digit, "http_version")
+
+-- Patterns for HTTP status, HTTP response size and HTTP response time in
+-- OpenLayers logs.
+--
+-- Notes:
+-- Nova changes the default log format of eventlet.wsgi (see nova/wsgi.py) and
+-- prefixes the HTTP status, response size and response time values with
+-- respectively "status: ", "len: " and "time: ".
+-- Other OpenStack services just rely on the default log format.
+-- TODO(pasquier-s): build the LPEG grammar based on the log_format parameter
+-- passed to eventlet.wsgi.server similar to what the build_rsyslog_grammar
+-- function does for RSyslog.
+local openstack_http_status = l.P"status: "^-1 * l.Cg(l.digit^3, "http_status")
+local openstack_response_size = l.P"len: "^-1 * l.Cg(l.digit^1 / tonumber, "http_response_size")
+local openstack_response_time = l.P"time: "^-1 * l.Cg(l.digit^1 * dot^0 * l.digit^0 / tonumber, "http_response_time")
+
+-- Capture for OpenStack HTTP producing six values: http_method, http_url,
+-- http_version, http_status, http_response_size and http_response_time.
+openstack_http = anywhere(l.Ct(
+    quote * http_method * sp * url * sp * l.P'HTTP/' * http_version * quote * sp *
+    openstack_http_status * sp * openstack_response_size * sp *
+    openstack_response_time
+))
+
+-- Capture for IP addresses producing one value: ip_address.
+ip_address = anywhere(l.Ct(
+    l.Cg(l.digit^-3 * dot * l.digit^-3 * dot * l.digit^-3 * dot * l.digit^-3, "ip_address")
+))
 
 return M
