@@ -67,7 +67,7 @@ TestPatterns = {}
         assertEquals(patt.openstack:match(
             '1970-01-01 00:00:02 3434 INFO oslo_service.periodic_task [-] Blabla...'),
             {Timestamp = local_epoch + 2e9, Pid = '3434', SeverityLabel = 'INFO',
-             Message = '[-] Blabla...'})
+             PythonModule = 'oslo_service.periodic_task', Message = '[-] Blabla...'})
     end
 
     function TestPatterns:test_openstack_request_context()
