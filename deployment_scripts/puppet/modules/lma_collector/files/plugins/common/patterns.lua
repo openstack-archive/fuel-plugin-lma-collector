@@ -68,20 +68,16 @@ Pid           = l.digit^1
 SeverityLabel = l.P"CRITICAL" + l.P"ERROR" + l.P"WARNING" + l.P"INFO" + l.P"AUDIT" + l.P"DEBUG"
 Message       = l.P(1)^0
 
-local timestamp = l.Cg(Timestamp, "Timestamp")
-local pid       = l.Cg(Pid, "Pid")
-local severity  = l.Cg(SeverityLabel, "SeverityLabel")
-local message   = l.Cg(Message, "Message")
-
 -- Capture for OpenStack logs producing four values: Timestamp, Pid,
--- SeverityLabel and Message.
+-- SeverityLabel, PythonModule and Message.
 --
 -- OpenStack log messages are of this form:
 -- 2015-11-30 08:38:59.306 3434 INFO oslo_service.periodic_task [-] Blabla...
 --
 -- [-] is the "request" part, it can take multiple forms. See below.
-openstack = l.Ct(timestamp * sp * pid * sp * severity * sp * programname
-    * sp * message)
+openstack = l.Ct(l.Cg(Timestamp, "Timestamp")* sp * l.Cg(Pid, "Pid") * sp *
+    l.Cg(SeverityLabel, "SeverityLabel") * sp * l.Cg(programname, "PythonModule") *
+    sp * l.Cg(Message, "Message"))
 
 -- Capture for OpenStack request context producing three values: RequestId,
 -- UserId and TenantId.
