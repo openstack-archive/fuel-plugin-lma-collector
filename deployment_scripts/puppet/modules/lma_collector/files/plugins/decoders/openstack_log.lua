@@ -57,6 +57,7 @@ function process_message ()
     msg.Severity = utils.label_to_severity_map[m.SeverityLabel] or 7
     msg.Fields = {}
     msg.Fields.severity_label = m.SeverityLabel
+    msg.Fields.python_module = m.PythonModule
     msg.Fields.programname = program
 
     m = patt.openstack_request_context:match(msg.Payload)
