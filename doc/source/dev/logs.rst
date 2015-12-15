@@ -49,7 +49,9 @@ Attributes in **bold** are always present in the messages while attributes in
   * **severity_label** (string), the textual representation of the severity
     level.
 
-  * *programname* (string), the application name for Syslog-based messages.
+  * *programname* (string), the application name for Syslog-based messages, or
+    the OpenStack service daemon name for OpenStack log messages (eg
+    "nova-compute").
 
   * *syslogfacility* (number), the Syslog facility for Syslog-based messages.
 
