@@ -55,6 +55,9 @@ Attributes in **bold** are always present in the messages while attributes in
 
   * *syslogfacility* (number), the Syslog facility for Syslog-based messages.
 
+  * *python_module* (string), the Python module that generated the log message
+    for OpenStack service logs.
+
   * *http_method* (string), the HTTP method (for instance 'GET').
 
   * *http_client_ip_address* (string), the IP address of the client that
