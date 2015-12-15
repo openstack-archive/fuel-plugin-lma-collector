@@ -235,4 +235,13 @@ function truncate(str, max_length, delimiter)
     return string.sub(str, 1, pos)
 end
 
+function traceback_keys_equal(t1, t2)
+    for k, v in pairs(t1) do
+        if t2[k] ~= v then
+            return false
+        end
+    end
+    return true
+end
+
 return M
