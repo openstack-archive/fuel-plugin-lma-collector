@@ -105,6 +105,8 @@ local http_method = l.Cg(l.R"AZ"^3, "http_method")
 local url = l.Cg( (1 - sp)^1, "http_url")
 local http_version = l.Cg(l.digit * dot * l.digit, "http_version")
 
+http_request = http_method * sp * url * sp * l.P'HTTP/' * http_version
+
 -- Patterns for HTTP status, HTTP response size and HTTP response time in
 -- OpenLayers logs.
 --
@@ -123,7 +125,7 @@ local openstack_response_time = l.P"time: "^-1 * l.Cg(l.digit^1 * dot^0 * l.digi
 -- Capture for OpenStack HTTP producing six values: http_method, http_url,
 -- http_version, http_status, http_response_size and http_response_time.
 openstack_http = anywhere(l.Ct(
-    quote * http_method * sp * url * sp * l.P'HTTP/' * http_version * quote * sp *
+    quote * http_request * quote * sp *
     openstack_http_status * sp * openstack_response_size * sp *
     openstack_response_time
 ))
