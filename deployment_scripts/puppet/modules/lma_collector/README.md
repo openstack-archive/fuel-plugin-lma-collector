@@ -61,6 +61,14 @@ class { 'lma_collector::logs::swift':
 }
 ```
 
+For Keystone, in addition to declaring the `lma_collector::logs::openstack`
+define, the `lma_collector::logs::keystone_wsgi` class should be declared
+to read Keystone logs stored from Apache log files:
+
+```puppet
+class { 'lma_collector::logs::keystone_wsgi': }
+```
+
 ### Collect libvirt logs
 
 To make the collector collect logs created by libvirt declare the
@@ -125,6 +133,7 @@ Public Classes:
 
 * [`lma_collector`](#class-lma_collector)
 * [`lma_collector::elasticsearch`](#class-lma_collectorelasticsearch)
+* [`lma_collector::logs::keystone_wsgi`](#class-lma_collectorlogskeystone_wsgi)
 * [`lma_collector::logs::libvirt`](#class-lma_collectorlogslibvirt)
 * [`lma_collector::logs::mysql`](#class-lma_collectorlogsmysql)
 * [`lma_collector::logs::ovs`](#class-lma_collectorlogsovs)
@@ -160,6 +169,25 @@ Elasticsearch for indexing.
 
 * `server`: *Required*. Elasticsearch server name. Valid options: a string.
 * `port`: *Optional*. Elasticsearch service port. Valid options: a string. Default: "9200".
+
+#### Class: `lma_collector::logs::keystone_wsgi`
+
+Declare this class to create an Heka `logstreamer` that reads Keystone Apache
+logs from `/var/log/apache2/keystone_wsgi_*_access.log`.
+
+This class currently assumes the following log configuration in Apache:
+
+```
+CustomLog "/var/log/apache2/keystone_wsgi_main_access.log" "%h %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\""
+```
+
+for Keystone main and:
+
+```
+CustomLog "/var/log/apache2/keystone_wsgi_admin_access.log" "%h %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\""
+```
+
+for Keystone admin.
 
 #### Class: `lma_collector::logs::libvirt`
 
