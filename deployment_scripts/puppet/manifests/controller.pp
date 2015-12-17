@@ -39,12 +39,6 @@ else {
   $rabbitmq_user = 'nova'
 }
 
-if hiera('deployment_mode') =~ /^ha_/ {
-  $ha_deployment = true
-}else{
-  $ha_deployment = false
-}
-
 # OpenStack notifications are always useful for indexation and metrics collection
 class { 'lma_collector::notifications::controller':
   host     => $messaging_address,
@@ -75,15 +69,9 @@ if ! $storage_options['objects_ceph'] {
 
 # Logs
 if $lma_collector['elasticsearch_mode'] != 'disabled' {
-
   class { 'lma_collector::logs::mysql': }
-
   class { 'lma_collector::logs::rabbitmq': }
-
-  if $ha_deployment {
-    class { 'lma_collector::logs::pacemaker': }
-  }
-
+  class { 'lma_collector::logs::pacemaker': }
 }
 
 # Metrics
@@ -92,13 +80,7 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
   $nova           = hiera_hash('nova', {})
   $neutron        = hiera_hash('quantum_settings', {})
   $cinder         = hiera_hash('cinder', {})
-
-  if $ha_deployment {
-    $haproxy_socket = '/var/lib/haproxy/stats'
-  }else{
-    # do not deploy HAproxy collectd plugin
-    $haproxy_socket = undef
-  }
+  $haproxy_socket = '/var/lib/haproxy/stats'
 
   if $storage_options['volumes_ceph'] or $storage_options['images_ceph'] or $storage_options['objects_ceph'] or $storage_options['ephemeral_ceph']{
     $ceph_enabled = true

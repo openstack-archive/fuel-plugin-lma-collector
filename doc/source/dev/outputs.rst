@@ -63,7 +63,6 @@ For instance, lets take the following Heka message::
     :Fields:
         | name:"type" type:string value:"derive"
         | name:"source" type:string value:"cpu"
-        | name:"deployment_mode" type:string value:"ha_compact"
         | name:"deployment_id" type:string value:"1"
         | name:"openstack_roles" type:string value:"primary-controller"
         | name:"openstack_release" type:string value:"2015.1.0-7.0"
