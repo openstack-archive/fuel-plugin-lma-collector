@@ -165,7 +165,7 @@ def get_stats():
     if pxname in NAMES_MAPPING:
         pxname = NAMES_MAPPING.get(pxname)
     else:
-      logger('warn', 'Mapping missing for "%s"' % pxname)
+      logger('verb', 'Mapping missing for "%s"' % pxname)
 
     if statdict['type'] == BACKEND_SERVER_TYPE:
       # Count the number of servers per backend and per status
