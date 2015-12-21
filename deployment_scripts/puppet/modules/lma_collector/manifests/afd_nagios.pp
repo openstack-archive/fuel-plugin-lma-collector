@@ -49,6 +49,8 @@ define lma_collector::afd_nagios(
     headers         => {
       'Content-Type' => 'application/x-www-form-urlencoded'
     },
+    # Buffering isn't needed for Nagios checks
+    use_buffering   => false,
     require         => Heka::Encoder::Sandbox["nagios_afd_${title}"],
     notify          => Class['lma_collector::service'],
   }

@@ -15,19 +15,26 @@
 define heka::output::http (
   $config_dir,
   $url,
-  $encoder         = $title,
-  $message_matcher = 'FALSE',
-  $username        = undef,
-  $password        = undef,
-  $timeout         = undef,
-  $method          = 'POST',
-  $headers         = {},
-  $ensure          = present,
+  $encoder           = $title,
+  $message_matcher   = 'FALSE',
+  $username          = undef,
+  $password          = undef,
+  $timeout           = undef,
+  $method            = 'POST',
+  $headers           = {},
+  $use_buffering     = true,
+  $max_buffer_size   = 1024 * 1024 * 1024, # 1GiB
+  $queue_full_action = 'drop',
+  $max_file_size     = undef,
+  $ensure            = present,
 ) {
 
   include heka::params
 
   validate_hash($headers)
+  if $use_buffering {
+    validate_buffering($max_buffer_size, $max_file_size, $queue_full_action)
+  }
 
   file { "${config_dir}/output-${title}.toml":
     ensure  => $ensure,
