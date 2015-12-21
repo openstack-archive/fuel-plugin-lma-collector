@@ -68,10 +68,10 @@ class lma_collector::params {
   # this is required by elasticsearch buffered output.
   # Lets configure 192Kb by default.
   # see https://github.com/mozilla-services/heka/issues/1389
-  $hekad_max_message_size = 192*1024
+  $hekad_max_message_size = 192 * 1024
 
-  # Lets use the default Heka value
-  $buffering_max_file_size = 0
+  $buffering_max_file_size = 128 * 1024 * 1024
+  $buffering_max_buffer_size = 1024 * 1024 * 1024
 
   if $buffering_max_file_size != 0 and $buffering_max_file_size < $hekad_max_message_size {
       fail('max_message_size setting must be greater than max_file_size')

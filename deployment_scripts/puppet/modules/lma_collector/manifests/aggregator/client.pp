@@ -29,6 +29,7 @@ class lma_collector::aggregator::client (
     address         => $address,
     port            => $port,
     use_buffering   => $lma_collector::params::buffering_enabled,
+    max_buffer_size => $lma_collector::params::buffering_max_buffer_size,
     max_file_size   => $lma_collector::params::buffering_max_file_size,
     message_matcher => $lma_collector::params::aggregator_client_message_matcher,
   }

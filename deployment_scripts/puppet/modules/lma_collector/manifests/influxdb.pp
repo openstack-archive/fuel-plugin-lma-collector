@@ -66,6 +66,9 @@ class lma_collector::influxdb (
     headers         => {
       'Content-Type' => 'application/x-www-form-urlencoded'
     },
+    use_buffering   => $lma_collector::params::buffering_enabled,
+    max_file_size   => $lma_collector::params::buffering_max_file_size,
+    max_buffer_size => $lma_collector::params::buffering_max_buffer_size,
     require         => Heka::Encoder::Payload['influxdb'],
     notify          => Class['lma_collector::service'],
   }

@@ -33,6 +33,7 @@ class lma_collector::elasticsearch (
     port            => $port,
     message_matcher => 'Type == \'log\' || Type  == \'notification\'',
     use_buffering   => $lma_collector::params::buffering_enabled,
+    max_buffer_size => $lma_collector::params::buffering_max_buffer_size,
     max_file_size   => $lma_collector::params::buffering_max_file_size,
     require         => Heka::Encoder::Es_json['elasticsearch'],
     notify          => Class['lma_collector::service'],

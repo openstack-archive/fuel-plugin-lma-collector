@@ -14,20 +14,24 @@
 #
 define heka::output::elasticsearch (
   $config_dir,
-  $server = undef,
-  $port = undef,
-  $encoder = $title,
-  $message_matcher = 'FALSE',
-  $flush_interval = 5,
-  $flush_count = 10,
-  $use_buffering = true,
-  $queue_max_buffer_size = 1000000000, # 1GB
+  $server            = undef,
+  $port              = undef,
+  $encoder           = $title,
+  $message_matcher   = 'FALSE',
+  $flush_interval    = 5,
+  $flush_count       = 10,
+  $use_buffering     = true,
+  $max_buffer_size   = 1024 * 1024 * 1024, # 1GiB
   $queue_full_action = 'drop',
-  $max_file_size = undef,
-  $ensure = present,
+  $max_file_size     = undef,
+  $ensure            = present,
 ) {
 
   include heka::params
+
+  if $use_buffering {
+    validate_buffering($max_buffer_size, $max_file_size, $queue_full_action)
+  }
 
   file { "${config_dir}/output-${title}.toml":
     ensure  => $ensure,

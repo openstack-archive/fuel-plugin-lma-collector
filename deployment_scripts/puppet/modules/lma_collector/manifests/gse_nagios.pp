@@ -60,6 +60,8 @@ define lma_collector::gse_nagios (
     headers         => {
       'Content-Type' => 'application/x-www-form-urlencoded'
     },
+    # Buffering isn't needed for Nagios checks
+    use_buffering   => false,
     require         => Heka::Encoder::Sandbox["nagios_gse_${title}"],
     notify          => Class['lma_collector::service'],
   }
