@@ -57,16 +57,19 @@ class lma_collector::influxdb (
   }
 
   heka::output::http { 'influxdb':
-    config_dir      => $lma_collector::params::config_dir,
-    url             => "http://${server}:${port}/write?db=${database}&precision=${time_precision}",
-    message_matcher => 'Fields[payload_type] == \'txt\' && Fields[payload_name] == \'influxdb\'',
-    username        => $user,
-    password        => $password,
-    timeout         => $lma_collector::params::influxdb_timeout,
-    headers         => {
+    config_dir            => $lma_collector::params::config_dir,
+    url                   => "http://${server}:${port}/write?db=${database}&precision=${time_precision}",
+    message_matcher       => 'Fields[payload_type] == \'txt\' && Fields[payload_name] == \'influxdb\'',
+    username              => $user,
+    password              => $password,
+    timeout               => $lma_collector::params::influxdb_timeout,
+    headers               => {
       'Content-Type' => 'application/x-www-form-urlencoded'
     },
-    require         => Heka::Encoder::Payload['influxdb'],
-    notify          => Class['lma_collector::service'],
+    use_buffering         => $lma_collector::params::buffering_enabled,
+    max_file_size         => $lma_collector::params::buffering_max_file_size,
+    queue_max_buffer_size => 20 * 1000 * 1000,
+    require               => Heka::Encoder::Payload['influxdb'],
+    notify                => Class['lma_collector::service'],
   }
 }
