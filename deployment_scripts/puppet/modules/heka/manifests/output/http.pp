@@ -15,14 +15,18 @@
 define heka::output::http (
   $config_dir,
   $url,
-  $encoder         = $title,
-  $message_matcher = 'FALSE',
-  $username        = undef,
-  $password        = undef,
-  $timeout         = undef,
-  $method          = 'POST',
-  $headers         = {},
-  $ensure          = present,
+  $encoder               = $title,
+  $message_matcher       = 'FALSE',
+  $username              = undef,
+  $password              = undef,
+  $timeout               = undef,
+  $method                = 'POST',
+  $headers               = {},
+  $use_buffering         = true,
+  $queue_max_buffer_size = 1000000000, # 1GB
+  $queue_full_action     = 'drop',
+  $max_file_size         = undef,
+  $ensure                = present,
 ) {
 
   include heka::params
