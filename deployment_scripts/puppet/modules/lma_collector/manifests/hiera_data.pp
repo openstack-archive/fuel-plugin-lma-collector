@@ -46,9 +46,7 @@ define lma_collector::hiera_data (
     require => File[$hiera_directory],
   }
 
-  file_line { "${name}_hiera_override":
-    path  => '/etc/hiera.yaml',
-    line  => "  - override/${name}",
-    after => '  - override/module/%{calling_module}',
+  hiera_custom_source { "override/${name}":
+    ensure => present
   }
 }
