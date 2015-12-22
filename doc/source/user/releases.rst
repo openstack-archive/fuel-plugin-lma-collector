@@ -6,7 +6,7 @@ Release Notes
 Version 0.9.0
 -------------
 
-*
+* Collect libvirt metrics on compute nodes.
 
 Version 0.8.0
 -------------
