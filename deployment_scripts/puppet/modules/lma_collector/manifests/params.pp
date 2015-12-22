@@ -128,6 +128,7 @@ class lma_collector::params {
   $memcached_host = '127.0.0.1'
   $fstypes = ['ext2', 'ext3', 'ext4', 'xfs']
   $collectd_types = [ 'ceph', 'ceph_perf' ]
+  $libvirt_connection = 'qemu:///system'
 
   $heartbeat_timeout = 30
 

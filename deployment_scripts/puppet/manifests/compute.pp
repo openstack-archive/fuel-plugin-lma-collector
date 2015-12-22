@@ -34,3 +34,5 @@ else {
 class { 'lma_collector::notifications::compute':
   topics  => $notification_topics,
 }
+
+class { 'lma_collector::collectd::libvirt': }
