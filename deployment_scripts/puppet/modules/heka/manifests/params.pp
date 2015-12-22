@@ -36,9 +36,11 @@ class heka::params {
   case $::osfamily {
     'Debian': {
       $groups = ['syslog', 'adm']
+      $nologin_bin = '/usr/sbin/nologin'
     }
     'RedHat': {
       $groups = ['adm']
+      $nologin_bin = '/sbin/nologin'
     }
     default: {
       fail("${::osfamily} not supported")
