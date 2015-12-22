@@ -117,7 +117,7 @@ class heka (
   # This Puppet User resource is used by other manifests even if the hekad
   # process runs as 'root'.
   user { $heka_user:
-    shell  => '/sbin/nologin',
+    shell  => $heka::params::nologin_bin,
     home   => $base_dir,
     system => true,
     groups => $additional_groups,
