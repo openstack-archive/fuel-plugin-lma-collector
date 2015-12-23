@@ -91,4 +91,19 @@ function orderedPairs(t)
     return orderedNext, t, nil
 end
 
+-- Shallow comparison between two tables.
+-- Return true if the two tables have the same keys with identical
+-- values, otherwise false.
+function table_equal(t1, t2)
+    -- all key-value pairs in t1 must be in t2
+    for k, v in pairs(t1) do
+        if t2[k] ~= v then return false end
+    end
+    -- there must not be other keys in t2
+    for k, v in pairs(t2) do
+        if t1[k] == nil then return false end
+    end
+    return true
+end
+
 return M

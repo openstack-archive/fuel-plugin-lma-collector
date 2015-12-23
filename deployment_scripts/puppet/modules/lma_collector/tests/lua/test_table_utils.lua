@@ -63,6 +63,23 @@ TestTableUtils = {}
         assertEquals(t[3].v, 'C')
     end
 
+    function TestTableUtils:test_table_equal_with_equal_keys_and_values()
+        assertTrue(table_utils.table_equal({a = 'a', b = 'b'}, {a = 'a', b = 'b'}))
+    end
+
+    function TestTableUtils:test_table_equal_with_nonequal_values()
+        assertFalse(table_utils.table_equal({a = 'a', b = 'b'}, {a = 'a', b = 'c'}))
+    end
+
+    function TestTableUtils:test_table_equal_with_nonequal_keys_1()
+        assertFalse(table_utils.table_equal({a = 'a', b = 'b'}, {a = 'a', c = 'b'}))
+    end
+
+    function TestTableUtils:test_table_equal_with_nonequal_keys_2()
+        assertFalse(table_utils.table_equal({a = 'a', b = 'b'},
+                                            {a = 'a', b = 'b', c = 'c'}))
+    end
+
 lu = LuaUnit
 lu:setVerbosity( 1 )
 os.exit( lu:run() )
