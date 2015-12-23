@@ -31,7 +31,6 @@ $influxdb_nodes = filter_nodes(hiera('nodes'), 'role', 'influxdb_grafana')
 
 $tags = {
   deployment_id => hiera('deployment_id'),
-  deployment_mode => hiera('deployment_mode'),
   openstack_region => 'RegionOne',
   openstack_release => hiera('openstack_version'),
   openstack_roles => join($roles, ','),
@@ -46,13 +45,9 @@ else {
 }
 
 if $is_controller {
-  if hiera('deployment_mode') =~ /^ha_/ {
-    $additional_groups = ['haclient', 'keystone']
-    $pacemaker_managed = true
-    $rabbitmq_resource = 'master_p_rabbitmq-server'
-  } else {
-    $additional_groups = ['keystone']
-  }
+  $additional_groups = ['haclient', 'keystone']
+  $pacemaker_managed = true
+  $rabbitmq_resource = 'master_p_rabbitmq-server'
 }else{
   $additional_groups = []
   $pacemaker_managed = false

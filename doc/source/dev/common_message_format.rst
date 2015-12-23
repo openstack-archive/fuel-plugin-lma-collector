@@ -34,9 +34,6 @@ populated with a set of predefined fields:
 Attributes in **bold** are always present in the messages while attributes in
 *italic* are optional.
 
-* **deployment_mode** (string), the deployment mode of the Fuel environment
-  (either 'multinode' or 'ha_compact').
-
 * **deployment_id** (number), the deployment identifier of the Fuel
   environment.
 
