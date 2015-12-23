@@ -62,6 +62,7 @@ lma_collector::logs::openstack { 'cinder': }
 lma_collector::logs::openstack { 'glance': }
 lma_collector::logs::openstack { 'heat': }
 lma_collector::logs::openstack { 'keystone': }
+class {'lma_collector::logs::keystone_wsgi': }
 lma_collector::logs::openstack { 'horizon': }
 if $murano['enabled'] {
   lma_collector::logs::openstack { 'murano': }
