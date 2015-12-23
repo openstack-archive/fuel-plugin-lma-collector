@@ -61,7 +61,14 @@ case $elasticsearch_mode {
     $es_server = $lma_collector['elasticsearch_address']
   }
   'local': {
-    $es_server = $es_nodes[0]['internal_address']
+    $vip_name = 'es_vip_mgmt'
+    $network_metadata = hiera_hash('network_metadata')
+    if $network_metadata['vips'][$vip_name] {
+      $es_server = $network_metadata['vips'][$vip_name]['ipaddr']
+    }else{
+      # compatibility with elasticsearch-kibana version 0.8
+      $es_server = $es_nodes[0]['internal_address']
+    }
   }
   'disabled': {
     # Nothing to do
