@@ -24,6 +24,7 @@ class lma_collector::elasticsearch (
     config_dir              => $lma_collector::params::config_dir,
     index                   => '%{Type}-%{%Y.%m.%d}',
     es_index_from_timestamp => true,
+    fields                  => $lma_collector::params::elasticsearch_fields,
     notify                  => Class['lma_collector::service'],
   }
 

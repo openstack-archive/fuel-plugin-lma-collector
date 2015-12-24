@@ -17,9 +17,14 @@ define heka::encoder::es_json (
   $es_index_from_timestamp = false,
   $index = undef,
   $ensure = present,
+  $fields = undef,
 ) {
 
   include heka::params
+
+  if $fields != undef {
+    validate_array($fields)
+  }
 
   file { "${config_dir}/encoder-${title}.toml":
     ensure  => $ensure,
