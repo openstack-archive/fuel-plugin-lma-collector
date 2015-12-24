@@ -48,12 +48,8 @@ if $is_controller {
   # "keystone" group required for lma_collector::logs::openstack to be able
   # to read log files located in /var/log/keystone
   $additional_groups = ['haclient', 'keystone']
-  $pacemaker_managed = true
-  $rabbitmq_resource = 'master_p_rabbitmq-server'
-}else{
+} else {
   $additional_groups = []
-  $pacemaker_managed = false
-  $rabbitmq_resource = undef
 }
 
 $elasticsearch_mode = $lma_collector['elasticsearch_mode']
@@ -103,11 +99,93 @@ if $is_controller{
   $pre_script = undef
 }
 
+case $::osfamily {
+  'Debian': {
+    $heka_user = 'heka'
+  }
+  'RedHat': {
+    # For CentOS, the LMA collector needs to run as root because the files
+    # created by RSyslog aren't created with the correct mode for now.
+    $heka_user = 'root'
+  }
+  default: {
+    fail("${::osfamily} not supported")
+  }
+}
+
 class { 'lma_collector':
-  tags              => merge($tags, $additional_tags),
-  groups            => $additional_groups,
-  pacemaker_managed => $pacemaker_managed,
-  rabbitmq_resource => $rabbitmq_resource,
+  tags   => merge($tags, $additional_tags),
+  user   => $heka_user,
+  groups => $additional_groups,
+}
+
+# On controller nodes the LMA collector service is managed by Pacemaker, so we
+# use pacemaker_wrappers::service to reconfigure the service resource to use
+# the "pacemaker" service provider
+if $is_controller {
+
+  include lma_collector::params
+
+  $service_name = $lma_collector::params::service_name
+  $config_dir = $lma_collector::params::config_dir
+  $rabbitmq_resource = 'master_p_rabbitmq-server'
+
+  pacemaker_wrappers::service { $service_name:
+    ensure          => present,
+    prefix          => false,
+    primitive_class => 'ocf',
+    primitive_type  => 'ocf-lma_collector',
+    complex_type    => 'clone',
+    use_handler     => false,
+    ms_metadata     => {
+      # the resource should start as soon as the dependent resources (eg RabbitMQ)
+      # are running *locally*
+      'interleave'          => true,
+      'migration-threshold' => '3',
+      'failure-timeout'     => '120',
+    },
+    parameters      => {
+      'config'   => $config_dir,
+      'log_file' => "/var/log/${service_name}.log",
+      'user'     => $heka_user,
+    },
+    operations      => {
+      'monitor' => {
+        'interval' => '20',
+        'timeout'  => '10',
+      },
+      'start'   => {
+        'timeout' => '30',
+      },
+      'stop'    => {
+        'timeout' => '30',
+      },
+    },
+    ocf_script_file => 'lma_collector/ocf-lma_collector',
+  }
+
+  cs_rsc_colocation { "${service_name}-with-rabbitmq":
+    ensure     => present,
+    alias      => $service_name,
+    primitives => ["clone_${service_name}", $rabbitmq_resource],
+    score      => 0,
+    require    => Pacemaker_wrappers::Service[$service_name],
+  }
+
+  cs_rsc_order { "${service_name}-after-rabbitmq":
+    ensure  => present,
+    alias   => $service_name,
+    first   => $rabbitmq_resource,
+    second  => "clone_${service_name}",
+    # Heka cannot start if RabbitMQ isn't ready to accept connections. But
+    # once it is initialized, it can recover from a RabbitMQ outage. This is
+    # why we set score to 0 (interleave) meaning that the collector should
+    # start once RabbitMQ is active but a restart of RabbitMQ
+    # won't trigger a restart of the LMA collector.
+    score   => 0,
+    require => Cs_rsc_colocation[$service_name],
+    before  => Class['lma_collector'],
+  }
 }
 
 if $elasticsearch_mode != 'disabled' {
