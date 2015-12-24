@@ -39,12 +39,16 @@ function replace_dot_by_sep (str)
     return string.gsub(str, '%.', sep)
 end
 
-function split_service_and_state(str)
-    local service, state = string.match(str, '^services%.(.+)%.([^.]+)$')
-    if service == nil then
-        service, state = string.match(str, '^agents%.(.+)%.([^.]+)$')
-    end
-    return replace_dot_by_sep(service), state
+function split_service_and_state_and_hostname(str)
+    -- Possible values:
+    -- services.compute.down.node-1.test.domain.local
+    -- services.scheduler.up
+    -- agents.dhcp.down.node-44
+    -- agents.dhcp.up
+    local service, state, hostname = string.match(str, '^%w+%.([%w-]+)%.([%w-]+)%.?([%w-.]-)$')
+    -- remove domain part of the hostname or nil if string is empty
+    hostname = string.match(hostname, '^([^.]+).-$')
+    return replace_dot_by_sep(service), state, hostname
 end
 
 function process_message ()
@@ -305,20 +309,35 @@ function process_message ()
                     end
                 end
             elseif metric_source ==  'dbi' and sample['plugin_instance'] == 'services_nova' then
-                local service, state = split_service_and_state(sample['type_instance'])
-                msg['Fields']['name'] = 'openstack' .. sep .. 'nova' .. sep .. 'services'
+                local service, state, hostname = split_service_and_state_and_hostname(sample['type_instance'])
+                if hostname then
+                    msg['Fields']['name'] = 'openstack' .. sep .. 'nova' .. sep .. 'service'
+                    msg['Fields']['hostname'] = hostname
+                else
+                    msg['Fields']['name'] = 'openstack' .. sep .. 'nova' .. sep .. 'services'
+                end
                 msg['Fields']['tag_fields'] = { 'service', 'state' }
                 msg['Fields']['service'] = service
                 msg['Fields']['state'] = state
             elseif metric_source ==  'dbi' and sample['plugin_instance'] == 'services_cinder' then
-                local service, state = split_service_and_state(sample['type_instance'])
-                msg['Fields']['name'] = 'openstack' .. sep .. 'cinder' .. sep .. 'services'
+                local service, state, hostname = split_service_and_state_and_hostname(sample['type_instance'])
+                if hostname then
+                    msg['Fields']['name'] = 'openstack' .. sep .. 'cinder' .. sep .. 'service'
+                    msg['Fields']['hostname'] = hostname
+                else
+                    msg['Fields']['name'] = 'openstack' .. sep .. 'cinder' .. sep .. 'services'
+                end
                 msg['Fields']['tag_fields'] = { 'service', 'state' }
                 msg['Fields']['service'] = service
                 msg['Fields']['state'] = state
             elseif metric_source ==  'dbi' and sample['plugin_instance'] == 'agents_neutron' then
-                local service, state = split_service_and_state(sample['type_instance'])
-                msg['Fields']['name'] = 'openstack' .. sep .. 'neutron' .. sep .. 'agents'
+                local service, state, hostname = split_service_and_state_and_hostname(sample['type_instance'])
+                if hostname then
+                    msg['Fields']['name'] = 'openstack' .. sep .. 'neutron' .. sep .. 'agent'
+                    msg['Fields']['hostname'] = hostname
+                else
+                    msg['Fields']['name'] = 'openstack' .. sep .. 'neutron' .. sep .. 'agents'
+                end
                 msg['Fields']['tag_fields'] = { 'service', 'state' }
                 msg['Fields']['service'] = service
                 msg['Fields']['state'] = state

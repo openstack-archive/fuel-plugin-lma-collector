@@ -9,6 +9,15 @@
       ValuesFrom "value"
     </Result>
   </Query>
+  <Query "services_down_host">
+    Statement "select concat_ws('.', 'services', replace(replace(s1.binary, 'nova-', ''), 'cinder-', ''), 'down', s1.host) as metric, count(s2.id) as value from services s1 left outer join services s2 on s1.id = s2.id and s1.disabled=0 and s2.deleted=0 and timestampdiff(SECOND,s1.updated_at,utc_timestamp())><%= @downtime %> group by s1.binary, s2.host;"
+    MinVersion 50000
+    <Result>
+      Type "gauge"
+      InstancesFrom "metric"
+      ValuesFrom "value"
+    </Result>
+  </Query>
   <Query "services_up">
     Statement "select concat_ws('.', 'services', replace(replace(s1.binary, 'nova-', ''), 'cinder-', ''), 'up') as metric, count(s2.id) as value from services s1 left outer join services s2 on s1.id = s2.id and s1.disabled=0 and s1.deleted=0 and timestampdiff(SECOND,s1.updated_at,utc_timestamp())<=<%= @downtime %> group by s1.binary;"
     MinVersion 50000
@@ -18,8 +27,26 @@
       ValuesFrom "value"
     </Result>
   </Query>
+  <Query "services_up_host">
+    Statement "select concat_ws('.', 'services', replace(replace(s1.binary, 'nova-', ''), 'cinder-', ''), 'up', s1.host) as metric, count(s2.id) as value from services s1 left outer join services s2 on s1.id = s2.id and s1.disabled=0 and s2.deleted=0  and timestampdiff(SECOND,s1.updated_at,utc_timestamp())<=<%= @downtime %> group by s1.binary, s1.host;"
+    MinVersion 50000
+    <Result>
+      Type "gauge"
+      InstancesFrom "metric"
+      ValuesFrom "value"
+    </Result>
+  </Query>
   <Query "services_disabled">
     Statement "select concat_ws('.', 'services', replace(replace(s1.binary, 'nova-', ''), 'cinder-', ''), 'disabled') as metric, count(s2.id) as value from services s1 left outer join services s2 on s1.id = s2.id and s2.disabled = 1 and s1.deleted=0 group by s1.binary;"
+    MinVersion 50000
+    <Result>
+      Type "gauge"
+      InstancesFrom "metric"
+      ValuesFrom "value"
+    </Result>
+  </Query>
+  <Query "services_disabled_host">
+    Statement "select concat_ws('.', 'services', replace(replace(s1.binary, 'nova-', ''), 'cinder-', ''), 'disabled', s1.host) as metric, count(s2.id) as value from services s1 left outer join services s2 on s1.id = s2.id and s1.disabled=1 and s2.deleted=0 group by s1.binary, s1.host;"
     MinVersion 50000
     <Result>
       Type "gauge"
@@ -38,6 +65,15 @@
       ValuesFrom "value"
     </Result>
   </Query>
+  <Query "agents_down_host">
+    Statement "select concat_ws('.', 'agents', replace(replace(a1.binary, '-agent', ''), 'neutron-', ''), 'down', a1.host) as metric, count(a2.id) as value from agents a1 left outer join agents a2 on a1.id = a2.id and a1.admin_state_up=1 and timestampdiff(SECOND,a1.heartbeat_timestamp,utc_timestamp())><%= @downtime %> group by a1.binary, a1.host;"
+    MinVersion 50000
+    <Result>
+      Type "gauge"
+      InstancesFrom "metric"
+      ValuesFrom "value"
+    </Result>
+  </Query>
   <Query "agents_up">
     Statement "select concat_ws('.', 'agents', replace(replace(a1.binary, '-agent', ''), 'neutron-', ''), 'up') as metric, count(a2.id) as value from agents a1 left outer join agents a2 on a1.id = a2.id and a1.admin_state_up=1 and timestampdiff(SECOND,a1.heartbeat_timestamp,utc_timestamp())<=<%= @downtime %>  group by a1.binary;"
     MinVersion 50000
@@ -47,8 +83,26 @@
       ValuesFrom "value"
     </Result>
   </Query>
+  <Query "agents_up_host">
+    Statement "select concat_ws('.', 'agents', replace(replace(a1.binary, '-agent', ''), 'neutron-', ''), 'up', a1.host) as metric, count(a2.id) as value from agents a1 left outer join agents a2 on a1.id = a2.id and a1.admin_state_up=1 and timestampdiff(SECOND,a1.heartbeat_timestamp,utc_timestamp())<=<%= @downtime %> group by a1.binary, a1.host;"
+    MinVersion 50000
+    <Result>
+      Type "gauge"
+      InstancesFrom "metric"
+      ValuesFrom "value"
+    </Result>
+  </Query>
   <Query "agents_disabled">
     Statement "select concat_ws('.', 'agents', replace(replace(a1.binary, '-agent', ''), 'neutron-', ''), 'disabled') as metric, count(a2.id) as value from agents a1 left outer join agents a2 on a1.id = a2.id and a1.admin_state_up=0 group by a1.binary;"
+    MinVersion 50000
+    <Result>
+      Type "gauge"
+      InstancesFrom "metric"
+      ValuesFrom "value"
+    </Result>
+  </Query>
+  <Query "agents_disabled_host">
+    Statement "select concat_ws('.', 'agents', replace(replace(a1.binary, '-agent', ''), 'neutron-', ''), 'down', a1.host) as metric, count(a2.id) as value from agents a1 left outer join agents a2 on a1.id = a2.id and a1.admin_state_up=0 group by a1.binary, a1.host;"
     MinVersion 50000
     <Result>
       Type "gauge"
@@ -67,5 +121,8 @@
     Query "<%= @type %>_disabled"
     Query "<%= @type %>_up"
     Query "<%= @type %>_down"
+    Query "<%= @type %>_disabled_host"
+    Query "<%= @type %>_up_host"
+    Query "<%= @type %>_down_host"
   </Database>
 </Plugin>
