@@ -24,10 +24,8 @@
 # [*config_dir*]
 #   The directory where to store the configuration (default: '/etc/hekad').
 #
-# [*run_as_root*]
-#   Whether or not to run the Heka service as root (default: false).
-#   You may have to set this parameter to true on some systems to access log
-#   files, run additional commands, ...
+# [*user*]
+#   The user to run the Heka service as (default: 'heka'). You may have to use 'root' on some systems for the Heka service to be able to access log files, run additional commands, ...
 #
 # [*additional_groups*]
 #   Additional groups to which the heka user should be added.
@@ -75,7 +73,7 @@
 class heka (
   $service_name = $heka::params::service_name,
   $config_dir = $heka::params::config_dir,
-  $run_as_root = $heka::params::run_as_root,
+  $user = $heka::params::user,
   $additional_groups = $heka::params::additional_groups,
   $hostname = $heka::params::hostname,
   $maxprocs = $heka::params::maxprocs,
@@ -91,7 +89,8 @@ class heka (
   $hekad_wrapper = "/usr/local/bin/${service_name}_wrapper"
   $base_dir      = "/var/cache/${service_name}"
   $log_file      = "/var/log/${service_name}.log"
-  $heka_user     = $heka::params::user
+  $heka_user     = $user
+  $run_as_root   = $heka_user == 'root'
 
   package { $heka::params::package_name:
     ensure => present,
