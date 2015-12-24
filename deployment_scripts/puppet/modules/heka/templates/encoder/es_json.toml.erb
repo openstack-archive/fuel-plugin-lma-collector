@@ -2,3 +2,6 @@
 type = "ESJsonEncoder"
 index = "<%= @index %>"
 es_index_from_timestamp = <%= @es_index_from_timestamp %>
+<% if @fields -%>
+fields = [ <%= @fields.collect{ |x| '"%s"' % x }.join(", ") %> ]
+<% end -%>
