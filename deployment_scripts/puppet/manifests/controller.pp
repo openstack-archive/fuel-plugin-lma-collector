@@ -39,6 +39,11 @@ else {
   $rabbitmq_user = 'nova'
 }
 
+include lma_collector::params
+Service<| title == $lma_collector::params::service_name |> {
+  provider => 'pacemaker'
+}
+
 # OpenStack notifications are always useful for indexation and metrics collection
 class { 'lma_collector::notifications::controller':
   host     => $messaging_address,

@@ -16,6 +16,15 @@ include lma_collector::params
 
 $ceilometer    = hiera_hash('ceilometer', {})
 $lma_collector = hiera_hash('lma_collector')
+$roles          = node_roles(hiera('nodes'), hiera('uid'))
+$is_controller  = member($roles, 'controller') or member($roles, 'primary-controller')
+
+if $is_controller {
+  include lma_collector::params
+  Service<| title == $lma_collector::params::service_name |> {
+    provider => 'pacemaker'
+  }
+}
 
 if $lma_collector['elasticsearch_mode'] != 'disabled' {
   lma_collector::logs::openstack { 'cinder': }
