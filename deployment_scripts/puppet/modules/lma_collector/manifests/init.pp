@@ -35,8 +35,6 @@ class lma_collector (
   $pre_script = undef,
   $pacemaker_managed = $lma_collector::params::pacemaker_managed,
   $rabbitmq_resource = undef,
-  $aggregator_address = undef,
-  $aggregator_port = $lma_collector::params::aggregator_port,
 ) inherits lma_collector::params {
   include heka::params
 
