@@ -47,19 +47,13 @@ class lma_collector::service (
     }
   }
 
-  if member(split($::pacemaker_resources, ','), $service_name) {
-    $real_provider = 'pacemaker'
-  } else {
-    $real_provider = $provider
-  }
-
   if $service_manage {
-    if $real_provider {
+    if $provider {
       service { 'lma_collector':
         ensure   => $_service_ensure,
         name     => $service_name,
         enable   => $service_enable,
-        provider => $real_provider,
+        provider => $provider,
       }
     } else {
       service { 'lma_collector':
