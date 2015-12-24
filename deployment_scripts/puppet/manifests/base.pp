@@ -45,6 +45,8 @@ else {
 }
 
 if $is_controller {
+  # "keystone" group required for lma_collector::logs::openstack to be able
+  # to read log files located in /var/log/keystone
   $additional_groups = ['haclient', 'keystone']
   $pacemaker_managed = true
   $rabbitmq_resource = 'master_p_rabbitmq-server'
