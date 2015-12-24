@@ -23,6 +23,15 @@ $management_network = hiera('management_network_range')
 $aggregator_port    = 5565
 $check_port         = 5566
 
+if $is_controller {
+  # On controllers make sure the LMA service is configured
+  # with the "pacemaker" provider
+  include lma_collector::params
+  Service<| title == $lma_collector::params::service_name |> {
+    provider => 'pacemaker'
+  }
+}
+
 class { 'lma_collector::aggregator::client':
   address => $aggregator_address,
   port    => $aggregator_port,
