@@ -130,6 +130,9 @@ end
 -- inject an AFD event into the Heka pipeline
 function inject_afd_metric(msg_type, msg_tag_name, msg_tag_value, metric_name,
                            value, hostname, interval, source)
+    assert(metric_name)
+    assert(hostname)
+    assert(source)
     local payload
 
     if #alarms > 0 then
