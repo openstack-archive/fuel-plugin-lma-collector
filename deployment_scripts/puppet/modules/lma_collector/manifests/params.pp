@@ -52,13 +52,9 @@ class lma_collector::params {
   # required to read the log files
   case $::osfamily {
     'Debian': {
-      $run_as_root = false
       $groups = ['syslog', 'adm']
     }
     'RedHat': {
-      # For CentOS, the LMA collector needs to run as root because the files
-      # created by RSyslog aren't created with the correct mode for now.
-      $run_as_root = true
       $groups = []
     }
     default: {
