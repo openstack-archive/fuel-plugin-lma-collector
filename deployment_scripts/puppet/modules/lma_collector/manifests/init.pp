@@ -32,11 +32,8 @@
 class lma_collector (
   $tags = $lma_collector::params::tags,
   $groups = [],
-  $pre_script = undef,
   $pacemaker_managed = $lma_collector::params::pacemaker_managed,
   $rabbitmq_resource = undef,
-  $aggregator_address = undef,
-  $aggregator_port = $lma_collector::params::aggregator_port,
 ) inherits lma_collector::params {
   include heka::params
 
@@ -53,7 +50,6 @@ class lma_collector (
     run_as_root         => $lma_collector::params::run_as_root,
     additional_groups   => union($lma_collector::params::groups, $groups),
     hostname            => $::hostname,
-    pre_script          => $pre_script,
     internal_statistics => false,
     max_message_size    => $lma_collector::params::hekad_max_message_size,
     max_process_inject  => $lma_collector::params::hekad_max_process_inject,
