@@ -59,6 +59,10 @@ These metrics are retrieved from the Nova database.
   'conductor', 'scheduler', 'cert' or 'consoleauth') and a ``state`` field (one
   of 'up', 'down' or 'disabled').
 
+* ``openstack_nova_service``, the count of Nova service in particular state (either 0 or 1).
+  The metric contains a ``service`` field (one of 'compute', 'conductor', 'scheduler', 'cert'
+  or 'consoleauth'), a ``state`` field (one of 'up', 'down' or 'disabled') and a ``hostname`` field.
+
 Identity
 ^^^^^^^^
 
@@ -95,6 +99,10 @@ These metrics are retrieved from the Cinder database.
 * ``openstack_cinder_services``, the total count of Cinder services by state.
   The metric contains a ``service`` field (one of 'volume', 'backup',
   'scheduler') and a ``state`` field (one of 'up', 'down' or 'disabled').
+
+* ``openstack_cinder_service``, the count of Cinder service in particular state (either 0 or 1).
+  The metric contains a ``service`` field (one of 'volume', 'backup', 'scheduler'),
+  a ``state`` field (one of 'up', 'down' or 'disabled') and a ``hostname`` field.
 
 Image
 ^^^^^
@@ -136,6 +144,10 @@ These metrics are retrieved from the Neutron database.
 * ``openstack_neutron_agents``, the total number of Neutron agents by service
   and state. The metric contains ``service`` (one of 'dhcp', 'l3', 'metadata'
   or 'openvswitch') and ``state`` (one of 'up', 'down' or 'disabled') fields.
+
+* ``openstack_neutron_agent``, the count of Neutron agent in particular state (either 0 or 1).
+  The metric contains a ``service`` field (one of 'dhcp', 'l3', 'metadata' or 'openvswitch'),
+  a ``state`` field (one of 'up', 'down' or 'disabled') and a ``hostname`` field.
 
 API response times
 ^^^^^^^^^^^^^^^^^^
