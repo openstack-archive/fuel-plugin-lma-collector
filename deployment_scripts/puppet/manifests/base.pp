@@ -15,7 +15,6 @@
 # TODO(spasquier): fail if Neutron isn't used
 
 prepare_network_config(hiera('network_scheme', {}))
-$messaging_address = get_network_role_property('mgmt/messaging', 'ipaddr')
 $lma_collector     = hiera_hash('lma_collector')
 $roles             = node_roles(hiera('nodes'), hiera('uid'))
 $is_controller     = member($roles, 'controller') or member($roles, 'primary-controller')
@@ -78,29 +77,6 @@ case $elasticsearch_mode {
   default: {
     fail("'${elasticsearch_mode}' mode not supported for Elasticsearch")
   }
-}
-
-# Notifications are always collected even when event indexation is disabled
-if $is_controller{
-  #$pre_script        = '/usr/local/bin/wait_for_rabbitmq'
-  # Params used by the script.
-  $rabbit            = hiera('rabbit')
-  $rabbitmq_port     = hiera('amqp_port', '5673')
-  $rabbitmq_host     = $messaging_address
-  $rabbitmq_user     = 'nova'
-  $rabbitmq_password = $rabbit['password']
-  $wait_delay        = 30
-
-  #  file { $pre_script:
-  #    ensure  => present,
-  #    owner   => 'root',
-  #    group   => 'root',
-  #    mode    => '0755',
-  #    content => template('lma_collector/wait_for_rabbitmq.erb'),
-  #    before  => Class['lma_collector']
-  #  }
-} else {
-  $pre_script = undef
 }
 
 case $::osfamily {
