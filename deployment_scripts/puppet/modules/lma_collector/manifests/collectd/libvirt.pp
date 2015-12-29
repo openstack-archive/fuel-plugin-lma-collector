@@ -28,13 +28,13 @@
 class lma_collector::collectd::libvirt (
   $connection = $lma_collector::params::libvirt_connection,
 ) inherits lma_collector::params {
-  include lma_collector::collectd::service
+  #include lma_collector::collectd::service
 
   validate_string($connection)
 
   class { 'collectd::plugin::libvirt':
     connection      => $connection,
     hostname_format => 'uuid',
-    notify          => Class['lma_collector::collectd::service']
+    #notify          => Class['lma_collector::collectd::service']
   }
 }

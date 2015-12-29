@@ -144,32 +144,26 @@ case $influxdb_mode {
       $influxdb_password = $influxdb_grafana['influxdb_userpass']
     }
 
-    if member($current_roles, 'influxdb_grafana') {
-      $processes = ['influxd', 'grafana-server', 'hekad', 'collectd']
-    } else {
-      $processes = ['hekad', 'collectd']
-    }
+    if ! $is_controller {
 
-    if member($current_roles, 'elasticsearch_kibana') {
-      $process_matches = [{name => 'elasticsearch', regex => 'java'}]
-    }else{
-      $process_matches = undef
-    }
+      if member($current_roles, 'influxdb_grafana') {
+        $processes = ['influxd', 'grafana-server', 'hekad', 'collectd']
+      } else {
+        $processes = ['hekad', 'collectd']
+      }
 
-    if $is_controller {
-      # plugins on the controllers do many network I/O operations so it is
-      # recommended to increase this value.
-      $collectd_read_threads = 10
-    }
-    else {
-      $collectd_read_threads = 5
-    }
+      if member($current_roles, 'elasticsearch_kibana') {
+        $process_matches = [{name => 'elasticsearch', regex => 'java'}]
+      } else {
+        $process_matches = undef
+      }
 
-    class { 'lma_collector::collectd::base':
-      processes       => $processes,
-      process_matches => $process_matches,
-      read_threads    => $collectd_read_threads,
-      require         => Class['lma_collector'],
+      class { 'lma_collector::collectd::base':
+        processes       => $processes,
+        process_matches => $process_matches,
+        read_threads    => 5,
+        require         => Class['lma_collector'],
+      }
     }
 
     class { 'lma_collector::influxdb':
