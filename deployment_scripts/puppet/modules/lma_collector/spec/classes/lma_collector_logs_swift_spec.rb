@@ -23,11 +23,21 @@ describe 'lma_collector::logs::swift' do
         it { is_expected.to raise_error(Puppet::Error, /must pass file_match/i) }
     end
 
-    describe 'with file_match => "swift\.log$"' do
+    describe 'with file_match => swift\.log$' do
         let(:params) do
             {:file_match => 'swift\.log$'}
         end
         it {is_expected.to contain_heka__input__logstreamer('swift') \
             .with_file_match('swift\.log$') }
+    end
+
+    describe 'with file_match => swift\.log\.?(?P<Seq>\d*)$ and priority => ["^Seq"]' do
+        let(:params) do
+            {:file_match => 'swift\.log\.?(?P<Seq>\d*)$',
+             :priority => '["^Seq"]'}
+        end
+        it {is_expected.to contain_heka__input__logstreamer('swift') \
+            .with_file_match('swift\.log\.?(?P<Seq>\d*)$') \
+            .with_priority('["^Seq"]') }
     end
 end

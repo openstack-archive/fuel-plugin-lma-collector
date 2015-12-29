@@ -36,8 +36,9 @@ define lma_collector::logs::openstack {
     log_directory  => "/var/log/${title}",
     decoder        => 'openstack',
     splitter       => 'openstack',
-    file_match     => '(?P<Service>.+)\.log$',
+    file_match     => '(?P<Service>.+)\.log\.?(?P<Seq>\d*)$',
     differentiator => "['${title}', '/', 'Service']",
+    priority       => '["^Seq"]',
     require        => Class['lma_collector::logs::openstack_decoder_splitter'],
     notify         => Class['lma_collector::service'],
   }

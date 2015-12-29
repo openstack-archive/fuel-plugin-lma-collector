@@ -189,6 +189,15 @@ CustomLog "/var/log/apache2/keystone_wsgi_admin_access.log" "%h %l %u %t \"%r\" 
 
 for Keystone admin.
 
+The class correctly configures the Heka `logstreamer` for the case of
+sequential rotating log files, i.e. log files with the following structure:
+
+```
+/var/log/apache2/keystone_wsgi_*_access.log
+/var/log/apache2/keystone_wsgi_*_access.log.1
+/var/log/apache2/keystone_wsgi_*_access.log.2
+```
+
 #### Class: `lma_collector::logs::libvirt`
 
 Declare this class to create an Heka `logstreamer` that reads libvirt logs
@@ -229,7 +238,15 @@ a Syslog file.
 ##### Parameters
 
 * `file_match`: *Required*. The log file name pattern. Example:
-  `'swift\.log$'`.
+  `'swift\.log$'`. Example for a sequential rotating file:
+  `'swift\.log\.?(?P<Seq>\d*)$'`. See
+  http://hekad.readthedocs.org/en/latest/pluginconfig/logstreamer.html
+  for more information.
+* `priority`: *Optional*. When using sequential logstreams, the priority
+  defines how to sort the log files in order from the slowest to newest.
+  Example: `'["^Seq"]'`. See
+  http://hekad.readthedocs.org/en/latest/pluginconfig/logstreamer.html
+  for more information.
 * `log_directory`: *Optional*. The log directory. Default: `/var/log`.
 
 #### Define: `lma_collector::logs::openstack`

@@ -34,8 +34,9 @@ class lma_collector::logs::keystone_wsgi (
     config_dir     => $lma_collector::params::config_dir,
     decoder        => 'keystone_wsgi',
     log_directory  => $log_directory,
-    file_match     => 'keystone_wsgi_(?P<Service>.+)_access\.log',
+    file_match     => 'keystone_wsgi_(?P<Service>.+)_access\.log\.?(?P<Seq>\d*)$',
     differentiator => "['keystone-wsgi-', 'Service']",
+    priority       => '["^Seq"]',
     require        => Heka::Decoder::Sandbox['keystone_wsgi'],
     notify         => Class['lma_collector::service'],
   }
