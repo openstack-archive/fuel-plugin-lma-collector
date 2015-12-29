@@ -16,7 +16,8 @@ class lma_collector::collectd::ceph_osd
 {
   include lma_collector::params
   include collectd::params
-  include lma_collector::collectd::service
+  #include lma_collector::collectd::service
+  include collectd
 
   $python_module_path = $lma_collector::params::python_module_path
 
@@ -30,7 +31,8 @@ class lma_collector::collectd::ceph_osd
     group   => $collectd::params::root_group,
     mode    => '0644',
     content => template('lma_collector/collectd_python.conf.erb'),
-    notify  => Class['lma_collector::collectd::service'],
+    #notify  => Class['lma_collector::collectd::service'],
+    notify  => Class['collectd'],
   }
 
   lma_collector::collectd::python_script { 'base.py':

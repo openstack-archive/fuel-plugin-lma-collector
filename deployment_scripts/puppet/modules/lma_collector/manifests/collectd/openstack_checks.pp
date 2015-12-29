@@ -12,16 +12,24 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-define lma_collector::collectd::python_script (
-  $config = {},
-) {
-  include lma_collector::params
-  include lma_collector::collectd::python_base
 
-  collectd::plugin::python::module { "module_${title}":
-    module        => $title,
-    modulepath    => $lma_collector::collectd::python_base::modulepath,
-    script_source => "puppet:///modules/lma_collector/collectd/${title}.py",
-    config        => $config,
+class lma_collector::collectd::openstack_checks (
+  $user,
+  $password,
+  $tenant,
+  $keystone_url,
+  $timeout = $lma_collector::params::openstack_client_timeout,
+) inherits lma_collector::params {
+
+  include lma_collector::collectd::python_openstack_base
+
+  lma_collector::collectd::python_script { 'check_openstack_api':
+    config => {
+      'Username'    => "\"${user}\"",
+      'Password'    => "\"${password}\"",
+      'Tenant'      => "\"${tenant}\"",
+      'KeystoneUrl' => "\"${keystone_url}\"",
+      'Timeout'     => "\"${timeout}\"",
+    }
   }
 }
