@@ -12,16 +12,24 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-define lma_collector::collectd::python_script (
-  $config = {},
-) {
-  include lma_collector::params
-  include lma_collector::collectd::python_base
 
-  collectd::plugin::python::module { "module_${title}":
-    module        => $title,
-    modulepath    => $lma_collector::collectd::python_base::modulepath,
-    script_source => "puppet:///modules/lma_collector/collectd/${title}.py",
-    config        => $config,
+define lma_collector::collectd::ceph {
+
+  $supported = ['pg_mon_status', 'pool_osd', 'osd_status', 'osd_perf']
+  if ! member($supported, $title) {
+    fail("'${title}' is not supported")
   }
+
+  if $title == 'osd_perf' {
+    $config = {
+      'AdminSocket' => '/var/run/ceph/ceph-*.asock',
+    }
+  } else {
+    $config = {}
+  }
+
+  lma_collector::collectd::python_script { "ceph_${title}":
+    config => $config,
+  }
+
 }

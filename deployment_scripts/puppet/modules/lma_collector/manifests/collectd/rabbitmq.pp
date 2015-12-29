@@ -12,16 +12,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-define lma_collector::collectd::python_script (
-  $config = {},
-) {
-  include lma_collector::params
-  include lma_collector::collectd::python_base
 
-  collectd::plugin::python::module { "module_${title}":
-    module        => $title,
-    modulepath    => $lma_collector::collectd::python_base::modulepath,
-    script_source => "puppet:///modules/lma_collector/collectd/${title}.py",
-    config        => $config,
-  }
+class lma_collector::collectd::rabbitmq {
+
+  lma_collector::collectd::python_script { 'rabbitmq_info': }
 }
