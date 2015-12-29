@@ -12,20 +12,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-class lma_collector::collectd::dbi {
-  include lma_collector::params
 
-  if $::osfamily == 'RedHat' {
-    package { 'collectd-dbi':
-      ensure => present,
-    }
-  }
+class lma_collector::collectd::rabbitmq {
 
-  package { $lma_collector::params::collectd_dbi_package:
-    ensure => present,
-  }
-
-  collectd::plugin { 'dbi':
-    require => Package[$lma_collector::params::collectd_dbi_package],
-  }
+  lma_collector::collectd::python { 'rabbitmq_info': }
 }
