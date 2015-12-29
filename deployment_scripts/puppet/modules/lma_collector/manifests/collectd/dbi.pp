@@ -14,7 +14,6 @@
 #
 class lma_collector::collectd::dbi {
   include lma_collector::params
-  include lma_collector::collectd::service
 
   if $::osfamily == 'RedHat' {
     package { 'collectd-dbi':
