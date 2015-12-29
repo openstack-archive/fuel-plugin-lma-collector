@@ -12,27 +12,19 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-#
-# == Class lma_collector::collectd::libvirt
-#
-# Class that configures collectd for collecting libvirt metrics.
-#
-# Note that the collectd plugin is configured to send the instance's UUID as
-# the hostname of the collectd data.
-#
-# === Parameters:
-#
-# [*connection*]
-#   (optional) The hypervisor connection URI. Default is 'qemu:///system'.
-#
-class lma_collector::collectd::libvirt (
-  $connection = $lma_collector::params::libvirt_connection,
-) inherits lma_collector::params {
 
-  validate_string($connection)
+class lma_collector::collectd::haproxy (
+  $socket,
+) {
 
-  class { 'collectd::plugin::libvirt':
-    connection      => $connection,
-    hostname_format => 'uuid',
+  include lma_collector::params
+
+  lma_collector::collectd::python { 'haproxy':
+    config => {
+      'Socket'      => $socket,
+      'Mapping'     => $lma_collector::params::haproxy_names_mapping,
+      # Ignore internal stats ('Stats' for 6.1, 'stats' for 7.0) and lma proxies
+      'ProxyIgnore' => ['Stats', 'stats', 'lma'],
+    },
   }
 }
