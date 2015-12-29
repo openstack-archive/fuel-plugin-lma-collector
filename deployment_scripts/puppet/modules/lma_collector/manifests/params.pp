@@ -126,7 +126,6 @@ class lma_collector::params {
   $openstack_url = 'http://127.0.0.1:5000/v2.0/'
   $openstack_client_timeout = 5
   $nova_cpu_allocation_ratio = 8.0
-  $memcached_host = '127.0.0.1'
   $fstypes = ['ext2', 'ext3', 'ext4', 'xfs']
   $collectd_types = [ 'ceph', 'ceph_perf' ]
   $libvirt_connection = 'qemu:///system'
@@ -156,28 +155,6 @@ class lma_collector::params {
 
   $apache_status_host = '127.0.0.1'
   $apache_allow_from  = ['127.0.0.1','::1']
-
-  $haproxy_names_mapping = {
-    'cinder-api'          => 'cinder-api',
-    'glance-api'          => 'glance-api',
-    'glance-registry'     => 'glance-registry-api',
-    'heat-api'            => 'heat-api',
-    'heat-api-cfn'        => 'heat-cfn-api',
-    'heat-api-cloudwatch' => 'heat-cloudwatch-api',
-    'horizon'             => 'horizon-web',
-    'horizon-ssl'         => 'horizon-https',
-    'keystone-1'          => 'keystone-public-api',
-    'keystone-2'          => 'keystone-admin-api',
-    'murano'              => 'murano-api',
-    'mysqld'              => 'mysqld-tcp',
-    'neutron'             => 'neutron-api',
-    'nova-api-1'          => 'nova-ec2-api',
-    'nova-api-2'          => 'nova-api',
-    'nova-novncproxy'     => 'nova-novncproxy-websocket',
-    'nova-metadata-api'   => 'nova-metadata-api',
-    'sahara'              => 'sahara-api',
-    'swift'               => 'swift-api',
-  }
 
   $gse_policies_module = 'gse_policies'
 
