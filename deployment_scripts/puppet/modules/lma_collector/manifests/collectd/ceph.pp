@@ -12,20 +12,24 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-class lma_collector::collectd::dbi {
-  include lma_collector::params
 
-  if $::osfamily == 'RedHat' {
-    package { 'collectd-dbi':
-      ensure => present,
+define lma_collector::collectd::ceph {
+
+  $supported = ['pg_mon_status', 'pool_osd', 'osd_status', 'osd_perf']
+  if ! member($supported, $title) {
+    fail("'${title}' is not supported")
+  }
+
+  if $title == 'osd_perf' {
+    $config = {
+      'AdminSocket' => '/var/run/ceph/ceph-*.asock',
     }
+  } else {
+    $config = {}
   }
 
-  package { $lma_collector::params::collectd_dbi_package:
-    ensure => present,
+  lma_collector::collectd::python { "ceph_${title}":
+    config => $config,
   }
 
-  collectd::plugin { 'dbi':
-    require => Package[$lma_collector::params::collectd_dbi_package],
-  }
 }
