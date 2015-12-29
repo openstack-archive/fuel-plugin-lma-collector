@@ -22,7 +22,7 @@ describe 'lma_collector::collectd::pacemaker' do
     describe 'with "resources" param' do
         let(:params) {{:resources => ['vip__public', 'vip__management']}}
         it { is_expected.to contain_lma_collector__collectd__python('pacemaker_resource') \
-             .with_config({'Resources' => ['vip__public', 'vip__management']}) }
+             .with_config({'Resource' => ['vip__public', 'vip__management']}) }
         it { is_expected.not_to contain_collectd__plugin('target_notification') }
         it { is_expected.not_to contain_collectd__plugin('match_regex') }
         it { is_expected.not_to contain_class('collectd::plugin::chain') }
@@ -34,7 +34,7 @@ describe 'lma_collector::collectd::pacemaker' do
              :master_resource => 'vip__management'}
         end
         it { is_expected.to contain_lma_collector__collectd__python('pacemaker_resource') \
-             .with_config({'Resources' => ['vip__public', 'vip__management']}) }
+             .with_config({'Resource' => ['vip__public', 'vip__management']}) }
         it { is_expected.to contain_collectd__plugin('target_notification') }
         it { is_expected.to contain_collectd__plugin('match_regex') }
         it { is_expected.to contain_class('collectd::plugin::chain') }
