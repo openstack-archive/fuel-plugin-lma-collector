@@ -19,6 +19,7 @@ define heka::input::logstreamer(
   $log_directory = '/var/log',
   $file_match = undef,
   $differentiator = undef,
+  $priority = undef,
   $ensure = present,
 ) {
 
