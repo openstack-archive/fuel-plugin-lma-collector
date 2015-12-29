@@ -12,27 +12,17 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-#
-# == Class lma_collector::collectd::libvirt
-#
-# Class that configures collectd for collecting libvirt metrics.
-#
-# Note that the collectd plugin is configured to send the instance's UUID as
-# the hostname of the collectd data.
-#
-# === Parameters:
-#
-# [*connection*]
-#   (optional) The hypervisor connection URI. Default is 'qemu:///system'.
-#
-class lma_collector::collectd::libvirt (
-  $connection = $lma_collector::params::libvirt_connection,
+
+class lma_collector::collectd::apache (
+  $host = $lma_collector::params::apache_status_host,
 ) inherits lma_collector::params {
 
-  validate_string($connection)
-
-  class { 'collectd::plugin::libvirt':
-    connection      => $connection,
-    hostname_format => 'uuid',
+  class { 'collectd::plugin::apache':
+    instances => {
+      'localhost' => {
+        'url' => "http://${host}/server-status?auto"
+      },
+    }
   }
+
 }
