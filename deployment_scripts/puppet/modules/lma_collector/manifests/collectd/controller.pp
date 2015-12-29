@@ -28,7 +28,7 @@ class lma_collector::collectd::controller (
 ) inherits lma_collector::params {
 
   include collectd::params
-  include lma_collector::collectd::service
+  #include lma_collector::collectd::service
 
   $openstack_configuration = {
     'Username'    => $service_user,
@@ -132,7 +132,7 @@ class lma_collector::collectd::controller (
     group   => $collectd::params::root_group,
     mode    => '0640',
     content => template('lma_collector/collectd_python.conf.erb'),
-    notify  => Class['lma_collector::collectd::service'],
+    #notify  => Class['lma_collector::collectd::service'],
   }
 
   lma_collector::collectd::python_script { 'base.py':
