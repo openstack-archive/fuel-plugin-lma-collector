@@ -21,8 +21,9 @@ define lma_collector::collectd::dbi_services (
   $report_interval  = undef,
   $downtime_factor  = undef,
 ) {
+
   include collectd::params
-  include lma_collector::collectd::service
+
   $service = $title
 
   if $report_interval == undef {
@@ -49,11 +50,16 @@ define lma_collector::collectd::dbi_services (
 
   $plugin_conf_dir = $collectd::params::plugin_conf_dir
 
+  # FIXME(elemoine) we really should use the collecd::plugin::dbi class instead
+  # of adding collectd configuration files ourselves. Adding collectd
+  # configuration files ourselves forces us to reference to "collectd" service
+  # resource, which is private to the "collectd" module.
+
   file { "${plugin_conf_dir}/dbi_${service}_${type}.conf":
     owner   => 'root',
     group   => $collectd::params::root_group,
     mode    => '0640',
     content => template('lma_collector/collectd_dbi_services.conf.erb'),
-    notify  => Class['lma_collector::collectd::service'],
+    notify  => Service['collectd'],
   }
 }
