@@ -12,20 +12,16 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-class lma_collector::collectd::dbi {
+define lma_collector::collectd::python (
+  $config = {},
+) {
   include lma_collector::params
+  include lma_collector::collectd::python_base
 
-  if $::osfamily == 'RedHat' {
-    package { 'collectd-dbi':
-      ensure => present,
-    }
-  }
-
-  package { $lma_collector::params::collectd_dbi_package:
-    ensure => present,
-  }
-
-  collectd::plugin { 'dbi':
-    require => Package[$lma_collector::params::collectd_dbi_package],
+  collectd::plugin::python::module { "module_${title}":
+    module        => $title,
+    modulepath    => $lma_collector::collectd::python_base::modulepath,
+    script_source => "puppet:///modules/lma_collector/collectd/${title}.py",
+    config        => $config,
   }
 }
