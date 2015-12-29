@@ -28,7 +28,7 @@ describe 'lma_collector::collectd::hypervisor' do
              .with_config({"Username" => '"user"', "Password" => '"password"',
                            "Tenant" => '"tenant"',
                            "KeystoneUrl" => '"http://example.com/keystone"',
-                           "Timeout" => '"5"', "CpuAllocationRatio" => '"8.0"'}) }
+                           "Timeout" => '"5"', "CpuAllocationRatio" => '"16.0"'}) }
     end
 
     describe 'with required and optional params' do
