@@ -22,7 +22,7 @@ class lma_collector::collectd::pacemaker (
 
   lma_collector::collectd::python { 'pacemaker_resource':
     config => {
-      'Resources' => $resources,
+      'Resource' => $resources,
     },
   }
 
