@@ -15,6 +15,7 @@
 prepare_network_config(hiera('network_scheme', {}))
 $messaging_address = get_network_role_property('mgmt/messaging', 'ipaddr')
 $memcache_address  = get_network_role_property('mgmt/memcache', 'ipaddr')
+$current_roles     = hiera('roles')
 
 include lma_collector::params
 
@@ -89,21 +90,77 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     $ceph_enabled = false
   }
 
-  class { 'lma_collector::collectd::controller':
-    service_user              => 'nova',
-    service_password          => $nova['user_password'],
-    service_tenant            => 'services',
+  #  class { 'lma_collector::collectd::controller':
+  #    service_user              => 'nova',
+  #    service_password          => $nova['user_password'],
+  #    service_tenant            => 'services',
+  #    keystone_url              => "http://${management_vip}:5000/v2.0",
+  #    haproxy_socket            => $haproxy_socket,
+  #    ceph_enabled              => $ceph_enabled,
+  #    memcached_host            => $memcache_address,
+  #    pacemaker_resources       => [
+  #        'vip__public',
+  #        'vip__management',
+  #        'vip__vrouter_pub',
+  #        'vip__vrouter',
+  #    ],
+  #    pacemaker_master_resource => 'vip__management',
+  #  }
+
+  if member($current_roles, 'influxdb_grafana') {
+    $processes = ['influxd', 'grafana-server', 'hekad', 'collectd']
+  } else {
+    $processes = ['hekad', 'collectd']
+  }
+
+  if member($current_roles, 'elasticsearch_kibana') {
+    $process_matches = [{name => 'elasticsearch', regex => 'java'}]
+  } else {
+    $process_matches = undef
+  }
+
+  class { 'lma_collector::collectd::base':
+    processes       => $processes,
+    process_matches => $process_matches,
+    # collectd plugins on controller do many network I/O operations, so
+    # it is recommended to increase this value
+    read_threads    => 10,
+  }
+
+  class { 'lma_collector::collectd::rabbitmq': }
+
+  $openstack_service_config = {
+    user                      => 'nova',
+    password                  => $nova['user_password'],
+    tenant                    => 'services',
     keystone_url              => "http://${management_vip}:5000/v2.0",
-    haproxy_socket            => $haproxy_socket,
-    ceph_enabled              => $ceph_enabled,
-    memcached_host            => $memcache_address,
-    pacemaker_resources       => [
-        'vip__public',
-        'vip__management',
-        'vip__vrouter_pub',
-        'vip__vrouter',
-    ],
     pacemaker_master_resource => 'vip__management',
+  }
+  $openstack_services = {
+    'nova'     => $openstack_service_config,
+    'cinder'   => $openstack_service_config,
+    'glance'   => $openstack_service_config,
+    'keystone' => $openstack_service_config,
+    'neutron'  => $openstack_service_config,
+  }
+  create_resources(lma_collector::collectd::openstack, $openstack_services)
+
+  # FIXME use the special attribute * when Fuel uses a Puppet version
+  # that supports it.
+  class { 'lma_collector::collectd::openstack_checks':
+    user         => $openstack_service_config[user],
+    password     => $openstack_service_config[password],
+    tenant       => $openstack_service_config[tenant],
+    keystone_url => $openstack_service_config[keystone_url]
+  }
+
+  # FIXME use the special attribute * when Fuel uses a Puppet version
+  # that supports it.
+  class { 'lma_collector::collectd::hypervisor':
+    user         => $openstack_service_config[user],
+    password     => $openstack_service_config[password],
+    tenant       => $openstack_service_config[tenant],
+    keystone_url => $openstack_service_config[keystone_url]
   }
 
   class { 'lma_collector::collectd::mysql':
@@ -112,8 +169,7 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     password => $nova['db_password'],
   }
 
-  class { 'lma_collector::collectd::dbi':
-  }
+  class { 'lma_collector::collectd::dbi': }
 
   lma_collector::collectd::dbi_services { 'nova':
     username        => 'nova',
@@ -148,6 +204,31 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     downtime_factor => 4,
     require         => Class['lma_collector::collectd::dbi'],
   }
+
+  class { 'lma_collector::collectd::haproxy':
+    socket => $haproxy_socket,
+  }
+
+  if $ceph_enabled {
+    lma_collector::collectd::ceph { 'pg_mon_status': }
+    lma_collector::collectd::ceph { 'pg_pool_osd': }
+    lma_collector::collectd::ceph { 'pg_osd_stats': }
+  }
+
+  class { 'lma_collector::collectd::memcached':
+    host => $memcached_host,
+  }
+
+  class { 'lma_collector::collectd::pacemaker':
+    resources => [
+      'vip__public',
+      'vip__management',
+      'vip__vrouter_pub',
+      'vip__vrouter',
+    ]
+  }
+
+  class { 'lma_collector::collectd::apache': }
 
   class { 'lma_collector::logs::metrics': }
 
