@@ -52,8 +52,6 @@ class lma_collector::params {
   # required to read the log files
   case $::osfamily {
     'Debian': {
-      # "keystone" group required to be able to read log files located
-      # in /var/log/keystone
       $run_as_root = false
       $groups = ['syslog', 'adm']
     }
