@@ -33,7 +33,7 @@ module Puppet::Parser::Functions
 
         $max_buffer_size = 1024
         $max_file_size = 2048
-        validate_buffering($max_buffer_size, $max_file_size)
+        validate_buffering($max_buffer_size, $max_file_size, 'drop')
 
         $max_buffer_size = 2048
         $max_file_size = 1024
