@@ -36,6 +36,7 @@ local logger_map = {
     identity = 'keystone',
     -- nova
     compute = 'nova',
+    compute_task = 'nova',
     scheduler = 'nova',
     keypair = 'nova',
     -- neutron
