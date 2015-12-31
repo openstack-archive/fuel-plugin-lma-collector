@@ -58,10 +58,10 @@ end
 
 function process_message ()
 
-    -- Logger is of form "<service>/<program>" (e.g. "nova/nova-api",
-    -- "neutron/l3-agent").
+    -- Logger is of form "<service>_<program>" (e.g. "nova_nova-api",
+    -- "neutron_l3-agent").
     local logger = read_message("Logger")
-    local service, program = string.match(logger, '([^/]+)/(.+)')
+    local service, program = string.match(logger, '([^_]+)_(.+)')
 
     local log = read_message("Payload")
     local m

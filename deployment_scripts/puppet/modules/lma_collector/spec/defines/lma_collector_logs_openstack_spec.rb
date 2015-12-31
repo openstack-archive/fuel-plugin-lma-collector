@@ -23,6 +23,7 @@ describe "lma_collector::logs::openstack" do
 
     describe "with title" do
         let(:title) { :nova }
-        it { is_expected.to contain_heka__input__logstreamer('nova') }
+        it { is_expected.to contain_heka__input__logstreamer('nova') \
+             .with_differentiator("['nova', '_', 'Service']") }
     end
 end
