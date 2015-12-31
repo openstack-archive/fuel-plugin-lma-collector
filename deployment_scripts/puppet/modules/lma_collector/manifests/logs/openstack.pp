@@ -37,7 +37,7 @@ define lma_collector::logs::openstack {
     decoder        => 'openstack',
     splitter       => 'openstack',
     file_match     => '(?P<Service>.+)\.log$',
-    differentiator => "['${title}', '/', 'Service']",
+    differentiator => "['${title}', '_', 'Service']",
     require        => Class['lma_collector::logs::openstack_decoder_splitter'],
     notify         => Class['lma_collector::service'],
   }
