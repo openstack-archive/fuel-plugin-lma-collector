@@ -5,5 +5,8 @@ file_match = '<%= @file_match %>'
 <% if @differentiator -%>
 differentiator = <%= @differentiator %>
 <% end -%>
+<% if @priority -%>
+priority = <%= @priority %>
+<% end -%>
 decoder = "<%= @decoder %>_decoder"
 splitter = "<%= @splitter ? "#{ @splitter }_splitter" : "TokenSplitter" %>"
