@@ -25,6 +25,10 @@ define heka::input::logstreamer(
 
   include heka::params
 
+  if $differentiator and ('/' in $differentiator) {
+    fail('differentiator contains a slash character')
+  }
+
   file { "${config_dir}/logstreamer-${title}.toml":
     ensure  => $ensure,
     content => template('heka/input/logstreamer.toml.erb'),
