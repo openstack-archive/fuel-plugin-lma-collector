@@ -16,6 +16,7 @@
 # plugin's configuration matches with the environment.
 
 $lma_collector = hiera_hash('lma_collector')
+$network_metadata = hiera('network_metadata')
 
 $elasticsearch_mode = $lma_collector['elasticsearch_mode']
 if $elasticsearch_mode == 'local' {
@@ -30,8 +31,8 @@ if $elasticsearch_mode == 'local' {
   }
 
   # Check that the Elasticsearch-Kibana node exists in the environment
-  $es_nodes = filter_nodes(hiera('nodes'), 'role', 'elasticsearch_kibana')
-  if size($es_nodes) < 1 {
+  $es_nodes = get_nodes_hash_by_roles($network_metadata, ['elasticsearch_kibana', 'primary-elasticsearch_kibana'])
+  if size(keys($es_nodes)) < 1 {
     fail("Could not find node with role 'elasticsearch_kibana' in the environment")
   }
 }
@@ -48,8 +49,8 @@ if $influxdb_mode == 'local' {
     fail('Could not get the InfluxDB parameters. The InfluxDB-Grafana plugin is probably not enabled for this environment.')
   }
   # Check that the InfluxDB-Grafana node exists in the environment
-  $influxdb_nodes = filter_nodes(hiera('nodes'), 'role', 'influxdb_grafana')
-  if size($influxdb_nodes) < 1 {
+  $influxdb_nodes = get_nodes_hash_by_roles($network_metadata, ['influxdb_grafana', 'primary-influxdb_grafana'])
+  if size(keys($influxdb_nodes)) < 1 {
     fail("Could not find node with role 'influxdb_grafana' in the environment")
   }
 }
@@ -66,8 +67,8 @@ if $alerting_mode == 'local' {
     fail('Could not get the LMA Infrastructure Alerting parameters. The LMA-Infrastructure-Alerting plugin is probably not enabled for this environment.')
   }
   # Check that the LMA-Infrastructure-Alerting node exists in the environment
-  $infra_alerting_nodes = filter_nodes(hiera('nodes'), 'role', 'infrastructure_alerting')
-  if size($infra_alerting_nodes) < 1 {
+  $infra_alerting_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting', 'primary-infrastructure_alerting'])
+  if size(keys($infra_alerting_nodes)) < 1 {
     fail("Could not find node with role 'infrastructure_alerting' in the environment")
   }
 }
