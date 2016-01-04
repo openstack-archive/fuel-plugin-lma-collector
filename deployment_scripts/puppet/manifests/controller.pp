@@ -63,7 +63,8 @@ if $murano['enabled'] {
 }
 if ! $storage_options['objects_ceph'] {
   class { 'lma_collector::logs::swift':
-    file_match => 'swift-all\.log$',
+    file_match => 'swift-all\.log\.?(?P<Seq>\d*)$',
+    priority   => '["^Seq"]',
   }
 }
 
