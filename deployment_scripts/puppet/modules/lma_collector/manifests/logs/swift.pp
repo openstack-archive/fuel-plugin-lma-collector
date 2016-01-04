@@ -29,13 +29,24 @@
 # === Parameters:
 #
 # [*file_match*]
-#   (mandatory) The log file name pattern. Example: 'swift\.log$'.
+#   (mandatory) The log file name pattern. Example: 'swift\.log$'. Example
+#   for a sequential rotating logfile: 'swift\.log\.?(?P<Seq>\d*)$'. See
+#   http://hekad.readthedocs.org/en/latest/pluginconfig/logstreamer.html
+#   for more information.
+#
+# [*priority*]
+#   (optional) When using sequential logstreams, the priority defines how
+#   to sort the logfiles in order from the slowest to newest. Example:
+#   '["^Seq"]'. See
+#   http://hekad.readthedocs.org/en/latest/pluginconfig/logstreamer.html
+#   for more information.
 #
 # [*log_directory*]
 #   (optional) The log directory. Default is /var/log.
 #
 class lma_collector::logs::swift (
   $file_match,
+  $priority = undef,
   $log_directory = $lma_collector::params::log_directory,
 ) inherits lma_collector::params {
   include lma_collector::service
@@ -58,6 +69,7 @@ class lma_collector::logs::swift (
     log_directory  => $log_directory,
     file_match     => $file_match,
     differentiator => '[\'openstack.swift\']',
+    priority       => $priority,
     require        => Heka::Decoder::Sandbox['swift'],
     notify         => Class['lma_collector::service'],
   }
