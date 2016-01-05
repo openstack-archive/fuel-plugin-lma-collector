@@ -7,7 +7,7 @@ version: 0.9.0
 # Description
 description: Collect logs, metrics and notifications from system and OpenStack services and forward that information to external backends such as Elasticsearch and InfluxDB.
 # Required fuel version
-fuel_version: ['7.0', '8.0']
+fuel_version: ['8.0']
 
 authors: [Mirantis Inc.]
 licenses: [Apache License Version 2.0]
@@ -18,11 +18,6 @@ groups: ['monitoring']
 releases:
   - os: ubuntu
     version: 2015.1.0-8.0
-    mode: ['ha']
-    deployment_scripts_path: deployment_scripts/
-    repository_path: repositories/ubuntu
-  - os: ubuntu
-    version: 2015.1.0-7.0
     mode: ['ha']
     deployment_scripts_path: deployment_scripts/
     repository_path: repositories/ubuntu
