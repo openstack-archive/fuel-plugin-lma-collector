@@ -146,3 +146,9 @@ LMA self-monitoring
 -------------------
 
 .. include:: metrics/lma.rst
+
+
+Elasticsearch
+-------------
+
+.. include:: metrics/elasticsearch.rst
