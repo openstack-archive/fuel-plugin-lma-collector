@@ -352,6 +352,8 @@ function process_message ()
                 else
                     msg['Fields']['name'] = 'virt' .. sep .. metric_name
                 end
+            elseif metric_source ==  'elasticsearch_cluster' then
+                msg['Fields']['name'] = metric_source .. sep .. sample['type_instance']
             else
                 msg['Fields']['name'] = replace_dot_by_sep(metric_name)
             end

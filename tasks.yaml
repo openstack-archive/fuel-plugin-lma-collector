@@ -86,6 +86,16 @@
     puppet_modules: puppet/modules
     timeout: 600
 
+- role:
+    - primary-elasticsearch_kibana
+    - elasticsearch_kibana
+  stage: post_deployment/8200
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/lma_backends.pp
+    puppet_modules: puppet/modules
+    timeout: 600
+
 - role: '*'
   stage: post_deployment/8200
   type: puppet
