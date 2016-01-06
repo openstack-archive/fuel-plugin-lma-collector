@@ -146,18 +146,6 @@ case $influxdb_mode {
       $influxdb_password = $influxdb_grafana['influxdb_userpass']
     }
 
-    if member($current_roles, 'influxdb_grafana') or  member($current_roles, 'primary-influxdb_grafana'){
-      $processes = ['influxd', 'grafana-server', 'hekad', 'collectd']
-    } else {
-      $processes = ['hekad', 'collectd']
-    }
-
-    if member($current_roles, 'elasticsearch_kibana') or member($current_roles, 'primary-elasticsearch_kibana') {
-      $process_matches = [{name => 'elasticsearch', regex => 'java'}]
-    }else{
-      $process_matches = undef
-    }
-
     if $is_controller {
       # plugins on the controllers do many network I/O operations so it is
       # recommended to increase this value.
@@ -167,11 +155,13 @@ case $influxdb_mode {
       $collectd_read_threads = 5
     }
 
+    # TODO(all): this class could be executed several times by other puppet runs,
+    # this is useless and need to be fixed by using a single collectd.pp
+    # manifest configuring collectd for all roles.
     class { 'lma_collector::collectd::base':
-      processes       => $processes,
-      process_matches => $process_matches,
-      read_threads    => $collectd_read_threads,
-      require         => Class['lma_collector'],
+      processes    => ['hekad', 'collectd'],
+      read_threads => $collectd_read_threads,
+      require      => Class['lma_collector'],
     }
 
     class { 'lma_collector::influxdb':
