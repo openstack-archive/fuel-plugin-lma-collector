@@ -146,13 +146,13 @@ case $influxdb_mode {
       $influxdb_password = $influxdb_grafana['influxdb_userpass']
     }
 
-    if member($current_roles, 'influxdb_grafana') {
+    if member($current_roles, 'influxdb_grafana') or  member($current_roles, 'primary-influxdb_grafana'){
       $processes = ['influxd', 'grafana-server', 'hekad', 'collectd']
     } else {
       $processes = ['hekad', 'collectd']
     }
 
-    if member($current_roles, 'elasticsearch_kibana') {
+    if member($current_roles, 'elasticsearch_kibana') or member($current_roles, 'primary-elasticsearch_kibana') {
       $process_matches = [{name => 'elasticsearch', regex => 'java'}]
     }else{
       $process_matches = undef
