@@ -19,7 +19,7 @@ lma_collector:
   #   - 'percent' which returns the percentage of members that match the passed value(s)
   #
   # The following rule definition reads as "the cluster's status is critical if
-  # more than 50% of its members are either down or criticial":
+  # more than 50% of its members are either down or critical":
   #
   #    - status: critical
   #      trigger:
@@ -379,6 +379,13 @@ lma_collector:
         members:
           - cpu
           - root-fs
+<% if @elasticsearch_enabled -%>
+      elasticsearch-nodes:
+        policy: majority_of_members
+        group_by: member
+        members:
+          - data-fs
+<% end -%>
 
   gse_cluster_global:
     input_message_types:
@@ -553,4 +560,12 @@ lma_collector:
           - ceph-mon
           - controller
           - storage
+<% end -%>
+<% if @elasticsearch_enabled -%>
+      elasticsearch:
+        policy: highest_severity
+        group_by: member
+        members:
+          - elasticsearch
+          - elasticsearch-nodes
 <% end -%>
