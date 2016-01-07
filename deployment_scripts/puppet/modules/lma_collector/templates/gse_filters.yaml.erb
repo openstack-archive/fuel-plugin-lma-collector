@@ -333,6 +333,13 @@ lma_collector:
           - health
           - capacity
 <% end -%>
+<% if @monitor_elasticsearch -%>
+      elasticsearch:
+        policy: highest_severity
+        group_by: member
+        members:
+          - health
+<% end -%>
 
   gse_cluster_node:
     input_message_types:
@@ -546,4 +553,11 @@ lma_collector:
           - ceph-mon
           - controller
           - storage
+<% end -%>
+<% if @monitor_elasticsearch -%>
+      elasticsearch:
+        policy: highest_severity
+        group_by: member
+        members:
+          - elasticsearch
 <% end -%>

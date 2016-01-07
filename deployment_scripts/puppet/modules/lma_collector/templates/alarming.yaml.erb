@@ -506,6 +506,30 @@ lma_collector:
             window: 60
             function: max
 <% end -%>
+<% if @monitor_elasticsearch -%>
+    - name: 'elasticsearch-health-critical'
+      description: 'Elasticsearch cluster health is critical'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: elasticsearch_cluster_health
+            relational_operator: '=='
+            threshold: 3 # red
+            window: 60
+            function: max
+    - name: 'elasticsearch-health-warning'
+      description: 'Elasticsearch health is warning'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: elasticsearch_cluster_health
+            relational_operator: '=='
+            threshold: 2 # yellow
+            window: 60
+            function: max
+<% end -%>
 
   node_cluster_roles:
     controller: ['primary-controller', 'controller']
@@ -529,6 +553,9 @@ lma_collector:
     keystone-admin-api: ['primary-controller', 'controller']
 <% if @storage_options["volumes_ceph"] then -%>
     ceph-mon: ['primary-controller', 'controller']
+<% end -%>
+<% if @monitor_elasticsearch -%>
+    elasticsearch: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
 <% end -%>
 
   node_cluster_alarms:
@@ -580,4 +607,8 @@ lma_collector:
     ceph-mon:
       health: ['ceph-health-critical', 'ceph-health-warning']
       capacity: ['ceph-capacity-critical', 'ceph-capacity-warning']
+<% end -%>
+<% if @monitor_elasticsearch -%>
+    elasticsearch:
+      health: ['elasticsearch-health-critical', 'elasticsearch-health-warning']
 <% end -%>
