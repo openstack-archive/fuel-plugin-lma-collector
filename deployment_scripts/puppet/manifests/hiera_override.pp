@@ -20,6 +20,13 @@ if ($plugin_data) {
   $ceilometer = hiera_hash('ceilometer', {})
   $ceilometer_enabled = pick($ceilometer['enabled'], false)
 
+  $elasticsearch_mode = $plugin_data['elasticsearch_mode']
+  if $elasticsearch_mode != 'disabled' {
+      $elasticsearch_enabled = true
+  } else {
+      $elasticsearch_enabled = false
+  }
+
   lma_collector::hiera_data { 'gse_filters':
     content => template('lma_collector/gse_filters.yaml.erb')
   }

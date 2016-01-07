@@ -333,6 +333,13 @@ lma_collector:
           - health
           - capacity
 <% end -%>
+<% if @elasticsearch_enabled -%>
+      elasticsearch:
+        policy: highest_severity
+        group_by: member
+        members:
+          - health
+<% end -%>
 
   gse_cluster_node:
     input_message_types:
