@@ -529,6 +529,34 @@ lma_collector:
             threshold: 2 # yellow
             window: 60
             function: max
+    - name: 'elasticsearch-fs-warning'
+      description: "The filesystem's free space is low (elasticsearch node)."
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: fs_space_percent_free
+            fields:
+              fs: '/opt/es-data'
+            relational_operator: '<'
+            threshold: 10
+            window: 60
+            periods: 0
+            function: min
+    - name: 'elasticsearch-fs-critical'
+      description: "The filesystem's free space is too low (elasticsearch node)."
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: fs_space_percent_free
+            fields:
+              fs: '/opt/es-data'
+            relational_operator: '<'
+            threshold: 5
+            window: 60
+            periods: 0
+            function: min
 <% end -%>
 
   node_cluster_roles:
@@ -536,6 +564,9 @@ lma_collector:
     mysql-nodes: ['primary-controller', 'controller']
     compute: ['compute']
     storage: ['cinder', 'ceph-osd']
+<% if @monitor_elasticsearch -%>
+    elasticsearch-nodes: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
+<% end -%>
 
   service_cluster_roles:
     rabbitmq: ['primary-controller', 'controller']
@@ -575,6 +606,12 @@ lma_collector:
     default:
       cpu: ['cpu-critical-default']
       root-fs: ['root-fs-critical', 'root-fs-warning']
+<% if @monitor_elasticsearch -%>
+    elasticsearch-nodes:
+      cpu: ['cpu-critical-default']
+      root-fs: ['root-fs-critical', 'root-fs-warning']
+      data-fs: ['elasticsearch-fs-critical', 'elasticsearch-fs-warning']
+<% end -%>
 
   service_cluster_alarms:
     rabbitmq:
