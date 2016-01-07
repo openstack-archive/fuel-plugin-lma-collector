@@ -73,7 +73,7 @@ meta_data() {
     cat <<END
 <?xml version="1.0"?>
 <!DOCTYPE resource-agent SYSTEM "ra-api-1.dtd">
-<resource-agent name="heat-engine">
+<resource-agent name="lma_collector">
 <version>1.0</version>
 
 <longdesc lang="en">
