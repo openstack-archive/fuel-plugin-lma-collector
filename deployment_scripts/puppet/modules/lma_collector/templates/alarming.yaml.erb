@@ -286,7 +286,7 @@ lma_collector:
             function: min
     - name: 'nova-fs-warning'
       description: "The filesystem's free space is low (compute node)."
-      severity: 'critical'
+      severity: 'warning'
       enabled: 'true'
       trigger:
         rules:
@@ -541,7 +541,7 @@ lma_collector:
     compute:
       cpu: ['cpu-critical-compute', 'cpu-warning-compute']
       root-fs: ['root-fs-critical', 'root-fs-warning']
-      nova-fs: ['nova-fs-critical']
+      nova-fs: ['nova-fs-critical', 'nova-fs-warning']
     storage:
       cpu: ['cpu-critical-storage', 'cpu-warning-storage']
       root-fs: ['root-fs-critical', 'root-fs-warning']
