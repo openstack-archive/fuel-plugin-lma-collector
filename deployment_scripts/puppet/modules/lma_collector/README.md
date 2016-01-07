@@ -125,6 +125,22 @@ class { 'lma_collector::elasticsearch':
 }
 ```
 
+### Collect statistics (a.k.a. metrics)
+
+The `lma_collector::collectd::base` sets up collectd and the communication
+channel between collectd and Heka. It also sets up a number of standard collect
+plugins.
+
+Usage example:
+
+```puppet
+class { 'lma_collector::collectd::base':
+  processes       => ['influxdb', 'grafana-server', 'hekad', 'collectd'],
+  process_matches => [{name => 'elasticsearch', regex => 'java'}]
+  read_threads    => 10,
+}
+```
+
 ## Reference
 
 ### Classes
@@ -141,6 +157,7 @@ Public Classes:
 * [`lma_collector::logs::rabbitmq`](#class-lma_collectorlogsrabbitmq)
 * [`lma_collector::logs::system`](#class-lma_collectorlogssystem)
 * [`lma_collector::logs::swift`](#class-lma_collectorlogsswift)
+* [`lma_collector::collectd::base`](#class-lma_collectorcollectdbase)
 
 Private Classes:
 
@@ -248,6 +265,28 @@ a Syslog file.
   http://hekad.readthedocs.org/en/latest/pluginconfig/logstreamer.html
   for more information.
 * `log_directory`: *Optional*. The log directory. Default: `/var/log`.
+
+#### Class: `lma_collector::collectd::base`
+
+Declare this class to set up collectd and the communication channel between
+collectd and Heka. The declaration of this class also sets up a number of
+standard collectd plugins, namely `logfile`, `cpu`, `disk`, `interface`,
+`load`, `memory`, `processes`, `swap`, and `users`.
+
+##### Parameters
+
+* `processes`: *Optional*. The names of processes that the collectd
+  `processes` plugin will get statistics for. Valid options: an array of
+  strings. Default: `undef`. See
+  https://github.com/voxpupuli/puppet-collectd#class-collectdpluginprocesses
+  for more information.
+* `process_matches`: *Optional*. Name/regex pairs specifying the processes that
+  the collectd `processes` plugin will get statistics for. Valid options: an
+  array of hashs with two properties, `name` and `regex`. See
+  https://github.com/voxpupuli/puppet-collectd#class-collectdpluginprocesses
+  for more information.
+* `read_threads`: *Optional*. The number of threads used by collectd. Valid
+  options: an integer. Default: 5.
 
 #### Define: `lma_collector::logs::openstack`
 
