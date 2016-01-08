@@ -18,8 +18,7 @@ class lma_collector::collectd::base (
   $queue_limit = $lma_collector::params::collectd_queue_limit,
   $read_threads = $lma_collector::params::collectd_read_threads,
   $hostname = undef,
-){
-  include lma_collector::params
+) inherits lma_collector::params {
   include lma_collector::service
 
   $type_directory = "${lma_collector::params::plugins_dir}/collectd_types/"
