@@ -169,6 +169,17 @@ lma_collector::collectd::openstack { 'neutron':
 }
 ```
 
+### Collect HAProxy statistics
+
+To make the collector collect statistics for HAProxy declare the
+``lma_collector::collectd::haproxy`` class:
+
+```puppet
+lma_collector::collectd::haproxy {
+    socket => '/var/lib/haproxy/stats',
+}
+```
+
 ## Reference
 
 ### Classes
@@ -186,6 +197,7 @@ Public Classes:
 * [`lma_collector::logs::system`](#class-lma_collectorlogssystem)
 * [`lma_collector::logs::swift`](#class-lma_collectorlogsswift)
 * [`lma_collector::collectd::base`](#class-lma_collectorcollectdbase)
+* [`lma_collector::collectd::haproxy`](#class-lma_collectorcollectdhaproxy)
 
 Private Classes:
 
@@ -316,6 +328,16 @@ standard collectd plugins, namely `logfile`, `cpu`, `disk`, `interface`,
   for more information.
 * `read_threads`: *Optional*. The number of threads used by collectd. Valid
   options: an integer. Default: 5.
+
+#### Class: `lma_collector::collectd::haproxy`
+
+Declare this class to configure collectd to collect HAProxy statistics. The
+collectd plugin used is a Python script.
+
+##### Parameters
+
+* `socket`: *Required*. The path to HAProxy's `stats` Unix socket. E.g.
+  `/var/lib/haproxy/stats`. Valid options: a string.
 
 #### Define: `lma_collector::logs::openstack`
 
