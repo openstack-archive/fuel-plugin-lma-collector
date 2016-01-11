@@ -2,12 +2,22 @@
 
 ## Overview
 
-The `lma_collector` module lets you use Puppet to configure and deploy LMA
-(Logging, Monitoring and Alerting) collectors.
+The `lma_collector` module lets you use Puppet to configure and deploy
+collectors of the LMA (Logging, Monitoring and Alerting) toolchain.
 
-The LMA collector's main component is [Heka](http://hekad.readthedocs.org).
-Heka is used to process log, notification and metric messages, and persist
-these messages into Elasticsearch and InfluxDB.
+The main components of an LMA collector are:
+
+* [Heka](http://hekad.readthedocs.org). Heka is used to process log,
+  notification and metric messages, and persist these messages into
+  Elasticsearch and InfluxDB.
+
+* [collectd](http://collectd.org/). collectd is used for collecting
+  performance statistics from various sources.
+
+The following versions of Heka and collectd are known to work for LMA:
+
+* Heka v0.10.0 (`heka_0.10.0_amd64.deb`)
+* collectd v5.4.0 (`collectd_5.4.0-3ubuntu2_amd64.deb`)
 
 ## Usage
 
