@@ -22,6 +22,7 @@ $is_controller     = member($roles, 'controller') or member($roles, 'primary-con
 $is_base_os        = member($roles, 'base-os')
 $current_node_name = hiera('user_node_name')
 $current_roles     = hiera('roles')
+$network_metadata  = hiera_hash('network_metadata')
 
 $elasticsearch_kibana = hiera_hash('elasticsearch_kibana', {})
 $es_nodes = filter_nodes(hiera('nodes'), 'role', 'elasticsearch_kibana')
@@ -64,7 +65,6 @@ case $elasticsearch_mode {
   }
   'local': {
     $vip_name = 'es_vip_mgmt'
-    $network_metadata = hiera_hash('network_metadata')
     if $network_metadata['vips'][$vip_name] {
       $es_server = $network_metadata['vips'][$vip_name]['ipaddr']
     }else{
@@ -140,7 +140,12 @@ case $influxdb_mode {
     else {
       # Note: we don't validate data inputs because another manifest
       # is responsible to check their coherences.
-      $influxdb_server = $influxdb_nodes[0]['internal_address']
+      $influxdb_vip_name = 'influxdb'
+      if $network_metadata['vips'][$influxdb_vip_name] {
+        $influxdb_server = $network_metadata['vips'][$influxdb_vip_name]['ipaddr']
+      } else {
+        $influxdb_server = $influxdb_nodes[0]['internal_address']
+      }
       $influxdb_database = $influxdb_grafana['influxdb_dbname']
       $influxdb_user = $influxdb_grafana['influxdb_username']
       $influxdb_password = $influxdb_grafana['influxdb_userpass']
