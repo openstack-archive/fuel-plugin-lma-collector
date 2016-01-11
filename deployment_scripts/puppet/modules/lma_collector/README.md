@@ -190,6 +190,17 @@ lma_collector::collectd::rabbitmq {
 }
 ```
 
+### Collectd Memcached statistics
+
+To make the collector collect statistics for Memcached declare the
+``lma_collector::collectd::memcached`` class:
+
+```puppet
+lma_collector::collectd::memcached {
+    host => 'localhost',
+}
+```
+
 ## Reference
 
 ### Classes
@@ -209,6 +220,7 @@ Public Classes:
 * [`lma_collector::collectd::base`](#class-lma_collectorcollectdbase)
 * [`lma_collector::collectd::haproxy`](#class-lma_collectorcollectdhaproxy)
 * [`lma_collector::collectd::rabbitmq`](#class-lma_collectorcollectdrabbitmq)
+* [`lma_collector::collectd::memcached`](#class-lma_collectorcollectdmemcached)
 
 Private Classes:
 
@@ -354,6 +366,16 @@ collectd plugin used is a Python script.
 
 Declare this class to configure collectd to collect RabbitMQ statistics. The
 collectd plugin used is a Python script.
+
+#### Class: `lma_collector::collectd::memcached`
+
+Declare this class to configure collectd to collect Memcached statistics.
+collectd's native `memcached` plugin is used.
+
+#### Parameters
+
+* `host`: *Required*. The Memcached host. Valid options: a string. See
+  https://github.com/voxpupuli/puppet-collectd#class-collectdpluginmemcached.
 
 #### Define: `lma_collector::logs::openstack`
 
