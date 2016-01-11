@@ -180,6 +180,16 @@ lma_collector::collectd::haproxy {
 }
 ```
 
+### Collectd RabbitMQ statistics
+
+To make the collector collect statistics for RabbitMQ declare the
+``lma_collector::collectd::rabbitmq`` class:
+
+```puppet
+lma_collector::collectd::rabbitmq {
+}
+```
+
 ## Reference
 
 ### Classes
@@ -198,6 +208,7 @@ Public Classes:
 * [`lma_collector::logs::swift`](#class-lma_collectorlogsswift)
 * [`lma_collector::collectd::base`](#class-lma_collectorcollectdbase)
 * [`lma_collector::collectd::haproxy`](#class-lma_collectorcollectdhaproxy)
+* [`lma_collector::collectd::rabbitmq`](#class-lma_collectorcollectdrabbitmq)
 
 Private Classes:
 
@@ -338,6 +349,12 @@ collectd plugin used is a Python script.
 
 * `socket`: *Required*. The path to HAProxy's `stats` Unix socket. E.g.
   `/var/lib/haproxy/stats`. Valid options: a string.
+
+#### Class: `lma_collector::collectd::rabbitmq`
+
+Declare this class to configure collectd to collect RabbitMQ statistics. The
+collectd plugin used is a Python script, which uses the `rabbitmqctl` command
+to get statistics from RabbitMQ.
 
 #### Define: `lma_collector::logs::openstack`
 
