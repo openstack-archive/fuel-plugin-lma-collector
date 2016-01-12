@@ -15,7 +15,6 @@
 define lma_collector::collectd::python_script {
   include collectd::params
   include lma_collector::params
-  include lma_collector::collectd::service
 
   $python_module_path = $lma_collector::params::python_module_path
 
@@ -24,6 +23,6 @@ define lma_collector::collectd::python_script {
     group  => $collectd::params::root_group,
     mode   => '0644',
     source => "puppet:///modules/lma_collector/collectd/${title}",
-    notify => Class['lma_collector::collectd::service'],
+    notify => Service['collectd'],
   }
 }
