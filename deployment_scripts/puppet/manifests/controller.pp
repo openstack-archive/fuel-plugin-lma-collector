@@ -89,21 +89,63 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     $ceph_enabled = false
   }
 
-  class { 'lma_collector::collectd::controller':
-    service_user              => 'nova',
-    service_password          => $nova['user_password'],
-    service_tenant            => 'services',
-    keystone_url              => "http://${management_vip}:5000/v2.0",
-    haproxy_socket            => $haproxy_socket,
-    ceph_enabled              => $ceph_enabled,
-    memcached_host            => $memcache_address,
-    pacemaker_resources       => [
-        'vip__public',
-        'vip__management',
-        'vip__vrouter_pub',
-        'vip__vrouter',
+  class { 'lma_collector::collectd::base':
+    processes    => ['hekad', 'collectd'],
+    # collectd plugins on controller do many network I/O operations, so
+    # it is recommended to increase this value
+    read_threads => 10,
+  }
+
+  class { 'lma_collector::collectd::rabbitmq': }
+
+  $pacemaker_master_resource = 'vip__management'
+
+  class { 'lma_collector::collectd::pacemaker':
+    resources       => [
+      'vip__public',
+      'vip__management',
+      'vip__vrouter_pub',
+      'vip__vrouter',
     ],
-    pacemaker_master_resource => 'vip__management',
+    master_resource => $pacemaker_master_resource,
+  }
+
+  $openstack_service_config = {
+    user                      => 'nova',
+    password                  => $nova['user_password'],
+    tenant                    => 'services',
+    keystone_url              => "http://${management_vip}:5000/v2.0",
+    pacemaker_master_resource => $pacemaker_master_resource,
+  }
+  $openstack_services = {
+    'nova'     => $openstack_service_config,
+    'cinder'   => $openstack_service_config,
+    'glance'   => $openstack_service_config,
+    'keystone' => $openstack_service_config,
+    'neutron'  => $openstack_service_config,
+  }
+  create_resources(lma_collector::collectd::openstack, $openstack_services)
+
+  # FIXME(elemoine) use the special attribute * when Fuel uses a Puppet version
+  # that supports it.
+  class { 'lma_collector::collectd::openstack_checks':
+    user                      => $openstack_service_config[user],
+    password                  => $openstack_service_config[password],
+    tenant                    => $openstack_service_config[tenant],
+    keystone_url              => $openstack_service_config[keystone_url],
+    pacemaker_master_resource => $openstack_service_config[pacemaker_master_resource],
+  }
+
+  # FIXME(elemoine) use the special attribute * when Fuel uses a Puppet version
+  # that supports it.
+  class { 'lma_collector::collectd::hypervisor':
+    user                      => $openstack_service_config[user],
+    password                  => $openstack_service_config[password],
+    tenant                    => $openstack_service_config[tenant],
+    keystone_url              => $openstack_service_config[keystone_url],
+    pacemaker_master_resource => $openstack_service_config[pacemaker_master_resource],
+    # Fuel sets cpu_allocation_ratio to 8.0 in nova.conf
+    cpu_allocation_ratio      => 8.0,
   }
 
   class { 'lma_collector::collectd::mysql':
@@ -112,8 +154,7 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     password => $nova['db_password'],
   }
 
-  class { 'lma_collector::collectd::dbi':
-  }
+  class { 'lma_collector::collectd::dbi': }
 
   lma_collector::collectd::dbi_services { 'nova':
     username        => 'nova',
@@ -148,6 +189,43 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     downtime_factor => 4,
     require         => Class['lma_collector::collectd::dbi'],
   }
+
+  class { 'lma_collector::collectd::haproxy':
+    socket       => $haproxy_socket,
+    # Ignore internal stats ('Stats' for 6.1, 'stats' for 7.0) and lma proxies
+    proxy_ignore => ['Stats', 'stats', 'lma'],
+    proxy_names  => {
+      'cinder-api'          => 'cinder-api',
+      'glance-api'          => 'glance-api',
+      'glance-registry'     => 'glance-registry-api',
+      'heat-api'            => 'heat-api',
+      'heat-api-cfn'        => 'heat-cfn-api',
+      'heat-api-cloudwatch' => 'heat-cloudwatch-api',
+      'horizon'             => 'horizon-web',
+      'horizon-ssl'         => 'horizon-https',
+      'keystone-1'          => 'keystone-public-api',
+      'keystone-2'          => 'keystone-admin-api',
+      'murano'              => 'murano-api',
+      'mysqld'              => 'mysqld-tcp',
+      'neutron'             => 'neutron-api',
+      'nova-api-1'          => 'nova-ec2-api',
+      'nova-api-2'          => 'nova-api',
+      'nova-novncproxy'     => 'nova-novncproxy-websocket',
+      'nova-metadata-api'   => 'nova-metadata-api',
+      'sahara'              => 'sahara-api',
+      'swift'               => 'swift-api',
+    },
+  }
+
+  if $ceph_enabled {
+    class { 'lma_collector::collectd::ceph_mon': }
+  }
+
+  class { 'lma_collector::collectd::memcached':
+    host => $memcached_host,
+  }
+
+  class { 'lma_collector::collectd::apache': }
 
   class { 'lma_collector::logs::metrics': }
 

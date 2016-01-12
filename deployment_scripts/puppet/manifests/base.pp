@@ -151,22 +151,13 @@ case $influxdb_mode {
       $influxdb_password = $influxdb_grafana['influxdb_userpass']
     }
 
-    if $is_controller {
-      # plugins on the controllers do many network I/O operations so it is
-      # recommended to increase this value.
-      $collectd_read_threads = 10
-    }
-    else {
-      $collectd_read_threads = 5
-    }
+    if ! $is_controller {
 
-    # TODO(all): this class could be executed several times by other puppet runs,
-    # this is useless and need to be fixed by using a single collectd.pp
-    # manifest configuring collectd for all roles.
-    class { 'lma_collector::collectd::base':
-      processes    => ['hekad', 'collectd'],
-      read_threads => $collectd_read_threads,
-      require      => Class['lma_collector'],
+      class { 'lma_collector::collectd::base':
+        processes    => ['hekad', 'collectd'],
+        read_threads => 5,
+        require      => Class['lma_collector'],
+      }
     }
 
     class { 'lma_collector::influxdb':
