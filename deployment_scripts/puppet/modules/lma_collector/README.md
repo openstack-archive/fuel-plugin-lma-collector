@@ -267,6 +267,17 @@ lma_collector::collectd::ceph { 'osd_perf':
 }
 ```
 
+### Collect Pacemaker statistics
+
+To make the collector collect statistics for Pacemaker declare the
+``lma_collector::collectd::pacemaker`` class:
+
+```puppet
+class { 'lma_collector::collectd::pacemaker':
+  resources => ['vip__public', 'vip__management'],
+}
+```
+
 ## Reference
 
 ### Classes
@@ -290,6 +301,7 @@ Public Classes:
 * [`lma_collector::collectd::openstack_checks`](#class-lma_collectorcollectdopenstackchecks)
 * [`lma_collector::collectd::apache`](#class-lma_collectorcollectdapache)
 * [`lma_collector::collectd::hypervisor`](#class-lma_collectorcollectdhypervisor)
+* [`lma_collector::collectd::pacemaker`](#class-lma_collectorcollectdpacemaker)
 
 Private Classes:
 
@@ -475,7 +487,10 @@ services. The collectd plugin used is a Python script.
   Default: 5.
 * `pacemaker_master_resource`: *Optional*. Name of the pacemaker resource used
   to determine if the collecting of statistics should be active. This is
-  a parameter for advanced users. Valid options: a string. Default: `undef`.
+  a parameter for advanced users. For this to function the
+  [`lma_collector::collectd::pacemaker`](#class-lma_collectorcollectdpacemaker)
+  class should be declared, with its `master_resource` parameter set to the
+  same value as this parameter. Valid options: a string. Default: `undef`.
 
 #### Class: `lma_collector::collectd::apache``
 
@@ -510,7 +525,32 @@ Nova API.
   Default: 5.
 * `pacemaker_master_resource`: *Optional*. Name of the pacemaker resource used
   to determine if the collecting of statistics should be active. This is
-  a parameter for advanced users. Valid options: a string. Default: `undef`.
+  a parameter for advanced users. For this to function the
+  [`lma_collector::collectd::pacemaker`](#class-lma_collectorcollectdpacemaker)
+  class should be declared, with its `master_resource` parameter set to the
+  same value as this parameter. Valid options: a string. Default: `undef`.
+
+#### Class: `lma_collector::collectd::pacemaker`
+
+Declare this class to configure collectd to collect statistics on Pacemaker.
+The collectd plugin used is a Python script, which uses Pacemaker's
+`crm_resource` command to get statistics from Pacemaker.
+
+#### Parameters
+
+* `resources`: *Required*. The Pacemaker resources to get statistics for. Valid
+  options: an array of strings.
+* `master_resource`: *Optional*. If this is set a collectd `PostCache` chain is
+  created to generate a collectd notification each time the Python plugin
+  generates a metric for the Pacemaker resource identified to by
+  `master_resource`. Users of
+  [`lma_collector::collectd::openstack`](#define-lma_collectorcollectdopenstack),
+  [`lma_collector::collectd::openstack_checks`](#class-lma_collectorcollectdopenstackchecks) and
+  [`lma_collector::collectd::hypervisor`](#class-lma_collectorcollectdhypervisor)
+  with the `pacemaker_resource_master` parameter needs to declare the
+  `lma_collector::collectd::pacemaker` class and use that parameter.
+  Valid options: a string. Default: `undef`.
+
 
 #### Define: `lma_collector::logs::openstack`
 
@@ -552,7 +592,10 @@ The resource title should be set to the service name (e.g. `'nova'`).
   Default: 5.
 * `pacemaker_master_resource`: *Optional*. Name of the pacemaker resource used
   to determine if the collecting of statistics should be active. This is
-  a parameter for advanced users. Valid options: a string. Default: `undef`.
+  a parameter for advanced users. For this to function the
+  [`lma_collector::collectd::pacemaker`](#class-lma_collectorcollectdpacemaker)
+  class should be declared, with its `master_resource` parameter set to the
+  same value as this parameter. Valid options: a string. Default: `undef`.
 
 #### Define: `lma_collector::collectd::ceph`
 
