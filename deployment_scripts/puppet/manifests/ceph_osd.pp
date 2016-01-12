@@ -23,6 +23,9 @@ if $lma_collector_hash['influxdb_mode'] != 'disabled' {
   # overwritten by the next run. Currently only controller nodes have python
   # plugins installed so it's safe to install on all other roles .. for now.
   if ! ('controller' in $roles or 'primary-controller' in $roles){
+    class { 'lma_collector::collectd::base':
+      processes    => ['hekad', 'collectd'],
+    }
     class { 'lma_collector::collectd::ceph_osd': }
   }else{
     notice('ceph_osd_perf not configured to avoid messing of collectd python plugin configuration!')
