@@ -220,6 +220,19 @@ class {'lma_collector::collectd::memcached':
 }
 ```
 
+### Collect Apache statistics
+
+To make the collector collect statistics for Apache declare the
+``lma_collector::collectd::apache`` class:
+
+```puppet
+class { 'lma_collector::collectd::apache':
+}
+```
+
+This will collectd Apache statistics from
+`http://127.0.0.1/server-status?auto`.
+
 ## Reference
 
 ### Classes
@@ -241,6 +254,7 @@ Public Classes:
 * [`lma_collector::collectd::rabbitmq`](#class-lma_collectorcollectdrabbitmq)
 * [`lma_collector::collectd::memcached`](#class-lma_collectorcollectdmemcached)
 * [`lma_collector::collectd::openstack_checks`](#class-lma_collectorcollectdopenstackchecks)
+* [`lma_collector::collectd::apache`](#class-lma_collectorcollectdapache)
 
 Private Classes:
 
@@ -426,6 +440,19 @@ services. The collectd plugin used is a Python script.
 * `pacemaker_master_resource`: *Optional*. Name of the pacemaker resource used
   to determine if the collecting of statistics should be active. This is
   a parameter for advanced users. Valid options: a string. Default: `undef`.
+
+#### Class: `lma_collector::collectd::apache``
+
+Declare this class to configure collectd to collect Apache statistics.
+collectd's native `apache` plugin is used. The URL used is
+`http://${host}/server-status?auto`, where `${host}`  is replaced by the value
+provided with the `host` parameter.
+
+##### Parameters
+
+* `host`: *Optional*. The Apache host. Valid options: a string. Default:
+  `'127.0.0.1'`.
+* `port`: *Optional*. The Apache port. Valid options: a string. Default: `'80'`.
 
 #### Define: `lma_collector::logs::openstack`
 
