@@ -1,4 +1,4 @@
-#    Copyright 2015 Mirantis, Inc.
+#    Copyright 2015-2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -16,10 +16,11 @@ require 'spec_helper'
 describe 'lma_collector::collectd::ceph_osd' do
     let(:facts) do
         {:kernel => 'Linux', :operatingsystem => 'Ubuntu',
-         :osfamily => 'Debian'}
+         :osfamily => 'Debian', :concat_basedir => '/foo'}
     end
 
-    describe 'with defaults' do
-        it { is_expected.to contain_file('/etc/collectd/conf.d/ceph-osd.conf') }
+    describe 'with default params' do
+        it { is_expected.to contain_lma_collector__collectd__python('ceph_osd_perf') \
+             .with_config({'AdminSocket' => '/var/run/ceph/ceph-*.asock'}) }
     end
 end
