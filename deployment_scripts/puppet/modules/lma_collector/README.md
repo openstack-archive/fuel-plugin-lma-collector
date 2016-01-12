@@ -247,6 +247,19 @@ class { 'lma_collector::collectd::hypervisor':
 }
 ```
 
+### Collect Ceph statistics
+
+To make the collector collect statistics for Ceph declare the
+``lma_collector::collectd::ceph_mon``  class
+
+```puppet
+class { 'lma_collector::collectd::ceph_mon:
+}
+```
+
+With this the collector will collect information on the Ceph cluster (health,
+monitor count, quorum count, free space, ...) and the placement groups.
+
 ## Reference
 
 ### Classes
@@ -269,6 +282,7 @@ Public Classes:
 * [`lma_collector::collectd::memcached`](#class-lma_collectorcollectdmemcached)
 * [`lma_collector::collectd::openstack_checks`](#class-lma_collectorcollectdopenstackchecks)
 * [`lma_collector::collectd::apache`](#class-lma_collectorcollectdapache)
+* [`lma_collector::collectd::ceph_mon`](#define-lma_collectorcollectdcephmon)
 * [`lma_collector::collectd::hypervisor`](#class-lma_collectorcollectdhypervisor)
 
 Private Classes:
@@ -491,6 +505,18 @@ Nova API.
 * `pacemaker_master_resource`: *Optional*. Name of the pacemaker resource used
   to determine if the collecting of statistics should be active. This is
   a parameter for advanced users. Valid options: a string. Default: `undef`.
+
+#### Class: `lma_collector::collectd::ceph_mon`
+
+Declare this class to make collectd collect Ceph statistics.
+
+With this the collector will collect information on the Ceph cluster (health,
+monitor count, quorum count, free space, ...) and the Placement Groups.
+
+The collectd plugin used is a Python script. That script uses the `ceph`
+command internally. So for this plugin to work the `ceph` command should be
+installed, and a valid configuration for accessing the Ceph cluster should be
+in place.
 
 #### Define: `lma_collector::logs::openstack`
 
