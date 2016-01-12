@@ -247,6 +247,26 @@ class { 'lma_collector::collectd::hypervisor':
 }
 ```
 
+### Collect Ceph statistics
+
+To make the collector collect statistics for Ceph declare the
+``lma_collector::collectd::ceph`` define:
+
+```puppet
+lma_collector::collectd::ceph { 'pg_mon_status':
+}
+```
+
+This define can be used with the following Ceph resource: pg_mon_status,
+pool_osd, osd_status and osd_perf.
+
+Here is another example for osd_perf:
+
+```puppet
+lma_collector::collectd::ceph { 'osd_perf':
+}
+```
+
 ## Reference
 
 ### Classes
@@ -280,6 +300,7 @@ Private Classes:
 
 * [`lma_collector::logs::openstack`](#define-lma_collectorlogsopenstack)
 * [`lma_collector::collectd::openstack`](#define-lma_collectorcollectdopenstack)
+* [`lma_collector::collectd::ceph`](#define-lma_collectorcollectdceph)
 
 #### Class: `lma_collector`
 
@@ -532,6 +553,15 @@ The resource title should be set to the service name (e.g. `'nova'`).
 * `pacemaker_master_resource`: *Optional*. Name of the pacemaker resource used
   to determine if the collecting of statistics should be active. This is
   a parameter for advanced users. Valid options: a string. Default: `undef`.
+
+#### Define: `lma_collector::collectd::ceph`
+
+Declare this define to make collectd collect Ceph statistics.
+
+This define supports the following services: pg_mon_status, pool_osd,
+osd_status and osd_perf.
+
+The resource title should be set to the service name (e.g. `'pg_mon_status'`).
 
 Limitations
 -----------
