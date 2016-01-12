@@ -169,6 +169,20 @@ lma_collector::collectd::openstack { 'neutron':
 }
 ```
 
+### Collect OpenStack service statuses
+
+To make the collector collect statuses of OpenStack services declare the
+``lma_collector::collectd::openstack_checks`` class:
+
+```puppet
+class { 'lma_collector::collectd::openstack_checks':
+  user         => 'user',
+  password     => 'password',
+  tenant       => 'tenant',
+  keystone_url => 'http://example.com/keystone',
+}
+```
+
 ### Collect HAProxy statistics
 
 To make the collector collect statistics for HAProxy declare the
@@ -221,6 +235,7 @@ Public Classes:
 * [`lma_collector::collectd::haproxy`](#class-lma_collectorcollectdhaproxy)
 * [`lma_collector::collectd::rabbitmq`](#class-lma_collectorcollectdrabbitmq)
 * [`lma_collector::collectd::memcached`](#class-lma_collectorcollectdmemcached)
+* [`lma_collector::collectd::openstack_checks`](#class-lma_collectorcollectdopenstackchecks)
 
 Private Classes:
 
@@ -377,6 +392,28 @@ collectd's native `memcached` plugin is used.
 
 * `host`: *Required*. The Memcached host. Valid options: a string. See
   https://github.com/voxpupuli/puppet-collectd#class-collectdpluginmemcached.
+
+#### Class: `lma_collector::collectd::openstack_checks`
+
+Declare this class to configure collectd to collect statuses of OpenStack
+services. The collectd plugin used is a Python script.
+
+##### Parameters
+
+* `user`: *Required*. The user to use when querying the OpenStack endpoint.
+  Valid options: a string.
+* `password`: *Required*. The password to use when querying the OpenStack
+  endpoint. Valid options: a string.
+* `tenant`: *Required*. The tenant to use when querying the OpenStack endpoint.
+  Valid options: a string.
+* `keystone_url`: *Required*. The Keystone endpoint URL to use. Valid options:
+  a string.
+* `timeout`: *Optional*. Timeout in seconds beyond which the collector
+  considers that the endpoint doesn't respond. Valid options: an integer.
+  Default: 5.
+* `pacemaker_master_resource`: *Optional*. Name of the pacemaker resource used
+  to determine if the collecting of statistics should be active. This is
+  a parameter for advanced users. Valid options: a string. Default: `undef`.
 
 #### Define: `lma_collector::logs::openstack`
 
