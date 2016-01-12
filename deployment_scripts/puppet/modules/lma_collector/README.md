@@ -233,6 +233,20 @@ class { 'lma_collector::collectd::apache':
 This will collectd Apache statistics from
 `http://127.0.0.1/server-status?auto`.
 
+### Collect Nova Hypervisor statistics
+
+To make the collector collect statistics for the Nova hypervisors declare the
+``lma_collector::collectd::hypervisor`` class:
+
+```puppet
+class { 'lma_collector::collectd::hypervisor':
+  user         => 'user',
+  password     => 'password',
+  tenant       => 'tenant',
+  keystone_url => 'http://example.com/keystone',
+}
+```
+
 ## Reference
 
 ### Classes
@@ -255,6 +269,7 @@ Public Classes:
 * [`lma_collector::collectd::memcached`](#class-lma_collectorcollectdmemcached)
 * [`lma_collector::collectd::openstack_checks`](#class-lma_collectorcollectdopenstackchecks)
 * [`lma_collector::collectd::apache`](#class-lma_collectorcollectdapache)
+* [`lma_collector::collectd::hypervisor`](#class-lma_collectorcollectdhypervisor)
 
 Private Classes:
 
@@ -452,6 +467,29 @@ provided with the `host` parameter.
 
 * `host`: *Optional*. The Apache host. Valid options: a string. Default:
   `127.0.0.1`.
+
+#### Class: `lma_collector::collectd::hypervisor`
+
+Declare this class to configure collectd to collect statistics on Nova
+hypervisors. The collectd plugin used is a Python script talking to the
+Nova API.
+
+##### Parameters
+
+* `user`: *Required*. The user to use when querying the OpenStack endpoint.
+  Valid options: a string.
+* `password`: *Required*. The password to use when querying the OpenStack
+  endpoint. Valid options: a string.
+* `tenant`: *Required*. The tenant to use when querying the OpenStack endpoint.
+  Valid options: a string.
+* `keystone_url`: *Required*. The Keystone endpoint URL to use. Valid options:
+  a string.
+* `timeout`: *Optional*. Timeout in seconds beyond which the collector
+  considers that the endpoint doesn't respond. Valid options: an integer.
+  Default: 5.
+* `pacemaker_master_resource`: *Optional*. Name of the pacemaker resource used
+  to determine if the collecting of statistics should be active. This is
+  a parameter for advanced users. Valid options: a string. Default: `undef`.
 
 #### Define: `lma_collector::logs::openstack`
 
