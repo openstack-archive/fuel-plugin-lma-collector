@@ -151,6 +151,34 @@ class { 'lma_collector::collectd::base':
 }
 ```
 
+### Collect OpenStack statistics
+
+To make the collector collect statistics for an OpenStack service declare
+the ``lma_collector::collectd::openstack`` define:
+
+```puppet
+lma_collector::collectd::openstack { 'nova':
+  user         => 'user',
+  password     => 'password',
+  tenant       => 'tenant',
+  keystone_url => 'http://example.com/keystone',
+}
+```
+
+This define can be used for the following OpenStack services: nova, cinder,
+glance, keystone, and neutron.
+
+Here is another example for neutron:
+
+```puppet
+lma_collector::collectd::openstack { 'neutron':
+  user         => 'user',
+  password     => 'password',
+  tenant       => 'tenant',
+  keystone_url => 'http://example.com/keystone',
+}
+```
+
 ## Reference
 
 ### Classes
@@ -177,6 +205,7 @@ Private Classes:
 ### Defines
 
 * [`lma_collector::logs::openstack`](#define-lma_collectorlogsopenstack)
+* [`lma_collector::collectd::openstack`](#define-lma_collectorcollectdopenstack)
 
 #### Class: `lma_collector`
 
@@ -312,6 +341,33 @@ and Murano.
 The define doesn't work for Swift, as Swift only writes its logs to Syslog.
 See the specific [`lma_collector::logs::swift`](#class-lma_collectorlogsswift)
 class for Swift.
+
+#### Define: `lma_collector::collectd::openstack`
+
+Declare this define to make collectd collect statistics from an OpenStack
+service endpoint.
+
+This define supports the following services: nova, cinder, glance, keystone and
+neutron.
+
+The resource title should be set to the service name (e.g. `'nova'`).
+
+##### Parameters
+
+* `user`: *Required*. The user to use when querying the OpenStack endpoint.
+  Valid options: a string.
+* `password`: *Required*. The password to use when querying the OpenStack
+  endpoint. Valid options: a string.
+* `tenant`: *Required*. The tenant to use when querying the OpenStack endpoint.
+  Valid options: a string.
+* `keystone_url`: *Required*. The Keystone endpoint URL to use. Valid options:
+  a string.
+* `timeout`: *Optional*. Timeout in seconds beyond which the collector
+  considers that the endpoint doesn't respond. Valid options: an integer.
+  Default: 5.
+* `pacemaker_master_resource`: *Optional*. Name of the pacemaker resource used
+  to determine if the collecting of statistics should be active. This is
+  a parameter for advanced users. Valid options: a string. Default: `undef`.
 
 Limitations
 -----------
