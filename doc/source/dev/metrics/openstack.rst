@@ -143,3 +143,8 @@ API response times
 * ``openstack_<service>_http_responses``, the time (in second) it took to serve the HTTP request. The metric contains ``http_method`` (eg 'GET', 'POST', and so on) and ``http_status`` (eg '200', '404', and so on) fields.
 
 ``<service>`` is one of 'cinder', 'glance', 'heat' 'keystone', 'neutron' or 'nova'.
+
+Logs
+^^^^
+
+* ``log_messages``, the number of log messages per second for the given service and severity level. The metric contains ``service`` and ``severity`` (one of 'debug', 'info', ... ) fields.
