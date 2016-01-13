@@ -158,28 +158,6 @@ class lma_collector::params {
   $apache_status_port = '80'
   $apache_allow_from  = ['127.0.0.1','::1']
 
-  $haproxy_names_mapping = {
-    'cinder-api'          => 'cinder-api',
-    'glance-api'          => 'glance-api',
-    'glance-registry'     => 'glance-registry-api',
-    'heat-api'            => 'heat-api',
-    'heat-api-cfn'        => 'heat-cfn-api',
-    'heat-api-cloudwatch' => 'heat-cloudwatch-api',
-    'horizon'             => 'horizon-web',
-    'horizon-ssl'         => 'horizon-https',
-    'keystone-1'          => 'keystone-public-api',
-    'keystone-2'          => 'keystone-admin-api',
-    'murano'              => 'murano-api',
-    'mysqld'              => 'mysqld-tcp',
-    'neutron'             => 'neutron-api',
-    'nova-api-1'          => 'nova-ec2-api',
-    'nova-api-2'          => 'nova-api',
-    'nova-novncproxy'     => 'nova-novncproxy-websocket',
-    'nova-metadata-api'   => 'nova-metadata-api',
-    'sahara'              => 'sahara-api',
-    'swift'               => 'swift-api',
-  }
-
   $gse_policies_module = 'gse_policies'
 
   # Nagios parameters
