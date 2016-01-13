@@ -125,7 +125,7 @@ class lma_collector::params {
   $openstack_tenant = ''
   $openstack_url = 'http://127.0.0.1:5000/v2.0/'
   $openstack_client_timeout = 5
-  $nova_cpu_allocation_ratio = 8.0
+  $nova_cpu_allocation_ratio = 16.0
   $memcached_host = '127.0.0.1'
   $fstypes = ['ext2', 'ext3', 'ext4', 'xfs']
   $collectd_types = [ 'ceph', 'ceph_perf' ]
