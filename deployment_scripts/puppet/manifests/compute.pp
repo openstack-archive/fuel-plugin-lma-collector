@@ -23,6 +23,10 @@ if $lma_collector['elasticsearch_mode'] != 'disabled' {
   class { 'lma_collector::logs::libvirt': }
 }
 
+if $lma_collector['influxdb_mode'] != 'disabled' {
+  class { 'lma_collector::logs::counter': }
+}
+
 if $ceilometer['enabled'] {
   $notification_topics = [$lma_collector::params::openstack_topic, $lma_collector::params::lma_topic]
 }
