@@ -68,6 +68,8 @@ if ! $storage_options['objects_ceph'] {
   }
 }
 
+class { 'lma_collector::logs::counter': }
+
 # Logs
 if $lma_collector['elasticsearch_mode'] != 'disabled' {
   class { 'lma_collector::logs::mysql': }
