@@ -25,6 +25,19 @@ describe 'lma_collector::collectd::python' do
         it { is_expected.to contain_collectd__plugin__python__module('module_haproxy') \
              .with_module('haproxy') \
              .with_modulepath('/usr/lib/collectd') \
-             .with_config({"Foo" => "Bar"}) }
+             .with_config({"Foo" => "\"Bar\""}) }
+    end
+
+    describe 'with complex config' do
+        let(:title) { :haproxy }
+        let(:params) do
+            {:config => {"key1" => ["elt0", "elt1"],
+                         "key2" => {"k1" => "v1", "k2" => "v2"}}}
+        end
+        it { is_expected.to contain_collectd__plugin__python__module('module_haproxy') \
+             .with_module('haproxy') \
+             .with_modulepath('/usr/lib/collectd') \
+             .with_config({"key1 \"elt0\"" => "", "key1 \"elt1\"" => "",
+                           "key2 \"k1\"" => "\"v1\"", "key2 \"k2\"" => "\"v2\""}) }
     end
 end
