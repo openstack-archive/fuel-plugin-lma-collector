@@ -17,6 +17,12 @@ include lma_collector::params
 $ceilometer    = hiera_hash('ceilometer', {})
 $lma_collector = hiera_hash('lma_collector')
 
+if $lma_collector['influxdb_mode'] != 'disabled' {
+  class { 'lma_collector::logs::counter':
+    hostname => $::hostname,
+  }
+}
+
 if $lma_collector['elasticsearch_mode'] != 'disabled' {
   lma_collector::logs::openstack { 'cinder': }
 }
