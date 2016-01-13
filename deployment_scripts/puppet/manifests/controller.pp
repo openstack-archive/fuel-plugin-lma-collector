@@ -89,6 +89,8 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     $ceph_enabled = false
   }
 
+  class { 'lma_collector::logs::counter': }
+
   class { 'lma_collector::collectd::base':
     processes    => ['hekad', 'collectd'],
     # collectd plugins on controller do many network I/O operations, so
