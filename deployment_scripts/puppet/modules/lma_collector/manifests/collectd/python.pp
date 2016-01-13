@@ -20,10 +20,16 @@ define lma_collector::collectd::python (
 
   validate_hash($config)
 
+  # We use the adapt_collectd_python_plugin_config function to work around
+  # a limitation in collectd::plugin::python::module where the config hash
+  # cannot include values that are arrays or hashes.  See
+  # https://github.com/voxpupuli/puppet-collectd/issues/390.
+  $real_config = adapt_collectd_python_plugin_config($config)
+
   collectd::plugin::python::module { "module_${title}":
     module        => $title,
     modulepath    => $lma_collector::collectd::python_base::modulepath,
     script_source => "puppet:///modules/lma_collector/collectd/${title}.py",
-    config        => $config,
+    config        => $real_config,
   }
 }
