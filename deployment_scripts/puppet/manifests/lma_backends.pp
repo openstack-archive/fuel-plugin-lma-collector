@@ -44,4 +44,8 @@ if $lma_collector_hash['influxdb_mode'] != 'disabled' {
       address => hiera('lma::elasticsearch::vip'),
     }
   }
+
+  class { 'lma_collector::collectd::haproxy':
+    socket => '"/var/lib/haproxy/stats"',
+  }
 }
