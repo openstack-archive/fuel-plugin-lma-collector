@@ -24,11 +24,19 @@ class lma_collector::collectd::haproxy (
   validate_array($proxy_ignore)
   validate_hash($proxy_names)
 
+  # Add quotes around the array values
+  $real_proxy_ignore = suffix(prefix($proxy_ignore, '"'), '"')
+
+  # Add quotes around the hash keys and values
+  $proxy_names_keys = suffix(prefix(keys($proxy_names), '"'), '"')
+  $proxy_names_values = suffix(prefix(values($proxy_names), '"'), '"')
+  $real_proxy_names = hash(flatten(zip($proxy_names_keys, $proxy_names_values)))
+
   lma_collector::collectd::python { 'haproxy':
     config => {
-      'Socket'      => $socket,
-      'Mapping'     => $proxy_names,
-      'ProxyIgnore' => $proxy_ignore,
+      'Socket'      => "\"${socket}\"",
+      'Mapping'     => $real_proxy_names,
+      'ProxyIgnore' => $real_proxy_ignore,
     },
   }
 }

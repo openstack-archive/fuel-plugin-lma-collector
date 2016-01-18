@@ -20,9 +20,12 @@ class lma_collector::collectd::pacemaker (
 
   validate_array($resources)
 
+  # Add quotes around the array values
+  $real_resources = suffix(prefix($resources, '"'), '"')
+
   lma_collector::collectd::python { 'pacemaker_resource':
     config => {
-      'Resource' => $resources,
+      'Resource' => $real_resources,
     },
   }
 

@@ -22,8 +22,8 @@ class lma_collector::collectd::elasticsearch (
 
   lma_collector::collectd::python { 'elasticsearch_cluster':
     config => {
-      'Address' => $address,
-      'Port'    => $port,
+      'Address' => "\"${address}\"",
+      'Port'    => "\"${port}\"",
     },
   }
 }

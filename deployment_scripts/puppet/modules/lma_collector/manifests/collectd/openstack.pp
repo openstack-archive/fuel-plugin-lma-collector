@@ -38,15 +38,15 @@ define lma_collector::collectd::openstack (
   }
 
   $config = {
-    'Username'    => $user,
-    'Password'    => $password,
-    'Tenant'      => $tenant,
-    'KeystoneUrl' => $keystone_url,
-    'Timeout'     => $real_timeout,
+    'Username'    => "\"${user}\"",
+    'Password'    => "\"${password}\"",
+    'Tenant'      => "\"${tenant}\"",
+    'KeystoneUrl' => "\"${keystone_url}\"",
+    'Timeout'     => "\"${real_timeout}\"",
   }
 
   if $pacemaker_master_resource {
-    $real_config = merge($config, {'DependsOnResource' => $pacemaker_master_resource})
+    $real_config = merge($config, {'DependsOnResource' => "\"${pacemaker_master_resource}\""})
   } else {
     $real_config = $config
   }

@@ -24,7 +24,7 @@ describe 'lma_collector::collectd::haproxy' do
             {:socket => '/path/to/socket'}
         end
         it { is_expected.to contain_lma_collector__collectd__python('haproxy') \
-             .with_config({'Socket' => '/path/to/socket', 'Mapping' => {},
+             .with_config({'Socket' => '"/path/to/socket"', 'Mapping' => {},
                            'ProxyIgnore' => []}) }
     end
 
@@ -34,8 +34,8 @@ describe 'lma_collector::collectd::haproxy' do
              :proxy_names => {'keystone-1' => 'keystone-public-api'}}
         end
         it { is_expected.to contain_lma_collector__collectd__python('haproxy') \
-             .with_config({'Socket' => '/path/to/socket',
-                           'Mapping' => {'keystone-1' => 'keystone-public-api'},
-                           'ProxyIgnore' => ['lma']}) }
+             .with_config({'Socket' => '"/path/to/socket"',
+                           'Mapping' => {'"keystone-1"' => '"keystone-public-api"'},
+                           'ProxyIgnore' => ['"lma"']}) }
     end
 end

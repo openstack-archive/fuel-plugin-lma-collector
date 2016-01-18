@@ -26,9 +26,9 @@
 #     "key3" => "val3"}
 #
 # Result:
-#     {"key1 \"e1\"" => "", "key1 \"e2\"" => "",
-#      "key2 \"k1\"" => "\"v1\"", "key2 \"k2\"" => "\"v1\"",
-#      "key3" => "\"val3\""}
+#     {"key1 e1" => "", "key1 e2" => "",
+#      "key2 k1" => "v1", "key2 k2" => "v1",
+#      "key3" => "val3"}
 #
 
 module Puppet::Parser::Functions
@@ -42,14 +42,14 @@ module Puppet::Parser::Functions
     config.each do |key,val|
         if val.is_a?(Array)
             val.each do |elt|
-              adapted_config["#{key} \"#{elt}\""] = ""
+              adapted_config["#{key} #{elt}"] = ""
             end
         elsif val.is_a?(Hash)
             val.each do |k,v|
-              adapted_config["#{key} \"#{k}\""] = "\"#{v}\""
+              adapted_config["#{key} #{k}"] = "#{v}"
             end
         else
-            adapted_config[key] = "\"#{val}\""
+            adapted_config["#{key}"] = "#{val}"
         end
     end
 

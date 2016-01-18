@@ -17,7 +17,7 @@ class lma_collector::collectd::ceph_osd {
 
   lma_collector::collectd::python { 'ceph_osd_perf':
     config => {
-      'AdminSocket' => '/var/run/ceph/ceph-*.asok',
+      'AdminSocket' => '"/var/run/ceph/ceph-*.asok"',
     },
   }
 

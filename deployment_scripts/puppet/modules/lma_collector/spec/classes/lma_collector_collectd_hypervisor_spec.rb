@@ -25,10 +25,10 @@ describe 'lma_collector::collectd::hypervisor' do
              :keystone_url => 'http://example.com/keystone'}
         end
         it { is_expected.to contain_lma_collector__collectd__python('hypervisor_stats') \
-             .with_config({"Username" => "user", "Password" => "password",
-                           "Tenant" => "tenant",
-                           "KeystoneUrl" => "http://example.com/keystone",
-                           "Timeout" => "5", "CpuAllocationRatio" => "16.0"}) }
+             .with_config({"Username" => '"user"', "Password" => '"password"',
+                           "Tenant" => '"tenant"',
+                           "KeystoneUrl" => '"http://example.com/keystone"',
+                           "Timeout" => '"5"', "CpuAllocationRatio" => '"16.0"'}) }
     end
 
     describe 'with required and optional params' do
@@ -38,11 +38,11 @@ describe 'lma_collector::collectd::hypervisor' do
                        :timeout => 10, :cpu_allocation_ratio => 10.0,
                        :pacemaker_master_resource => "vip__management"}}
         it { is_expected.to contain_lma_collector__collectd__python('hypervisor_stats') \
-             .with_config({"Username" => "user", "Password" => "password",
-                           "Tenant" => "tenant",
-                           "KeystoneUrl" => "http://example.com/keystone",
-                           "Timeout" => "10",
-                           "CpuAllocationRatio" => "10.0",
-                           "DependsOnResource" => "vip__management"}) }
+             .with_config({"Username" => '"user"', "Password" => '"password"',
+                           "Tenant" => '"tenant"',
+                           "KeystoneUrl" => '"http://example.com/keystone"',
+                           "Timeout" => '"10"',
+                           "CpuAllocationRatio" => '"10.0"',
+                           "DependsOnResource" => '"vip__management"'}) }
     end
 end

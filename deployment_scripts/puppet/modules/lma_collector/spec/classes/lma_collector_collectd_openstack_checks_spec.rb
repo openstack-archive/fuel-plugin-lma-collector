@@ -25,10 +25,10 @@ describe 'lma_collector::collectd::openstack_checks' do
              :keystone_url => 'http://example.com/keystone'}
         end
         it { is_expected.to contain_lma_collector__collectd__python('check_openstack_api') \
-             .with_config({"Username" => "user", "Password" => "password",
-                           "Tenant" => "tenant",
-                           "KeystoneUrl" => "http://example.com/keystone",
-                           "Timeout" => "5"}) }
+             .with_config({"Username" => '"user"', "Password" => '"password"',
+                           "Tenant" => '"tenant"',
+                           "KeystoneUrl" => '"http://example.com/keystone"',
+                           "Timeout" => '"5"'}) }
     end
 
     describe 'with required and optional params' do
@@ -37,9 +37,9 @@ describe 'lma_collector::collectd::openstack_checks' do
                        :keystone_url => "http://example.com/keystone",
                        :timeout => 10, :pacemaker_master_resource => "vip__management"}}
         it { is_expected.to contain_lma_collector__collectd__python('check_openstack_api') \
-             .with_config({"Username" => "user", "Password" => "password",
-                           "Tenant" => "tenant",
-                           "KeystoneUrl" => "http://example.com/keystone",
-                           "Timeout" => "10", "DependsOnResource" => "vip__management"}) }
+             .with_config({"Username" => '"user"', "Password" => '"password"',
+                           "Tenant" => '"tenant"',
+                           "KeystoneUrl" => '"http://example.com/keystone"',
+                           "Timeout" => '"10"', "DependsOnResource" => '"vip__management"'}) }
     end
 end

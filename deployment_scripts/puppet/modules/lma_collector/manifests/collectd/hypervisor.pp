@@ -26,16 +26,16 @@ class lma_collector::collectd::hypervisor (
   include lma_collector::collectd::python_openstack_base
 
   $config = {
-    'Username'           => $user,
-    'Password'           => $password,
-    'Tenant'             => $tenant,
-    'KeystoneUrl'        => $keystone_url,
-    'Timeout'            => $timeout,
-    'CpuAllocationRatio' => $cpu_allocation_ratio,
+    'Username'           => "\"${user}\"",
+    'Password'           => "\"${password}\"",
+    'Tenant'             => "\"${tenant}\"",
+    'KeystoneUrl'        => "\"${keystone_url}\"",
+    'Timeout'            => "\"${timeout}\"",
+    'CpuAllocationRatio' => "\"${cpu_allocation_ratio}\"",
   }
 
   if $pacemaker_master_resource {
-    $real_config = merge($config, {'DependsOnResource' => $pacemaker_master_resource})
+    $real_config = merge($config, {'DependsOnResource' => "\"${pacemaker_master_resource}\""})
   } else {
     $real_config = $config
   }

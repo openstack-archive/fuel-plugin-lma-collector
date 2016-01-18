@@ -21,6 +21,6 @@ describe 'lma_collector::collectd::ceph_osd' do
 
     describe 'with default params' do
         it { is_expected.to contain_lma_collector__collectd__python('ceph_osd_perf') \
-             .with_config({'AdminSocket' => '/var/run/ceph/ceph-*.asok'}) }
+             .with_config({'AdminSocket' => '"/var/run/ceph/ceph-*.asok"'}) }
     end
 end
