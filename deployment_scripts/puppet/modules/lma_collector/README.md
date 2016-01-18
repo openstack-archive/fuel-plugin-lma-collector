@@ -179,6 +179,22 @@ lma_collector::collectd::openstack { 'neutron':
 }
 ```
 
+### Collect HAProxy statistics
+
+To make the collector collect statistics for HAProxy declare the
+``lma_collector::collectd::haproxy`` class:
+
+```puppet
+class { 'lma_collector::collectd::haproxy':
+ socket      => '/var/lib/haproxy/stats',
+ # mapping of proxy names to meaningful names to use in metrics names
+ proxy_names => {
+   'keystone-1' => 'keystone-public-api',
+   'keystone-2' => 'keystone-admin-api',
+ },
+}
+```
+
 ## Reference
 
 ### Classes
@@ -196,6 +212,7 @@ Public Classes:
 * [`lma_collector::logs::system`](#class-lma_collectorlogssystem)
 * [`lma_collector::logs::swift`](#class-lma_collectorlogsswift)
 * [`lma_collector::collectd::base`](#class-lma_collectorcollectdbase)
+* [`lma_collector::collectd::haproxy`](#class-lma_collectorcollectdhaproxy)
 
 Private Classes:
 
@@ -326,6 +343,23 @@ standard collectd plugins, namely `logfile`, `cpu`, `disk`, `interface`,
   for more information.
 * `read_threads`: *Optional*. The number of threads used by collectd. Valid
   options: an integer. Default: 5.
+
+#### Class: `lma_collector::collectd::haproxy`
+
+Declare this class to configure collectd to collect HAProxy statistics. The
+collectd plugin used is a Python script.
+
+##### Parameters
+
+* `socket`: *Required*. The path to HAProxy's `stats` Unix socket. E.g.
+  `/var/lib/haproxy/stats`. Valid options: a string.
+* `proxy_ignore`: *Optional*. The list of proxy names to ignore, i.e. for which
+  no metrics will be created. Valid options: an array of strings. Default:
+  `[]`.
+* `proxy_names`: *Optional*. A mapping of proxy names to meaningful names used
+  in metrics names. This is useful when there are meaningless proxy names such
+  as "keystone-1" in the HAProxy configuration. Valid options: a hash. Default:
+  `{}`.
 
 #### Define: `lma_collector::logs::openstack`
 
