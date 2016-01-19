@@ -15,7 +15,7 @@
 
 class lma_collector::collectd::ceph_mon {
 
-  lma_collector::collectd::python { ['ceph_pg_mon_status', 'ceph_pool_osd', 'ceph_osd_status']:
+  lma_collector::collectd::python { ['ceph_pg_mon_status', 'ceph_pool_osd', 'ceph_osd_stats']:
     config => {},
   }
 }

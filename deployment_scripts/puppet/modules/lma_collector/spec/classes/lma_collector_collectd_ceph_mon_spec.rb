@@ -24,7 +24,7 @@ describe 'lma_collector::collectd::ceph_mon' do
              .with_config({}) }
         it { is_expected.to contain_lma_collector__collectd__python('ceph_pool_osd') \
              .with_config({}) }
-        it { is_expected.to contain_lma_collector__collectd__python('ceph_osd_status') \
+        it { is_expected.to contain_lma_collector__collectd__python('ceph_osd_stats') \
              .with_config({}) }
     end
 end
