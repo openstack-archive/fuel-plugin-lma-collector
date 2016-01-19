@@ -12,6 +12,7 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
+local anomaly = require('anomaly')
 local circular_buffer = require('circular_buffer')
 local setmetatable = setmetatable
 local ipairs = ipairs
@@ -63,10 +64,37 @@ function Rule.new(rule)
     r.fields = rule.fields or {}
     r.fct = rule['function']
     r.threshold = rule.threshold + 0
+    if r.fct == 'roc' then
+        -- We use the name of the metric as the payload_name.
+        --
+        -- The ROC algorithm needs the following parameters:
+        --   - the number of intervals in the analysis window
+        --   - the number of intervals in the historical analysis window
+        --   - the threshold
+        --
+        -- r.window is an interval in seconds. So to get the number of
+        -- intervals we divide r.window by the number of seconds per row.
+        --
+        -- r.periods represents the number of windows that we want to use for
+        -- the historical analysis. As we tell the ROC algorithm to use all
+        -- remaining buffer for the historical window we need to allocate
+        -- r.periods * (r.window / SECONDS_PER_ROW) for the historical
+        -- analysis and 2 additional periods for the previous and current
+        -- analysis windows.
+        --
+        local cfg_str = string.format('roc("%s",1,%s,0,%s,false,false)',
+                                       r.metric,
+                                       math.ceil(r.window/SECONDS_PER_ROW),
+                                       r.threshold)
+        r.roc_cfg = anomaly.parse_config(cfg_str)
+        r.cbuf_size = math.ceil(r.window / SECONDS_PER_ROW) * (r.periods + 2)
+    else
+        r.roc_cfg = nil
+        r.cbuf_size = math.ceil(r.window * r.periods / SECONDS_PER_ROW)
+    end
     r.ids_datastore = {}
     r.datastore = {}
     r.observation_window = math.ceil(r.window * r.periods)
-    r.cbuf_size = math.ceil(r.window * r.periods / SECONDS_PER_ROW)
 
     return r
 end
@@ -147,7 +175,7 @@ local function isnumber(value)
 end
 
 local available_functions = {avg=true, max=true, min=true, sum=true,
-                             variance=true, sd=true, diff=true}
+                             variance=true, sd=true, diff=true, roc=true}
 
 -- evaluate the rule against datapoints
 -- return a list: match (bool or string), context ({value=v, fields=list of field table})
@@ -178,7 +206,16 @@ function Rule:evaluate(ns)
             else
                 if available_functions[self.fct] then
                     local result
-                    if self.fct == 'avg' then
+
+                    if self.fct == 'roc' then
+                        local anomaly_detected, _ = anomaly.detect(ns, self.metric, data.cbuf, self.roc_cfg)
+                        if anomaly_detected then
+                            one_match = true
+                            fields[#fields+1] = {value=-1, fields=data.fields}
+                        else
+                            one_no_match = true
+                        end
+                    elseif self.fct == 'avg' then
                         local total
                         total = data.cbuf:compute('sum', 1)
                         local count = data.cbuf:compute('sum', 2)
@@ -209,6 +246,7 @@ function Rule:evaluate(ns)
                     else
                         result = data.cbuf:compute(self.fct, 1)
                     end
+
                     if result then
                         local m = self:compare_threshold(result)
                         if m then
