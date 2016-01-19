@@ -223,6 +223,23 @@ local alarms = {
         },
         severity = 'warning',
     },
+    { -- 10
+        name = 'nova_logs_errors_rate',
+        description = 'Rate of change for nova logs in error is too high',
+        enabled = true,
+        trigger = {
+            rules = {
+                {
+                    metric = 'log_messages',
+                    window = 60,
+                    periods = 4,
+                    ['function'] = 'roc',
+                    threshold = 1.5,
+                },
+            },
+        },
+        severity = 'warning',
+    },
 }
 
 TestLMAAlarm = {}
@@ -288,7 +305,7 @@ function TestLMAAlarm:test_get_alarms()
     for _, _ in pairs(all_alarms) do
         num = num + 1
     end
-    assertEquals(num, 9)
+    assertEquals(num, #alarms)
 end
 
 function TestLMAAlarm:test_no_datapoint()
@@ -522,6 +539,65 @@ function TestLMAAlarm:test_diff()
     -- missing data
     local state, result = errors_5xx:evaluate(next_time(60))
     assertEquals(state, consts.UNKW)
+end
+
+function TestLMAAlarm:test_roc()
+    lma_alarm.load_alarms(alarms)
+    local errors_logs = lma_alarm.get_alarm('nova_logs_errors_rate')
+    assertEquals(errors_logs.severity, consts.WARN)
+    local m_values = {}
+
+    -- Test one error in the current window
+    m_values = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  -- historical window 0
+                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  -- historical window 0
+                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  -- historical window 3
+                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  -- historical window 4
+                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  -- previous window
+                 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 } -- current window
+    for _,v in pairs(m_values) do
+        lma_alarm.add_value(next_time(5), 'log_messages', v, {service = 'nova', level = 'error'})
+    end
+    local state, _ = errors_logs:evaluate(current_time)
+    assertEquals(state, consts.WARN)
+
+    -- Test one error in the historical window
+    m_values = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  -- historical window 0
+                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  -- historical window 0
+                 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,  -- historical window 3
+                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  -- historical window 4
+                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  -- previous window
+                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } -- current window
+    for _,v in pairs(m_values) do
+        lma_alarm.add_value(next_time(5), 'log_messages', v, {service = 'nova', level = 'error'})
+    end
+    local state, _ = errors_logs:evaluate(current_time)
+    assertEquals(state, consts.OKAY)
+
+    -- with rate errors
+    m_values = { 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 2,  -- historical window 1
+                 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 2,  -- historical window 2
+                 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 2,  -- historical window 3
+                 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 2,  -- historical window 4
+                 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 2,  -- previous window
+                 1, 2, 1, 1, 1, 2, 1, 5, 5, 7, 1, 7 } -- current window
+    for _,v in pairs(m_values) do
+        lma_alarm.add_value(next_time(5), 'log_messages', v, {service = 'nova', level = 'error'})
+    end
+    local state, _ = errors_logs:evaluate(current_time)
+    assertEquals(state, consts.WARN)
+
+    -- without rate errors
+    m_values = { 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 2,  -- historical window 1
+                 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 2,  -- historical window 2
+                 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 2,  -- historical window 3
+                 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 2,  -- historical window 4
+                 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1, 2,  -- previous window
+                 1, 2, 1, 1, 1, 2, 1, 3, 4, 3, 3, 4 } -- current window
+    for _,v in pairs(m_values) do
+        lma_alarm.add_value(next_time(5), 'log_messages', v, {service = 'nova', level = 'error'})
+    end
+    local state, _ = errors_logs:evaluate(current_time)
+    assertEquals(state, consts.OKAY)
 end
 
 function TestLMAAlarm:test_alarm_first_match()
