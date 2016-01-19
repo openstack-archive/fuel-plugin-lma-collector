@@ -48,7 +48,28 @@ end
 
 # Need to pull date_time.lua from the lua_sandbox repository because some tests
 # depend on it indirectly
-task :lua_libraries => ['tests/lua/mocks/date_time.lua', 'tests/lua/mocks/inspect.lua']
+task :lua_libraries => ['tests/lua/mocks/date_time.lua', 'tests/lua/mocks/inspect.lua',
+                        'tests/lua/mocks/anomaly.lua', 'tests/lua/mocks/annotation.lua']
+
+file 'tests/lua/mocks/annotation.lua' do |t|
+    verbose(false) do
+        sh "curl", "-s", "-o", t.name, "https://raw.githubusercontent.com/mozilla-services/heka/dev/sandbox/lua/modules/annotation.lua" do |ok, res|
+            if ! ok then
+                raise "Fail to download annotation.lua from lua_sandbox repository!"
+            end
+        end
+    end
+end
+
+file 'tests/lua/mocks/anomaly.lua' do |t|
+    verbose(false) do
+        sh "curl", "-s", "-o", t.name, "https://raw.githubusercontent.com/mozilla-services/heka/dev/sandbox/lua/modules/anomaly.lua" do |ok, res|
+            if ! ok then
+                raise "Fail to download anomaly.lua from lua_sandbox repository!"
+            end
+        end
+    end
+end
 
 file 'tests/lua/mocks/date_time.lua' do |t|
     verbose(false) do
