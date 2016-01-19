@@ -12,6 +12,7 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
+local anomaly = require('anomaly')
 local circular_buffer = require('circular_buffer')
 local setmetatable = setmetatable
 local ipairs = ipairs
@@ -62,6 +63,12 @@ function Rule.new(rule)
     r.metric = rule.metric
     r.fields = rule.fields or {}
     r.fct = rule['function']
+    if r.fct == 'roc' then
+        r.roc_cfg = anomaly.parse_config(rule.metric, 1, rule.window, 0,
+                                         rule.threshold, true, false)
+    else
+        r.roc_cfg = nil
+    end
     r.threshold = rule.threshold + 0
     r.ids_datastore = {}
     r.datastore = {}
@@ -147,7 +154,7 @@ local function isnumber(value)
 end
 
 local available_functions = {avg=true, max=true, min=true, sum=true,
-                             variance=true, sd=true, diff=true}
+                             variance=true, sd=true, diff=true, roc=true}
 
 -- evaluate the rule against datapoints
 -- return a list: match (bool or string), context ({value=v, fields=list of field table})
@@ -206,16 +213,24 @@ function Rule:evaluate(ns)
                         else
                             result = last - first
                         end
+                    elseif self.fct == 'roc' then
+                        result, annot = anomaly.detect(ns, self.metric,
+                                                       data.cbuf, self.roc_cfg)
                     else
                         result = data.cbuf:compute(self.fct, 1)
                     end
                     if result then
-                        local m = self:compare_threshold(result)
-                        if m then
+                        if self.fct == 'roc' then
                             one_match = true
-                            fields[#fields+1] = {value=result, fields=data.fields}
+                            fields[#fields+1] = {value=annot[1].x, fields=data.fields}
                         else
-                            one_no_match = true
+                            local m = self:compare_threshold(result)
+                            if m then
+                                one_match = true
+                                fields[#fields+1] = {value=result, fields=data.fields}
+                            else
+                                one_no_match = true
+                            end
                         end
                     end
                 end
