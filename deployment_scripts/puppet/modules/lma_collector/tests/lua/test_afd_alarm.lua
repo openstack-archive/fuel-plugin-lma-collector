@@ -223,6 +223,23 @@ local alarms = {
         },
         severity = 'warning',
     },
+    { -- 10
+        name = 'nova_logs_errors_rate',
+        description = 'Rate of change for nova logs in error is too high',
+        enabled = true,
+        trigger = {
+            rules = {
+                {
+                    metric = 'log_messages',
+                    window = 60,
+                    periods = 4,
+                    ['function'] = 'roc',
+                    threshold = 1.5,
+                },
+            },
+        },
+        severity = 'warning',
+    },
 }
 
 TestLMAAlarm = {}
@@ -288,7 +305,7 @@ function TestLMAAlarm:test_get_alarms()
     for _, _ in pairs(all_alarms) do
         num = num + 1
     end
-    assertEquals(num, 9)
+    assertEquals(num, #alarms)
 end
 
 function TestLMAAlarm:test_no_datapoint()
@@ -522,6 +539,47 @@ function TestLMAAlarm:test_diff()
     -- missing data
     local state, result = errors_5xx:evaluate(next_time(60))
     assertEquals(state, consts.UNKW)
+end
+
+function TestLMAAlarm:test_roc()
+    lma_alarm.load_alarms(alarms)
+    local errors_logs = lma_alarm.get_alarm('nova_logs_errors_rate')
+    assertEquals(errors_logs.severity, consts.WARN)
+
+    -- with rate errors
+    lma_alarm.add_value(next_time(60), 'log_messages', 1, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 2, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 1, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 1, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 5, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 15, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 19, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 32, {service = 'nova', level = 'error'})
+    local state, result = errors_logs:evaluate(current_time)
+    assertEquals(state, 1)
+
+    lma_alarm.add_value(next_time(60), 'log_messages', 1, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 2, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 1, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 1, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 2, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 11, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 1, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 2, {service = 'nova', level = 'error'})
+    local state, result = errors_logs:evaluate(current_time)
+    assertEquals(state, 1)
+
+    -- without rate errors
+    lma_alarm.add_value(next_time(60), 'log_messages', 1, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 2, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 1, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 1, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 2, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 1, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 1, {service = 'nova', level = 'error'})
+    lma_alarm.add_value(next_time(60), 'log_messages', 2, {service = 'nova', level = 'error'})
+    local state, result = errors_logs:evaluate(current_time)
+    assertEquals(state, 2)
 end
 
 function TestLMAAlarm:test_alarm_first_match()
