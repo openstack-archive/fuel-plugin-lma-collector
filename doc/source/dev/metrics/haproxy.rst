@@ -54,7 +54,7 @@ The following metrics have a ``frontend`` field that contains the name of the fr
 * ``haproxy_frontend_response_5xx``, the number of HTTP responses with 5xx code.
 * ``haproxy_frontend_response_other``, the number of HTTP responses with other code.
 * ``haproxy_frontend_session_current``, the number of current sessions.
-* ``haproxy_frontend_session_total``, the cumulative of total number of session.
+* ``haproxy_frontend_session_total``, the cumulative number of sessions.
 
 Backends
 ^^^^^^^^
