@@ -30,6 +30,14 @@ These metrics are emitted per compute node.
 
 * ``openstack_nova_instance_creation_time``, the time (in seconds) it took to launch a new instance.
 * ``openstack_nova_instance_state``, the count of instances which entered a given state (the value is always 1). The metric contains a ``state`` field.
+* ``openstack_nova_free_disk``, the amount of disk space (in GB) available for new instances.
+* ``openstack_nova_used_disk``, the amount of disk space (in GB) used by the instances.
+* ``openstack_nova_free_ram``, the amount of memory (in MB) available for new instances.
+* ``openstack_nova_used_ram``, the amount of memory (in MB) used by the instances.
+* ``openstack_nova_free_vcpus``, the number of virtual CPU available for new instances.
+* ``openstack_nova_used_vcpus``, the number of virtual CPU used by the instances.
+* ``openstack_nova_running_instances``, the number of running instances.
+* ``openstack_nova_running_tasks``, the number of tasks currently executed.
 
 These metrics are retrieved from the Nova API and represent the aggregated
 values across all compute nodes.
