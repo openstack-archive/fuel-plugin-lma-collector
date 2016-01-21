@@ -65,7 +65,7 @@ Timestamp = TimestampTable / dt.time_to_ns
 
 programname   = (l.R("az", "AZ", "09") + l.P"." + dash + l.P"_")^1
 Pid           = l.digit^1
-SeverityLabel = l.P"CRITICAL" + l.P"ERROR" + l.P"WARNING" + l.P"INFO" + l.P"AUDIT" + l.P"DEBUG"
+SeverityLabel = l.P"CRITICAL" + l.P"ERROR" + l.P"WARNING" + l.P"INFO" + l.P"AUDIT" + l.P"DEBUG" + l.P"TRACE"
 Message       = l.P(1)^0
 
 -- Capture for OpenStack logs producing four values: Timestamp, Pid,
