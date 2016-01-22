@@ -21,7 +21,9 @@ local alarms = {
             ['<%= k %>'] = '<%= v %>',
 <% end -%>
           },
+<% if defined? rule["relational_operator"] -%>
           ['relational_operator'] = '<%= rule["relational_operator"] %>',
+<% end -%>
           ['threshold'] = '<%= rule["threshold"] %>',
           ['window'] = '<%= rule["window"] %>',
           ['periods'] = '<%= rule["periods"] || 0 %>',
