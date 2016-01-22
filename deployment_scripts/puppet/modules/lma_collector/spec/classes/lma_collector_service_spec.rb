@@ -1,4 +1,4 @@
-#    Copyright 2015 Mirantis, Inc.
+#    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -11,25 +11,17 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-#
-# Class: lma_collector::service
-#
-# Manages the LMA collector daemon
-#
-# Sample Usage:
-#
-# sometype { 'foo':
-#   notify => Class['lma_collector::service'],
-# }
-#
-#
-class lma_collector::service {
+require 'spec_helper'
 
-  include lma_collector::params
+describe 'lma_collector::service' do
+    let(:facts) do
+        {:kernel => 'Linux', :operatingsystem => 'Ubuntu',
+         :osfamily => 'Debian'}
+    end
 
-  service { $lma_collector::params::service_name:
-    ensure => 'running',
-    enable => true,
-  }
+    describe 'default params' do
+        it { is_expected.to contain_service('lma_collector') \
+             .with({'ensure' => 'running', 'enable' => true}) }
+    end
+end
 
-}
