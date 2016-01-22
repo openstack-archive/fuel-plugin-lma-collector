@@ -557,7 +557,7 @@ function TestLMAAlarm:test_roc()
     for _,v in pairs(m_values) do
         lma_alarm.add_value(next_time(5), 'log_messages', v, {service = 'nova', level = 'error'})
     end
-    local state, result = errors_logs:evaluate(current_time)
+    local state, _ = errors_logs:evaluate(current_time)
     assertEquals(state, consts.WARN)
 
     -- without rate errors
@@ -570,7 +570,7 @@ function TestLMAAlarm:test_roc()
     for _,v in pairs(m_values) do
         lma_alarm.add_value(next_time(5), 'log_messages', v, {service = 'nova', level = 'error'})
     end
-    local state, result = errors_logs:evaluate(current_time)
+    local state, _ = errors_logs:evaluate(current_time)
     assertEquals(state, consts.OKAY)
 end
 
