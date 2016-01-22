@@ -327,6 +327,22 @@ lma_collector:
             window: 60
             periods: 1
             function: diff
+    - name: 'nova-logs-error'
+      description: 'Some errors have been detected in Nova logs'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: log_messages
+            fields:
+              service: 'nova'
+              level: 'error'
+            relational_operator: '>'
+            threshold: 0.1
+            window: 70
+            periods: 0
+            function: max
     - name: 'heat-api-http-errors'
       description: 'Some 5xx HTTP errors have been detected on heat-api'
       severity: 'warning'
@@ -342,6 +358,22 @@ lma_collector:
             window: 60
             periods: 1
             function: diff
+    - name: 'heat-logs-error'
+      description: 'Some errors have been detected in Heat logs'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: log_messages
+            fields:
+              service: 'heat'
+              level: 'error'
+            relational_operator: '>'
+            threshold: 0.1
+            window: 70
+            periods: 0
+            function: max
 <% if not @storage_options["objects_ceph"] then -%>
     - name: 'swift-api-http-errors'
       description: 'Some 5xx HTTP errors have been detected on swift-api'
@@ -358,6 +390,22 @@ lma_collector:
             window: 60
             periods: 1
             function: diff
+    - name: 'swift-logs-error'
+      description: 'Some errors have been detected in Swift logs'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: log_messages
+            fields:
+              service: 'swift'
+              level: 'error'
+            relational_operator: '>'
+            threshold: 0.1
+            window: 70
+            periods: 0
+            function: max
 <% end -%>
     - name: 'cinder-api-http-errors'
       description: 'Some 5xx HTTP errors have been detected on cinder-api'
@@ -374,6 +422,22 @@ lma_collector:
             window: 60
             periods: 1
             function: diff
+    - name: 'cinder-logs-error'
+      description: 'Some errors have been detected in Cinder logs'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: log_messages
+            fields:
+              service: 'cinder'
+              level: 'error'
+            relational_operator: '>'
+            threshold: 0.1
+            window: 70
+            periods: 0
+            function: max
     - name: 'glance-api-http-errors'
       description: 'Some 5xx HTTP errors have been detected on glance-api'
       severity: 'warning'
@@ -389,6 +453,22 @@ lma_collector:
             window: 60
             periods: 1
             function: diff
+    - name: 'glance-logs-error'
+      description: 'Some errors have been detected in Glance logs'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: log_messages
+            fields:
+              service: 'glance'
+              level: 'error'
+            relational_operator: '>'
+            threshold: 0.1
+            window: 70
+            periods: 0
+            function: max
     - name: 'neutron-api-http-errors'
       description: 'Some 5xx HTTP errors have been detected on neutron-api'
       severity: 'warning'
@@ -404,6 +484,22 @@ lma_collector:
             window: 60
             periods: 1
             function: diff
+    - name: 'neutron-logs-error'
+      description: 'Some errors have been detected in Neutron logs'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: log_messages
+            fields:
+              service: 'neutron'
+              level: 'error'
+            relational_operator: '>'
+            threshold: 0.1
+            window: 70
+            periods: 0
+            function: max
     - name: 'keystone-public-api-http-errors'
       description: 'Some 5xx HTTP errors have been detected on keystone-public-api'
       severity: 'warning'
@@ -434,6 +530,22 @@ lma_collector:
             window: 60
             periods: 1
             function: diff
+    - name: 'keystone-logs-error'
+      description: 'Some errors have been detected in Keystone logs'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: log_messages
+            fields:
+              service: 'keystone'
+              level: 'error'
+            relational_operator: '>'
+            threshold: 0.1
+            window: 70
+            periods: 0
+            function: max
     - name: 'mysql-node-connected'
       description: 'The MySQL service has lost connectivity with the other nodes.'
       severity: 'critical'
@@ -573,15 +685,22 @@ lma_collector:
     mysql: ['primary-controller', 'controller']
     apache: ['primary-controller', 'controller']
     nova-api: ['primary-controller', 'controller']
+    nova-logs: ['primary-controller', 'controller', 'compute']
     heat-api: ['primary-controller', 'controller']
+    heat-logs: ['primary-controller', 'controller']
 <% if not @storage_options["objects_ceph"] then -%>
     swift-api: ['primary-controller', 'controller']
+    swift-logs: ['primary-controller', 'controller']
 <% end -%>
     cinder-api: ['primary-controller', 'controller']
+    cinder-logs: ['primary-controller', 'controller']
     glance-api: ['primary-controller', 'controller']
+    glance-logs: ['primary-controller', 'controller']
     neutron-api: ['primary-controller', 'controller']
+    neutron-logs: ['primary-controller', 'controller']
     keystone-public-api: ['primary-controller', 'controller']
     keystone-admin-api: ['primary-controller', 'controller']
+    keystone-logs: ['primary-controller', 'controller']
 <% if @storage_options["volumes_ceph"] then -%>
     ceph-mon: ['primary-controller', 'controller']
 <% end -%>
@@ -624,20 +743,34 @@ lma_collector:
       worker: ['apache-warning']
     nova-api:
       http_errors: ['nova-api-http-errors']
+    nova-logs:
+      error: ['nova-logs-error']
     heat-api:
       http_errors: ['heat-api-http-errors']
+    heat-logs:
+      error: ['heat-logs-error']
 <% if not @storage_options["objects_ceph"] then -%>
     swift-api:
       http_errors: ['swift-api-http-errors']
+    swift-logs:
+      error: ['swift-logs-error']
 <% end -%>
     cinder-api:
       http_errors: ['cinder-api-http-errors']
+    cinder-logs:
+      errors: ['cinder-logs-error']
     glance-api:
       http_errors: ['glance-api-http-errors']
+    glance-logs:
+      errors: ['glance-logs-error']
     neutron-api:
       http_errors: ['neutron-api-http-errors']
+    neutron-logs:
+      errors: ['neutron-logs-error']
     keystone-public-api:
       http_errors: ['keystone-public-api-http-errors']
+    keystone-logs:
+      error: ['keystone-logs-error']
     keystone-admin-api:
       http_errors: ['keystone-admin-api-http-errors']
 <% if @storage_options["volumes_ceph"] then -%>
