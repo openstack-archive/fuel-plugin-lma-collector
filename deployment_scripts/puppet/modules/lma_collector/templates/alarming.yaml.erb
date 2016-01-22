@@ -1,6 +1,76 @@
 ---
 lma_collector:
   alarms:
+    - name: 'log-messages-error-controller'
+      description: 'The number of error in logs is too high (controller node).'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: log_messages
+            fields:
+              service: 'cinder'
+              level: 'error'
+            relational_operator: '<='
+            threshold: 2
+            window: 60
+            periods: 4
+            function: roc
+          - metric: log_messages
+            fields:
+              service: 'neutron'
+              level: 'error'
+            relational_operator: '<='
+            threshold: 2
+            window: 60
+            periods: 4
+            function: roc
+          - metric: log_messages
+            fields:
+              service: 'keystone'
+              level: 'error'
+            relational_operator: '<='
+            threshold: 2
+            window: 60
+            periods: 4
+            function: roc
+          - metric: log_messages
+            fields:
+              service: 'glance'
+              level: 'error'
+            relational_operator: '<='
+            threshold: 2
+            window: 60
+            periods: 4
+            function: roc
+          - metric: log_messages
+            fields:
+              service: 'nova'
+              level: 'error'
+            relational_operator: '<='
+            threshold: 2
+            window: 60
+            periods: 4
+            function: roc
+          - metric: log_messages
+            fields:
+              service: 'swift'
+              level: 'error'
+            relational_operator: '<='
+            threshold: 2
+            window: 60
+            periods: 4
+            function: roc
+          - metric: log_messages
+            fields:
+              service: 'heat'
+              level: 'error'
+            relational_operator: '<='
+            threshold: 2
+            window: 60
+            periods: 4
+            function: roc
     - name: 'cpu-critical-controller'
       description: 'The CPU usage is too high (controller node).'
       severity: 'critical'
@@ -594,6 +664,7 @@ lma_collector:
       cpu: ['cpu-critical-controller', 'cpu-warning-controller']
       root-fs: ['root-fs-critical', 'root-fs-warning']
       log-fs: ['log-fs-critical', 'log-fs-warning']
+      log-messages: ['log-messages-error-controller']
     mysql-nodes:
       mysql-fs: ['mysql-fs-critical', 'mysql-fs-warning']
     compute:
