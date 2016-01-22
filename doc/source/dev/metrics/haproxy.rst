@@ -60,11 +60,11 @@ Backends
 ^^^^^^^^
 .. _haproxy_backend_metric:
 
-* ``haproxy_backend.bytes_in``, the total number of bytes received by all backends.
-* ``haproxy_backend.bytes_out``, the total number of bytes transmitted by all backends.
-* ``haproxy_backend.queue_current``, the total number of requests in queue for all backends.
-* ``haproxy_backend.session_current``, the total number of current sessions for all backends.
-* ``haproxy_backend.error_responses``, the total number of error responses for all backends.
+* ``haproxy_backend_bytes_in``, the total number of bytes received by all backends.
+* ``haproxy_backend_bytes_out``, the total number of bytes transmitted by all backends.
+* ``haproxy_backend_queue_current``, the total number of requests in queue for all backends.
+* ``haproxy_backend_session_current``, the total number of current sessions for all backends.
+* ``haproxy_backend_error_responses``, the total number of error responses for all backends.
 
 The following metrics have a ``backend`` field that contains the name of the backend server.
 
