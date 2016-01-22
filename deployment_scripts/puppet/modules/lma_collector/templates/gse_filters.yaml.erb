@@ -116,6 +116,36 @@ lma_collector:
     interval: 10
     warm_up_period: 20
     clusters:
+      nova-logs:
+        policy: highest_severity
+        group_by: member
+        members:
+          - error
+      heat-logs:
+        policy: highest_severity
+        group_by: member
+        members:
+          - error
+      cinder-logs:
+        policy: highest_severity
+        group_by: member
+        members:
+          - error
+      glance-logs:
+        policy: highest_severity
+        group_by: member
+        members:
+          - error
+      neutron-logs:
+        policy: highest_severity
+        group_by: member
+        members:
+          - error
+      keystone-logs:
+        policy: highest_severity
+        group_by: member
+        members:
+          - error
       mysqld-tcp:
         policy: highest_severity
         group_by: member
@@ -437,6 +467,7 @@ lma_collector:
         policy: highest_severity
         group_by: member
         members:
+          - nova-logs
           - nova-api
           - nova-ec2-api
           - nova-metadata-api
@@ -459,6 +490,7 @@ lma_collector:
         policy: highest_severity
         group_by: member
         members:
+          - cinder-logs
           - cinder-api
           - cinder-v2-api
           - cinder-scheduler
@@ -473,6 +505,7 @@ lma_collector:
         policy: highest_severity
         group_by: member
         members:
+          - neutron-logs
           - neutron-api
           - neutron-l3
           - neutron-dhcp
@@ -487,6 +520,7 @@ lma_collector:
         policy: highest_severity
         group_by: member
         members:
+          - keystone-logs
           - keystone-public-api
           - keystone-admin-api
           - controller
@@ -497,6 +531,7 @@ lma_collector:
         policy: highest_severity
         group_by: member
         members:
+          - glance-logs
           - glance-api
           - glance-registry-api
           - controller
@@ -507,6 +542,7 @@ lma_collector:
         policy: highest_severity
         group_by: member
         members:
+          - heat-logs
           - heat-api
           - heat-cfn-api
           - heat-cloudwatch-api
