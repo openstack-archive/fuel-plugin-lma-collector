@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-class lma_collector::logs::metrics {
+class lma_collector::logs::http_metrics {
   include lma_collector::params
   include lma_collector::service
 

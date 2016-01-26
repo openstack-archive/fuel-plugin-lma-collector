@@ -227,7 +227,7 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
 
   class { 'lma_collector::collectd::apache': }
 
-  class { 'lma_collector::logs::metrics': }
+  class { 'lma_collector::logs::http_metrics': }
 
   # Notification are always collected, lets extract metrics from there
   class { 'lma_collector::notifications::metrics': }
