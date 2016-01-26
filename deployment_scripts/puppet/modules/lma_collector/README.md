@@ -44,8 +44,8 @@ class {'lma_collector':
 
 ### Collect system logs
 
-To make the Collector collect standard system logs from `/var/log/kern.log`,
-`/var/log/messages`, etc. declare the `lma_collector::logs::system` class:
+To make the Collector collect standard system logs from log files in `/var/log`
+declare the `lma_collector::logs::system` class:
 
 ```puppet
 class { 'lma_collector::logs::system': }
@@ -391,10 +391,24 @@ from log files located in the `/var/log/rabbitmq` directory.
 
 #### Class: `lma_collector::logs::system`
 
-Declare this class to create an Heka `logstreamer` that reads system logs. Logs
-are read from the following files: `daemon.log`, `cron.log`, `haproxy.log`,
-`kern.log`, `auth.log`, `syslog`, `messages` and `debug` (all located in the
-`/var/log` directory).
+Declare this class to create an Heka `logstreamer` that reads system logs.
+
+Logs are read from following files in `/var/log`: `daemon.log`, `cron.log`,
+`haproxy.log`, `kern.log`, `auth.log`, `syslog`, `messages` and `debug`. This
+class assumes that Rsyslog is used, with the `RSYSLOG_TraditionalFileFormat`
+template.
+
+More specifically, the following syslog patterns are assumed:
+
+```
+<%PRI%>%TIMESTAMP% %HOSTNAME% %syslogtag%%msg:::sp-if-no-1st-sp%%msg%\n
+```
+
+or
+
+```
+'%TIMESTAMP% %HOSTNAME% %syslogtag%%msg:::sp-if-no-1st-sp%%msg%\n'
+```
 
 #### Class: `lma_collector::logs::swift`
 
