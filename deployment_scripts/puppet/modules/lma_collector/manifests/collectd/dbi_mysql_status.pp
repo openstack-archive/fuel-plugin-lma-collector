@@ -21,6 +21,7 @@ define lma_collector::collectd::dbi_mysql_status (
 ) {
 
   include collectd::params
+  include lma_collector::collectd::dbi
 
   $plugin_conf_dir = $collectd::params::plugin_conf_dir
 
@@ -34,6 +35,7 @@ define lma_collector::collectd::dbi_mysql_status (
     group   => $collectd::params::root_group,
     mode    => '0640',
     content => template('lma_collector/collectd_dbi_mysql_status.conf.erb'),
+    require => Class['lma_collector::collectd::dbi'],
     notify  => Service['collectd'],
   }
 }
