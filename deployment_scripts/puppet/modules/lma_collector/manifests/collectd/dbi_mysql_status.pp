@@ -21,6 +21,7 @@ define lma_collector::collectd::dbi_mysql_status (
 ) {
 
   include collectd::params
+  include lma_collector::collectd::dbi
 
   $plugin_conf_dir = $collectd::params::plugin_conf_dir
 

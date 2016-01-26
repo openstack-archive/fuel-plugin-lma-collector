@@ -154,22 +154,18 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     password => $nova['db_password'],
   }
 
-  class { 'lma_collector::collectd::dbi': }
-
   lma_collector::collectd::dbi_services { 'nova':
     username        => 'nova',
     dbname          => 'nova',
     password        => $nova['db_password'],
     report_interval => 60,
     downtime_factor => 2,
-    require         => Class['lma_collector::collectd::dbi'],
   }
 
   lma_collector::collectd::dbi_mysql_status{ 'mysql_status':
     username => 'nova',
     dbname   => 'nova',
     password => $nova['db_password'],
-    require  => Class['lma_collector::collectd::dbi'],
   }
 
   lma_collector::collectd::dbi_services { 'cinder':
@@ -178,7 +174,6 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     password        => $cinder['db_password'],
     report_interval => 60,
     downtime_factor => 2,
-    require         => Class['lma_collector::collectd::dbi'],
   }
 
   lma_collector::collectd::dbi_services { 'neutron':
@@ -187,7 +182,6 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     password        => $neutron['database']['passwd'],
     report_interval => 15,
     downtime_factor => 4,
-    require         => Class['lma_collector::collectd::dbi'],
   }
 
   class { 'lma_collector::collectd::haproxy':

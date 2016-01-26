@@ -23,6 +23,7 @@ define lma_collector::collectd::dbi_services (
 ) {
 
   include collectd::params
+  include lma_collector::collectd::dbi
 
   $service = $title
 
@@ -60,6 +61,7 @@ define lma_collector::collectd::dbi_services (
     group   => $collectd::params::root_group,
     mode    => '0640',
     content => template('lma_collector/collectd_dbi_services.conf.erb'),
+    require => Class['lma_collector::collectd::dbi'],
     notify  => Service['collectd'],
   }
 }
