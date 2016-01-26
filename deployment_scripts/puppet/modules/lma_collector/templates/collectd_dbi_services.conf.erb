@@ -39,7 +39,7 @@
     </Result>
   </Query>
   <Query "agents_up">
-    Statement "select concat_ws('.', 'agents', replace(replace(a1.binary, '-agent', ''), 'neutron-', ''), 'up') as metric, count(a2.id) as value from agents a1 left outer join agents a2 on a1.id = a2.id and a1.admin_state_up=1 and timestampdiff(SECOND,a1.heartbeat_timestamp,utc_timestamp())<<%= @downtime %>  group by a1.binary;"
+    Statement "select concat_ws('.', 'agents', replace(replace(a1.binary, '-agent', ''), 'neutron-', ''), 'up') as metric, count(a2.id) as value from agents a1 left outer join agents a2 on a1.id = a2.id and a1.admin_state_up=1 and timestampdiff(SECOND,a1.heartbeat_timestamp,utc_timestamp())<=<%= @downtime %>  group by a1.binary;"
     MinVersion 50000
     <Result>
       Type "gauge"
