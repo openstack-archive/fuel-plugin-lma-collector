@@ -1,0 +1,50 @@
+.. InfluxDB:
+
+The following metrics are extracted from the output of 'show stats' command.
+The values are reset to zero when InfluxDB is restarted.
+
+cluster
+^^^^^^^
+
+* ``influxdb_cluster_write_shard_points_requests``, the number of requests for writing a time series points to a shard.
+* ``influxdb_cluster_write_shard_requests``, the number of requests for writing to a shard.
+
+httpd
+^^^^^
+
+* ``influxdb_cluster_httpd_failed_auths``, the number of times failed authentications.
+* ``influxdb_cluster_httpd_ping_requests``, the number of ping requests.
+* ``influxdb_cluster_httpd_points_written_ok``, the number of points successfully written.
+* ``influxdb_cluster_httpd_query_requests``, the number of query requests received.
+* ``influxdb_cluster_httpd_query_response_bytes``, the number of bytes returned to the client.
+* ``influxdb_cluster_httpd_requests``, the number of requests received.
+* ``influxdb_cluster_httpd_write_requests``, the number of write requests received.
+* ``influxdb_cluster_httpd_write_request_bytes``, the number of bytes received for write requests.
+
+write
+^^^^^
+
+* ``influxdb_cluster_write_point_requests``, the number of write points requests across multiple data nodes.
+* ``influxdb_cluster_write_point_request_local``, the number of write points requests from local data nodes.
+* ``influxdb_cluster_write_point_request_remote``, the number of write points requests across remote data node.
+* ``influxdb_cluster_write_requests``, the number of write requests across multiple data nodes.
+* ``influxdb_cluster_write_sub_ok``, the number of successful points send to subscriptions.
+* ``influxdb_cluster_write_ok``, the number of successful writes of consistency level.
+
+runtime
+^^^^^^^
+
+* ``influxdb_cluster_memory_alloc``, the number of bytes allocated and not yet freed.
+* ``influxdb_cluster_memory_total_alloc``, the number of bytes allocated (even if freed).
+* ``influxdb_cluster_memory_system``, the number of bytes obtained from system.
+* ``influxdb_cluster_memory_lookups``, the number of pointer lookups.
+* ``influxdb_cluster_memory_mallocs``, the number of malloc operations.
+* ``influxdb_cluster_memory_frees``, the number of free operations.
+* ``influxdb_cluster_heap_idle``, the number of bytes in idle spans.
+* ``influxdb_cluster_heap_in_use``, the number of bytes in non-idle spans.
+* ``influxdb_cluster_heap_objects``, the total number of allocated objects.
+* ``influxdb_cluster_heap_released``, the number of bytes released to the operating system.
+* ``influxdb_cluster_heap_system``, the number of bytes obtained from system.
+* ``influxdb_cluster_garbage_collections``, the number of garbage collections.
+* ``influxdb_cluster_gc_pause_total``, the total number of garbage collector pause durations.
+* ``influxdb_cluster_go_routines``, the number of go routines.
