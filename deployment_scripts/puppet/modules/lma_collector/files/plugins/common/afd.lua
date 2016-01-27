@@ -17,6 +17,9 @@ local string = require 'string'
 
 local lma = require 'lma_utils'
 local consts = require 'gse_constants'
+--local math = require 'math'
+--local inspect = require 'inspect'
+--local cjson = require 'cjson'
 
 local read_message = read_message
 local assert = assert
@@ -60,6 +63,9 @@ function get_alarm_for_human(alarm)
     local host = ''
     if alarm.hostname then
         host = string.format(', host=%s', alarm.hostname)
+    end
+    if alarm.tags and alarm.tags.hostnames then
+       host = string.format("<br/>%s", alarm.tags.hostnames)
     end
 
     return string.format(
