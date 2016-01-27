@@ -14,6 +14,7 @@
 #
 
 $lma_collector_hash = hiera_hash('lma_collector')
+$influxdb_grafana = hiera('influxdb_grafana')
 
 if $lma_collector_hash['influxdb_mode'] != 'disabled' {
   $network_metadata = hiera('network_metadata')
@@ -37,6 +38,13 @@ if $lma_collector_hash['influxdb_mode'] != 'disabled' {
   class { 'lma_collector::collectd::base':
     processes       => $processes,
     process_matches => $process_matches,
+  }
+
+  if $is_influxdb_node {
+    class { 'lma_collector::collectd::influxdb':
+        username => 'root',
+        password => $influxdb_grafana['influxdb_rootpass'],
+    }
   }
 
   if $is_elasticsearch_node {
