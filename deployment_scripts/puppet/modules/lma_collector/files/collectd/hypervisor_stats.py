@@ -25,13 +25,13 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
     """ Class to report the statistics on Nova hypervisors.
     """
     VALUE_MAP = {
-        'current_workload': 'total_running_tasks',
-        'running_vms': 'total_running_instances',
-        'local_gb_used': 'total_used_disk_GB',
-        'free_disk_gb': 'total_free_disk_GB',
-        'memory_mb_used': 'total_used_ram_MB',
-        'free_ram_mb': 'total_free_ram_MB',
-        'vcpus_used': 'total_used_vcpus',
+        'current_workload': 'running_tasks',
+        'running_vms': 'running_instances',
+        'local_gb_used': 'used_disk_GB',
+        'free_disk_gb': 'free_disk_GB',
+        'memory_mb_used': 'used_ram_MB',
+        'free_ram_mb': 'free_ram_MB',
+        'vcpus_used': 'used_vcpus',
     }
 
     def config_callback(self, config):
@@ -42,7 +42,7 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
         if 'cpu_ratio' not in self.extra_config:
             self.logger.warning('CpuAllocationRatio parameter not set')
 
-    def dispatch_value(self, name, value):
+    def dispatch_value(self, name, value, host=None):
         v = collectd.Values(
             plugin=PLUGIN_NAME,
             type='gauge',
@@ -52,22 +52,35 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
             meta={'0': True},
             values=[value]
         )
+        if host:
+            v.host = host
         v.dispatch()
 
     @openstack.read_callback_wrapper
     def read_callback(self):
-        r = self.get('nova', 'os-hypervisors/statistics')
+        r = self.get('nova', 'os-hypervisors/detail')
         if not r:
             self.logger.warning("Could not get hypervisor statistics")
             return
 
-        stats = r.json().get('hypervisor_statistics', {})
-        for k, v in self.VALUE_MAP.iteritems():
-            self.dispatch_value(v, stats.get(k, 0))
-        if 'cpu_ratio' in self.extra_config:
-            vcpus = int(self.extra_config['cpu_ratio'] * stats.get('vcpus', 0))
-            self.dispatch_value('total_free_vcpus',
-                                vcpus - stats.get('vcpus_used', 0))
+        total_stats = {v: 0 for v in self.VALUE_MAP.values()}
+        total_stats['free_vcpus'] = 0
+        hypervisor_stats = r.json().get('hypervisors', [])
+        for stats in hypervisor_stats:
+            # remove domain name and keep only the hostname portion
+            host = stats['hypervisor_hostname'].split('.')[0]
+            for k, v in self.VALUE_MAP.iteritems():
+                self.dispatch_value(v, stats.get(k, 0), host)
+                total_stats[v] += stats.get(k, 0)
+            if 'cpu_ratio' in self.extra_config:
+                free = (int(self.extra_config['cpu_ratio'] *
+                        stats.get('vcpus', 0))) - stats.get('vcpus_used', 0)
+                self.dispatch_value('free_vcpus', free, host)
+                total_stats['free_vcpus'] += free
+
+        # Dispatch the global metrics
+        for k, v in total_stats.iteritems():
+            self.dispatch_value('total_%s'.format(k), v)
 
 
 plugin = HypervisorStatsPlugin(collectd)
