@@ -152,3 +152,9 @@ Elasticsearch
 -------------
 
 .. include:: metrics/elasticsearch.rst
+
+
+InfluxDB
+--------
+
+.. include:: metrics/influxdb.rst
