@@ -17,13 +17,17 @@ class lma_collector::afd::workers () {
 
   $metrics_matcher = join([
     '(Type == \'metric\' || Type == \'heka.sandbox.metric\')', ' && ',
-    'Fields[name] =~ /^openstack_(nova|cinder|neutron)_(services|agents)$/',
+    'Fields[name] =~ /^openstack_(nova|cinder|neutron)_(service|agent)s?$/',
   ], '')
 
   heka::filter::sandbox { 'afd_workers':
     config_dir      => $lma_collector::params::config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/afd_workers.lua",
     message_matcher => $metrics_matcher,
+    ticker_interval => 1,
+    config          => {
+      max_timer_inject => $lma_collector::params::hekad_max_timer_inject,
+    }
     notify          => Class['lma_collector::service'],
   }
 }
