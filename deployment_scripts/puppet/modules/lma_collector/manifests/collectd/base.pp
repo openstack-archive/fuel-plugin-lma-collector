@@ -84,7 +84,7 @@ class lma_collector::collectd::base (
   }
 
   class { 'collectd::plugin::interface':
-    interfaces => grep(split($::interfaces, ','), '^eth\d+$')
+    interfaces => reject(grep(split($::interfaces, ','), '^[a-z0-9]+$'), '^lo$')
   }
 
   class { 'collectd::plugin::load':

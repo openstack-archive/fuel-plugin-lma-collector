@@ -22,4 +22,15 @@ describe 'lma_collector::collectd::base' do
     describe 'with defaults' do
         it { is_expected.to contain_class('collectd') }
     end
+
+    describe 'with defaults' do
+        let(:facts) do
+            {:kernel => 'Linux', :operatingsystem => 'Ubuntu',
+             :osfamily => 'Debian', :concat_basedir => '/foo',
+             :interfaces => 'br-mgmt,en0,bond0,lo'}
+        end
+
+        it { is_expected.to contain_class('collectd') }
+        it { is_expected.to contain_class('collectd::plugin::interface').with_interfaces(['en0', 'bond0']) }
+    end
 end
