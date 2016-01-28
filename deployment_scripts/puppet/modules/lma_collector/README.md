@@ -164,7 +164,7 @@ class { 'lma_collector::collectd::base':
 ### Collect OpenStack statistics
 
 To make the collector collect statistics for an OpenStack service declare
-the ``lma_collector::collectd::openstack`` define:
+the `lma_collector::collectd::openstack` define:
 
 ```puppet
 lma_collector::collectd::openstack { 'nova':
@@ -192,7 +192,7 @@ lma_collector::collectd::openstack { 'neutron':
 ### Collect OpenStack service statuses
 
 To make the collector collect statuses of OpenStack services declare the
-``lma_collector::collectd::openstack_checks`` class:
+`lma_collector::collectd::openstack_checks` class:
 
 ```puppet
 class { 'lma_collector::collectd::openstack_checks':
@@ -206,7 +206,7 @@ class { 'lma_collector::collectd::openstack_checks':
 ### Collect HAProxy statistics
 
 To make the collector collect statistics for HAProxy declare the
-``lma_collector::collectd::haproxy`` class:
+`lma_collector::collectd::haproxy` class:
 
 ```puppet
 class { 'lma_collector::collectd::haproxy':
@@ -222,7 +222,7 @@ class { 'lma_collector::collectd::haproxy':
 ### Collect RabbitMQ statistics
 
 To make the collector collect statistics for RabbitMQ declare the
-``lma_collector::collectd::rabbitmq`` class:
+`lma_collector::collectd::rabbitmq` class:
 
 ```puppet
 class { 'lma_collector::collectd::rabbitmq':
@@ -232,7 +232,7 @@ class { 'lma_collector::collectd::rabbitmq':
 ### Collect Memcached statistics
 
 To make the collector collect statistics for Memcached declare the
-``lma_collector::collectd::memcached`` class:
+`lma_collector::collectd::memcached` class:
 
 ```puppet
 class {'lma_collector::collectd::memcached':
@@ -243,7 +243,7 @@ class {'lma_collector::collectd::memcached':
 ### Collect Apache statistics
 
 To make the collector collect statistics for Apache declare the
-``lma_collector::collectd::apache`` class:
+`lma_collector::collectd::apache` class:
 
 ```puppet
 class { 'lma_collector::collectd::apache':
@@ -256,7 +256,7 @@ This will collectd Apache statistics from
 ### Collect Nova Hypervisor statistics
 
 To make the collector collect statistics for the Nova hypervisors declare the
-``lma_collector::collectd::hypervisor`` class:
+`lma_collector::collectd::hypervisor` class:
 
 ```puppet
 class { 'lma_collector::collectd::hypervisor':
@@ -270,7 +270,7 @@ class { 'lma_collector::collectd::hypervisor':
 ### Collect Ceph statistics
 
 To make the collector collect statistics for Ceph declare the
-``lma_collector::collectd::ceph_mon``  class
+`lma_collector::collectd::ceph_mon` class:
 
 ```puppet
 class { 'lma_collector::collectd::ceph_mon:
@@ -293,7 +293,7 @@ class { 'lma_collector::collectd::ceph_osd':
 ### Collect Pacemaker statistics
 
 To make the collector collect statistics for Pacemaker declare the
-``lma_collector::collectd::pacemaker`` class:
+`lma_collector::collectd::pacemaker` class:
 
 ```puppet
 class { 'lma_collector::collectd::pacemaker':
@@ -540,7 +540,7 @@ services. The collectd plugin used is a Python script.
   class should be declared, with its `master_resource` parameter set to the
   same value as this parameter. Valid options: a string. Default: `undef`.
 
-#### Class: `lma_collector::collectd::apache``
+#### Class: `lma_collector::collectd::apache`
 
 Declare this class to configure collectd to collect Apache statistics.
 collectd's native `apache` plugin is used. The URL used is
