@@ -16,6 +16,7 @@
 class lma_collector::collectd::pacemaker (
   $resources,
   $master_resource = undef,
+  $hostname = undef,
 ) {
 
   validate_array($resources)
@@ -23,10 +24,19 @@ class lma_collector::collectd::pacemaker (
   # Add quotes around the array values
   $real_resources = suffix(prefix($resources, '"'), '"')
 
-  lma_collector::collectd::python { 'pacemaker_resource':
-    config => {
+  if $hostname {
+    $config = {
       'Resource' => $real_resources,
-    },
+      'Hostname' => $hostname,
+    }
+  } else {
+    $config = {
+      'Resource' => $real_resources,
+    }
+  }
+
+  lma_collector::collectd::python { 'pacemaker_resource':
+    config => $config
   }
 
   if $master_resource {
