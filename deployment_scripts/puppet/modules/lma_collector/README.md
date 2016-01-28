@@ -603,7 +603,7 @@ Declare this class to configure collectd to collect statistics on Pacemaker.
 The collectd plugin used is a Python script, which uses Pacemaker's
 `crm_resource` command to get statistics from Pacemaker.
 
-#### Parameters
+##### Parameters
 
 * `resources`: *Required*. The Pacemaker resources to get statistics for. Valid
   options: an array of strings.
