@@ -226,7 +226,7 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
   }
 
   class { 'lma_collector::collectd::memcached':
-    host => $memcached_host,
+    host => $memcache_address,
   }
 
   class { 'lma_collector::collectd::apache': }
