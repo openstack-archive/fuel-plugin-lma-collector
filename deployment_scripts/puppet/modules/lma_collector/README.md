@@ -203,6 +203,24 @@ class { 'lma_collector::collectd::openstack_checks':
 }
 ```
 
+### Collectd OpenStack service worker statuses
+
+To make the collector collect statuses of workers of an OpenStack service
+declare the `lma_collector::collectd::dbi_services` define:
+
+```puppet
+lma_collector::collectd::dbi_services { 'nova':
+  dbname          => 'nova',
+  username        => 'nova',
+  password        => 'nova',
+  report_interval => 60,
+  downtime_factor => 2,
+}
+```
+
+This define can be used for the following OpenStack services: nova, cinder and
+neutron.
+
 ### Collect HAProxy statistics
 
 To make the collector collect statistics for HAProxy declare the
@@ -667,6 +685,33 @@ The resource title should be set to the service name (e.g. `'nova'`).
   [`lma_collector::collectd::pacemaker`](#class-lma_collectorcollectdpacemaker)
   class should be declared, with its `master_resource` parameter set to the
   same value as this parameter. Valid options: a string. Default: `undef`.
+
+#### Define `lma_collector::collectd::dbi_services`
+
+Declare this define to make collectd collect the statuses (`up`, `down` or
+`disabled`) of the various workers of an OpenStack service.
+
+The collectd plugin used is DBI, which is a native collectd plugin. That plugin
+uses SQL queries to the MySQL database.
+
+This define supports the following services: nova, cinder, and neutron.
+
+The resource title should be set to the service name (e.g. `'nova'`).
+
+##### Parameters
+
+* `dbname`: *Required*. The database name. Valid options: a string.
+* `username`: *Required*. The database user. Valid options: a string.
+* `password`: *Required*. The database password. Valid options: a string.
+* `hostname`: *Optional*. The database hostname. Valid options: a string.
+  Default: `'localhost'`.
+* `report_interval`: *Required*. The report interval in seconds used in the
+  service configuration. For example Nova's current default value is 10.
+  Valid options: an integer.
+* `downtime_factor`: *Required*. The downtime factor used to determine when
+  consider a worker is down. A service is deemed "down" if no heartbeat has
+  been received since `downtime_factor * report_interval` seconds. Valid
+  options: an integer.
 
 Limitations
 -----------
