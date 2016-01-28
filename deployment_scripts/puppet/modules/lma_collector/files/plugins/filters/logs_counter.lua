@@ -20,6 +20,7 @@ local interval = (read_config('interval') or error('interval must be specified!'
 
 local discovered_services = {}
 local logs_counters = {}
+local last_timer_events = {}
 local current_service = 1
 local enter_at
 local interval_in_ns = interval * 1e9
@@ -42,7 +43,7 @@ function process_message ()
         -- a new service has been discovered
         discovered_services[#discovered_services + 1] = service
         logs_counters[service] = {}
-        logs_counters[service]['last_timer_event'] = 0
+        last_timer_events[service] = 0
         for _, label in pairs(utils.severity_to_label_map) do
             logs_counters[service][label] = 0
         end
@@ -73,7 +74,7 @@ function timer_event(ns)
     -- all metrics.
     if ns - enter_at < interval_in_ns and current_service <= #discovered_services then
         local service_name = discovered_services[current_service]
-        local last_timer_event = logs_counters[service_name]['last_timer_event']
+        local last_timer_event = last_timer_events[service_name]
         local delta_sec = (ns - last_timer_event) / 1e9
 
         for level, val in pairs(logs_counters[service_name]) do
@@ -103,7 +104,7 @@ function timer_event(ns)
 
         end
 
-        logs_counters[service_name]['last_timer_event'] = ns
+        last_timer_events[service_name] = ns
         current_service = current_service + 1
     end
 
