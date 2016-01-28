@@ -550,9 +550,9 @@ Nova API.
 
 #### Class: `lma_collector::collectd::pacemaker`
 
-Declare this class to configure collectd to collect statistics on Pacemaker.
-The collectd plugin used is a Python script, which uses Pacemaker's
-`crm_resource` command to get statistics from Pacemaker.
+Declare this class to configure collectd to collect statistics for Pacemaker
+resources running on the node. The collectd plugin used is a Python script,
+which uses Pacemaker's `crm_resource` command to get statistics from Pacemaker.
 
 #### Parameters
 
@@ -567,6 +567,10 @@ The collectd plugin used is a Python script, which uses Pacemaker's
   [`lma_collector::collectd::hypervisor`](#class-lma_collectorcollectdhypervisor)
   with the `pacemaker_resource_master` parameter needs to declare the
   `lma_collector::collectd::pacemaker` class and use that parameter.
+  Valid options: a string. Default: `undef`.
+* `hostname`: *Optional*. If this is set it will be used to identify the local
+  host in the Pacemaker cluster. If unset, collectd will use the value returned
+  by the Python socket.getfqdn() function.
   Valid options: a string. Default: `undef`.
 
 

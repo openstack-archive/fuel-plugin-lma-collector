@@ -112,6 +112,7 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
       'vip__vrouter',
     ],
     master_resource => $pacemaker_master_resource,
+    hostname        => $::fqdn,
   }
 
   $openstack_service_config = {
