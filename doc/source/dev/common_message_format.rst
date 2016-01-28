@@ -44,7 +44,7 @@ Attributes in **bold** are always present in the messages while attributes in
 * **openstack_roles** (string), a comma-separated list of the node's roles (eg
   'controller', 'compute,cinder').
 
-* *environment_label* (string), the label assigned to the OpenStack
+* **environment_label** (string), the label assigned to the OpenStack
   environment.
 
 .. note:: All date/time fields represented as string are formatted according

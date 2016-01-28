@@ -7,7 +7,7 @@ attributes:
   environment_label:
     value: ''
     label: 'Environment label'
-    description: 'Optional string to tag the data.'
+    description: 'Optional string to tag the data. If empty, it will default to "env-<environment id>".'
     weight: 10
     type: "text"
 

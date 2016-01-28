@@ -30,19 +30,17 @@ $es_nodes = filter_nodes(hiera('nodes'), 'role', 'elasticsearch_kibana')
 $influxdb_grafana = hiera_hash('influxdb_grafana', {})
 $influxdb_nodes = filter_nodes(hiera('nodes'), 'role', 'influxdb_grafana')
 
-$tags = {
-  deployment_id => hiera('deployment_id'),
-  openstack_region => 'RegionOne',
-  openstack_release => hiera('openstack_version'),
-  openstack_roles => join($roles, ','),
-}
 if $lma_collector['environment_label'] != '' {
-  $additional_tags = {
-    environment_label => $lma_collector['environment_label'],
-  }
+  $environment_label = $lma_collector['environment_label']
+} else {
+  $environment_label = join(['env-', hiera('deployment_id')], '')
 }
-else {
-  $additional_tags = {}
+$tags = {
+  deployment_id     => hiera('deployment_id'),
+  openstack_region  => 'RegionOne',
+  openstack_release => hiera('openstack_version'),
+  openstack_roles   => join($roles, ','),
+  environment_label => $environment_label,
 }
 
 if $is_controller {
@@ -104,7 +102,7 @@ if $is_controller{
 }
 
 class { 'lma_collector':
-  tags              => merge($tags, $additional_tags),
+  tags              => $tags,
   groups            => $additional_groups,
   pacemaker_managed => $pacemaker_managed,
   rabbitmq_resource => $rabbitmq_resource,
