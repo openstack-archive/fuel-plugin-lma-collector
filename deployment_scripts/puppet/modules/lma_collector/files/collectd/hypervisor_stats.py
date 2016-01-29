@@ -80,7 +80,7 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
 
         # Dispatch the global metrics
         for k, v in total_stats.iteritems():
-            self.dispatch_value('total_%s'.format(k), v)
+            self.dispatch_value('total_{}'.format(k), v)
 
 
 plugin = HypervisorStatsPlugin(collectd)
