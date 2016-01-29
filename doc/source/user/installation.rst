@@ -80,7 +80,7 @@ if you need further instructions about how to build the Fuel Plugin Builder.
 
 4. Clone the plugin git repository::
 
-    [root@home ~] git clone git@github.com:openstack/fuel-plugin-lma_collector.git
+    [root@home ~] git clone https://github.com/openstack/fuel-plugin-lma-collector.git
 
 5. Check that the plugin is valid::
 
