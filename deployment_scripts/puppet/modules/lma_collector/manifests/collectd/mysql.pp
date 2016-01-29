@@ -13,13 +13,17 @@
 #    under the License.
 #
 class lma_collector::collectd::mysql (
-  $database = $lma_collector::params::mysql_database,
+  $host = $lma_collector::params::mysql_host,
+  $port = $lma_collector::params::mysql_port,
   $username = $lma_collector::params::mysql_username,
   $password = $lma_collector::params::mysql_password,
 ) inherits lma_collector::params {
 
-  collectd::plugin::mysql::database { $database:
-    host     => 'localhost',
+  # We use "nova" as the resource title for backward-compatibility reasons,
+  # but we could use anything here really.
+  collectd::plugin::mysql::database { 'nova':
+    host     => $host,
+    port     => $port,
     username => $username,
     password => $password,
   }
