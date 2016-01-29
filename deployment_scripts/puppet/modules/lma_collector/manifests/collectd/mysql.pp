@@ -13,13 +13,24 @@
 #    under the License.
 #
 class lma_collector::collectd::mysql (
-  $database = $lma_collector::params::mysql_database,
+  $host = $lma_collector::params::mysql_host,
+  $port = $lma_collector::params::mysql_port,
   $username = $lma_collector::params::mysql_username,
   $password = $lma_collector::params::mysql_password,
 ) inherits lma_collector::params {
 
-  collectd::plugin::mysql::database { $database:
-    host     => 'localhost',
+  # Previously the collectd::plugin::mysql::database resource title was "nova",
+  # which did not make sense as the monitoring of MySQL is not at all related
+  # to Nova.  So we use a different resource title and make sure that the file
+  # associated with the "nova" resource is absent.
+
+  collectd::plugin::mysql::database { 'nova':
+    ensure => absent,
+  }
+
+  collectd::plugin::mysql::database { 'openstack-config':
+    host     => $host,
+    port     => $port,
     username => $username,
     password => $password,
   }
