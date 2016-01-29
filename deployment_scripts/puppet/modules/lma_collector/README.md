@@ -344,13 +344,13 @@ logs from `/var/log/apache2/keystone_wsgi_*_access.log`.
 This class currently assumes the following log configuration in Apache:
 
 ```
-CustomLog "/var/log/apache2/keystone_wsgi_main_access.log" "%h %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\""
+CustomLog "/var/log/apache2/keystone_wsgi_main_access.log" "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\""
 ```
 
 for Keystone main and:
 
 ```
-CustomLog "/var/log/apache2/keystone_wsgi_admin_access.log" "%h %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\""
+CustomLog "/var/log/apache2/keystone_wsgi_admin_access.log" "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\""
 ```
 
 for Keystone admin.

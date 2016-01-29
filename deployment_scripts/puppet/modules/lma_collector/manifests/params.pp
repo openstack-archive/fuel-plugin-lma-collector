@@ -47,7 +47,7 @@ class lma_collector::params {
   $fallback_syslog_pattern = '%TIMESTAMP% %HOSTNAME% %syslogtag%%msg:::sp-if-no-1st-sp%%msg%\n'
 
   $apache_log_directory = '/var/log/apache2'
-  $apache_log_pattern = '%h %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\"'
+  $apache_log_pattern = '%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\"'
 
   # required to read the log files
   case $::osfamily {
