@@ -206,6 +206,8 @@ Where:
 |   The number of prior time-series analysis window to compare the window with (this is
 |   not implemented yet)
 
+.. _alarm_functions:
+
 | function
 |   Type: enum('last' | 'min' | 'max' | 'sum' | 'count' | 'avg' | 'median' | 'mode' | 'roc' | 'mww' | 'mww_nonparametric')
 |   Where:
