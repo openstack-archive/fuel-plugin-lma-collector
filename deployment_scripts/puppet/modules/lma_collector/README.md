@@ -280,6 +280,16 @@ class { 'lma_collector::collectd::ceph_mon:
 With this the collector will collect information on the Ceph cluster (health,
 monitor count, quorum count, free space, ...) and the placement groups.
 
+### Collect Ceph OSD statistics
+
+To make the collector collect Ceph OSD (Object Storage Daemon) performance
+statistics declare the `lma_collector::collectd::ceph_osd` class:
+
+```puppet
+class { 'lma_collector::collectd::ceph_osd':
+}
+```
+
 ### Collect Pacemaker statistics
 
 To make the collector collect statistics for Pacemaker declare the
@@ -315,6 +325,7 @@ Public Classes:
 * [`lma_collector::collectd::openstack_checks`](#class-lma_collectorcollectdopenstackchecks)
 * [`lma_collector::collectd::apache`](#class-lma_collectorcollectdapache)
 * [`lma_collector::collectd::ceph_mon`](#define-lma_collectorcollectdcephmon)
+* [`lma_collector::collectd::ceph_osd`](#define-lma_collectorcollectdceph_osd)
 * [`lma_collector::collectd::hypervisor`](#class-lma_collectorcollectdhypervisor)
 * [`lma_collector::collectd::pacemaker`](#class-lma_collectorcollectdpacemaker)
 
@@ -605,6 +616,14 @@ The collectd plugin used is a Python script. That script uses the `ceph`
 command internally. So for this plugin to work the `ceph` command should be
 installed, and a valid configuration for accessing the Ceph cluster should be
 in place.
+
+#### Class: `lma_collector::collectd::ceph_osd`
+
+Declare this class to make collectd collect Ceph OSD (Object Storage Daemon)
+performance statistics of all the OSD daemons running on the host.
+
+The collectd plugin used is a Python script. That script uses the `ceph`
+command internally, so that command should be installed.
 
 #### Define: `lma_collector::logs::openstack`
 
