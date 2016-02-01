@@ -291,6 +291,15 @@ class { 'lma_collector::collectd::pacemaker':
 }
 ```
 
+### Collect MySQL statistics
+
+To make the collector collect statistics for MySQL declare the
+`lma_collector::collectd::mysql` class:
+
+```puppet
+class { 'lma_collector::collectd::mysql': }
+```
+
 ## Reference
 
 ### Classes
@@ -317,6 +326,7 @@ Public Classes:
 * [`lma_collector::collectd::ceph_mon`](#define-lma_collectorcollectdcephmon)
 * [`lma_collector::collectd::hypervisor`](#class-lma_collectorcollectdhypervisor)
 * [`lma_collector::collectd::pacemaker`](#class-lma_collectorcollectdpacemaker)
+* [`lma_collector::collectd::mysql`](#class-lma_collectorcollectdmysql)
 
 Private Classes:
 
@@ -593,6 +603,23 @@ which uses Pacemaker's `crm_resource` command to get statistics from Pacemaker.
   by the Python socket.getfqdn() function.
   Valid options: a string. Default: `undef`.
 
+#### Class: `lma_collector::collectd::mysql`
+
+Declare this class to configure collectd to collect statistics for MySQL.
+
+The collectd plugin used is the native collectd [MySQL
+plugin](https://collectd.org/wiki/index.php/Plugin:MySQL).
+
+##### Parameters
+
+* `host`: *Optional*. The host onto which the MySQL database runs. Valid
+  options: a string. Default: `'127.0.0.1'`.
+* `port`: *Optional*. The port the MySQL database listens on. Valid options: an
+  integer. Default: `3306`.
+* `username`: *Required*. The database user to use to connect to the MySQL
+  database. Valid options: a string.
+* `password`: *Required*. The database password to use to connect to the MySQL
+  database. Valid options: a string.
 
 #### Class: `lma_collector::collectd::ceph_mon`
 
