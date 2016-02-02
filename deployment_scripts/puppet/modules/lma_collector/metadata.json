@@ -1,5 +1,5 @@
 {
-    "name": "lma_collector",
+    "name": "mirantis-lma_collector",
     "version": "1.0.0",
     "author": "Simon Pasquier <spasquier@mirantis.com>",
     "summary": "Puppet LMA Collector Module",
@@ -10,18 +10,26 @@
     "operatingsystem_support": [
         {
             "operatingsystem": "Ubuntu",
-            "operatingsystemrelease": ["12.04", "14.04"]
-        },
-        {
-            "operatingsystem": "CentOS",
-            "operatingsystemrelease": ["6"]
+            "operatingsystemrelease": ["14.04"]
         }
+    ],
+    "requirements": [
+        {"name": "puppet", "version_requirement": "3.x"},
+        {"name": "pe", "version_requirement": "3.x"}
     ],
     "description": "Puppet module for configuring the LMA collector service",
     "dependencies": [
+        {"name": "mirantis/heka", "version_requirement": "1.x"},
+        {"name": "puppet/collectd", "version_requirement": ">= 4.1.2"},
         {"name": "puppetlabs/apache", "version_requirement": ">= 1.4.0"},
+        {"name": "puppetlabs/inifile", "version_requirement": ">= 1.4.2"},
         {"name": "puppetlabs/stdlib", "version_requirement": "4.x"},
-        {"name": "pdxcat/collectd", "version_requirement": ">= 3.2.0"},
-        {"name": "mirantis/heka", "version_requirement": "1.x"}
+        {"name": "openstack/cinder", "version_requirement": "7.x"},
+        {"name": "openstack/glance", "version_requirement": "7.x"},
+        {"name": "openstack/heat", "version_requirement": "7.x"},
+        {"name": "openstack/keystone", "version_requirement": "7.x"},
+        {"name": "openstack/neutron", "version_requirement": "7.x"},
+        {"name": "openstack/nova", "version_requirement": "7.x"},
+        {"name": "openstack/openstacklib", "version_requirement": "7.x"}
     ]
 }
