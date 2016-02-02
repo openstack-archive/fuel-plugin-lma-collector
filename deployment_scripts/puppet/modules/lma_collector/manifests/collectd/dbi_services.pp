@@ -13,7 +13,6 @@
 #    under the License.
 #
 define lma_collector::collectd::dbi_services (
-  $database         = undef,
   $hostname         = 'localhost',
   $username         = undef,
   $password         = undef,
