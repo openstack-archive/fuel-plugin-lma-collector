@@ -15,6 +15,7 @@
 prepare_network_config(hiera('network_scheme', {}))
 $messaging_address = get_network_role_property('mgmt/messaging', 'ipaddr')
 $memcache_address  = get_network_role_property('mgmt/memcache', 'ipaddr')
+$database_address  = get_network_role_property('mgmt/database', 'ipaddr')
 
 include lma_collector::params
 
@@ -159,8 +160,12 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     cpu_allocation_ratio      => 8.0,
   }
 
+  # We use the "nova" database user to connect to MySQL, but any valid
+  # user/password could be used really.  MySQL listens on
+  # <management ip>:3307.
   class { 'lma_collector::collectd::mysql':
-    database => 'nova',
+    host     => $database_address,
+    port     => 3307,
     username => 'nova',
     password => $nova['db_password'],
   }
