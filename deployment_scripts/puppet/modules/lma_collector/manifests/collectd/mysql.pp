@@ -15,9 +15,12 @@
 class lma_collector::collectd::mysql (
   $host = $lma_collector::params::mysql_host,
   $port = $lma_collector::params::mysql_port,
-  $username = $lma_collector::params::mysql_username,
-  $password = $lma_collector::params::mysql_password,
+  $username,
+  $password,
 ) inherits lma_collector::params {
+
+  validate_string($username)
+  validate_string($password)
 
   # Previously the collectd::plugin::mysql::database resource title was "nova",
   # which did not make sense as the monitoring of MySQL is not at all related
