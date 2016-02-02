@@ -50,6 +50,55 @@ Uninstall the plugins
 Functional testing
 ==================
 
+.. _deploy_ha_mode: 
+
+Deploy plugins in HA mode
+-------------------------
+
+.. include:: tests/deploy_ha_mode.rst
+
+.. _scale_influx:
+
+Add/remove influxdb nodes in existing environment
+-------------------------------------------------
+
+.. include:: tests/scale_influx.rst
+
+.. _scale_elasticsearch:
+
+Add/remove elasticsearch nodes in existing environment
+------------------------------------------------------
+
+.. include:: tests/scale_elasticsearch.rst
+
+.. _scale_infrastructure_alerting:
+
+Add/remove infrastructure alerting nodes in existing environment
+----------------------------------------------------------------
+
+.. include:: tests/scale_infrastructure_alerting.rst
+
+.. _shutdown_influx_node:
+
+Shutdown influxdb node
+----------------------
+
+.. include:: tests/shutdown_influx_node.rst
+
+.. _shutdown_elasticsearch_node:
+
+Shutdown elasticsearch node
+---------------------------
+
+.. include:: tests/shutdown_elasticsearch_node.rst
+
+.. _shutdown_infrastructure_alerting_node:
+
+Shutdown infrastructure alerting node
+-------------------------------------
+
+.. include:: tests/shutdown_infrastructure_alerting_node.rst
+
 .. _query_logs_in_kibana_ui:
 
 Display and query logs in the Kibana UI

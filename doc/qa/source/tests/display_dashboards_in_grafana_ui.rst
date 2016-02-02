@@ -44,6 +44,8 @@ Steps
 
     #. LMA Self-monitoring
 
+    #. Virtual instances
+
 
 
 Expected Result
