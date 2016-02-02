@@ -18,11 +18,13 @@ class lma_collector::influxdb (
   $database       = $lma_collector::params::influxdb_database,
   $user           = $lma_collector::params::influxdb_user,
   $password       = $lma_collector::params::influxdb_password,
+  $tag_fields     = $lma_collector::params::influxdb_tag_fields,
   $time_precision = $lma_collector::params::influxdb_time_precision,
 ) inherits lma_collector::params {
   include lma_collector::service
 
   validate_string($server)
+  validate_array($tag_fields)
 
   heka::filter::sandbox { 'influxdb_accumulator':
     config_dir      => $lma_collector::params::config_dir,
@@ -32,7 +34,7 @@ class lma_collector::influxdb (
     config          => {
       flush_interval => $lma_collector::params::influxdb_flush_interval,
       flush_count    => $lma_collector::params::influxdb_flush_count,
-      tag_fields     => 'hostname deployment_id tenant_id user_id',
+      tag_fields     => join(sort(concat(['hostname'], $tag_fields)), ' '),
       time_precision => $time_precision,
       # FIXME(pasquier-s): provide the default_tenant_id & default_user_id
       # parameters but this requires to request Keystone since we only have

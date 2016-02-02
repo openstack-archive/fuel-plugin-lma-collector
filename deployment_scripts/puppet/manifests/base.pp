@@ -213,11 +213,12 @@ case $influxdb_mode {
     }
 
     class { 'lma_collector::influxdb':
-      server   => $influxdb_server,
-      database => $influxdb_database,
-      user     => $influxdb_user,
-      password => $influxdb_password,
-      require  => Class['lma_collector'],
+      server     => $influxdb_server,
+      database   => $influxdb_database,
+      user       => $influxdb_user,
+      password   => $influxdb_password,
+      tag_fields => ['deployment_id', 'environment_label', 'tenant_id', 'user_id'],
+      require    => Class['lma_collector'],
     }
 
     class { 'lma_collector::metrics::heka_monitoring':

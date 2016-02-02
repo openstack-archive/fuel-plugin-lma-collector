@@ -143,6 +143,7 @@ class lma_collector::params {
   $influxdb_user = 'lma'
   $influxdb_password = 'lmapass'
   $influxdb_timeout = 5
+  $influxdb_tag_fields = []
   $influxdb_time_precision = 'ms'
   $influxdb_message_matcher = join([
     "Fields[${aggregator_flag}] == NIL", ' && ',
