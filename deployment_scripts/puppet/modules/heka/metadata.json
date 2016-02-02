@@ -1,5 +1,5 @@
 {
-    "name": "heka",
+    "name": "mirantis-heka",
     "version": "1.0.0",
     "author": "Simon Pasquier <spasquier@mirantis.com>",
     "summary": "Puppet Heka Module",
@@ -10,12 +10,12 @@
     "operatingsystem_support": [
         {
             "operatingsystem": "Ubuntu",
-            "operatingsystemrelease": ["12.04", "14.04"]
-        },
-        {
-            "operatingsystem": "CentOS",
-            "operatingsystemrelease": ["6"]
+            "operatingsystemrelease": ["14.04"]
         }
+    ],
+    "requirements": [
+        {"name": "puppet", "version_requirement": "3.x"},
+        {"name": "pe", "version_requirement": "3.x"}
     ],
     "description": "Puppet module for configuring Heka",
     "dependencies": [
