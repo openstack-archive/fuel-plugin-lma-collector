@@ -10,7 +10,7 @@
 Steps
 :::::
 
-#. Open the Grafana URL at :samp:`http://<{IP address of the 'lma' node}>:8000/`
+#. Open the Grafana URL (open the 'Dashboard' tab and click the 'Grafana' link).
 
 #. Sign-in using the credentials provided during the configuration of the environment.
 
@@ -43,6 +43,12 @@ Steps
     #. System
 
     #. LMA Self-monitoring
+
+    #. Hypervisor
+
+    #. Elasticsearch
+
+    #. InfluxDB
 
 
 
