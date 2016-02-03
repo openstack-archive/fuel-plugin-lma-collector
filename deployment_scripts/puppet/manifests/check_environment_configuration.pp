@@ -54,21 +54,3 @@ if $influxdb_mode == 'local' {
     fail("Could not find node with role 'influxdb_grafana' in the environment")
   }
 }
-
-$alerting_mode = $lma_collector['alerting_mode']
-if $alerting_mode == 'local' {
-  # Check that the LMA-Infrastructure-Alerting plugin is enabled for that environment
-  # and that the node names match
-  $infra_alerting = hiera_hash('lma_infrastructure_alerting', false)
-  if ! $infra_alerting {
-    fail('Could not get the LMA Infrastructure Alerting parameters. The LMA-Infrastructure-Alerting plugin is probably not installed.')
-  }
-  elsif ! $infra_alerting['metadata']['enabled'] {
-    fail('Could not get the LMA Infrastructure Alerting parameters. The LMA-Infrastructure-Alerting plugin is probably not enabled for this environment.')
-  }
-  # Check that the LMA-Infrastructure-Alerting node exists in the environment
-  $infra_alerting_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting', 'primary-infrastructure_alerting'])
-  if size(keys($infra_alerting_nodes)) < 1 {
-    fail("Could not find node with role 'infrastructure_alerting' in the environment")
-  }
-}
