@@ -1,2 +1,2 @@
 Sphinx
-fuel-plugin-builder>=2.0.4
+-e git+https://github.com/openstack/fuel-plugins.git#egg=fuel-plugin-builder
