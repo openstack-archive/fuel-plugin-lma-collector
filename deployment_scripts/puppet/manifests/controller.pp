@@ -257,18 +257,18 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
 }
 
 $alerting_mode = $lma_collector['alerting_mode']
-if $alerting_mode != 'disabled' {
-
-  $deployment_id = hiera('deployment_id')
-  if $alerting_mode == 'remote' {
-    $use_nagios = true
-    $nagios_url = $lma_collector['nagios_url']
-    $nagios_user = $lma_collector['nagios_user']
-    $nagios_password = $lma_collector['nagios_password']
-  } elsif $alerting_mode == 'local' {
+$deployment_id = hiera('deployment_id')
+if $alerting_mode == 'remote' {
+  $use_nagios = true
+  $nagios_url = $lma_collector['nagios_url']
+  $nagios_user = $lma_collector['nagios_user']
+  $nagios_password = $lma_collector['nagios_password']
+} elsif $alerting_mode == 'local' {
+  $network_metadata = hiera_hash('network_metadata')
+  $infra_alerting_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting', 'primary-infrastructure_alerting'])
+  if size(keys($infra_alerting_nodes)) > 0 {
     $use_nagios = true
     $lma_infra_alerting = hiera_hash('lma_infrastructure_alerting', false)
-    $network_metadata = hiera_hash('network_metadata')
     $nagios_server = $network_metadata['vips']['infrastructure_alerting_mgmt_vip']['ipaddr']
     $nagios_user = $lma_infra_alerting['nagios_user']
     $nagios_password = $lma_infra_alerting['nagios_password']
@@ -278,39 +278,39 @@ if $alerting_mode != 'disabled' {
     $http_port = $lma_collector::params::nagios_http_port
     $http_path = $lma_collector::params::nagios_http_path
     $nagios_url = "http://${nagios_server}:${http_port}/${http_path}"
-  } elsif $alerting_mode == 'standalone' {
-    $use_nagios = false
-    $subject = "${lma_collector::params::smtp_subject} environment ${deployment_id}"
-    class { 'lma_collector::smtp_alert':
-      send_from => $lma_collector['alerting_send_from'],
-      send_to   => [$lma_collector['alerting_send_to']],
-      subject   => $subject,
-      host      => $lma_collector['alerting_smtp_host'],
-      auth      => $lma_collector['alerting_smtp_auth'],
-      user      => $lma_collector['alerting_smtp_user'],
-      password  => $lma_collector['alerting_smtp_password'],
-    }
-  } else {
-    fail("'${alerting_mode}' mode not supported for the infrastructure alerting service")
+  }
+} elsif $alerting_mode == 'standalone' {
+  $use_nagios = false
+  $subject = "${lma_collector::params::smtp_subject} environment ${deployment_id}"
+  class { 'lma_collector::smtp_alert':
+    send_from => $lma_collector['alerting_send_from'],
+    send_to   => [$lma_collector['alerting_send_to']],
+    subject   => $subject,
+    host      => $lma_collector['alerting_smtp_host'],
+    auth      => $lma_collector['alerting_smtp_auth'],
+    user      => $lma_collector['alerting_smtp_user'],
+    password  => $lma_collector['alerting_smtp_password'],
+  }
+} else {
+  fail("'${alerting_mode}' mode not supported for the infrastructure alerting service")
+}
+
+if $use_nagios {
+  lma_collector::gse_nagios { 'global_clusters':
+    openstack_deployment_name => $deployment_id,
+    url                       => $nagios_url,
+    user                      => $nagios_user,
+    password                  => $nagios_password,
+    message_type              => $lma_collector['gse_cluster_global']['output_message_type'],
+    virtual_hostname          => $lma_collector::params::nagios_hostname_for_cluster_global,
   }
 
-  if $use_nagios {
-    lma_collector::gse_nagios { 'global_clusters':
-      openstack_deployment_name => $deployment_id,
-      url                       => $nagios_url,
-      user                      => $nagios_user,
-      password                  => $nagios_password,
-      message_type              => $lma_collector['gse_cluster_global']['output_message_type'],
-      virtual_hostname          => $lma_collector::params::nagios_hostname_for_cluster_global,
-    }
-
-    lma_collector::gse_nagios { 'node_clusters':
-      openstack_deployment_name => $deployment_id,
-      url                       => $nagios_url,
-      user                      => $nagios_user,
-      password                  => $nagios_password,
-      message_type              => $lma_collector['gse_cluster_node']['output_message_type'],
-      virtual_hostname          => $lma_collector::params::nagios_hostname_for_cluster_nodes,
-    }
+  lma_collector::gse_nagios { 'node_clusters':
+    openstack_deployment_name => $deployment_id,
+    url                       => $nagios_url,
+    user                      => $nagios_user,
+    password                  => $nagios_password,
+    message_type              => $lma_collector['gse_cluster_node']['output_message_type'],
+    virtual_hostname          => $lma_collector::params::nagios_hostname_for_cluster_nodes,
   }
 }
