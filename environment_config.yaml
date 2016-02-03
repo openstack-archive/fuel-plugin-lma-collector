@@ -100,15 +100,13 @@ attributes:
   alerting_mode:
     type: "radio"
     weight: 90
-    value: "disabled"
+    value: "local"
     label: "Alerting"
     values:
-      - data: "disabled"
-        label: "Disabled"
+      - data: "local"
+        label: "Alerts sent to a local cluster running the LMA Infrastructure Alerting plugin (if deployed)"
       - data: "standalone"
         label: "Alerts sent by email (requires a SMTP server)"
-      - data: "local"
-        label: "Alerts sent to a local node running the LMA Infrastructure Alerting plugin"
       - data: "remote"
         label: "Alerts sent to a remote Nagios server"
     restrictions: *all_disabled_msg
