@@ -41,7 +41,8 @@ class { 'lma_collector::afds':
     alarms                 => $alarms_definitions,
 }
 
-# Forward AFD status to Nagios
+# Forward AFD status to Nagios if deployed
+$network_metadata = hiera_hash('network_metadata')
 $alerting_mode = $lma['alerting_mode']
 if $alerting_mode == 'remote' {
   $nagios_enabled = true
@@ -49,15 +50,19 @@ if $alerting_mode == 'remote' {
   $nagios_user = $lma['nagios_user']
   $nagios_password = $lma['nagios_password']
 } elsif $alerting_mode == 'local' {
-  $nagios_enabled = true
-  $lma_infra_alerting = hiera_hash('lma_infrastructure_alerting', false)
-  $network_metadata = hiera_hash('network_metadata')
-  $nagios_server = $network_metadata['vips']['infrastructure_alerting_mgmt_vip']['ipaddr']
-  $nagios_user = $lma_infra_alerting['nagios_user']
-  $nagios_password = $lma_infra_alerting['nagios_password']
-  $http_port = $lma_collector::params::nagios_http_port
-  $http_path = $lma_collector::params::nagios_http_path
-  $nagios_url = "http://${nagios_server}:${http_port}/${http_path}"
+  $infra_alerting_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting', 'primary-infrastructure_alerting'])
+  if size(keys($infra_alerting_nodes)) > 0 {
+    $nagios_enabled = true
+    $lma_infra_alerting = hiera_hash('lma_infrastructure_alerting', false)
+    $nagios_server = $network_metadata['vips']['infrastructure_alerting_mgmt_vip']['ipaddr']
+    $nagios_user = $lma_infra_alerting['nagios_user']
+    $nagios_password = $lma_infra_alerting['nagios_password']
+    $http_port = $lma_collector::params::nagios_http_port
+    $http_path = $lma_collector::params::nagios_http_path
+    $nagios_url = "http://${nagios_server}:${http_port}/${http_path}"
+  } else {
+    notice('Could not get the LMA Infrastructure Alerting parameters. The LMA-Infrastructure-Alerting plugin is probably not enabled for this environment.')
+  }
 } else {
   $nagios_enabled = false
 }
