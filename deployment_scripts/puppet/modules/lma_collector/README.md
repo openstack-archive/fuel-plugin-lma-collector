@@ -328,6 +328,20 @@ To make the collector collect statistics for MySQL declare the
 class { 'lma_collector::collectd::mysql': }
 ```
 
+### Collect OpenStack notifications
+
+To make the collector collect notifications emitted by the OpenStack services
+declare the `lma_collector::notifications::input` class:
+
+```puppet
+class { 'lma_collector::notifications::input':
+  topic    => 'lma_notifications',
+  host     => '127.0.0.1',
+  user     => 'rabbit_user',
+  password => 'rabbit_password',
+}
+```
+
 ## Reference
 
 ### Classes
@@ -356,6 +370,7 @@ Public Classes:
 * [`lma_collector::collectd::hypervisor`](#class-lma_collectorcollectdhypervisor)
 * [`lma_collector::collectd::pacemaker`](#class-lma_collectorcollectdpacemaker)
 * [`lma_collector::collectd::mysql`](#class-lma_collectorcollectdmysql)
+* [`lma_collector::notifications::input`](#class-lma_notificationsinput)
 
 Private Classes:
 
@@ -670,6 +685,27 @@ performance statistics of all the OSD daemons running on the host.
 
 The collectd plugin used is a Python script. That script uses the `ceph`
 command internally, so that command should be installed.
+
+#### Class: `lma_collector::notifications::input`
+
+Declare this class to make Heka collect the notifications emitted by the
+OpenStack services on RabbitMQ.
+
+The OpenStack services should be configured to send their notifications to the
+same topic exchange as configured for this class.
+
+##### Parameters
+
+* `topic`: *Required*. The topic exchange from where to read the notifications.
+  Valid options: a string.
+* `host`: *Required*. The address of the RabbitMQ host. Valid options: a
+  string.
+* `port`: *Optional*. The port the RabbitMQ host listens on. Valid options:
+  an integer. Default: `5672`.
+* `user`: *Required*. The user to use to connect to the RabbitMQ host. Valid
+  options: a string.
+* `password`: *Required*. The password to use to connect to the RabbitMQ host.
+  Valid options: a string.
 
 #### Define: `lma_collector::logs::openstack`
 

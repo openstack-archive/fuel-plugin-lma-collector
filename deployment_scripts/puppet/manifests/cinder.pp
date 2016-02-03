@@ -39,13 +39,27 @@ if $lma_collector['elasticsearch_mode'] != 'disabled' {
 }
 
 if $ceilometer['enabled'] {
-  $notification_topics = [$lma_collector::params::openstack_topic, $lma_collector::params::lma_topic]
+  $notification_topics = ['notifications', 'lma_notifications']
 }
 else {
-  $notification_topics = [$lma_collector::params::lma_topic]
+  $notification_topics = ['lma_notifications']
 }
 
 # OpenStack notifcations are always useful for indexation and metrics collection
-class { 'lma_collector::notifications::cinder':
-  topics  => $notification_topics,
+include cinder::params
+$volume_service = $::cinder::params::volume_service
+
+cinder_config { 'DEFAULT/notification_topics':
+  value  => join($topics, ','),
+  notify => Service[$volume_service],
+}
+
+cinder_config { 'DEFAULT/notification_driver':
+  value  => $driver,
+  notify => Service[$volume_service],
+}
+
+service { $volume_service:
+  hasstatus  => true,
+  hasrestart => true,
 }
