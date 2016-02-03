@@ -6,6 +6,8 @@ The values are reset to zero when InfluxDB is restarted.
 cluster
 ^^^^^^^
 
+These metrics are only available if there are more than one node in the cluster.
+
 * ``influxdb_cluster_write_shard_points_requests``, the number of requests for writing a time series points to a shard.
 * ``influxdb_cluster_write_shard_requests``, the number of requests for writing to a shard.
 
