@@ -84,14 +84,7 @@ class lma_collector::params {
   $hekad_max_timer_inject = 10
 
   # Parameters for OpenStack notifications
-  $rabbitmq_host = false
   $rabbitmq_port = '5672'
-  $rabbitmq_user = ''
-  $rabbitmq_password = ''
-  $rabbitmq_exchange = ''
-  $lma_topic = 'lma_notifications'
-  $openstack_topic = 'notifications'
-  $notification_driver = 'messaging'
 
   # collectd parameters
   $collectd_port = '8325'

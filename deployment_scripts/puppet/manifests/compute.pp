@@ -41,15 +41,32 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
 }
 
 if $ceilometer['enabled'] {
-  $notification_topics = [$lma_collector::params::openstack_topic, $lma_collector::params::lma_topic]
+  $notification_topics = ['notifications', 'lma_notifications']
 }
 else {
-  $notification_topics = [$lma_collector::params::lma_topic]
+  $notification_topics = ['lma_notifications']
 }
 
 # OpenStack notifcations are always useful for indexation and metrics collection
-class { 'lma_collector::notifications::compute':
-  topics  => $notification_topics,
+include nova::params
+$compute_service = $::nova::params::compute_service_name
+
+nova_config { 'DEFAULT/notification_topics':
+  value  => join($notification_topics, ','),
+  notify => Service[$compute_service],
+}
+nova_config { 'DEFAULT/notification_driver':
+  value  => 'messaging',
+  notify => Service[$compute_service],
+}
+nova_config { 'DEFAULT/notify_on_state_change':
+  value  => 'vm_and_task_state',
+  notify => Service[$compute_service],
+}
+
+service { $compute_service:
+  hasstatus  => true,
+  hasrestart => true,
 }
 
 class { 'lma_collector::collectd::base':
