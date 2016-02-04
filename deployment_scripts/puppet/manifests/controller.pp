@@ -15,7 +15,6 @@
 prepare_network_config(hiera('network_scheme', {}))
 $messaging_address = get_network_role_property('mgmt/messaging', 'ipaddr')
 $memcache_address  = get_network_role_property('mgmt/memcache', 'ipaddr')
-$database_address  = get_network_role_property('mgmt/database', 'ipaddr')
 
 include lma_collector::params
 
@@ -302,10 +301,17 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
   }
 
   # We use the "nova" database user to connect to MySQL, but any valid
-  # user/password could be used really.  MySQL listens on
-  # <management ip>:3307.
+  # user/password could be used really.
+  #
+  # MySQL listens on <management ip>:3307. But we don't want to use
+  # the management IP in the collectd configuration or the Hostname
+  # tag will be set to the management IP in the metric values. Luckily
+  # $::hostname (e.g. node-4) is an alias to the management IP, so we
+  # can use that in the collectd configuration. Really we should use
+  # the Alias plugin setting, but that setting does not exist in the
+  # collectd version we currently use (v4.1.2).
   class { 'lma_collector::collectd::mysql':
-    host     => $database_address,
+    host     => $::hostname,
     port     => 3307,
     username => 'nova',
     password => $nova['db_password'],
