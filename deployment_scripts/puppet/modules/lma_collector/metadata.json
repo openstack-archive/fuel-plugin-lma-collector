@@ -23,13 +23,6 @@
         {"name": "puppet/collectd", "version_requirement": ">= 4.1.2"},
         {"name": "puppetlabs/apache", "version_requirement": ">= 1.4.0"},
         {"name": "puppetlabs/inifile", "version_requirement": ">= 1.4.2"},
-        {"name": "puppetlabs/stdlib", "version_requirement": "4.x"},
-        {"name": "openstack/cinder", "version_requirement": "7.x"},
-        {"name": "openstack/glance", "version_requirement": "7.x"},
-        {"name": "openstack/heat", "version_requirement": "7.x"},
-        {"name": "openstack/keystone", "version_requirement": "7.x"},
-        {"name": "openstack/neutron", "version_requirement": "7.x"},
-        {"name": "openstack/nova", "version_requirement": "7.x"},
-        {"name": "openstack/openstacklib", "version_requirement": "7.x"}
+        {"name": "puppetlabs/stdlib", "version_requirement": "4.x"}
     ]
 }
