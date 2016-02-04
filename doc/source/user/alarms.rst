@@ -59,9 +59,12 @@ aggregation and correlation rules and facts contained in the
 
 In the current version of the LMA Toolchain, three GSE plugins are configured:
 
-* The Service Cluster GSE which receives metrics from the AFD plugins monitoring the services and emits health status for the clusters of services (nova-api, nova-scheduler and so on).
-* The Node Cluster GSE which receives metrics from the AFD plugins monitoring the system and emits health status for the clusters of nodes (controllers, computes and so on).
-* The Global Cluster GSE which receives metrics from the two other GSE plugins and emits health status for the top-level clusters (Nova, MySQL and so on).
+* The Service Cluster GSE which receives metrics from the AFD plugins monitoring
+  the services and emits health status for the clusters of services (nova-api, nova-scheduler and so on).
+* The Node Cluster GSE which receives metrics from the AFD plugins monitoring
+  the system and emits health status for the clusters of nodes (controllers, computes and so on).
+* The Global Cluster GSE which receives metrics from the two other GSE plugins
+  and emits health status for the top-level clusters (Nova, MySQL and so on).
 
 The meaning associated with a health status is the following:
 
@@ -227,8 +230,35 @@ Where:
 |       returns the value that occurs most often in all the values
 |       (not implemented yet)
 |     roc:
-|       returns the result (true, false) of the rate of change test function of
-|       Heka (not implemented yet)
+|       The ‘roc’ function detects a significant rate
+        of change when comparing current metrics values with historical data.
+        To achieve this, it computes the average of the values in the current window,
+        and the average of the values in the window before the current window and
+        compare the difference against the standard deviation of the
+        historical window. The function returns true if the difference
+        exceeds the standard deviation threshold. This function uses the rate of 
+        change algorithm already available in the anomaly detection module of Heka.
+        With an alarm rule using the ‘roc’ function, the ‘window’ parameter
+        specifies the duration in seconds of the current window and the ‘periods’
+        parameter specifies the duration in seconds of the historical window.
+        You need at least one period and so, the ‘periods’ parameter must not be zero.
+        If you choose a period of ’p’,  the function will compute the rate of
+        change using an historical data window of (‘p’ * window) seconds.
+        For example, if you specify in the alarm rule:
+|
+|           window = 60
+|           periods = 3
+|           threshold = 1.5
+|
+|       The function will store in a circular buffer the value of the metrics
+        received during the last 300 seconds (5 minutes) where:
+|
+|           Current window = 60 sec
+|           Previous window = 60 sec
+|           Historical window = 180 sec
+|
+|       And apply a standard deviation threshold of 1.5.
+
 |     mww:
 |       returns the result (true, false) of the Mann-Whitney-Wilcoxon test function
 |       of Heka that can be used only with normal distributions (not implemented yet)
