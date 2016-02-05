@@ -117,8 +117,7 @@ class lma_collector::params {
     }
   }
   $additional_packages = [ 'python-dateutil' ]
-  $mysql_host     = '127.0.0.1'
-  $mysql_port     = 3306
+  $mysql_database = ''
   $mysql_username = ''
   $mysql_password = ''
   $openstack_user = ''
