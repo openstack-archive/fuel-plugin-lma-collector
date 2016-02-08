@@ -3,21 +3,23 @@
 Installation
 ============
 
-Prior to installing the LMA Collector Plugin, you may want to install its
-dependencies:
+Prior to installing the LMA Collector Plugin, you may want to install the backend
+services the Collector depends on. These backend services include:
 
-* Elasticsearch and Kibana for log analytics
-* InfluxDB and Grafana for metrics analytics
-* Nagios for alerting
+* Elasticsearch 
+* InfluxDB 
+* Nagios 
 
-To install them automatically you can refer to the:
+You have two options for that. 
 
-1. `Elasticsearch-Kibana Fuel Plugin Installation Guide <http://fuel-plugin-elasticsearch-kibana.readthedocs.org/en/latest/installation.html#installation-guide>`_.
-2. `InfluxDB-Grafana Fuel Plugin Installation Guide <http://fuel-plugin-influxdb-grafana.readthedocs.org/en/latest/installation.html#installation-guide>`_.
-3. `Infrastructure Alerting Fuel Plugin Installation Guide <http://fuel-plugin-lma-infrastructure-alerting.readthedocs.org/en/latest/installation.html#installation-guide>`_.
+1. Install these backend services automatically using the Fuel Plugins listed below.
 
-You can install Elasticsearch/Kibana, InfluxDB/Grafana and Nagios outside of the
-Fuel Plugin framework as long as your installation meets the LMA Collector plugin's :ref:`requirements <plugin_requirements>`.
+  * `Elasticsearch-Kibana Fuel Plugin Installation Guide <http://fuel-plugin-elasticsearch-kibana.readthedocs.org/en/latest/installation.html#installation-guide>`_.
+  * `InfluxDB-Grafana Fuel Plugin Installation Guide <http://fuel-plugin-influxdb-grafana.readthedocs.org/en/latest/installation.html#installation-guide>`_.
+  * `Infrastructure Alerting Fuel Plugin Installation Guide <http://fuel-plugin-lma-infrastructure-alerting.readthedocs.org/en/latest/installation.html#installation-guide>`_.
+
+2. Install these backend services manually outside of your OpenStack environment.
+   This installation must comply with the LMA Collector Plugin's :ref:`requirements <plugin_requirements>`.
 
 
 LMA Collector Fuel Plugin install using the RPM file of the Fuel Plugins Catalog
@@ -42,7 +44,7 @@ Catalog, you need to follow these steps:
     [root@fuel ~]# fuel plugins --list
     id | name                 | version | package_version
     ---|----------------------|---------|----------------
-    1  | lma_collector        | 0.9.0   | 2.0.0
+    1  | lma_collector        | 0.9.0   | 3.0.0
 
 
 LMA Collector Fuel Plugin install from source
