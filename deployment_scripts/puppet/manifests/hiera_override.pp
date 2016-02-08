@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-$plugin_data = hiera('lma_collector', undef)
+$plugin_data = hiera_hash('lma_collector', undef)
 
 if ($plugin_data) {
   $storage_options = hiera_hash('storage', {})
