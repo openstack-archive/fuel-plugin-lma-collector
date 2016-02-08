@@ -28,6 +28,7 @@ METRICS = ['number_of_nodes', 'active_primary_shards', 'active_primary_shards',
            'active_shards', 'relocating_shards', 'unassigned_shards',
            'number_of_pending_tasks', 'initializing_shards']
 
+
 class ElasticsearchClusterHealthPlugin(base.Base):
     def __init__(self, *args, **kwargs):
         super(ElasticsearchClusterHealthPlugin, self).__init__(*args, **kwargs)
@@ -37,6 +38,8 @@ class ElasticsearchClusterHealthPlugin(base.Base):
         self.max_retries = 3
         self.session = requests.Session()
         self.url = None
+        self.health_on_error = {'type_instance': 'health',
+                                'values': HEALTH_MAP['red']}
         self.session.mount(
             'http://',
             requests.adapters.HTTPAdapter(max_retries=self.max_retries)
@@ -62,11 +65,13 @@ class ElasticsearchClusterHealthPlugin(base.Base):
             r = self.session.get(self.url)
         except Exception as e:
             self.logger.error("Got exception for '{}': {}".format(self.url, e))
+            yield self.health_on_error
             return
 
         if r.status_code != 200:
             self.logger.error("{} responded with code {}".format(
                 self.url, r.status_code))
+            yield self.health_on_error
             return
         data = r.json()
         self.logger.debug("Got response from Elasticsearch: '%s'" % data)
@@ -82,6 +87,7 @@ class ElasticsearchClusterHealthPlugin(base.Base):
             }
 
 plugin = ElasticsearchClusterHealthPlugin()
+
 
 def init_callback():
     plugin.restore_sigchld()
