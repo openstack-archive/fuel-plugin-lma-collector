@@ -79,26 +79,19 @@ The output of the Collector / Aggregator is of four kinds:
 Requirements
 ------------
 
-+-------------------------------------------------------+-----------------------------------------------------------------+
-| Requirement                                           | Version/Comment                                                 |
-+=======================================================+=================================================================+
-| Mirantis OpenStack                                    | 7.0                                                             |
-+-------------------------------------------------------+-----------------------------------------------------------------+
-| A running Elasticsearch server (for log analytics)    | 1.4 or higher, the RESTful API must be enabled over port 9200   |
-+-------------------------------------------------------+-----------------------------------------------------------------+
-| A running InfluxDB server (for metric analytics)      | 0.9.2 or higher, the RESTful API must be enabled over port 8086 |
-+-------------------------------------------------------+-----------------------------------------------------------------+
-| A running Nagios server (for infrastructure alerting) | 3.5 or higher, the command CGI must be enabled                  |
-+-------------------------------------------------------+-----------------------------------------------------------------+
++-------------------------------------------------------+-------------------------------------------------------------------+
+| Requirement                                           | Version/Comment                                                   |
++=======================================================+===================================================================+
+| Mirantis OpenStack                                    | 8.0                                                               |
++-------------------------------------------------------+-------------------------------------------------------------------+
+| A running Elasticsearch server (for log analytics)    | 1.7.4 or higher, the RESTful API must be enabled over port 9200   |
++-------------------------------------------------------+-------------------------------------------------------------------+
+| A running InfluxDB server (for metric analytics)      | 0.9.2 or higher, the RESTful API must be enabled over port 8086   |
++-------------------------------------------------------+-------------------------------------------------------------------+
+| A running Nagios server (for infrastructure alerting) | 3.5 or higher, the command CGI must be enabled                    |
++-------------------------------------------------------+-------------------------------------------------------------------+
 
 Limitations
 -----------
 
-The plugin is only compatible with OpenStack environments deployed with Neutron
-as the networking configuration.
-
-The log and notification messages aren't buffered anymore by the LMA collector service
-before being sent to Elasticsearch (see `#1488717
-<https://bugs.launchpad.net/fuel-plugins/+bug/1488717>`_ for details). This
-means that the data may be lost when the Elasticsearch server is
-unreachable. It will be fixed in a future maintenance release of the plugin.
+The plugin is not compatible with OpenStack environments deployed with Nova-Network.
