@@ -7,6 +7,13 @@ Version 0.9.0
 -------------
 
 * Collect libvirt metrics on compute nodes.
+* Detect spikes of errors in the OpenStack services logs.
+* Report OpenStack workers status per node.
+* Support multi-environment deployments.
+* Several critical and high bugs fixes
+    * 1488717 Controller looses connection to elasticserch/kibana
+    * 1503251 The collector service stops when the local RabbitMQ server is down
+    * 1535577 Keystone HTTP metrics are missing
 
 Version 0.8.0
 -------------
