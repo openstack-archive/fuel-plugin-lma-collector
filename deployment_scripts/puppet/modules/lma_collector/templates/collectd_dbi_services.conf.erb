@@ -1,7 +1,7 @@
 <Plugin dbi>
 <% if @type == 'services' %>
   <Query "services">
-  Statement "select concat_ws('.', 'services', replace(replace(s.binary, 'nova-', ''), 'cinder-', ''), 'down', s.host) as metric, 1 as value from services s where s.disabled=0 and s.deleted=0 and timestampdiff(SECOND,s.updated_at,utc_timestamp())><%= @downtime %> group by s.binary, s.host UNION select concat_ws('.', 'services', replace(replace(s.binary, 'nova-', ''), 'cinder-', ''), 'up', s.host) as metric, 0 as value from services s where s.disabled=0 and s.deleted=0  and timestampdiff(SECOND,s.updated_at,utc_timestamp())<=<%= @downtime %> group by s.binary, s.host UNION select concat_ws('.', 'services', replace(replace(s.binary, 'nova-', ''), 'cinder-', ''), 'disabled', s.host) as metric, 2 as value from services s where s.disabled=1 and s.deleted=0 group by s.binary, s.host;"
+  Statement "select concat_ws('.', 'services', replace(replace(s.binary, 'nova-', ''), 'cinder-', ''), 'down', s.host) as metric, 1 as value from (selec * from services where deleted=0) s where s.disabled=0 and timestampdiff(SECOND,s.updated_at,utc_timestamp())><%= @downtime %> group by s.binary, s.host UNION select concat_ws('.', 'services', replace(replace(s.binary, 'nova-', ''), 'cinder-', ''), 'up', s.host) as metric, 0 as value from (select * from services where deleted=0) s where s.disabled=0 and timestampdiff(SECOND,s.updated_at,utc_timestamp())<=<%= @downtime %> group by s.binary, s.host UNION select concat_ws('.', 'services', replace(replace(s.binary, 'nova-', ''), 'cinder-', ''), 'disabled', s.host) as metric, 2 as value from (select * from services where deleted=0) s where s.disabled=1 group by s.binary, s.host;"
     MinVersion 50000
     <Result>
       Type "gauge"
@@ -10,7 +10,7 @@
     </Result>
   </Query>
   <Query "services_down">
-    Statement "select concat_ws('.', 'services', replace(replace(s1.binary, 'nova-', ''), 'cinder-', ''), 'down') as metric, count(s2.id) as value from services s1 left outer join services s2 on s1.id = s2.id and s1.disabled=0 and s1.deleted=0 and timestampdiff(SECOND,s1.updated_at,utc_timestamp())><%= @downtime %> group by s1.binary;"
+    Statement "select concat_ws('.', 'services', replace(replace(s1.binary, 'nova-', ''), 'cinder-', ''), 'down') as metric, count(s2.id) as value from (select * from services where deleted=0) s1 left outer join services s2 on s1.id = s2.id and s1.disabled=0 and timestampdiff(SECOND,s1.updated_at,utc_timestamp())><%= @downtime %> group by s1.binary;"
     MinVersion 50000
     <Result>
       Type "gauge"
@@ -19,7 +19,7 @@
     </Result>
   </Query>
   <Query "services_up">
-    Statement "select concat_ws('.', 'services', replace(replace(s1.binary, 'nova-', ''), 'cinder-', ''), 'up') as metric, count(s2.id) as value from services s1 left outer join services s2 on s1.id = s2.id and s1.disabled=0 and s1.deleted=0 and timestampdiff(SECOND,s1.updated_at,utc_timestamp())<=<%= @downtime %> group by s1.binary;"
+    Statement "select concat_ws('.', 'services', replace(replace(s1.binary, 'nova-', ''), 'cinder-', ''), 'down') as metric, count(s2.id) as value from (select * from services where deleted=0) s1 left outer join services s2 on s1.id = s2.id and s1.disabled=0 and timestampdiff(SECOND,s1.updated_at,utc_timestamp())<<%= @downtime %> group by s1.binary;"
     MinVersion 50000
     <Result>
       Type "gauge"
@@ -28,7 +28,7 @@
     </Result>
   </Query>
   <Query "services_disabled">
-    Statement "select concat_ws('.', 'services', replace(replace(s1.binary, 'nova-', ''), 'cinder-', ''), 'disabled') as metric, count(s2.id) as value from services s1 left outer join services s2 on s1.id = s2.id and s2.disabled = 1 and s1.deleted=0 group by s1.binary;"
+    Statement "select concat_ws('.', 'services', replace(replace(s1.binary, 'nova-', ''), 'cinder-', ''), 'disabled') as metric, count(s2.id) as value from (select * from services where deleted=0) s1 left outer join services s2 on s1.id = s2.id and s2.disabled = 1 group by s1.binary;"
     MinVersion 50000
     <Result>
       Type "gauge"
