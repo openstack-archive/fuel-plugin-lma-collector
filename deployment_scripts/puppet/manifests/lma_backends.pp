@@ -13,6 +13,9 @@
 #    under the License.
 #
 
+prepare_network_config(hiera('network_scheme', {}))
+$mgmt_address = get_network_role_property('management', 'ipaddr')
+
 $lma_collector_hash = hiera_hash('lma_collector')
 $influxdb_grafana = hiera('influxdb_grafana')
 
@@ -44,6 +47,7 @@ if $lma_collector_hash['influxdb_mode'] != 'disabled' {
     class { 'lma_collector::collectd::influxdb':
         username => 'root',
         password => $influxdb_grafana['influxdb_rootpass'],
+        address  => $mgmt_address,
     }
   }
 

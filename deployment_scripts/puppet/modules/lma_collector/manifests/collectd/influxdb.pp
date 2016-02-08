@@ -15,12 +15,14 @@
 class lma_collector::collectd::influxdb (
   $username,
   $password,
+  $address,
 ) {
 
   lma_collector::collectd::python { 'influxdb':
     config => {
       'Username' => "\"${username}\"",
       'Password' => "\"${password}\"",
+      'Address'  => "\"${address}\"",
     }
   }
 }
