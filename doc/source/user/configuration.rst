@@ -12,34 +12,45 @@ To configure your plugin, you need to follow the folling steps:
 
 1. `Create a new environment <http://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#launch-wizard-to-create-new-environment>`_ with the Fuel web user interface.
 
-2. Click on the Settings tab of the Fuel web UI.
+2. Click on the 'Settings' tab of the Fuel web UI and select the 'Other' category.
 
-3. Select the LMA collector plugin in the left column. The LMA Collector settings screen appears.
+3. Scroll down through the settings until you find the 'The Logging, Monitoring and
+   Alerting (LMA) Collector Plugin' section. You should see a page like this.
 
 .. image:: ../../images/collector_settings.png
    :scale: 50 %
    :alt: The LMA Collector settings
    :align: center
 
-4. Select the LMA collector plugin checkbox and fill-in the required fields.
+4. Check the 'The Logging, Monitoring and Alerting (LMA) Collector Plugin' box and
+   fill-in the required fields as indicated below.
 
-  a. Select "Local node" for Events analytics if you deploy the Elasticsearch-Kibana plugin on a dedicated node in the same environment.
-  b. Select "Remote server" for Events analytics if you have an Elasticsearch-Kibana server already deployed and running.
-     In that case, you have to enter the IP address or the fully qualified name of the server.
-  c. Select "Local node" for Metrics analytics if you deploy the InfluxDB-Grafana plugin on a dedicated node in the same environment.
-  d. Select "Remote server" for Metrics analytics if you have an InfluxDB-Grafana server already deployed and running.
-     In that case, you have to enter the IP address or the fully qualified name of the server as well as the credentials and database to store the metrics.
-  e. Select "Alerts sent by email" for Alerting if you wish to receive alerts by email.
-  f. Select "Alerts sent to a local node" for Alerting if you deploy the LMA Infrastructure Alerting plugin on a dedicated node in the same environment.
-  g. Select "Alerts sent to a remote Nagios server" for Alerting if you have a Nagios server already deployed and running.
+  a. Provide an 'Environment Label' of your choice to tag your data (optional).
+  b. For the 'Events Analytics' destination, select 'Local node' if you plan to use the 
+     Elasticsearch-Kibana Plugin in this environment. Otherwise, select 'Remote server'
+     and specify the fully qualified name or IP address of an external Elasticsearch server.
+  c. For the 'Metrics Analytics' destination, select 'Local node' if you plan to use the
+     InfluxDB-Grafana Plugin in this environment. Otherwise, select 'Remote server' and specify
+     the fully qualified name or IP address of an external InfluxDB server. Then, specify the
+     InfluxDB database name you want to use, a username and password that has read and write
+     access permissions.
+  d. For 'Alerting', select 'Alerts sent by email' if you want to receive alerts sent by email
+     from the Collector. Otherwise, select 'Alerts sent to a local node' if you plan to
+     use the Infrastructure Alerting Plugin in this environment.
+     Alternatively, you can select 'Alerts sent to a remote Nagios server'.
+  e. For 'Alerts sent by email', you can specify the SMTP authentication method you want to use. Then,
+     specify the SMTP server fully qualified name or IP address, the SMTP username and password that
+     the permissions to send emails.
+  f. Finaly, specify the Nagios server URL, username and password if you have chosen to send 
+     alerts to an external Nagios server.
 
-5. `Configure your environment <http://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#configure-your-environment>`_ as needed.
+5. `Configure your environment <http://docs.mirantis.com/openstack/fuel/fuel-8.0/user-guide.html#configure-your-environment>`_ as needed.
 
-6. `Assign roles to the nodes <http://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#assign-a-role-or-roles-to-each-node-server>`_ for the environment.
+6. `Assign roles to the nodes <http://docs.mirantis.com/openstack/fuel/fuel-8.0/user-guide.html#assign-a-role-or-roles-to-each-node-server>`_ for the environment.
 
-7. `Verify networks <http://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#verify-networks>`_ on the Networks tab of the Fuel web UI.
+7. `Verify networks <http://docs.mirantis.com/openstack/fuel/fuel-8.0/user-guide.html#verify-networks>`_ on the Networks tab of the Fuel web UI.
 
-8. `Deploy <http://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#deploy-changes>`_ your changes.
+8. `Deploy <http://docs.mirantis.com/openstack/fuel/fuel-8.0/user-guide.html#deploy-changes>`_ your changes.
 
 .. _plugin_verification:
 
@@ -47,14 +58,12 @@ Plugin verification
 -------------------
 
 Once the OpenStack environment is ready, you may want to check that both
-collectd and hekad processes are running on the controller nodes::
+the 'collectd' and 'hekad' processes of the LMA Collector are running on the OpenStack nodes::
 
     [root@node-1 ~]# pidof hekad
     5568
     [root@node-1 ~]# pidof collectd
     5684
-
-Please refer to the :ref:`troubleshooting` section otherwise.
 
 .. _troubleshooting:
 
@@ -63,20 +72,20 @@ Troubleshooting
 
 If you see no data in the Kibana and/or Grafana dashboards, use the instructions below to troubleshoot the problem:
 
-1. Check if the LMA collector service is up and running::
+1. Check if the LMA Collector service is up and running::
 
-    # On the controller nodes
+    # On the controller node(s)
     [root@node-1 ~]# crm resource status lma_collector
 
-    # On nodes which are not controllers
+    # On non controller nodes
     [root@node-1 ~]# status lma_collector
 
 2. If the LMA Collector is down, restart it::
 
-    # On the controller nodes
+    # On the controller node(s)
     [root@node-1 ~]# crm resource start lma_collector
 
-    # On nodes which are not controllers
+    # On non controller nodes
     [root@node-1 ~]# status lma_collector
 
 3. Look for errors in the LMA Collector log file (located at /var/log/lma_collector.log) on the different nodes.
