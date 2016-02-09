@@ -57,7 +57,7 @@ The health status of a cluster is inferred by the GSE plugins using
 aggregation and correlation rules and facts contained in the
 *AFD metrics* it receives from the Collectors.
 
-In the current version of the LMA Toolchain, three GSE plugins are configured:
+In the current version of the LMA Toolchain, three :ref:`gse_plugins` are configured:
 
 * The Service Cluster GSE which receives metrics from the AFD plugins monitoring
   the services and emits health status for the clusters of services (nova-api, nova-scheduler and so on).
@@ -398,10 +398,151 @@ need to re-apply the Puppet module::
 
 This will restart the LMA Collector with your change.
 
-Cluster policies
-----------------
+.. _gse_plugins:
 
-GSE plugins are driven by policies that describe how plugins determine the
+GSE configuration
+-----------------
+
+The LMA toolchain comes with a predefined configuration for the GSE plugins. As
+for the alarms, it is possible to modify this configuration.
+
+The GSE plugins are defined declaratively in the */etc/hiera/override/gse_filters.yaml*
+file at the following entries:
+
+* *gse_cluster_service* for the Service Cluster GSE.
+
+* *gse_cluster_node* for the Node Cluster GSE.
+
+* *gse_cluster_global* for the Global Cluster GSE.
+
+A GSE cluster plugin is defined as shown in the example below::
+
+  gse_cluster_service:
+    input_message_types:
+      - afd_service_metric
+    aggregator_flag: true
+    cluster_field: service
+    member_field: source
+    output_message_type: gse_service_cluster_metric
+    output_metric_name: cluster_service_status
+    interval: 10
+    warm_up_period: 20
+    clusters:
+      nova-api:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+          - endpoint
+          - http_errors
+      [...]
+
+Where
+
+| input_message_types
+|   Type: list
+|   The type(s) of metric message that the GSE plugin consumes.
+
+| aggregator_flag
+|   Type: boolean
+|   Whether or not the input messages are received from the upstream collectors.
+    This is true for the Service and Node Cluster plugins and false for the
+    Global Cluster plugin.
+
+| cluster_field
+|   Type: unicode
+|   The field in the input message that the GSE plugin uses to associate the
+    AFD/GSE metrics to the clusters.
+
+| member_field
+|   Type: unicode
+|   The field in the input message that the GSE plugin uses to identify the
+    cluster's members.
+
+| output_message_type
+|   Type: unicode
+|   The type of metric messages that the GSE plugin emits.
+
+| output_metric_name
+|   Type: unicode
+|   The Fields[name] value of the metric messages that the GSE plugin emits.
+
+| interval
+|   Type: integer
+|   The interval (in seconds) at which the GSE plugin emits its metric messages.
+
+| warm_up_period
+|   Type: integer
+|   The number of seconds after a (re)start that the GSE plugin will wait
+    before emitting its metric messages.
+
+| clusters
+|   Type: list
+|   The list of clusters that the plugin manages. See
+    :ref:`cluster_definitions` for details.
+
+.. _cluster_definitions:
+
+Cluster definition
+~~~~~~~~~~~~~~~~~~
+
+The GSE clusters are defined as shown in the example below::
+
+  gse_cluster_service:
+    [...]
+
+    clusters:
+      nova-api:
+        members:
+          - backends
+          - endpoint
+          - http_errors
+        group_by: member
+        policy: highest_severity
+
+    [...]
+
+Where
+
+| members
+|   Type: list
+|   This list of cluster's members.
+
+| group_by
+|   Type: Enum(member, hostname, none)
+|   This parameter defines how the incoming AFD metrics are aggregated.
+|
+|     member:
+|       aggregation by member, irrespective of the host that emitted the AFD metric.
+|       This setting is typically used for AFD metrics that are not host-centric.
+|
+|     hostname:
+|       aggregation by hostname then by member.
+|       This setting is typically used for AFD metrics that are host-centric such those working on filesystem or CPU usage metrics.
+|
+|     none:
+|       aggregation by member then by hostname.
+
+| policy:
+|   Type: unicode
+|   The policy to use for computing the cluster's status. See :ref:`cluster_policies`
+    for details.
+
+If we look more closely at the example above, it defines that the Service
+Cluster GSE plugin will emit a *gse_service_cluster_metric* message every 10
+seconds that will report the current status of the *nova-api* cluster. This
+status is computed using the  *afd_service_metric* metrics for which
+Fields[service] is 'nova-api and Fields[source] is one of 'backends',
+'endpoint' or 'http_errors'. The 'nova-api' cluster's status is computed using
+the 'highest_severity' policy which means that it will be equal to the 'worst'
+status across all the members.
+
+.. _cluster_policies:
+
+Cluster policies
+~~~~~~~~~~~~~~~~
+
+The GSE plugins are driven by policies that describe how plugins determine the
 cluster's health status.
 
 By default, two policies are defined:
