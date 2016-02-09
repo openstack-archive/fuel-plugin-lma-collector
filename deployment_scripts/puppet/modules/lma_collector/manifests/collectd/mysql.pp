@@ -13,12 +13,13 @@
 #    under the License.
 #
 class lma_collector::collectd::mysql (
-  $database = $lma_collector::params::mysql_database,
-  $username = $lma_collector::params::mysql_username,
-  $password = $lma_collector::params::mysql_password,
+  $username,
+  $password,
 ) inherits lma_collector::params {
 
-  collectd::plugin::mysql::database { $database:
+  # With "config" as the resource title the collectd configuration
+  # file will be named "mysql-config.conf".
+  collectd::plugin::mysql::database { 'config':
     host     => 'localhost',
     username => $username,
     password => $password,
