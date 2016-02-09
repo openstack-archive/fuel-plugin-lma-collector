@@ -41,11 +41,12 @@ end
 
 function split_service_and_state_and_hostname(str)
     -- Possible values:
-    -- services.compute.down.node-1.test.domain.local
-    -- services.scheduler.up
-    -- agents.dhcp.down.node-44
-    -- agents.dhcp.up
-    local service, state, hostname = string.match(str, '^%w+%.([%w-]+)%.([%w-]+)%.?([%w-.]-)$')
+    --   services.compute.down.node-1.test.domain.local
+    --   services.scheduler.up
+    --   agents.dhcp.down.node-44
+    --   agents.dhcp.up
+    --   services.scheduler.disabled.rbd:volumes
+    local service, state, hostname = string.match(str, '^%w+%.([%w-]+)%.([%w-]+)%.?(.-)$')
     -- remove domain part of the hostname or nil if string is empty
     hostname = string.match(hostname, '^([^.]+)')
     return replace_dot_by_sep(service), state, hostname
