@@ -40,7 +40,7 @@ To configure your plugin, you need to follow the folling steps:
      Alternatively, you can select 'Alerts sent to a remote Nagios server'.
   e. For 'Alerts sent by email', you can specify the SMTP authentication method you want to use. Then,
      specify the SMTP server fully qualified name or IP address, the SMTP username and password that
-     the permissions to send emails.
+     has the permission to send emails.
   f. Finaly, specify the Nagios server URL, username and password if you have chosen to send 
      alerts to an external Nagios server.
 
