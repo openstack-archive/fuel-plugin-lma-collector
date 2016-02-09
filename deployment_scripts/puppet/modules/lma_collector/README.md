@@ -325,7 +325,10 @@ To make the collector collect statistics for MySQL declare the
 `lma_collector::collectd::mysql` class:
 
 ```puppet
-class { 'lma_collector::collectd::mysql': }
+class { 'lma_collector::collectd::mysql':
+  username => 'mysql_username',
+  password => 'mysql_password',
+}
 ```
 
 ### Collect OpenStack notifications
@@ -650,17 +653,16 @@ which uses Pacemaker's `crm_resource` command to get statistics from Pacemaker.
 
 #### Class: `lma_collector::collectd::mysql`
 
-Declare this class to configure collectd to collect statistics for MySQL.
+Declare this class to configure collectd to collect statistics for the MySQL
+instance local to the node.
 
 The collectd plugin used is the native collectd [MySQL
-plugin](https://collectd.org/wiki/index.php/Plugin:MySQL).
+plugin](https://collectd.org/wiki/index.php/Plugin:MySQL). It is configured
+with `'localhost'` as the `Host`, meaning that the local MySQL Unix socket will
+be used to connect to MySQL.
 
 ##### Parameters
 
-* `host`: *Optional*. The host onto which the MySQL database runs. Valid
-  options: a string. Default: `'127.0.0.1'`.
-* `port`: *Optional*. The port the MySQL database listens on. Valid options: an
-  integer. Default: `3306`.
 * `username`: *Required*. The database user to use to connect to the MySQL
   database. Valid options: a string.
 * `password`: *Required*. The database password to use to connect to the MySQL
