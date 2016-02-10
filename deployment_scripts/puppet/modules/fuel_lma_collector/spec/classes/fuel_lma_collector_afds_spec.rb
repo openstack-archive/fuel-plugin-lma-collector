@@ -13,7 +13,7 @@
 #    under the License.
 require 'spec_helper'
 
-describe 'lma_collector::afds' do
+describe 'fuel_lma_collector::afds' do
     let(:facts) do
         {:kernel => 'Linux', :operatingsystem => 'Ubuntu',
          :osfamily => 'Debian'}
