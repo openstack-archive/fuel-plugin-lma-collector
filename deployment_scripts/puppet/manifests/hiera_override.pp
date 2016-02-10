@@ -26,6 +26,12 @@ if ($plugin_data) {
     default => false,
   }
 
+  $influxdb_mode = $plugin_data['influxdb_mode']
+  $monitor_influxdb = $influxdb_mode ? {
+    'local' => true,
+    default => false,
+  }
+
   lma_collector::hiera_data { 'gse_filters':
     content => template('lma_collector/gse_filters.yaml.erb')
   }
