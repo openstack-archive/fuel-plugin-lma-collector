@@ -14,9 +14,9 @@
 #
 include lma_collector::params
 
-$lma = hiera_hash('lma_collector', {})
-$roles          = node_roles(hiera('nodes'), hiera('uid'))
-$is_controller  = member($roles, 'controller') or member($roles, 'primary-controller')
+$lma           = hiera_hash('lma_collector', {})
+$roles         = node_roles(hiera('nodes'), hiera('uid'))
+$is_controller = member($roles, 'controller') or member($roles, 'primary-controller')
 
 $alarms_definitions = $lma['alarms']
 if $alarms_definitions == undef {
@@ -32,7 +32,7 @@ if $is_controller {
   }
 }
 
-class { 'lma_collector::afds':
+class { 'fuel_lma_collector::afds':
     roles                  => hiera('roles'),
     node_cluster_roles     => $lma['node_cluster_roles'],
     service_cluster_roles  => $lma['service_cluster_roles'],
