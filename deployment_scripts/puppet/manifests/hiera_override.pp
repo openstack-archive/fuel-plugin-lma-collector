@@ -26,11 +26,11 @@ if ($plugin_data) {
     default => false,
   }
 
-  lma_collector::hiera_data { 'gse_filters':
-    content => template('lma_collector/gse_filters.yaml.erb')
+  fuel_lma_collector::hiera_data { 'gse_filters':
+    content => template('fuel_lma_collector/gse_filters.yaml.erb')
   }
 
-  lma_collector::hiera_data { 'alarming':
-    content => template('lma_collector/alarming.yaml.erb')
+  fuel_lma_collector::hiera_data { 'alarming':
+    content => template('fuel_lma_collector/alarming.yaml.erb')
   }
 }

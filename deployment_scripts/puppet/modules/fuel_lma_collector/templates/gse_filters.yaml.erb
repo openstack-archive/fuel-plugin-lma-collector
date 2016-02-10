@@ -1,0 +1,573 @@
+---
+lma_collector:
+
+  # The GSE policies are applied to clusters and describe how the the GSE
+  # cluster filter computes the cluster's status. The LMA toolchain is
+  # pre-configured with a few set of policies but everything can be customized:
+  # thresholds can be modified, new policies can be defined, and so on.
+  #
+  # A policy consists of a list of rules which are evaluated against the
+  # current status of the cluster's members. When one of the rules matches, the
+  # cluster's status gets the value associated with the rule and the evaluation
+  # stops here. The last rule of the list is usually a catch-all rule that
+  # defines the default status in case no other rule matched.
+  #
+  # The declaration of a policy rule is similar to an alarm rule except that:
+  # - there are no 'metric', 'window' and 'period' parameters.
+  # - there are only 2 supported functions:
+  #   - 'count' which returns the number of members that match the passed value(s)
+  #   - 'percent' which returns the percentage of members that match the passed value(s)
+  #
+  # The following rule definition reads as "the cluster's status is critical if
+  # more than 50% of its members are either down or critical":
+  #
+  #    - status: critical
+  #      trigger:
+  #        logical_operator: or
+  #        rules:
+  #          - function: percent
+  #            arguments: [ down, critical ]
+  #            relational_operator: '>'
+  #            threshold: 50
+  #
+  gse_policies:
+    # A policy defining that the cluster's status depends on the member with the
+    # highest severity, typically used for a cluster of services.
+    highest_severity:
+      - status: down
+        trigger:
+          logical_operator: or
+          rules:
+            - function: count
+              arguments: [ down ]
+              relational_operator: '>'
+              threshold: 0
+      - status: critical
+        trigger:
+          logical_operator: or
+          rules:
+            - function: count
+              arguments: [ critical ]
+              relational_operator: '>'
+              threshold: 0
+      - status: warning
+        trigger:
+          logical_operator: or
+          rules:
+            - function: count
+              arguments: [ warning ]
+              relational_operator: '>'
+              threshold: 0
+      - status: okay
+        trigger:
+          logical_operator: or
+          rules:
+            - function: count
+              arguments: [ okay ]
+              relational_operator: '>'
+              threshold: 0
+      - status: unknown
+
+    # A policy which is typically used for clusters managed by Pacemaker
+    # with the no-quorum-policy set to 'stop'.
+    majority_of_members:
+      - status: down
+        trigger:
+          logical_operator: or
+          rules:
+            - function: percent
+              arguments: [ down ]
+              relational_operator: '>'
+              threshold: 50
+      - status: critical
+        trigger:
+          logical_operator: and
+          rules:
+            - function: percent
+              arguments: [ down, critical ]
+              relational_operator: '>'
+              threshold: 20
+            - function: percent
+              arguments: [ okay ]
+              relational_operator: '<'
+              threshold: 50
+              function: percent
+      - status: warning
+        trigger:
+          logical_operator: or
+          rules:
+            - function: percent
+              arguments: [ okay ]
+              relational_operator: '<'
+              threshold: 50
+              function: percent
+      - status: okay
+
+  gse_cluster_service:
+    input_message_types:
+      - afd_service_metric
+    aggregator_flag: true
+    # the field in the input messages to identify the cluster
+    cluster_field: service
+    # the field in the input messages to identify the cluster's member
+    member_field: source
+    output_message_type: gse_service_cluster_metric
+    output_metric_name: cluster_service_status
+    interval: 10
+    warm_up_period: 20
+    clusters:
+      mysqld-tcp:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+      mysql:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - node-status
+      haproxy:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - heartbeat
+      apache:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - worker
+      memcached:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - heartbeat
+      rabbitmq:
+        policy: highest_severity
+        group_by: member
+        members:
+          - memory
+          - disk
+          - queue
+      nova-api:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+          - endpoint
+          - http_errors
+      nova-ec2-api:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+      nova-novncproxy-websocket:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+      nova-metadata-api:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+      nova-scheduler:
+        policy: highest_severity
+        group_by: member
+        members:
+          - workers
+      nova-cert:
+        policy: highest_severity
+        group_by: member
+        members:
+          - workers
+      nova-consoleauth:
+        policy: highest_severity
+        group_by: member
+        members:
+          - workers
+      nova-compute:
+        policy: highest_severity
+        group_by: member
+        members:
+          - workers
+      nova-conductor:
+        policy: highest_severity
+        group_by: member
+        members:
+          - workers
+      cinder-api:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+          - endpoint
+          - http_errors
+      cinder-v2-api:
+        policy: highest_severity
+        group_by: member
+        members:
+          # Cinder V2 backends are in fact the same as the Cinder backends
+          - endpoint
+      cinder-scheduler:
+        policy: highest_severity
+        group_by: member
+        members:
+          - workers
+      cinder-volume:
+        policy: highest_severity
+        group_by: member
+        members:
+          - workers
+      neutron-api:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+          - endpoint
+          - http_errors
+      neutron-l3:
+        policy: highest_severity
+        group_by: member
+        members:
+          - workers
+      neutron-dhcp:
+        policy: highest_severity
+        group_by: member
+        members:
+          - workers
+      neutron-metadata:
+        policy: highest_severity
+        group_by: member
+        members:
+          - workers
+      neutron-openvswitch:
+        policy: highest_severity
+        group_by: member
+        members:
+          - workers
+      keystone-public-api:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+          - endpoint
+          - http_errors
+      keystone-admin-api:
+        policy: highest_severity
+        group_by: member
+        members:
+          # TODO(pasquier-s): add a metric reporting the status of the keystone-admin-api endpoint
+          - backends
+          - http_errors
+      glance-api:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+          - endpoint
+          - http_errors
+      glance-registry-api:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+      heat-api:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+          - endpoint
+          - http_errors
+      heat-cfn-api:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+          - endpoint
+      heat-cloudwatch-api:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+<% if @tls_enabled then -%>
+      horizon-https:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+<% else -%>
+      horizon-ui:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+<% end -%>
+<% if not @storage_options["objects_ceph"] then -%>
+      swift-api:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+          - endpoint
+          - http_errors
+      swift-s3-api:
+        policy: highest_severity
+        group_by: member
+        members:
+          # Swift S3 backends are in fact the same as the Swift backends
+          - endpoint
+<% end -%>
+<% if @ceilometer_enabled -%>
+      ceilometer-api:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+          - endpoint
+<% end -%>
+<% if @storage_options["volumes_ceph"] then -%>
+      ceph-mon:
+        policy: highest_severity
+        group_by: member
+        members:
+          - health
+          - capacity
+<% end -%>
+<% if @monitor_elasticsearch -%>
+      elasticsearch:
+        policy: highest_severity
+        group_by: member
+        members:
+          - health
+<% end -%>
+
+  gse_cluster_node:
+    input_message_types:
+      - afd_node_metric
+    aggregator_flag: true
+    # the field in the input messages to identify the cluster
+    cluster_field: node_role
+    # the field in the input messages to identify the cluster's member
+    member_field: source
+    output_message_type: gse_node_cluster_metric
+    output_metric_name: cluster_node_status
+    interval: 10
+    warm_up_period: 80
+    clusters:
+      controller:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - cpu
+          - root-fs
+          - log-fs
+      mysql-nodes:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - mysql-fs
+      compute:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - cpu
+          - root-fs
+          - nova-fs
+      storage:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - cpu
+          - root-fs
+<% if @monitor_elasticsearch -%>
+      elasticsearch-nodes:
+        policy: majority_of_members
+        group_by: member
+        members:
+          - data-fs
+          - root-fs
+          - cpu
+<% end -%>
+
+  gse_cluster_global:
+    input_message_types:
+      - gse_service_cluster_metric
+      - gse_node_cluster_metric
+    aggregator_flag: false
+    # the field in the input messages to identify the cluster's member
+    member_field: cluster_name
+    output_message_type: gse_cluster_metric
+    output_metric_name: cluster_status
+    interval: 10
+    warm_up_period: 30
+    clusters:
+      mysql:
+        policy: highest_severity
+        group_by: member
+        members:
+          - mysqld-tcp
+          - mysql
+          - mysql-nodes
+          - controller
+      haproxy:
+        policy: highest_severity
+        group_by: member
+        members:
+          - haproxy
+          - controller
+      apache:
+        policy: highest_severity
+        group_by: member
+        members:
+          - apache
+          - controller
+      memcached:
+        policy: highest_severity
+        group_by: member
+        members:
+          - memcached
+          - controller
+      rabbitmq:
+        policy: highest_severity
+        group_by: member
+        members:
+          - rabbitmq
+          - controller
+      nova:
+        policy: highest_severity
+        group_by: member
+        members:
+          - nova-api
+          - nova-ec2-api
+          - nova-metadata-api
+          - nova-scheduler
+          - nova-compute
+          - nova-conductor
+          - nova-cert
+          - nova-consoleauth
+          - nova-novncproxy-websocket
+          - controller
+          - compute
+        hints:
+          - cinder
+          - glance
+          - keystone
+          - neutron
+          - mysql
+          - rabbitmq
+      cinder:
+        policy: highest_severity
+        group_by: member
+        members:
+          - cinder-api
+          - cinder-v2-api
+          - cinder-scheduler
+          - cinder-volume
+          - controller
+          - storage
+        hints:
+          - keystone
+          - mysql
+          - rabbitmq
+      neutron:
+        policy: highest_severity
+        group_by: member
+        members:
+          - neutron-api
+          - neutron-l3
+          - neutron-dhcp
+          - neutron-metadata
+          - neutron-openvswitch
+          - controller
+        hints:
+          - keystone
+          - mysql
+          - rabbitmq
+      keystone:
+        policy: highest_severity
+        group_by: member
+        members:
+          - keystone-public-api
+          - keystone-admin-api
+          - controller
+        hints:
+          - mysql
+          - apache
+      glance:
+        policy: highest_severity
+        group_by: member
+        members:
+          - glance-api
+          - glance-registry-api
+          - controller
+        hints:
+          - keystone
+          - mysql
+      heat:
+        policy: highest_severity
+        group_by: member
+        members:
+          - heat-api
+          - heat-cfn-api
+          - heat-cloudwatch-api
+          - controller
+        hints:
+          - cinder
+          - glance
+          - keystone
+          - neutron
+          - nova
+          - mysql
+          - rabbitmq
+      horizon:
+        policy: highest_severity
+        group_by: member
+        members:
+<% if @tls_enabled then -%>
+          - horizon-https
+<% else -%>
+          - horizon-ui
+<% end -%>
+          - controller
+        hints:
+          - keystone
+          - apache
+<% if not @storage_options["objects_ceph"] then -%>
+      swift:
+        policy: highest_severity
+        group_by: member
+        members:
+          - swift-api
+          - swift-s3-api
+          - controller
+        hints:
+          - keystone
+<% end -%>
+<% if @ceilometer_enabled -%>
+      ceilometer:
+        policy: highest_severity
+        group_by: member
+        members:
+          - ceilometer-api
+          - controller
+        hints:
+          - keystone
+          - rabbitmq
+<% end -%>
+<% if @storage_options["volumes_ceph"] then -%>
+      ceph:
+        policy: highest_severity
+        group_by: member
+        members:
+          - ceph-mon
+          - controller
+          - storage
+<% end -%>
+<% if @monitor_elasticsearch -%>
+      elasticsearch:
+        policy: highest_severity
+        group_by: member
+        members:
+          - elasticsearch
+          - elasticsearch-nodes
+<% end -%>
