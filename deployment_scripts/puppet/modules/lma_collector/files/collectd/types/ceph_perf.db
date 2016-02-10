@@ -1,5 +1,5 @@
 # File generated automatically by the build_ceph_perf_types.py script
-# Ceph version: 0.80.9
+# Ceph versions: 0.80.9, 0.94.5
 osd_agent_evict value:GAUGE:U:U
 osd_agent_flush value:GAUGE:U:U
 osd_agent_skip value:GAUGE:U:U
@@ -17,6 +17,8 @@ osd_numpg value:GAUGE:U:U
 osd_numpg_primary value:GAUGE:U:U
 osd_numpg_replica value:GAUGE:U:U
 osd_numpg_stray value:GAUGE:U:U
+osd_object_ctx_cache_hit value:GAUGE:U:U
+osd_object_ctx_cache_total value:GAUGE:U:U
 osd_op value:GAUGE:U:U
 osd_op_in_bytes value:GAUGE:U:U
 osd_op_latency value:GAUGE:U:U
@@ -66,6 +68,7 @@ osd_tier_evict value:GAUGE:U:U
 osd_tier_flush value:GAUGE:U:U
 osd_tier_flush_fail value:GAUGE:U:U
 osd_tier_promote value:GAUGE:U:U
+osd_tier_proxy_read value:GAUGE:U:U
 osd_tier_try_flush value:GAUGE:U:U
 osd_tier_try_flush_fail value:GAUGE:U:U
 osd_tier_whiteout value:GAUGE:U:U
