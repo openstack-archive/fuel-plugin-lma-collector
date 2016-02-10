@@ -118,32 +118,32 @@ lma_collector:
     clusters:
       nova-logs:
         policy: highest_severity
-        group_by: member
+        group_by: hostname
         members:
           - error
       heat-logs:
         policy: highest_severity
-        group_by: member
+        group_by: hostname
         members:
           - error
       cinder-logs:
         policy: highest_severity
-        group_by: member
+        group_by: hostname
         members:
           - error
       glance-logs:
         policy: highest_severity
-        group_by: member
+        group_by: hostname
         members:
           - error
       neutron-logs:
         policy: highest_severity
-        group_by: member
+        group_by: hostname
         members:
           - error
       keystone-logs:
         policy: highest_severity
-        group_by: member
+        group_by: hostname
         members:
           - error
       mysqld-tcp:
