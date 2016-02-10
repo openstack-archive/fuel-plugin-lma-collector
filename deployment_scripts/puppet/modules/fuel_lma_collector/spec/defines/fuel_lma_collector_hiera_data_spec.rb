@@ -14,7 +14,7 @@
 require 'spec_helper'
 require 'yaml'
 
-describe 'lma_collector::hiera_data' do
+describe 'fuel_lma_collector::hiera_data' do
     let(:title) { :foo }
     let(:facts) do
         {:kernel => 'Linux', :operatingsystem => 'Ubuntu',
