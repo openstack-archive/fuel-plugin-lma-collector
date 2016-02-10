@@ -13,7 +13,7 @@
 #    under the License.
 #
 
-class lma_collector::afds (
+class fuel_lma_collector::afds (
     $roles = undef,
     $node_cluster_roles = undef,
     $service_cluster_roles = undef,
