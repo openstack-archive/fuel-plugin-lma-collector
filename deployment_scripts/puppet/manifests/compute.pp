@@ -38,6 +38,12 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
   class { 'lma_collector::logs::counter':
     hostname => $::hostname,
   }
+
+  class { 'lma_collector::collectd::base':
+    processes => ['hekad', 'collectd'],
+  }
+
+  class { 'lma_collector::collectd::libvirt': }
 }
 
 if $ceilometer['enabled'] {
@@ -68,9 +74,3 @@ service { $compute_service:
   hasstatus  => true,
   hasrestart => true,
 }
-
-class { 'lma_collector::collectd::base':
-  processes    => ['hekad', 'collectd'],
-}
-
-class { 'lma_collector::collectd::libvirt': }
