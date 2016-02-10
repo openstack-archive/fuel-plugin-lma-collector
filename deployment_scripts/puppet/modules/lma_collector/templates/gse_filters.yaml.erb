@@ -412,7 +412,7 @@ lma_collector:
 <% if @monitor_elasticsearch -%>
       elasticsearch-nodes:
         policy: majority_of_members
-        group_by: member
+        group_by: hostname
         members:
           - data-fs
           - root-fs
