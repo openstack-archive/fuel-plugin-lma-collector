@@ -53,17 +53,32 @@ Third Party Components
 Puppet modules
 --------------
 
-+---------------------+-----------------------------------------------------+-----------+
-| Name                | Project Web Site                                    | License   |
-+=====================+=====================================================+===========+
-| puppet-collectd     | https://github.com/puppet-community/puppet-collectd | Apache v2 |
-+---------------------+-----------------------------------------------------+-----------+
-| puppetlabs-apache   | https://github.com/puppetlabs/puppetlabs-apache     | Apache v2 |
-+---------------------+-----------------------------------------------------+-----------+
-| puppetlabs-stdlib   | https://github.com/puppetlabs/puppetlabs-stdlib     | Apache v2 |
-+---------------------+-----------------------------------------------------+-----------+
-| puppetlabs-concat   | https://github.com/puppetlabs/puppetlabs-concat     | Apache v2 |
-+---------------------+-----------------------------------------------------+-----------+
-| puppetlabs-firewall | https://github.com/puppetlabs/puppetlabs-firewall   | Apache v2 |
-+---------------------+-----------------------------------------------------+-----------+
-
++-----------------------+-----------------------------------------------------+-----------+
+| Name                  | Project Web Site                                    | License   |
++=======================+=====================================================+===========+
+| puppet-collectd       | https://github.com/puppet-community/puppet-collectd | Apache v2 |
++-----------------------+-----------------------------------------------------+-----------+
+| puppetlabs-apache     | https://github.com/puppetlabs/puppetlabs-apache     | Apache v2 |
++-----------------------+-----------------------------------------------------+-----------+
+| puppetlabs-stdlib     | https://github.com/puppetlabs/puppetlabs-stdlib     | Apache v2 |
++-----------------------+-----------------------------------------------------+-----------+
+| puppetlabs-inifile    | https://github.com/puppetlabs/puppetlabs-inifile    | Apache v2 |
++-----------------------+-----------------------------------------------------+-----------+
+| puppetlabs-concat     | https://github.com/puppetlabs/puppetlabs-concat     | Apache v2 |
++-----------------------+-----------------------------------------------------+-----------+
+| puppetlabs-firewall   | https://github.com/puppetlabs/puppetlabs-firewall   | Apache v2 |
++-----------------------+-----------------------------------------------------+-----------+
+| openstack-cinder      | https://github.com/openstack/puppet-cinder          | Apache v2 |
++-----------------------+-----------------------------------------------------+-----------+
+| openstack-glance      | https://github.com/openstack/puppet-glance          | Apache v2 |
++-----------------------+-----------------------------------------------------+-----------+
+| openstack-heat        | https://github.com/openstack/puppet-heat            | Apache v2 |
++-----------------------+-----------------------------------------------------+-----------+
+| openstack-keystone    | https://github.com/openstack/puppet-keystone        | Apache v2 |
++-----------------------+-----------------------------------------------------+-----------+
+| openstack-neutron     | https://github.com/openstack/puppet-neutron         | Apache v2 |
++-----------------------+-----------------------------------------------------+-----------+
+| openstack-nova        | https://github.com/openstack/puppet-nova            | Apache v2 |
++-----------------------+-----------------------------------------------------+-----------+
+| openstack-openstacklib| https://github.com/openstack/puppet-openstacklib    | Apache v2 |
++-----------------------+-----------------------------------------------------+-----------+
