@@ -60,7 +60,7 @@ class PacemakerResourcePlugin(base.Base):
                     'values': value
                 }
 
-plugin = PacemakerResourcePlugin()
+plugin = PacemakerResourcePlugin(collectd)
 
 
 def init_callback():

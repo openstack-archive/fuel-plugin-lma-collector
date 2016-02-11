@@ -15,6 +15,8 @@
 #
 # Collectd plugin for getting statistics from Cinder
 import collectd
+
+import base
 import openstack
 
 PLUGIN_NAME = 'cinder'
@@ -28,10 +30,7 @@ class CinderStatsPlugin(openstack.CollectdPlugin):
         total size of volumes usable and in error state
     """
 
-    def config_callback(self, config):
-        super(CinderStatsPlugin, self).config_callback(config)
-
-    @openstack.read_callback_wrapper
+    @base.read_callback_wrapper
     def read_callback(self):
         volumes_details = self.get_objects_details('cinder', 'volumes')
 
