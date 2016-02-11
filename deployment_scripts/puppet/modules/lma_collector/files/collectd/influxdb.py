@@ -58,6 +58,8 @@ METRICS_BY_NAME = {
         'NumGoroutine': ('go_routines', 'gauge')}
 }
 
+HEALTH_ON_ERROR = {'type_instance': 'health', 'values': 3}
+HEALTH_ON_OK  = {'type_instance': 'health', 'values': 1}
 
 class InfluxDBClusterPlugin(base.Base):
     def __init__(self, *args, **kwargs):
@@ -99,11 +101,13 @@ class InfluxDBClusterPlugin(base.Base):
         except Exception as e:
             self.logger.error("Got {0} when getting stats from {1}".format(
                 e, url))
+            yield HEALTH_ON_ERROR
             return
 
         if r.status_code != 200:
             self.logger.error("Got response {0} from {0}".format(
                 r.status_code, url))
+            yield HEALTH_ON_ERROR
             return
 
         data = r.json()
@@ -111,8 +115,10 @@ class InfluxDBClusterPlugin(base.Base):
             series_list = data['results'][0]['series']
         except:
             self.logger.error("Failed to retrieve series for InfluxDB cluster")
+            yield HEALTH_ON_ERROR
             return
 
+        yield HEALTH_ON_OK
         for serie in series_list:
             metrics_list = METRICS_BY_NAME.get(serie['name'], None)
             if not metrics_list:

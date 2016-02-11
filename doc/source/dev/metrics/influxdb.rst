@@ -8,6 +8,9 @@ cluster
 
 These metrics are only available if there are more than one node in the cluster.
 
+* ``influxdb_health``, the health status reported when the InfluxDB API returns
+  either a valid response or an unexpected result (network failure for instance)
+  where the metric's value is respectively ``1`` for ``OKAY`` and ``3`` for ``DOWN``.
 * ``influxdb_cluster_write_shard_points_requests``, the number of requests for writing a time series points to a shard.
 * ``influxdb_cluster_write_shard_requests``, the number of requests for writing to a shard.
 
