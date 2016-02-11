@@ -80,7 +80,7 @@ class CephOSDPerfPlugin(base.CephBase):
                         'values': self.convert_to_collectd_value(stats[k])
                     }
 
-plugin = CephOSDPerfPlugin()
+plugin = CephOSDPerfPlugin(collectd)
 
 
 def init_callback():

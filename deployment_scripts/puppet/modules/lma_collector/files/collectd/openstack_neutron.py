@@ -15,6 +15,8 @@
 #
 # Collectd plugin for getting resource statistics from Neutron
 import collectd
+
+import base
 import openstack
 
 PLUGIN_NAME = 'neutron'
@@ -31,10 +33,7 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
         number of floating IP addresses broken down by free/associated
     """
 
-    def config_callback(self, config):
-        super(NeutronStatsPlugin, self).config_callback(config)
-
-    @openstack.read_callback_wrapper
+    @base.read_callback_wrapper
     def read_callback(self):
         def groupby_network(x):
             return "networks.%s" % x.get('status', 'unknown').lower()
