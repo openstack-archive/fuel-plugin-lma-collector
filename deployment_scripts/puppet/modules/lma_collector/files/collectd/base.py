@@ -69,6 +69,10 @@ class Base(object):
             elif node.key == 'DependsOnResource':
                 self.depends_on_resource = node.values[0]
 
+    @read_callback_wrapper
+    def conditional_read_callback(self):
+        self.read_callback()
+
     def read_callback(self):
         try:
             for metric in self.itermetrics():
