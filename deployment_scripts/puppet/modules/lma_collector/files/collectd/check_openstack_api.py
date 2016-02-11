@@ -24,13 +24,13 @@ INTERVAL = openstack.INTERVAL
 
 
 class APICheckPlugin(openstack.CollectdPlugin):
-    """ Class to check the status of OpenStack API services.
-    """
+    """Class to check the status of OpenStack API services."""
+
     FAIL = 0
     OK = 1
     UNKNOWN = 2
 
-    # TODO: sahara, murano
+    # TODO(all): sahara, murano
     CHECK_MAP = {
         'keystone': {
             'path': '/', 'expect': 300, 'name': 'keystone-public-api'},
@@ -67,7 +67,8 @@ class APICheckPlugin(openstack.CollectdPlugin):
         for service in catalog:
             name = service['name']
             if name not in self.CHECK_MAP:
-                self.logger.notice("No check found for service '%s', skipping it" % name)
+                self.logger.notice(
+                    "No check found for service '%s', skipping it" % name)
                 status = self.UNKNOWN
             else:
                 check = self.CHECK_MAP[name]

@@ -30,6 +30,7 @@ METRICS = ['number_of_nodes', 'active_primary_shards', 'active_primary_shards',
 
 HEALTH_ON_ERROR = {'type_instance': 'health', 'values': HEALTH_MAP['red']}
 
+
 class ElasticsearchClusterHealthPlugin(base.Base):
     def __init__(self, *args, **kwargs):
         super(ElasticsearchClusterHealthPlugin, self).__init__(*args, **kwargs)

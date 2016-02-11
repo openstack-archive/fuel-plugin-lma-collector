@@ -49,8 +49,10 @@ class OSClient(object):
         # but not on timeout and backoff time is not supported.
         # (at this time we ship requests 2.2.1 and urllib3 1.6.1 or 1.7.1)
         self.session = requests.Session()
-        self.session.mount('http://', requests.adapters.HTTPAdapter(max_retries=max_retries))
-        self.session.mount('https://', requests.adapters.HTTPAdapter(max_retries=max_retries))
+        self.session.mount(
+            'http://', requests.adapters.HTTPAdapter(max_retries=max_retries))
+        self.session.mount(
+            'https://', requests.adapters.HTTPAdapter(max_retries=max_retries))
 
         self.get_token()
 
@@ -72,10 +74,9 @@ class OSClient(object):
                 {
                     'username': self.username,
                     'password': self.password
-                    }
                 }
             }
-        )
+        })
         self.logger.info("Trying to get token from '%s'" % self.keystone_url)
         r = self.make_request('post',
                               '%s/tokens' % self.keystone_url, data=data,

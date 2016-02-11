@@ -21,7 +21,8 @@ import requests
 NAME = 'influxdb'
 METRICS_BY_NAME = {
     'cluster': {
-        'writeShardPointsReq': ('cluster_write_shard_points_requests', 'gauge'),
+        'writeShardPointsReq': ('cluster_write_shard_points_requests',
+                                'gauge'),
         'writeShardReq':       ('cluster_write_shard_requests', 'gauge')},
 
     'httpd': {

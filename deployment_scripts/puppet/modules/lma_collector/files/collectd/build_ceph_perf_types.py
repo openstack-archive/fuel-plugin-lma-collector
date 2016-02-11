@@ -49,7 +49,7 @@ class CephPerfSchema(object):
             (stdout, stderr) = proc.communicate()
             stdout = stdout.rstrip('\n')
         except Exception as e:
-            print "Cannot execute command '%s': %s" % (cmd, str(e))
+            print("Cannot execute command '%s': %s" % (cmd, str(e)))
             raise e
 
         return json.loads(stdout)
@@ -69,15 +69,15 @@ class CephPerfSchema(object):
 def main():
     script_name = os.path.basename(sys.argv[0])
     if len(sys.argv) < 2 or len(sys.argv) > 3:
-        print "usage: %s <Ceph OSD socket> [namespace]" % script_name
+        print("usage: %s <Ceph OSD socket> [namespace]" % script_name)
     else:
         schema = CephPerfSchema(sys.argv[1])
         collection = sys.argv[2] if len(sys.argv) == 3 else None
-        print "# File generated automatically by the %s script" % script_name
-        print "# Ceph version: %s" % schema.ceph_version()
+        print("# File generated automatically by the %s script" % script_name)
+        print("# Ceph version: %s" % schema.ceph_version())
         for item in schema.itertypes():
             if collection is None or item.collection == collection:
-                print item
+                print(item)
 
 if __name__ == '__main__':
     main()
