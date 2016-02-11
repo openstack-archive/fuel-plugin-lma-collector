@@ -14,6 +14,9 @@ These metrics are only available if there are more than one node in the cluster.
 httpd
 ^^^^^
 
+* ``influxdb_httpd_health``, the health status reported when the InfluxDB API returns
+  either a valid response or an unexpected result (network failure for instance)
+  where the metric's value is respectively ``1`` for ``OKAY`` and ``3`` for ``DOWN``.
 * ``influxdb_httpd_failed_auths``, the number of times failed authentications.
 * ``influxdb_httpd_ping_requests``, the number of ping requests.
 * ``influxdb_httpd_write_points_ok``, the number of points successfully written.
