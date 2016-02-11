@@ -86,7 +86,7 @@ class ElasticsearchClusterHealthPlugin(base.Base):
                 'values': data[metric]
             }
 
-plugin = ElasticsearchClusterHealthPlugin()
+plugin = ElasticsearchClusterHealthPlugin(collectd)
 
 
 def init_callback():

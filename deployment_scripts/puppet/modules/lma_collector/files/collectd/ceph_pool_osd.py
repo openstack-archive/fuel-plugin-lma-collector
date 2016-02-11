@@ -116,7 +116,7 @@ class CephPoolPlugin(base.CephBase):
             'values': [_up, _down, _in, _out]
         }
 
-plugin = CephPoolPlugin()
+plugin = CephPoolPlugin(collectd)
 
 
 def init_callback():

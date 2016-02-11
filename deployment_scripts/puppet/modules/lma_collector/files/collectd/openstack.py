@@ -12,12 +12,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import base
 import datetime
 import dateutil.parser
 import dateutil.tz
-from functools import wraps
 import requests
 import simplejson as json
+
 
 # By default, query OpenStack API endpoints every 50 seconds. We choose a value
 # less than the default group by interval (which is 60 seconds) to avoid gaps
@@ -145,28 +147,14 @@ class OSClient(object):
         return r
 
 
-# A decorator that will call the decorated function only when the plugin has
-# detected that it is currently active.
-def read_callback_wrapper(f):
-    @wraps(f)
-    def wrapper(self, *args, **kwargs):
-        if self.do_collect_data:
-            f(self, *args, **kwargs)
+class CollectdPlugin(base.Base):
 
-    return wrapper
-
-
-class CollectdPlugin(object):
-
-    def __init__(self, logger):
+    def __init__(self, *args, **kwargs):
+        super(CollectdPlugin, self).__init__(*args, **kwargs)
         self.os_client = None
-        self.logger = logger
         self.timeout = 5
         self.max_retries = 3
         self.extra_config = {}
-        # attributes controlling whether the plugin is in collect mode or not
-        self.do_collect_data = True
-        self.depends_on_resource = None
 
     def _build_url(self, service, resource):
         s = (self.get_service(service) or {})
@@ -209,6 +197,7 @@ class CollectdPlugin(object):
                     if x['name'] == service_name), None)
 
     def config_callback(self, config):
+        super(CollectdPlugin, self).config_callback(config)
         for node in config.children:
             if node.key == 'Timeout':
                 self.timeout = int(node.values[0])
@@ -222,36 +211,9 @@ class CollectdPlugin(object):
                 tenant_name = node.values[0]
             elif node.key == 'KeystoneUrl':
                 keystone_url = node.values[0]
-            elif node.key == 'DependsOnResource':
-                self.depends_on_resource = node.values[0]
         self.os_client = OSClient(username, password, tenant_name,
                                   keystone_url, self.timeout, self.logger,
                                   self.max_retries)
-
-    def notification_callback(self, notification):
-        if not self.depends_on_resource:
-            return
-
-        try:
-            data = json.loads(notification.message)
-        except ValueError:
-            return
-
-        if 'value' not in data:
-            self.logger.warning(
-                "%s: missing 'value' in notification" %
-                self.__class__.__name__)
-        elif 'resource' not in data:
-            self.logger.warning(
-                "%s: missing 'resource' in notification" %
-                self.__class__.__name__)
-        elif data['resource'] == self.depends_on_resource:
-            do_collect_data = data['value'] > 0
-            if self.do_collect_data != do_collect_data:
-                # log only the transitions
-                self.logger.notice("%s: do_collect_data=%s" %
-                                   (self.__class__.__name__, do_collect_data))
-            self.do_collect_data = do_collect_data
 
     def read_callback(self):
         """ Read metrics and dispatch values

@@ -15,6 +15,8 @@
 #
 # Collectd plugin for getting statistics from Keystone
 import collectd
+
+import base
 import openstack
 
 PLUGIN_NAME = 'keystone'
@@ -28,10 +30,7 @@ class KeystoneStatsPlugin(openstack.CollectdPlugin):
         number of roles
     """
 
-    def config_callback(self, config):
-        super(KeystoneStatsPlugin, self).config_callback(config)
-
-    @openstack.read_callback_wrapper
+    @base.read_callback_wrapper
     def read_callback(self):
 
         def groupby(d):
