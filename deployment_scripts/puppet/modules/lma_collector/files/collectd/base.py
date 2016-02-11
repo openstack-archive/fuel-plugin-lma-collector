@@ -69,6 +69,10 @@ class Base(object):
             elif node.key == 'DependsOnResource':
                 self.depends_on_resource = node.values[0]
 
+    @read_callback_wrapper
+    def conditional_read_callback(self):
+        self.read_callback()
+
     def read_callback(self):
         try:
             for metric in self.itermetrics():
@@ -103,6 +107,8 @@ class Base(object):
             values = (values,)
 
         type_instance = str(metric.get('type_instance', ''))
+        plugin_instance = str(metric.get('plugin_instance',
+                                         self.plugin_instance))
         if len(type_instance) > self.MAX_IDENTIFIER_LENGTH:
             self.logger.warning(
                 '%s: Identifier "%s..." too long (length: %d, max limit: %d)' %
@@ -112,7 +118,7 @@ class Base(object):
         v = self.collectd.Values(
             plugin=self.plugin,
             type=metric.get('type', 'gauge'),
-            plugin_instance=self.plugin_instance,
+            plugin_instance=plugin_instance,
             type_instance=type_instance,
             values=values,
             # w/a for https://github.com/collectd/collectd/issues/716
