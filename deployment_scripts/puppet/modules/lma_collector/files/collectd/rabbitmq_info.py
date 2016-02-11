@@ -212,7 +212,7 @@ class RabbitMqPlugin(base.Base):
             yield {'type_instance': k, 'values': v}
 
 
-plugin = RabbitMqPlugin()
+plugin = RabbitMqPlugin(collectd)
 
 
 def init_callback():

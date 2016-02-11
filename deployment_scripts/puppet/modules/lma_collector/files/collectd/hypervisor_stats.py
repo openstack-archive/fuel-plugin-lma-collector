@@ -15,6 +15,8 @@
 #
 # Collectd plugin for getting hypervisor statistics from Nova
 import collectd
+
+import base
 import openstack
 
 PLUGIN_NAME = 'hypervisor_stats'
@@ -55,7 +57,7 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
             v.host = host
         v.dispatch()
 
-    @openstack.read_callback_wrapper
+    @base.read_callback_wrapper
     def read_callback(self):
         r = self.get('nova', 'os-hypervisors/detail')
         if not r:

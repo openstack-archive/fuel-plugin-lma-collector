@@ -47,7 +47,7 @@ class CephOSDStatsPlugin(base.CephBase):
                            osd['fs_perf_stat']['commit_latency_ms']],
             }
 
-plugin = CephOSDStatsPlugin()
+plugin = CephOSDStatsPlugin(collectd)
 
 
 def init_callback():
