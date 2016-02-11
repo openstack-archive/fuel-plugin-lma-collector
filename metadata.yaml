@@ -7,7 +7,7 @@ version: 0.8.1
 # Description
 description: Collect logs, metrics and notifications from system and OpenStack services and forward that information to external backends such as Elasticsearch and InfluxDB.
 # Required fuel version
-fuel_version: ['7.0', '8.0']
+fuel_version: ['7.0']
 
 authors: [Mirantis Inc.]
 licenses: [Apache License Version 2.0]
@@ -17,17 +17,7 @@ groups: ['monitoring']
 # The plugin is compatible with releases in the list
 releases:
   - os: ubuntu
-    version: 2015.1.0-8.0
-    mode: ['ha']
-    deployment_scripts_path: deployment_scripts/
-    repository_path: repositories/ubuntu
-  - os: ubuntu
     version: 2015.1.0-7.0
-    mode: ['ha']
-    deployment_scripts_path: deployment_scripts/
-    repository_path: repositories/ubuntu
-  - os: ubuntu
-    version: liberty-8.0
     mode: ['ha']
     deployment_scripts_path: deployment_scripts/
     repository_path: repositories/ubuntu
