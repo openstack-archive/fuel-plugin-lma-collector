@@ -128,7 +128,7 @@ class InfluxDBClusterPlugin(base.Base):
                     }
 
 
-plugin = InfluxDBClusterPlugin()
+plugin = InfluxDBClusterPlugin(collectd)
 
 
 def init_callback():

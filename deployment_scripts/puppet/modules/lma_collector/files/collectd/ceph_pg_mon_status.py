@@ -78,7 +78,7 @@ class CephMonPlugin(base.CephBase):
                 'values': state['count']
             }
 
-plugin = CephMonPlugin()
+plugin = CephMonPlugin(collectd)
 
 
 def init_callback():

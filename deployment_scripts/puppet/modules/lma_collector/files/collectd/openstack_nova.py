@@ -15,6 +15,8 @@
 #
 # Collectd plugin for getting statistics from Nova
 import collectd
+
+import base
 import openstack
 
 PLUGIN_NAME = 'nova'
@@ -27,10 +29,7 @@ class NovaStatsPlugin(openstack.CollectdPlugin):
         number of instances broken down by state
     """
 
-    def config_callback(self, config):
-        super(NovaStatsPlugin, self).config_callback(config)
-
-    @openstack.read_callback_wrapper
+    @base.read_callback_wrapper
     def read_callback(self):
         servers_details = self.get_objects_details('nova', 'servers')
 
