@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from functools import wraps
 import json
 import signal
 import subprocess
@@ -20,28 +21,53 @@ import sys
 import time
 import traceback
 
-import collectd
+
+INTERVAL = 10
+
+
+# A decorator that will call the decorated function only when the plugin has
+# detected that it is currently active.
+def read_callback_wrapper(f):
+    @wraps(f)
+    def wrapper(self, *args, **kwargs):
+        if self.do_collect_data:
+            f(self, *args, **kwargs)
+
+    return wrapper
 
 
 class Base(object):
     """Base class for writing Python plugins."""
 
+    FAIL = 0
+    OK = 1
+    UNKNOWN = 2
+
     MAX_IDENTIFIER_LENGTH = 63
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, collectd):
         self.debug = False
         self.timeout = 5
+        self.max_retries = 3
         self.logger = collectd
+        self.collectd = collectd
         self.plugin = None
         self.plugin_instance = ''
+        # attributes controlling whether the plugin is in collect mode or not
+        self.depends_on_resource = None
+        self.do_collect_data = True
 
     def config_callback(self, conf):
         for node in conf.children:
             if node.key == "Debug":
                 if node.values[0] in ['True', 'true']:
                     self.debug = True
-            if node.key == "Timeout":
+            elif node.key == "Timeout":
                 self.timeout = int(node.values[0])
+            elif node.key == 'MaxRetries':
+                self.max_retries = int(node.values[0])
+            elif node.key == 'DependsOnResource':
+                self.depends_on_resource = node.values[0]
 
     def read_callback(self):
         try:
@@ -60,6 +86,7 @@ class Base(object):
             - 'values', a scalar number or a list of numbers if the type
             defines several datasources.
             - 'type_instance' (optional)
+            - 'plugin_instance' (optional)
             - 'type' (optional, default='gauge')
 
         For example:
@@ -82,7 +109,7 @@ class Base(object):
                 (self.plugin, type_instance[:24], len(type_instance),
                  self.MAX_IDENTIFIER_LENGTH))
 
-        v = collectd.Values(
+        v = self.collectd.Values(
             plugin=self.plugin,
             type=metric.get('type', 'gauge'),
             plugin_instance=self.plugin_instance,
@@ -173,6 +200,31 @@ class Base(object):
         """
         if sys.version_info[0] == 2 and sys.version_info[1] <= 6:
             signal.signal(signal.SIGCHLD, signal.SIG_DFL)
+
+    def notification_callback(self, notification):
+        if not self.depends_on_resource:
+            return
+
+        try:
+            data = json.loads(notification.message)
+        except ValueError:
+            return
+
+        if 'value' not in data:
+            self.logger.warning(
+                "%s: missing 'value' in notification" %
+                self.__class__.__name__)
+        elif 'resource' not in data:
+            self.logger.warning(
+                "%s: missing 'resource' in notification" %
+                self.__class__.__name__)
+        elif data['resource'] == self.depends_on_resource:
+            do_collect_data = data['value'] > 0
+            if self.do_collect_data != do_collect_data:
+                # log only the transitions
+                self.logger.notice("%s: do_collect_data=%s" %
+                                   (self.__class__.__name__, do_collect_data))
+            self.do_collect_data = do_collect_data
 
 
 class CephBase(Base):

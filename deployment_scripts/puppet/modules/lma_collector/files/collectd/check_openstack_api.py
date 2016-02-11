@@ -15,6 +15,8 @@
 #
 # Collectd plugin for checking the status of OpenStack API services
 import collectd
+
+import base
 import openstack
 
 from urlparse import urlparse
@@ -25,10 +27,6 @@ INTERVAL = openstack.INTERVAL
 
 class APICheckPlugin(openstack.CollectdPlugin):
     """Class to check the status of OpenStack API services."""
-
-    FAIL = 0
-    OK = 1
-    UNKNOWN = 2
 
     # TODO(all): sahara, murano
     CHECK_MAP = {
@@ -94,7 +92,7 @@ class APICheckPlugin(openstack.CollectdPlugin):
                 'region': service['region']
             }
 
-    @openstack.read_callback_wrapper
+    @base.read_callback_wrapper
     def read_callback(self):
         for item in self.check_api():
             if item['status'] == self.UNKNOWN:
