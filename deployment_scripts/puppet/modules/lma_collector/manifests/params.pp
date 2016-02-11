@@ -73,7 +73,14 @@ class lma_collector::params {
   $buffering_max_file_size = 128 * 1024 * 1024
   $buffering_max_buffer_size = 1024 * 1024 * 1024
 
+  $buffering_max_file_tiny_size = 1 * 1024 * 1024
+  $buffering_max_buffer_tiny_size = 2 * 1024 * 1024
+
   if $buffering_max_file_size != 0 and $buffering_max_file_size < $hekad_max_message_size {
+      fail('max_message_size setting must be greater than max_file_size')
+  }
+
+  if $buffering_max_file_tiny_size != 0 and $buffering_max_file_tiny_size < $hekad_max_message_size {
       fail('max_message_size setting must be greater than max_file_size')
   }
 
