@@ -37,7 +37,6 @@ class ElasticsearchClusterHealthPlugin(base.Base):
         self.plugin = NAME
         self.address = '127.0.0.1'
         self.port = 9200
-        self.max_retries = 3
         self.session = requests.Session()
         self.url = None
         self.session.mount(
@@ -86,7 +85,7 @@ class ElasticsearchClusterHealthPlugin(base.Base):
                 'values': data[metric]
             }
 
-plugin = ElasticsearchClusterHealthPlugin()
+plugin = ElasticsearchClusterHealthPlugin(collectd)
 
 
 def init_callback():
