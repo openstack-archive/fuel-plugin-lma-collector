@@ -126,11 +126,7 @@ class lma_collector::params {
   $elasticsearch_port = '9200'
   $elasticsearch_fields = ['Timestamp', 'Type', 'Logger', 'Severity', 'Payload', 'Pid', 'Hostname', 'DynamicFields']
 
-  $influxdb_server = false
   $influxdb_port = '8086'
-  $influxdb_database = 'lma'
-  $influxdb_user = 'lma'
-  $influxdb_password = 'lmapass'
   $influxdb_timeout = 5
   $influxdb_tag_fields = []
   $influxdb_time_precision = 'ms'
