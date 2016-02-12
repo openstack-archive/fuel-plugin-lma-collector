@@ -15,6 +15,7 @@
 prepare_network_config(hiera('network_scheme', {}))
 $messaging_address = get_network_role_property('mgmt/messaging', 'ipaddr')
 $memcache_address  = get_network_role_property('mgmt/memcache', 'ipaddr')
+$network_metadata = hiera_hash('network_metadata')
 
 include lma_collector::params
 
@@ -222,8 +223,66 @@ if $lma_collector['elasticsearch_mode'] != 'disabled' {
   class { 'lma_collector::logs::pacemaker': }
 }
 
+$alerting_mode = $lma_collector['alerting_mode']
+$deployment_id = hiera('deployment_id')
+if $alerting_mode == 'remote' {
+  $use_nagios = true
+  $nagios_url = $lma_collector['nagios_url']
+  $nagios_user = $lma_collector['nagios_user']
+  $nagios_password = $lma_collector['nagios_password']
+} elsif $alerting_mode == 'local' {
+  $infra_alerting_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting', 'primary-infrastructure_alerting'])
+  if size(keys($infra_alerting_nodes)) > 0 {
+    $use_nagios = true
+    $lma_infra_alerting = hiera_hash('lma_infrastructure_alerting', false)
+    $nagios_server = $network_metadata['vips']['infrastructure_alerting_mgmt_vip']['ipaddr']
+    $nagios_user = $lma_infra_alerting['nagios_user']
+    $nagios_password = $lma_infra_alerting['nagios_password']
+
+    # Important: $http_port and $http_path must match the
+    # lma_infra_monitoring configuration.
+    $http_port = $lma_collector::params::nagios_http_port
+    $http_path = $lma_collector::params::nagios_http_path
+    $nagios_url = "http://${nagios_server}:${http_port}/${http_path}"
+  }
+} elsif $alerting_mode == 'standalone' {
+  $use_nagios = false
+  $subject = "${lma_collector::params::smtp_subject} environment ${deployment_id}"
+  class { 'lma_collector::smtp_alert':
+    send_from => $lma_collector['alerting_send_from'],
+    send_to   => [$lma_collector['alerting_send_to']],
+    subject   => $subject,
+    host      => $lma_collector['alerting_smtp_host'],
+    auth      => $lma_collector['alerting_smtp_auth'],
+    user      => $lma_collector['alerting_smtp_user'],
+    password  => $lma_collector['alerting_smtp_password'],
+  }
+} else {
+  fail("'${alerting_mode}' mode not supported for the infrastructure alerting service")
+}
+
+$elasticsearch_mode = $lma_collector['elasticsearch_mode']
+case $elasticsearch_mode {
+  'remote': {
+    $use_local_elasticsearch = false
+    $use_remote_elasticsearch = true
+    $es_server = $lma_collector['elasticsearch_address']
+  }
+  'local': {
+    $use_local_elasticsearch = true
+    $use_remote_elasticsearch = false
+    $es_vip_name = 'es_vip_mgmt'
+    $es_server = $network_metadata['vips'][$es_vip_name]['ipaddr']
+  }
+  default: {
+    $use_local_elasticsearch = false
+    $use_remote_elasticsearch = false
+  }
+}
+
 # Metrics
-if $lma_collector['influxdb_mode'] != 'disabled' {
+$influxdb_mode = $lma_collector['influxdb_mode']
+if $influxdb_mode != 'disabled' {
 
   $nova           = hiera_hash('nova', {})
   $neutron        = hiera_hash('quantum_settings', {})
@@ -389,45 +448,54 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
   class { 'lma_collector::afd::api': }
   class { 'lma_collector::afd::workers': }
 
-}
-
-$alerting_mode = $lma_collector['alerting_mode']
-$deployment_id = hiera('deployment_id')
-if $alerting_mode == 'remote' {
-  $use_nagios = true
-  $nagios_url = $lma_collector['nagios_url']
-  $nagios_user = $lma_collector['nagios_user']
-  $nagios_password = $lma_collector['nagios_password']
-} elsif $alerting_mode == 'local' {
-  $network_metadata = hiera_hash('network_metadata')
-  $infra_alerting_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting', 'primary-infrastructure_alerting'])
-  if size(keys($infra_alerting_nodes)) > 0 {
-    $use_nagios = true
-    $lma_infra_alerting = hiera_hash('lma_infrastructure_alerting', false)
-    $nagios_server = $network_metadata['vips']['infrastructure_alerting_mgmt_vip']['ipaddr']
-    $nagios_user = $lma_infra_alerting['nagios_user']
-    $nagios_password = $lma_infra_alerting['nagios_password']
-
-    # Important: $http_port and $http_path must match the
-    # lma_infra_monitoring configuration.
-    $http_port = $lma_collector::params::nagios_http_port
-    $http_path = $lma_collector::params::nagios_http_path
-    $nagios_url = "http://${nagios_server}:${http_port}/${http_path}"
+  # VIP checks
+  if $influxdb_mode == 'remote' {
+    $use_local_influxdb = false
+    $use_remote_influxdb = true
+    $influxdb_server = $lma_collector['influxdb_address']
+  } elsif $influxdb_mode == 'local'{
+    $use_local_influxdb = true
+    $use_remote_influxdb = false
+    $influxdb_vip_name = 'influxdb'
+    $influxdb_server = $network_metadata['vips'][$influxdb_vip_name]['ipaddr']
+  } else {
+    $use_local_influxdb = false
+    $use_remote_influxdb = false
   }
-} elsif $alerting_mode == 'standalone' {
-  $use_nagios = false
-  $subject = "${lma_collector::params::smtp_subject} environment ${deployment_id}"
-  class { 'lma_collector::smtp_alert':
-    send_from => $lma_collector['alerting_send_from'],
-    send_to   => [$lma_collector['alerting_send_to']],
-    subject   => $subject,
-    host      => $lma_collector['alerting_smtp_host'],
-    auth      => $lma_collector['alerting_smtp_auth'],
-    user      => $lma_collector['alerting_smtp_user'],
-    password  => $lma_collector['alerting_smtp_password'],
+
+  if $use_local_influxdb or $use_remote_influxdb {
+    $influxdb_url = "http://${influxdb_server}:${lma_collector::params::influxdb_port}/ping"
   }
-} else {
-  fail("'${alerting_mode}' mode not supported for the infrastructure alerting service")
+  if $use_local_influxdb {
+    $grafana_url = "http://${influxdb_server}:${lma_collector::params::grafana_port}/login"
+  }
+
+  if $use_local_elasticsearch or $use_remote_elasticsearch {
+    $elasticsearch_url = "http://${es_server}:${lma_collector::params::elasticsearch_port}"
+  }
+  if $use_local_elasticsearch {
+    $kibana_url = "http://${es_server}:${lma_collector::params::kibana_port}"
+  }
+
+  $vip_urls = {
+    'nagios'        => $nagios_url,
+    'kibana'        => $kibana_url,
+    'elasticsearch' => $elasticsearch_url,
+    'influxdb'      => $influxdb_url,
+    'grafana'       => $grafana_url,
+  }
+  $expected_codes = {
+    'nagios'        => 401,
+    'influxdb'      => 204,
+  }
+
+  class { 'lma_collector::collectd::http_check':
+    urls                      => delete_undef_values($vip_urls),
+    expected_codes            => $expected_codes,
+    timeout                   => 1,
+    max_retries               => 3,
+    pacemaker_master_resource => $pacemaker_master_resource,
+  }
 }
 
 if $use_nagios {
