@@ -374,6 +374,10 @@ function process_message ()
                 end
             elseif metric_source == 'elasticsearch_cluster' or metric_source == 'influxdb' then
                 msg['Fields']['name'] = metric_source .. sep .. sample['type_instance']
+            elseif metric_source == 'http_check' then
+                msg['Fields']['name'] = metric_source
+                msg['Fields']['service'] = sample['type_instance']
+                msg['Fields']['tag_fields'] = { 'service' }
             else
                 msg['Fields']['name'] = replace_dot_by_sep(metric_name)
             end
