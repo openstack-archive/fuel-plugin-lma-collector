@@ -345,6 +345,20 @@ class { 'lma_collector::notifications::input':
 }
 ```
 
+### Store metrics into InfluxDB
+
+To make the collector store the collected metrics into InfluxDB declare the
+`lma_collector::influxdb` class:
+
+```puppet
+class { 'lma_collector::influxdb':
+  database => 'lma',
+  user     => 'lma',
+  password => 'secret',
+  server   => 'example.com',
+}
+```
+
 ## Reference
 
 ### Classes
@@ -373,6 +387,7 @@ Public Classes:
 * [`lma_collector::collectd::hypervisor`](#class-lma_collectorcollectdhypervisor)
 * [`lma_collector::collectd::pacemaker`](#class-lma_collectorcollectdpacemaker)
 * [`lma_collector::collectd::mysql`](#class-lma_collectorcollectdmysql)
+* [`lma_collector::influxdb`](#class-lma_collectorinfluxdb)
 * [`lma_collector::notifications::input`](#class-lma_notificationsinput)
 
 Private Classes:
@@ -689,6 +704,24 @@ performance statistics of all the OSD daemons running on the host.
 
 The collectd plugin used is a Python script. That script uses the `ceph`
 command internally, so that command should be installed.
+
+#### Class: `lma_collector::influxdb`
+
+Declare this class to make Heka serialize the metric messages and send them to
+InfluxDB.
+
+##### Parameters
+
+* `database`: *Required*. InfluxDB database. Valid options: a string.
+* `user`: *Required*. InfluxDB username. Valid options: a string.
+* `password`: *Required*. InfluxDB password. Valid options: a string.
+* `server`: *Required*. InfluxDB server name. Valid options: a string.
+* `port`: *Optional*. InfluxDB service port. Valid options: a string. Default:
+  `8086`.
+* `tag_fields`: *Optional*. List of message fields to be stored as tags. Valid
+  options: an array. Default: `[]`.
+* `time_precision`: *Optional*. Time precision. Valid options: a string.
+  Default: `ms`.
 
 #### Class: `lma_collector::notifications::input`
 
