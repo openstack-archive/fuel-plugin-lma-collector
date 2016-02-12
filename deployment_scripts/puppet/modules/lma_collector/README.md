@@ -358,6 +358,19 @@ class { 'lma_collector::influxdb':
 }
 ```
 
+### Send AFD messages to Nagios
+
+To make the collector send AFD messages to Nagios declare the
+`lma_collector::afd_nagios` define:
+
+```puppet
+lma_collector::afd_nagios { 'node_afds':
+  url      => 'http://nagios.example.com/cgi-bin/',
+  user     => 'nagiosadmin'
+  password => 'secret',
+}
+```
+
 ## Reference
 
 ### Classes
@@ -399,6 +412,7 @@ Private Classes:
 * [`lma_collector::logs::openstack`](#define-lma_collectorlogsopenstack)
 * [`lma_collector::collectd::openstack`](#define-lma_collectorcollectdopenstack)
 * [`lma_collector::afd_filter`](#define-lma_collectorafd_filter)
+* [`lma_collector::afd_nagios`](#define-lma_collectorafd_nagios)
 
 #### Class: `lma_collector`
 
@@ -835,6 +849,28 @@ in Heka.
   options: an array.
 * `message_matcher`: *Required*. Message matcher for the Heka filter. Valid
   options: a string.
+
+#### Define `lma_collector::afd_nagios`
+
+Declare this define to send [Anomaly and Fault Detection messages](
+http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/alarms.html)
+to Nagios as passive check results.
+
+##### Parameters
+
+* `url`: *Required*. URL to the Nagios cgi.bin script. Valid options: a
+  string.
+* `user`: *Optional*. Username used to authenticate to the Nagios web
+  interface. Valid options: a string. Default: `nagiosadmin`.
+* `password`: *Optional*. Password used to authenticate to the Nagios web
+  interface. Valid options: a string. Default: empty string.
+* `hostname`: *Optional*. It must match the hostname configured in Nagios.
+  Valid options: a string. Default: `$::hostname`.
+* `service_template`: *Optional*. It must match the service description
+  configured in Nagios. Supports interpolation of message field values. Valid
+  options: a string. Default: `%{node_role}.%{source}`.
+* `message_type`: *Optional*. Type of AFD messages to send to Nagios. Valid
+  options: a string. Default: `afd_node_metric`.
 
 Limitations
 -----------
