@@ -92,7 +92,7 @@ class RabbitMqPlugin(base.Base):
 
         mem_str = re.findall('{memory,\s+\[([^\]]+)\]\}', out)
         # We are only interested by the total of memory used
-        # TODO: Get all informations about memory usage from mem_str
+        # TODO(all): Get all informations about memory usage from mem_str
         try:
             stats['used_memory'] = int(re.findall('total,([0-9]+)',
                                                   mem_str[0])[0])
@@ -101,9 +101,11 @@ class RabbitMqPlugin(base.Base):
                               self.rabbitmqctl_bin)
 
         if 'vm_memory_limit' in stats and 'used_memory' in stats:
-            stats['remaining_memory'] = stats['vm_memory_limit'] - stats['used_memory']
+            stats['remaining_memory'] = \
+                stats['vm_memory_limit'] - stats['used_memory']
         if 'disk_free' in stats and 'disk_free_limit' in stats:
-            stats['remaining_disk'] = stats['disk_free'] - stats['disk_free_limit']
+            stats['remaining_disk'] = \
+                stats['disk_free'] - stats['disk_free_limit']
 
         out, err = self.execute([self.rabbitmqctl_bin, '-q', 'cluster_status'],
                                 shell=False)
@@ -112,7 +114,7 @@ class RabbitMqPlugin(base.Base):
                               self.rabbitmqctl_bin)
             return
 
-        # TODO: Need to be modified in case we are using RAM nodes.
+        # TODO(all): Need to be modified in case we are using RAM nodes.
         status = CLUSTER_STATUS.findall(out)
         if len(status) == 0:
             self.logger.error('%s: Failed to parse (%s)' %

@@ -26,8 +26,7 @@ HEALTH_MAP = {
 
 
 class CephMonPlugin(base.CephBase):
-    """ Collect states and information about ceph cluster and placement groups.
-    """
+    """ Collect states and metrics about ceph cluster and placement groups."""
 
     def __init__(self, *args, **kwargs):
         super(CephMonPlugin, self).__init__(*args, **kwargs)

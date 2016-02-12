@@ -39,7 +39,7 @@ class CinderStatsPlugin(openstack.CollectdPlugin):
             return d.get('status', 'unknown').lower()
 
         def count_size_bytes(d):
-            return d.get('size', 0) * 10**9
+            return d.get('size', 0) * 10 ** 9
 
         status = self.count_objects_group_by(volumes_details,
                                              group_by_func=groupby)

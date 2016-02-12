@@ -24,8 +24,7 @@ RE_OSD_ID = re.compile(".*?osd\.(\d+)\.asok$")
 
 
 class CephOSDPerfPlugin(base.CephBase):
-    """ Collect OSD performance counters of all OSD daemons running on the host.
-    """
+    """Collect OSD performance counters of OSD daemons running on the host."""
 
     # Collect only metrics from the 'osd' namespace
     PREFIXES = ('osd')
@@ -46,9 +45,10 @@ class CephOSDPerfPlugin(base.CephBase):
 
     @staticmethod
     def convert_to_collectd_value(value):
+        # See for details
+        # https://www.mail-archive.com/ceph-users@lists.ceph.com/msg18705.html
         if isinstance(value, dict):
             if value['avgcount'] > 0:
-                # See https://www.mail-archive.com/ceph-users@lists.ceph.com/msg18705.html
                 return value['sum'] / value['avgcount']
             else:
                 return 0.0

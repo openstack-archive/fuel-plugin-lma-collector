@@ -24,8 +24,7 @@ import collectd
 
 
 class Base(object):
-    """ Base class for writing Python plugins.
-    """
+    """Base class for writing Python plugins."""
 
     MAX_IDENTIFIER_LENGTH = 63
 
@@ -54,8 +53,7 @@ class Base(object):
             return
 
     def itermetrics(self):
-        """
-        Iterate over the collected metrics
+        """Iterate over the collected metrics
 
         This class must be implemented by the subclass and should yield dict
         objects that represent the collected values. Each dict has 3 keys:
@@ -96,8 +94,7 @@ class Base(object):
         v.dispatch()
 
     def execute(self, cmd, shell=True, cwd=None):
-        """
-        Executes a program with arguments.
+        """Executes a program with arguments.
 
         Args:
             cmd: a list of program arguments where the first item is the
@@ -150,8 +147,7 @@ class Base(object):
         return (stdout, stderr)
 
     def execute_to_json(self, *args, **kwargs):
-        """
-        Executes a program and decodes the output as a JSON string.
+        """Executes a program and decodes the output as a JSON string.
 
         See execute().
 
@@ -165,8 +161,7 @@ class Base(object):
 
     @staticmethod
     def restore_sigchld():
-        """
-        Restores the SIGCHLD handler for Python <= v2.6.
+        """Restores the SIGCHLD handler for Python <= v2.6.
 
         This should be provided to collectd as the init callback by plugins
         that execute external programs.

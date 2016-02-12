@@ -22,8 +22,7 @@ INTERVAL = openstack.INTERVAL
 
 
 class HypervisorStatsPlugin(openstack.CollectdPlugin):
-    """ Class to report the statistics on Nova hypervisors.
-    """
+    """ Class to report the statistics on Nova hypervisors."""
     VALUE_MAP = {
         'current_workload': 'running_tasks',
         'running_vms': 'running_instances',
