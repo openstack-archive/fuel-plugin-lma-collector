@@ -36,3 +36,18 @@ Additional metrics for *filter* type:
 
 * ``heakd_timer_event_avg_duration``, the average time for executing the *timer_event* function (in nanoseconds).
 * ``hekad_timer_event_count``, the total number of executions of the *timer_event* function. This will reset to 0 when the process is restarted.
+
+Backend checks
+^^^^^^^^^^^^^^
+
+* ``http_check``, the backend's API status, 1 if it is responsive, 0 otherwise.
+  The metric contains a ``service`` field that identifies the LMA backend service being checked.
+
+``<service>`` is one of the following values (depending of which Fuel plugins are deployed in the environment) with their respective resource checks:
+
+* 'influxdb'
+* 'grafana'
+* 'elasticsearch'
+* 'kibana'
+* 'nagios'
+
