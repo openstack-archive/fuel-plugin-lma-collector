@@ -1,6 +1,6 @@
 <Plugin dbi>
 <% if @type == 'services' %>
-  <Query "services">
+  <Query "<%= @dbname %>_<%= @type %>">
   Statement "select concat_ws('.', 'services', replace(replace(s.binary, 'nova-', ''), 'cinder-', ''), 'down', s.host) as metric, 1 as value from (select * from services where deleted=0) s where s.disabled=0 and timestampdiff(SECOND,s.updated_at,utc_timestamp())><%= @downtime %> group by s.binary, s.host UNION select concat_ws('.', 'services', replace(replace(s.binary, 'nova-', ''), 'cinder-', ''), 'up', s.host) as metric, 0 as value from (select * from services where deleted=0) s where s.disabled=0 and timestampdiff(SECOND,s.updated_at,utc_timestamp())<=<%= @downtime %> group by s.binary, s.host UNION select concat_ws('.', 'services', replace(replace(s.binary, 'nova-', ''), 'cinder-', ''), 'disabled', s.host) as metric, 2 as value from (select * from services where deleted=0) s where s.disabled=1 group by s.binary, s.host;"
     MinVersion 50000
     <Result>
@@ -9,7 +9,7 @@
       ValuesFrom "value"
     </Result>
   </Query>
-  <Query "services_down">
+  <Query "<%= @dbname %>_<%= @type %>_down">
     Statement "select concat_ws('.', 'services', replace(replace(s1.binary, 'nova-', ''), 'cinder-', ''), 'down') as metric, count(s2.id) as value from (select * from services where deleted=0) s1 left outer join services s2 on s1.id = s2.id and s1.disabled=0 and timestampdiff(SECOND,s1.updated_at,utc_timestamp())><%= @downtime %> group by s1.binary;"
     MinVersion 50000
     <Result>
@@ -18,7 +18,7 @@
       ValuesFrom "value"
     </Result>
   </Query>
-  <Query "services_up">
+  <Query "<%= @dbname %>_<%= @type %>_up">
     Statement "select concat_ws('.', 'services', replace(replace(s1.binary, 'nova-', ''), 'cinder-', ''), 'up') as metric, count(s2.id) as value from (select * from services where deleted=0) s1 left outer join services s2 on s1.id = s2.id and s1.disabled=0 and timestampdiff(SECOND,s1.updated_at,utc_timestamp())<=<%= @downtime %> group by s1.binary;"
     MinVersion 50000
     <Result>
@@ -27,7 +27,7 @@
       ValuesFrom "value"
     </Result>
   </Query>
-  <Query "services_disabled">
+  <Query "<%= @dbname %>_<%= @type %>_disabled">
     Statement "select concat_ws('.', 'services', replace(replace(s1.binary, 'nova-', ''), 'cinder-', ''), 'disabled') as metric, count(s2.id) as value from (select * from services where deleted=0) s1 left outer join services s2 on s1.id = s2.id and s2.disabled = 1 group by s1.binary;"
     MinVersion 50000
     <Result>
@@ -82,9 +82,9 @@
     DriverOption "password" "<%= @password %>"
     DriverOption "dbname" "<%= @dbname %>"
     SelectDB "<%= @dbname %>"
-    Query "<%= @type %>_disabled"
-    Query "<%= @type %>_up"
-    Query "<%= @type %>_down"
-    Query "<%= @type %>"
+    Query "<%= @dbname %>_<%= @type %>_disabled"
+    Query "<%= @dbname %>_<%= @type %>_up"
+    Query "<%= @dbname %>_<%= @type %>_down"
+    Query "<%= @dbname %>_<%= @type %>"
   </Database>
 </Plugin>
