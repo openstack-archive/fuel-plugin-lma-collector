@@ -21,15 +21,33 @@ if ($plugin_data) {
   $ceilometer_enabled = pick($ceilometer['enabled'], false)
 
   $elasticsearch_mode = $plugin_data['elasticsearch_mode']
-  $monitor_elasticsearch = $elasticsearch_mode ? {
+  $monitor_local_elasticsearch = $elasticsearch_mode ? {
     'local' => true,
+    default => false,
+  }
+  $monitor_remote_elasticsearch = $elasticsearch_mode ? {
+    'remote' => true,
     default => false,
   }
 
   $influxdb_mode = $plugin_data['influxdb_mode']
-  $monitor_influxdb = $influxdb_mode ? {
+  $monitor_local_influxdb = $influxdb_mode ? {
     'local' => true,
     default => false,
+  }
+  $monitor_remote_influxdb = $influxdb_mode ? {
+    'remote' => true,
+    default => false,
+  }
+
+  $plugin_influxdb_grafana = hiera('influxdb_grafana')
+  if $plugin_influxdb_grafana {
+    $grafana_local_mysql = $plugin_influxdb_grafana['mysql_mode'] ? {
+      'local' => true,
+      default => false,
+    }
+  } else {
+    $grafana_local_mysql = false
   }
 
   lma_collector::hiera_data { 'gse_filters':

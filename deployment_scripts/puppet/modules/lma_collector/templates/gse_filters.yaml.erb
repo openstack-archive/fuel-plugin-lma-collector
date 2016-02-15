@@ -363,14 +363,43 @@ lma_collector:
           - health
           - capacity
 <% end -%>
-<% if @monitor_elasticsearch -%>
+<% if @monitor_local_elasticsearch -%>
       elasticsearch:
         policy: highest_severity
         group_by: member
         members:
           - health
+          - endpoint
+      kibana:
+        policy: highest_severity
+        group_by: member
+        members:
+          - endpoint
+<% elsif @monitor_remote_elasticsearch -%>
+      elasticsearch:
+        policy: highest_severity
+        group_by: member
+        members:
+          - endpoint
 <% end -%>
-
+<% if @monitor_local_influxdb -%>
+      influxdb:
+        policy: highest_severity
+        group_by: member
+        members:
+          - endpoint
+      grafana:
+        policy: highest_severity
+        group_by: member
+        members:
+          - endpoint
+<% elsif @monitor_remote_influxdb -%>
+      influxdb:
+        policy: highest_severity
+        group_by: member
+        members:
+          - endpoint
+<% end -%>
   gse_cluster_node:
     input_message_types:
       - afd_node_metric
@@ -409,7 +438,7 @@ lma_collector:
         members:
           - cpu
           - root-fs
-<% if @monitor_elasticsearch -%>
+<% if @monitor_local_elasticsearch -%>
       elasticsearch-nodes:
         policy: majority_of_members
         group_by: hostname
@@ -418,7 +447,7 @@ lma_collector:
           - root-fs
           - cpu
 <% end -%>
-<% if @monitor_influxdb -%>
+<% if @monitor_local_influxdb -%>
       influxdb-nodes:
         policy: majority_of_members
         group_by: hostname
@@ -608,11 +637,48 @@ lma_collector:
           - controller
           - storage
 <% end -%>
-<% if @monitor_elasticsearch -%>
+<% if @monitor_local_elasticsearch -%>
       elasticsearch:
         policy: highest_severity
         group_by: member
         members:
           - elasticsearch
           - elasticsearch-nodes
+      kibana:
+        policy: highest_severity
+        group_by: member
+        members:
+          - kibana
+        hints:
+          - elasticsearch
+<% elsif @monitor_remote_elasticsearch -%>
+      elasticsearch:
+        policy: highest_severity
+        group_by: member
+        members:
+          - elasticsearch
+<% end -%>
+<% if @monitor_local_influxdb -%>
+      influxdb:
+        policy: highest_severity
+        group_by: member
+        members:
+          - influxdb
+          - influxdb-nodes
+      grafana:
+        policy: highest_severity
+        group_by: member
+        members:
+          - grafana
+        hints:
+          - influxdb
+<% if @grafana_local_mysql -%>
+          - mysql
+<% end -%>
+<% elsif @monitor_remote_influxdb -%>
+      influxdb:
+        policy: highest_severity
+        group_by: member
+        members:
+          - influxdb
 <% end -%>
