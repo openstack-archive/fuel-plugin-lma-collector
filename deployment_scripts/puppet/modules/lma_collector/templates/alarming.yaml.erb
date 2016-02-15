@@ -602,7 +602,7 @@ lma_collector:
             window: 60
             function: max
 <% end -%>
-<% if @monitor_elasticsearch -%>
+<% if @monitor_local_elasticsearch -%>
     - name: 'elasticsearch-health-critical'
       description: 'Elasticsearch cluster health is critical'
       severity: 'critical'
@@ -655,7 +655,7 @@ lma_collector:
             function: min
 <% end -%>
 
-<% if @monitor_influxdb-%>
+<% if @monitor_local_influxdb-%>
     - name: 'influxdb-fs-warning'
       description: "The filesystem's free space is low (influxdb node)."
       severity: 'warning'
@@ -691,10 +691,10 @@ lma_collector:
     mysql-nodes: ['primary-controller', 'controller']
     compute: ['compute']
     storage: ['cinder', 'ceph-osd']
-<% if @monitor_elasticsearch -%>
+<% if @monitor_local_elasticsearch -%>
     elasticsearch-nodes: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
 <% end -%>
-<% if @monitor_influxdb -%>
+<% if @monitor_local_influxdb -%>
     influxdb-nodes: ['primary-influxdb_grafana', 'influxdb_grafana']
 <% end -%>
 
@@ -721,7 +721,7 @@ lma_collector:
 <% if @storage_options["volumes_ceph"] then -%>
     ceph-mon: ['primary-controller', 'controller']
 <% end -%>
-<% if @monitor_elasticsearch -%>
+<% if @monitor_local_elasticsearch -%>
     elasticsearch: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
 <% end -%>
 
@@ -742,13 +742,13 @@ lma_collector:
     default:
       cpu: ['cpu-critical-default']
       root-fs: ['root-fs-critical', 'root-fs-warning']
-<% if @monitor_elasticsearch -%>
+<% if @monitor_local_elasticsearch -%>
     elasticsearch-nodes:
       cpu: ['cpu-critical-default']
       root-fs: ['root-fs-critical', 'root-fs-warning']
       data-fs: ['elasticsearch-fs-critical', 'elasticsearch-fs-warning']
 <% end -%>
-<% if @monitor_influxdb -%>
+<% if @monitor_local_influxdb -%>
     influxdb-nodes:
       cpu: ['cpu-critical-default']
       root-fs: ['root-fs-critical', 'root-fs-warning']
@@ -801,7 +801,7 @@ lma_collector:
       health: ['ceph-health-critical', 'ceph-health-warning']
       capacity: ['ceph-capacity-critical', 'ceph-capacity-warning']
 <% end -%>
-<% if @monitor_elasticsearch -%>
+<% if @monitor_local_elasticsearch -%>
     elasticsearch:
       health: ['elasticsearch-health-critical', 'elasticsearch-health-warning']
 <% end -%>
