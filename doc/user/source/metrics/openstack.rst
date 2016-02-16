@@ -149,6 +149,8 @@ These metrics are retrieved from the Neutron database.
 
 .. _network-agent-state-metrics:
 
+.. note:: These metrics are not collected when the Contrail plugin is deployed.
+
 * ``openstack_neutron_agents``, the total number of Neutron agents by service
   and state. The metric contains ``service`` (one of 'dhcp', 'l3', 'metadata'
   or 'openvswitch') and ``state`` (one of 'up', 'down' or 'disabled') fields.
