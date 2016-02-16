@@ -370,7 +370,13 @@ lma_collector:
         members:
           - health
 <% end -%>
-
+<% if @monitor_influxdb -%>
+      influxdb:
+        policy: highest_severity
+        group_by: member
+        members:
+          - endpoint
+<% end -%>
   gse_cluster_node:
     input_message_types:
       - afd_node_metric
@@ -615,4 +621,12 @@ lma_collector:
         members:
           - elasticsearch
           - elasticsearch-nodes
+<% end -%>
+<% if @monitor_influxdb -%>
+      influxdb:
+        policy: highest_severity
+        group_by: member
+        members:
+          - influxdb
+          - influxdb-nodes
 <% end -%>
