@@ -458,10 +458,12 @@ lma_collector:
         group_by: member
         members:
           - neutron-api
+<% if not @contrail_plugin then -%>
           - neutron-l3
           - neutron-dhcp
           - neutron-metadata
           - neutron-openvswitch
+<% end -%>
           - controller
         hints:
           - keystone

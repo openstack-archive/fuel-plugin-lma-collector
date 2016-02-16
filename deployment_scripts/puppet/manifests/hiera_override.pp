@@ -19,6 +19,7 @@ if ($plugin_data) {
   $tls_enabled = hiera('public_ssl', false)
   $ceilometer = hiera_hash('ceilometer', {})
   $ceilometer_enabled = pick($ceilometer['enabled'], false)
+  $contrail_plugin = hiera('contrail', false)
 
   lma_collector::hiera_data { 'gse_filters':
     content => template('lma_collector/gse_filters.yaml.erb')

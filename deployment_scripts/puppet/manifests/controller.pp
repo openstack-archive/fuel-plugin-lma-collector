@@ -23,6 +23,7 @@ $lma_collector   = hiera_hash('lma_collector')
 $rabbit          = hiera_hash('rabbit')
 $management_vip  = hiera('management_vip')
 $storage_options = hiera_hash('storage', {})
+$contrail        = hiera('contrail', false)
 
 if $ceilometer['enabled'] {
   $notification_topics = [$lma_collector::params::openstack_topic, $lma_collector::params::lma_topic]
@@ -144,13 +145,15 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     require         => Class['lma_collector::collectd::dbi'],
   }
 
-  lma_collector::collectd::dbi_services { 'neutron':
-    username        => 'neutron',
-    dbname          => 'neutron',
-    password        => $neutron['database']['passwd'],
-    report_interval => 15,
-    downtime_factor => 4,
-    require         => Class['lma_collector::collectd::dbi'],
+  unless $contrail {
+    lma_collector::collectd::dbi_services { 'neutron':
+      username        => 'neutron',
+      dbname          => 'neutron',
+      password        => $neutron['database']['passwd'],
+      report_interval => 15,
+      downtime_factor => 4,
+      require         => Class['lma_collector::collectd::dbi'],
+    }
   }
 
   class { 'lma_collector::logs::metrics': }
