@@ -15,6 +15,7 @@
 prepare_network_config(hiera('network_scheme', {}))
 $messaging_address = get_network_role_property('mgmt/messaging', 'ipaddr')
 $memcache_address  = get_network_role_property('mgmt/memcache', 'ipaddr')
+$network_metadata = hiera_hash('network_metadata')
 
 include lma_collector::params
 
@@ -239,7 +240,8 @@ if $lma_collector['elasticsearch_mode'] != 'disabled' {
 }
 
 # Metrics
-if $lma_collector['influxdb_mode'] != 'disabled' {
+$influxdb_mode = $lma_collector['influxdb_mode']
+if $influxdb_mode != 'disabled' {
 
   $nova           = hiera_hash('nova', {})
   $neutron        = hiera_hash('quantum_settings', {})
@@ -407,6 +409,39 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
   class { 'lma_collector::afd::api': }
   class { 'lma_collector::afd::workers': }
 
+  # VIP checks
+  if $influxdb_mode == 'remote' {
+    $use_local_influxdb = false
+    $use_remote_influxdb = true
+    $influxdb_server = $lma_collector['influxdb_address']
+  } elsif $influxdb_mode == 'local'{
+    $use_local_influxdb = true
+    $use_remote_influxdb = false
+    $influxdb_vip_name = 'influxdb'
+    $influxdb_server = $network_metadata['vips'][$influxdb_vip_name]['ipaddr']
+  } else {
+    $use_local_influxdb = false
+    $use_remote_influxdb = false
+  }
+
+  if $use_local_influxdb or $use_remote_influxdb {
+    $influxdb_url = "http://${influxdb_server}:${lma_collector::params::influxdb_port}/ping"
+  }
+
+  $vip_urls = {
+    'influxdb' => $influxdb_url,
+  }
+  $expected_codes = {
+    'influxdb' => 204,
+  }
+
+  class { 'lma_collector::collectd::http_check':
+    urls                      => delete_undef_values($vip_urls),
+    expected_codes            => $expected_codes,
+    timeout                   => 1,
+    max_retries               => 3,
+    pacemaker_master_resource => $pacemaker_master_resource,
+  }
 }
 
 $alerting_mode = $lma_collector['alerting_mode']
@@ -417,7 +452,6 @@ if $alerting_mode == 'remote' {
   $nagios_user = $lma_collector['nagios_user']
   $nagios_password = $lma_collector['nagios_password']
 } elsif $alerting_mode == 'local' {
-  $network_metadata = hiera_hash('network_metadata')
   $infra_alerting_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting', 'primary-infrastructure_alerting'])
   if size(keys($infra_alerting_nodes)) > 0 {
     $use_nagios = true
