@@ -30,7 +30,7 @@ describe 'lma_collector::collectd::base' do
              :interfaces => 'br-mgmt,en0,bond0,lo'}
         end
 
-        it { is_expected.to contain_class('collectd') }
+        it { is_expected.to contain_class('collectd').with_purge(false) }
         it { is_expected.to contain_class('collectd::plugin::interface').with_interfaces(['en0', 'bond0']) }
     end
 end
