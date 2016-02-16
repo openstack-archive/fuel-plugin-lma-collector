@@ -25,6 +25,7 @@ $rabbit          = hiera_hash('rabbit')
 $management_vip  = hiera('management_vip')
 $storage_options = hiera_hash('storage', {})
 $murano          = hiera_hash('murano')
+$contrail        = hiera('contrail', false)
 
 if $ceilometer['enabled'] {
   $notification_topics = ['notifications', 'lma_notifications']
@@ -344,12 +345,14 @@ if $influxdb_mode != 'disabled' {
     downtime_factor => 2,
   }
 
-  lma_collector::collectd::dbi_services { 'neutron':
-    username        => 'neutron',
-    dbname          => 'neutron',
-    password        => $neutron['database']['passwd'],
-    report_interval => 15,
-    downtime_factor => 4,
+  unless $contrail {
+    lma_collector::collectd::dbi_services { 'neutron':
+      username        => 'neutron',
+      dbname          => 'neutron',
+      password        => $neutron['database']['passwd'],
+      report_interval => 15,
+      downtime_factor => 4,
+    }
   }
 
   class { 'lma_collector::collectd::haproxy':

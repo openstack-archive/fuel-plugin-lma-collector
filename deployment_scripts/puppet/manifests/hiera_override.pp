@@ -19,6 +19,7 @@ if ($plugin_data) {
   $tls_enabled = hiera('public_ssl', false)
   $ceilometer = hiera_hash('ceilometer', {})
   $ceilometer_enabled = pick($ceilometer['enabled'], false)
+  $contrail_plugin = hiera('contrail', false)
 
   $elasticsearch_mode = $plugin_data['elasticsearch_mode']
   $monitor_elasticsearch = $elasticsearch_mode ? {
