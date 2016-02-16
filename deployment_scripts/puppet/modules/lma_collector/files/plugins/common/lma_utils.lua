@@ -74,6 +74,12 @@ function inject_bulk_metric(ts, hostname, source)
 
     local payload = safe_json_encode(bulk_datapoints)
     if not payload then
+        -- If the size of the bulk exceeds the output_limit of the buffer then
+        -- the JSON encoding will fail. If we don't reset the table we will
+        -- continue to add points and we will reach the memory limit. Beyond
+        -- this limit the sandbox will be destroyed.
+        -- It fixes bug https://bugs.launchpad.net/lma-toolchain/+bug/1545743
+        bulk_datapoints = {}
         return
     end
 
