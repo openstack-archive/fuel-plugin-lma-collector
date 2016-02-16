@@ -208,6 +208,8 @@ case $influxdb_mode {
       class { 'lma_collector::collectd::base':
         processes    => ['hekad', 'collectd'],
         read_threads => 5,
+        # Purge once the default configuration brought by package
+        purge        => true,
         require      => Class['lma_collector'],
       }
     }
