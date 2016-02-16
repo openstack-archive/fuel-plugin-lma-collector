@@ -74,6 +74,10 @@ function inject_bulk_metric(ts, hostname, source)
 
     local payload = safe_json_encode(bulk_datapoints)
     if not payload then
+        -- Reset the table otherwise it may grow infinitely and the sandbox
+        -- will eventually be killed by Heka.
+        -- See https://bugs.launchpad.net/lma-toolchain/+bug/1545743
+        bulk_datapoints = {}
         return
     end
 
