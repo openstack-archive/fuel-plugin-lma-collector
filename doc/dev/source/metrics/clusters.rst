@@ -1,6 +1,6 @@
 .. _cluster_metrics:
 
-The cluster metrics are emitted by the GSE plugins (See the :ref:`alarm_guide` for details).
+The cluster metrics are emitted by the GSE plugins (See the `alarm_guide` for details).
 
 * ``cluster_service_status``, the status of the service cluster.
   The metric contains a ``cluster_name`` field that identifies the service cluster.
@@ -23,3 +23,5 @@ The supported values for these metrics are:
 * `3` for the *Critical* status.
 
 * `4` for the *Down* status.
+
+.. _alarm_guide: http://fuel-plugin-lma-collector.readthedocs.org/en/latest/alarms.html
