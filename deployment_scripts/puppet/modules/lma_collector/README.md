@@ -528,6 +528,8 @@ standard collectd plugins, namely `logfile`, `cpu`, `disk`, `interface`,
   for more information.
 * `read_threads`: *Optional*. The number of threads used by collectd. Valid
   options: an integer. Default: 5.
+* `purge`: *Optional*. Purge the collectd configuration files. Default:
+  `false`.
 
 #### Class: `lma_collector::collectd::haproxy`
 

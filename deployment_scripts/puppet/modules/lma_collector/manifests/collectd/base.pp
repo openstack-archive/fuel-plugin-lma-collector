@@ -18,6 +18,7 @@ class lma_collector::collectd::base (
   $queue_limit = $lma_collector::params::collectd_queue_limit,
   $read_threads = $lma_collector::params::collectd_read_threads,
   $hostname = undef,
+  $purge = false,
 ) inherits lma_collector::params {
   include lma_collector::service
 
@@ -33,7 +34,7 @@ class lma_collector::collectd::base (
 
   $port = $lma_collector::params::collectd_port
   class { '::collectd':
-    purge                  => true,
+    purge                  => $purge,
     recurse                => true,
     purge_config           => true,
     fqdnlookup             => false,
