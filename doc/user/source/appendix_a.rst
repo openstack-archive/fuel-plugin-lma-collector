@@ -1,7 +1,7 @@
-.. _user_appendix:
+.. _references:
 
-Appendix
-========
+Appendix A: References
+======================
 
 * The `LMA Collector plugin <https://github.com/openstack/fuel-plugin-lma-collector>`_ project at GitHub.
 * The `Elasticsearch-Kibana plugin <https://github.com/openstack/fuel-plugin-elasticsearch-kibana>`_ project at GitHub.
