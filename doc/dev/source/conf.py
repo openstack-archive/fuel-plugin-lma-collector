@@ -10,7 +10,6 @@ copyright = u'2015, Mirantis Inc.'
 version = '0.9'
 release = '0.9.0'
 exclude_patterns = [
-    'metrics/*.rst',
 ]
 pygments_style = 'sphinx'
 html_theme = 'classic'

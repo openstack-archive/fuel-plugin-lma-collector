@@ -11,7 +11,8 @@ Welcome to the Mirantis OpenStack LMA Collector Documentation!
    configuration
    alarms
    licenses
-   appendix
+   appendix_a
+   appendix_b
 
 Indices and Tables
 ==================

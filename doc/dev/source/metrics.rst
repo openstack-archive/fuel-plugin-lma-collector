@@ -46,7 +46,7 @@ Attributes in **bold** are always present in the messages while attributes in
 
 * **Fields**
 
- * **name** (string), the name of the metric. See :ref:`metric_list` for the
+ * **name** (string), the name of the metric. See the `User Documentation`_ for the
    current metric names that are emitted.
 
  * **value** (number), the value associated to the metric.
@@ -74,87 +74,6 @@ Attributes in **bold** are always present in the messages while attributes in
    applies.
 
 Metric messages may include additional fields to specify the scope of the
-measurement. When this is the case, these fields are detailed in the list of
-metrics presented hereafter.
+measurement. Refer to the `User Documentation`_ for more details.
 
-.. _metric_list:
-
-List of metrics
-===============
-
-This is the list of metrics that are emitted by the LMA collector service. They
-are listed by category then by metric name.
-
-System
-------
-
-.. include:: metrics/system.rst
-
-Apache
-------
-
-.. include:: metrics/apache.rst
-
-MySQL
------
-
-.. include:: metrics/mysql.rst
-
-RabbitMQ
---------
-
-.. include:: metrics/rabbitmq.rst
-
-HAProxy
--------
-
-.. include:: metrics/haproxy.rst
-
-Memcached
----------
-
-.. include:: metrics/memcached.rst
-
-Libvirt
--------
-
-.. include:: metrics/libvirt.rst
-
-
-OpenStack
----------
-
-.. include:: metrics/openstack.rst
-
-
-Ceph
-----
-
-.. include:: metrics/ceph.rst
-
-Pacemaker
----------
-
-.. include:: metrics/pacemaker.rst
-
-Clusters
---------
-
-.. include:: metrics/clusters.rst
-
-LMA self-monitoring
--------------------
-
-.. include:: metrics/lma.rst
-
-
-Elasticsearch
--------------
-
-.. include:: metrics/elasticsearch.rst
-
-
-InfluxDB
---------
-
-.. include:: metrics/influxdb.rst
+.. _User Documentation: http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/appendix_b.html
