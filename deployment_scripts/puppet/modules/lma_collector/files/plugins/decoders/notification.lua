@@ -106,6 +106,10 @@ local include_full_notification = read_config("include_full_notification") or fa
 
 function process_message ()
     local data = read_message("Payload")
+    if string.len(data) > 63000 then
+        -- See bug #1504141
+        return -1
+    end
     local ok, notif = pcall(cjson.decode, data)
     if not ok then
         return -1
@@ -114,7 +118,10 @@ function process_message ()
     if include_full_notification then
         msg.Payload = data
     else
-        msg.Payload = cjson.encode(notif.payload)
+        ok, msg.Payload = pcall(cjson.encode, notif.payload)
+        if not ok then
+            msg.Payload = nil
+        end
     end
 
     msg.Fields = {}
@@ -144,6 +151,6 @@ function process_message ()
     end
     utils.inject_tags(msg)
 
-    inject_message(msg)
+    pcall(inject_message, msg)
     return 0
 end
