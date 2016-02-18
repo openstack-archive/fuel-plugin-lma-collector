@@ -440,6 +440,7 @@ Public Classes:
 * [`lma_collector::notifications::input`](#class-lma_collectornotificationsinput)
 * [`lma_collector::aggregator::client`](#class-lma_collectoraggregatorclient)
 * [`lma_collector::aggregator::server`](#class-lma_collectoraggregatorserver)
+* [`lma_collector::gse_policies`](#class-lma_collectorgse_policies)
 
 Private Classes:
 
@@ -824,6 +825,16 @@ Declare this class to make Heka run the aggregator service.
 * `http_check_port`: *Optional*. The HTTP port that an external service can use
   to check the health of the aggregator service. Valid options: an integer.
   Default: `undef`.
+
+#### Class: `lma_collector::gse_policies`
+
+Declare this class to configure the GSE cluster policies on the aggregator node.
+
+##### Parameters
+
+* `policies`: *Required*. Definition of the GSE cluster policies as described
+  in the [Cluster Policies](http://fuel-plugin-lma-collector.readthedocs.org/en/latest/alarms.html#cluster-policies)
+  documentation. Valid options: a hash.
 
 #### Define: `lma_collector::logs::openstack`
 
