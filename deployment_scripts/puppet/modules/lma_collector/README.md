@@ -372,6 +372,23 @@ lma_collector::afd_nagios { 'node_afds':
 }
 ```
 
+### Send GSE messages to Nagios
+
+To make the collector send GSE messages to Nagios declare the
+`lma_collector::gse_nagios` define:
+
+```puppet
+lma_collector::gse_nagios { 'global_clusters':
+  url                       => 'http://nagios.example.com/cgi-bin/',
+  user                      => 'nagiosadmin'
+  password                  => 'secret',
+  message_type              => 'gse_cluster_metric',
+  virtual_hostname          => '00-global_clusters'
+  openstack_deployment_name => 'production',
+}
+
+```
+
 ### Configure the aggregator mode
 
 To make the collector send AFD messages to the aggregator node declare the
@@ -435,6 +452,7 @@ Private Classes:
 * [`lma_collector::collectd::openstack`](#define-lma_collectorcollectdopenstack)
 * [`lma_collector::afd_filter`](#define-lma_collectorafd_filter)
 * [`lma_collector::afd_nagios`](#define-lma_collectorafd_nagios)
+* [`lma_collector::gse_nagios`](#define-lma_collectorgse_nagios)
 
 #### Class: `lma_collector`
 
@@ -921,6 +939,31 @@ to Nagios as passive check results.
   options: a string. Default: `%{node_role}.%{source}`.
 * `message_type`: *Optional*. Type of AFD messages to send to Nagios. Valid
   options: a string. Default: `afd_node_metric`.
+
+#### Define `lma_collector::gse_nagios`
+
+Declare this define to send [Global Status Evaluation messages](
+http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/alarms.html)
+to Nagios as passive check results.
+
+##### Parameters
+
+* `url`: *Required*. URL to the Nagios cgi.bin script. Valid options: a
+  string.
+* `user`: *Optional*. Username used to authenticate to the Nagios web
+  interface. Valid options: a string. Default: `nagiosadmin`.
+* `password`: *Optional*. Password used to authenticate to the Nagios web
+  interface. Valid options: a string. Default: empty string.
+* `service_template`: *Optional*. It must match the service description
+  configured in Nagios. Supports interpolation of message field values. Valid
+  options: a string. Default: `%{cluster_name}`.
+* `message_type`: *Required*. Type of GSE messages to send to Nagios. Valid
+  options: a string.
+* `virtual_hostname`: *Required*. The host configured in Nagios to receive the
+  GSE checks must be named "${virtual_hostname}-env${openstack_deployment_name}".
+  Valid options: a string.
+* `openstack_deployment_name`: *Optional*. Additional label to identify the
+  environment.  Valid options: a string. Default: empty string.
 
 Limitations
 -----------
