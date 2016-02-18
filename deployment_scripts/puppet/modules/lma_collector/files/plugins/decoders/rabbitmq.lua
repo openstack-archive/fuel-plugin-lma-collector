@@ -67,6 +67,6 @@ function process_message ()
     msg.Fields.programname = 'rabbitmq'
     utils.inject_tags(msg)
 
-    inject_message(msg)
+    pcall(inject_message, msg)
     return 0
 end
