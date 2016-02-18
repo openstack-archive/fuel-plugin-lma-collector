@@ -41,7 +41,7 @@ local colon = l.P":"
 
 local timestamp   = l.Cg(dt.rfc3164_timestamp / dt.time_to_ns, "Timestamp")
 local pid         = l.Cg(patt.Pid, "Pid")
-local severity    = l.Cg((l.R"AZ" + l.R"az")^1 /  string.lower, "SeverityLabel")
+local severity    = l.Cg((l.R"AZ" + l.R"az")^1 /  string.upper, "SeverityLabel")
 local programname = l.Cg(patt.programname, "programname")
 local message     = l.Cg(patt.Message, "Message")
 
