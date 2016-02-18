@@ -441,6 +441,7 @@ Public Classes:
 * [`lma_collector::aggregator::client`](#class-lma_collectoraggregatorclient)
 * [`lma_collector::aggregator::server`](#class-lma_collectoraggregatorserver)
 * [`lma_collector::gse_policies`](#class-lma_collectorgse_policies)
+* [`lma_collector::metrics::heka_monitoring`](#class-lma_collectormetricsheka_monitoring)
 
 Private Classes:
 
@@ -835,6 +836,17 @@ Declare this class to configure the GSE cluster policies.
 * `policies`: *Required*. Definition of the GSE cluster policies as described
   in the [Cluster Policies](http://fuel-plugin-lma-collector.readthedocs.org/en/latest/alarms.html#cluster-policies)
   documentation. Valid options: a hash.
+
+#### Class: `lma_collector::metrics::heka_monitoring`
+
+Declare this class to collect metrics for the Heka service itself.
+
+##### Parameters
+
+* `dashboard_address`: *Optional*. The address the Heka dashboard listens on.
+  Valid options: a string. Default: `127.0.0.1`.
+* `dashboard_port`: *Optional*. The port the Heka dashboard listens on.
+  Valid options: a string. Default: `4352`.
 
 #### Define: `lma_collector::logs::openstack`
 
