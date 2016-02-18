@@ -83,17 +83,25 @@ service { [$nova_api_service, $nova_conductor_service, $nova_scheduler_service]:
 include cinder::params
 $cinder_api_service       = $::cinder::params::api_service
 $cinder_scheduler_service = $::cinder::params::scheduler_service
+$cinder_volume_service    = $::cinder::params::volume_service
+
+if $storage_options['volumes_ceph'] {
+  # In this case, cinder-volume runs on controller node
+  $cinder_services = [$cinder_api_service, $cinder_scheduler_service, $cinder_volume_service]
+} else {
+  $cinder_services = [$cinder_api_service, $cinder_scheduler_service]
+}
 
 cinder_config { 'DEFAULT/notification_topics':
   value  => $notification_topics,
-  notify => Service[$cinder_api_service, $cinder_scheduler_service],
+  notify => Service[$cinder_services],
 }
 cinder_config { 'DEFAULT/notification_driver':
   value  => 'messaging',
-  notify => Service[$cinder_api_service, $cinder_scheduler_service],
+  notify => Service[$cinder_services],
 }
 
-service { [$cinder_api_service, $cinder_scheduler_service]:
+service { $cinder_services:
   hasstatus  => true,
   hasrestart => true,
 }
