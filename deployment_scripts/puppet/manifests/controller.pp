@@ -207,7 +207,13 @@ service { $heat_engine_service:
 # OpenStack logs are useful for deriving HTTP metrics, so we enable them even
 # if Elasticsearch is disabled.
 lma_collector::logs::openstack { 'nova': }
-lma_collector::logs::openstack { 'neutron': }
+
+# Neutron creates one log file for each network creation, too avoid heka
+# to create as many log splitters and decoders log file names to parse are
+# specified explicitly. see bug #1547402
+lma_collector::logs::openstack { 'neutron':
+  service_match => '(dhcp-agent|l3-agent|metadata-agent|neutron-netns-cleanup|openvswitch-agent|server)',
+}
 lma_collector::logs::openstack { 'cinder': }
 lma_collector::logs::openstack { 'glance': }
 lma_collector::logs::openstack { 'heat': }
