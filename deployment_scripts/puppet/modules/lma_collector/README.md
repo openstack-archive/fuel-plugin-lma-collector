@@ -444,6 +444,7 @@ Public Classes:
 * [`lma_collector::gse_policies`](#class-lma_collectorgse_policies)
 * [`lma_collector::metrics::heka_monitoring`](#class-lma_collectormetricsheka_monitoring)
 * [`lma_collector::metrics::service_heartbeat`](#class-lma_collectormetricsserviceheartbeat)
+* [`lma_collector::smtp_alert`](#class-lma_collectorsmtp_alert)
 
 Private Classes:
 
@@ -865,6 +866,26 @@ Declare this class to configure the AFD filter that sends the heartbeat metrics.
 * `timeout`: *Optional*. Number of seconds after which the AFD filter will
   consider a service to be down if no metric has been received during this
   period. Valid options: an integer. Default: `30`.
+
+#### Class: `lma_collector::smtp_alert`
+
+Declare this class to send by email the alert notifications based on the GSE
+metrics.
+
+##### Parameters
+
+* `send_from`: *Required*. Sender email address. Valid options: a string.
+* `send_to`: *Required*. List of recipient email addresses. Valid options: an array.
+* `subject`: *Required*. Email subject. Valid options: a string. Default: `LMA
+  Alert Notification`.
+* `host`: *Optional*. SMTP server address and port. Valid options: a string.
+  Default: `127.0.0.1:25`.
+* `auth`: *Optional*. SMTP authentication method. Valid options: a string.
+  Default: `none`.
+* `user`: *Required*. SMTP username. Valid options: a string.
+* `password`: *Required*. SMTP Password. Valid options: a string.
+* `send_interval`: *Optional*. Minimum time interval in seconds between each
+  email. Valid options: an integer. Default: `0`.
 
 #### Define: `lma_collector::logs::openstack`
 
