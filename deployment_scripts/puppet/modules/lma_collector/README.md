@@ -57,7 +57,7 @@ To make the collector collect logs created by an OpenStack service declare the
 `lma_collector::logs::openstack` define. This is an example for the Nova logs:
 
 ```puppet
-lma_collector::logs::openstack { 'nova': }
+lma_collector::logs::openstack { 'nova': }
 ```
 
 This configures Heka to read the Nova logs from the log files located in
@@ -725,6 +725,14 @@ and Murano.
 The define doesn't work for Swift, as Swift only writes its logs to Syslog.
 See the specific [`lma_collector::logs::swift`](#class-lma_collectorlogsswift)
 class for Swift.
+
+##### Parameters
+
+* `service_match`: *Optional*. The regular expression portion which matches the
+  log file names excluding the suffix `.log`. This is generally used to
+  explicitly specify the file name(s) within the directory.
+  Valid options: a regexp string supported by [Go programming
+  language](https://golang.org/pkg/regexp/). Default: `.+`.
 
 #### Define: `lma_collector::collectd::openstack`
 

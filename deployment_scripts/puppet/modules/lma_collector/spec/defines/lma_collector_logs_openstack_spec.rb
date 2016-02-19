@@ -24,6 +24,18 @@ describe "lma_collector::logs::openstack" do
     describe "with title" do
         let(:title) { :nova }
         it { is_expected.to contain_heka__input__logstreamer('nova') \
-             .with_differentiator("['nova', '_', 'Service']") }
+             .with_differentiator("['nova', '_', 'Service']") \
+             .with_file_match('(?P<Service>.+)\.log\.?(?P<Seq>\d*)$')
+        }
+    end
+    describe "with title and service_match" do
+        let(:title) { :nova }
+        let(:params) do
+          { :service_match => '(dhcp-agent|l3-agent|metadata-agent|neutron-netns-cleanup|openvswitch-agent|server)' }
+        end
+
+        it { is_expected.to contain_heka__input__logstreamer('nova') \
+             .with_file_match('(?P<Service>(dhcp-agent|l3-agent|metadata-agent|neutron-netns-cleanup|openvswitch-agent|server))\.log\.?(?P<Seq>\d*)$')
+        }
     end
 end
