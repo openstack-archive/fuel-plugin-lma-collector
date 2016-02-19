@@ -442,6 +442,7 @@ Public Classes:
 * [`lma_collector::aggregator::server`](#class-lma_collectoraggregatorserver)
 * [`lma_collector::gse_policies`](#class-lma_collectorgse_policies)
 * [`lma_collector::metrics::heka_monitoring`](#class-lma_collectormetricsheka_monitoring)
+* [`lma_collector::metrics::service_heartbeat`](#class-lma_collectormetricsservice_heartbeat)
 
 Private Classes:
 
@@ -847,6 +848,18 @@ Declare this class to collect metrics for the Heka service itself.
   Valid options: a string. Default: `127.0.0.1`.
 * `dashboard_port`: *Optional*. The port the Heka dashboard listens on.
   Valid options: a string. Default: `4352`.
+
+#### Class: `lma_collector::metrics::service_heartbeat`
+
+Declare this class to configure the AFD filter that sends the heartbeat metrics.
+
+##### Parameters
+
+* `services`: *Required*. List of services for which the AFD filter should
+  emit the heartbeat metrics.  Valid options: an array of strings.
+* `timeout`: *Optional*. Number of seconds after which the AFD filter will
+  consider a service to be down if no metric has been received during this
+  period. Valid options: an integer. Default: `30`.
 
 #### Define: `lma_collector::logs::openstack`
 
