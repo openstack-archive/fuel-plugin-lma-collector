@@ -438,6 +438,7 @@ Public Classes:
 * [`lma_collector::collectd::mysql`](#class-lma_collectorcollectdmysql)
 * [`lma_collector::influxdb`](#class-lma_collectorinfluxdb)
 * [`lma_collector::notifications::input`](#class-lma_collectornotificationsinput)
+* [`lma_collector::notifications::metrics`](#class-lma_collectornotificationsmetrics)
 * [`lma_collector::aggregator::client`](#class-lma_collectoraggregatorclient)
 * [`lma_collector::aggregator::server`](#class-lma_collectoraggregatorserver)
 * [`lma_collector::gse_policies`](#class-lma_collectorgse_policies)
@@ -801,6 +802,10 @@ same topic exchange as the one this class is configured with.
   string.
 * `password`: *Required*. The password to use to connect to RabbitMQ.  Valid
   options: a string.
+
+#### Class: `lma_collector::notifications::metrics`
+
+Declare this class to make Heka emit metrics from the OpenStack notifications.
 
 #### Class: `lma_collector::aggregator::client`
 
