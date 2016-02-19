@@ -1,6 +1,5 @@
 import sys
 import os
-RTD_NEW_THEME = True
 extensions = []
 templates_path = ['_templates']
 source_suffix = '.rst'
@@ -12,7 +11,7 @@ release = '0.9.0'
 exclude_patterns = [
 ]
 pygments_style = 'sphinx'
-html_theme = 'classic'
+html_theme = 'default'
 html_static_path = ['_static']
 htmlhelp_basename = 'LMAcollectordevdoc'
 latex_elements = {
