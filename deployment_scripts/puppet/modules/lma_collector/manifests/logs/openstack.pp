@@ -23,7 +23,9 @@
 # It works for "standard" OpenStack services that write their logs into log files
 # located in /var/log/{service}, where {service} is the service name.
 #
-define lma_collector::logs::openstack {
+define lma_collector::logs::openstack (
+  $service_match = '.+',
+) {
 
   # Note: $log_directory could be made configurable in the future.
 
@@ -36,7 +38,7 @@ define lma_collector::logs::openstack {
     log_directory  => "/var/log/${title}",
     decoder        => 'openstack',
     splitter       => 'openstack',
-    file_match     => '(?P<Service>.+)\.log\.?(?P<Seq>\d*)$',
+    file_match     => "(?P<Service>${service_match})\\.log\\.?(?P<Seq>\\d*)$",
     differentiator => "['${title}', '_', 'Service']",
     priority       => '["^Seq"]',
     require        => Class['lma_collector::logs::openstack_decoder_splitter'],
