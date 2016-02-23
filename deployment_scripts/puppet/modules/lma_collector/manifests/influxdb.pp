@@ -13,16 +13,19 @@
 #    under the License.
 #
 class lma_collector::influxdb (
-  $server         = $lma_collector::params::influxdb_server,
+  $database,
+  $user,
+  $password,
+  $server,
   $port           = $lma_collector::params::influxdb_port,
-  $database       = $lma_collector::params::influxdb_database,
-  $user           = $lma_collector::params::influxdb_user,
-  $password       = $lma_collector::params::influxdb_password,
   $tag_fields     = $lma_collector::params::influxdb_tag_fields,
   $time_precision = $lma_collector::params::influxdb_time_precision,
 ) inherits lma_collector::params {
   include lma_collector::service
 
+  validate_string($database)
+  validate_string($user)
+  validate_string($password)
   validate_string($server)
   validate_array($tag_fields)
 
