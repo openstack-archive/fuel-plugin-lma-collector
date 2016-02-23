@@ -452,6 +452,7 @@ Private Classes:
 * [`lma_collector::collectd::openstack`](#define-lma_collectorcollectdopenstack)
 * [`lma_collector::afd_filter`](#define-lma_collectorafd_filter)
 * [`lma_collector::afd_nagios`](#define-lma_collectorafd_nagios)
+* [`lma_collector::gse_cluster_filter`](#define-lma_collectorgse_cluster_filter)
 * [`lma_collector::gse_nagios`](#define-lma_collectorgse_nagios)
 
 #### Class: `lma_collector`
@@ -948,6 +949,36 @@ results](https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/3/en/pas
   options: a string. Default: `%{node_role}.%{source}`.
 * `message_type`: *Optional*. Type of AFD messages to send to Nagios. Valid
   options: a string. Default: `afd_node_metric`.
+
+#### Define `lma_collector::gse_cluster_filter`
+
+Declare this define to configure an [Global Status Evaluation filter](
+http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/alarms.html)
+in Heka.
+
+##### Parameters
+
+* `input_message_types`: *Required*. Message types that the GSE filter should
+  process. Valid options: an array.
+* `aggregator_flag`: *Required*. Whether or not the GSE filter receives messages
+  emitted by the collectors or the aggregator itself. Valid options: a boolean.
+* `member_field`: *Required*. Field in the input messages used by the GSE filter
+  to identify the cluster members. Valid options: a string.
+* `output_message_type`: *Required*. Type of messages emitted by the GSE
+  filter. Valid options: a string.
+* `output_metric_name`: *Required*. Metric name for the messages emitted by the
+  GSE filter. Valid options: a string.
+* `interval`: *Optional*. Interval (in seconds) at which the GSE filter emits
+  its metric messages. Valid options: an integer. Default: 10.
+* `cluster_field`: *Optional*. Field in the input message used by the GSE
+  filter to associate the AFD/GSE metrics to the clusters. Valid options: a
+  string. Default: undef.
+* `clusters`: *Optional*. List of clusters that the plugin manages. See the [GSE
+  configuration](http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/alarms.html)
+  documentation for details. Valid options: a hash. Default: {}.
+* `warm_up_period`: *Optional*. Number of seconds after a (re)start that the
+  GSE plugin will wait before emitting its metric messages. Valid options: an
+  integer. Default: undef.
 
 #### Define `lma_collector::gse_nagios`
 
