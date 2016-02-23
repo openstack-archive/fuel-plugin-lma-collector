@@ -372,6 +372,25 @@ lma_collector::afd_nagios { 'node_afds':
 }
 ```
 
+### Configure the aggregator mode
+
+To make the collector send AFD messages to the aggregator node declare the
+`lma_collector::aggregator::client` class:
+
+```puppet
+class { 'lma_collector::aggregator::client':
+  address => 'aggregator.example.com',
+}
+```
+
+To make the collector act as an aggregator node for the other collectors
+declare the `lma_collector::aggregator::server` class:
+
+```puppet
+class { 'lma_collector::aggregator::server':
+}
+```
+
 ## Reference
 
 ### Classes
@@ -401,7 +420,9 @@ Public Classes:
 * [`lma_collector::collectd::pacemaker`](#class-lma_collectorcollectdpacemaker)
 * [`lma_collector::collectd::mysql`](#class-lma_collectorcollectdmysql)
 * [`lma_collector::influxdb`](#class-lma_collectorinfluxdb)
-* [`lma_collector::notifications::input`](#class-lma_notificationsinput)
+* [`lma_collector::notifications::input`](#class-lma_collectornotificationsinput)
+* [`lma_collector::aggregator::client`](#class-lma_collectoraggregatorclient)
+* [`lma_collector::aggregator::server`](#class-lma_collectoraggregatorserver)
 
 Private Classes:
 
@@ -758,6 +779,32 @@ same topic exchange as the one this class is configured with.
   string.
 * `password`: *Required*. The password to use to connect to RabbitMQ.  Valid
   options: a string.
+
+#### Class: `lma_collector::aggregator::client`
+
+Declare this class to make Heka send the AFD messages to another Heka node
+running the aggregator service.
+
+##### Parameters
+
+* `address`: *Required*. The address of the aggregator server. Valid options: a
+  string.
+* `port`: *Optional*. The port the aggregator server listens on. Valid options:
+  an integer. Default: `5565`.
+
+#### Class: `lma_collector::aggregator::server`
+
+Declare this class to make Heka run the aggregator service.
+
+##### Parameters
+
+* `listen_address`: *Optional*. The address the aggregator service listens on.
+  Valid options: a string. Default: `127.0.0.1`.
+* `port`: *Optional*. The port the aggregator service listens on. Valid options:
+  an integer. Default: `5565`.
+* `http_check_port`: *Optional*. The HTTP port that an external service can use
+  to check the health of the aggregator service. Valid options: an integer.
+  Default: `undef`.
 
 #### Define: `lma_collector::logs::openstack`
 
