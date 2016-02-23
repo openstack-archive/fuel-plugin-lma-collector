@@ -399,6 +399,7 @@ Private Classes:
 
 * [`lma_collector::logs::openstack`](#define-lma_collectorlogsopenstack)
 * [`lma_collector::collectd::openstack`](#define-lma_collectorcollectdopenstack)
+* [`lma_collector::afd_filter`](#define-lma_collectorafd_filter)
 
 #### Class: `lma_collector`
 
@@ -823,6 +824,28 @@ The resource title should be set to the service name (e.g. `'nova'`).
   consider a worker is down. A service is deemed "down" if no heartbeat has
   been received since `downtime_factor * report_interval` seconds. Valid
   options: an integer.
+
+#### Define `lma_collector::afd_filter`
+
+Declare this define to configure an [Anomaly and Fault Detection
+filter](http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/alarms.html)
+in Heka.
+
+##### Parameters
+
+* `type`: *Required*. Type of the AFD filter. Valid options: either `service`
+  for service AFD filters or `node` for node AFD filters.
+* `cluster_name`: *Required*. Value of the `service` field (for service AFD
+  filters) or `node_role` (for node AFD filters) for the messages emitted by
+  the filter. Valid options: a string.
+* `logical_name`: *Required*. Value of the `source` field for the messages
+  emitted by the filter. Valid options: a string.
+* `alarms`: *Required*. List of alarm rules enabled for this filter. Valid
+  options: an array.
+* `alarms_definitions`: *Required*. List of the alarm rules definitions. Valid
+  options: an array.
+* `message_matcher`: *Required*. Message matcher for the Heka filter. Valid
+  options: a string.
 
 Limitations
 -----------
