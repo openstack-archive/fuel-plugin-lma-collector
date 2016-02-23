@@ -9,7 +9,7 @@ The LMA Collector is an advanced monitoring agent solution that should
 be installed on each of the OpenStack nodes you want to monitor.
 
 Please check the [LMA Collector Plugin Overview](
-http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/overview.html)
+http://fuel-plugin-lma-collector.readthedocs.org/en/latest/overview.html)
 section of the plugin's documentation for additional details.
 
 Release Notes
@@ -17,14 +17,14 @@ Release Notes
 
 The release notes of the LMA Collector Plugin are provided in the
 [Release Notes](
-http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/releases.html)
+http://fuel-plugin-lma-collector.readthedocs.org/en/latest/releases.html)
 section of the plugin documentation.
 
 Requirements
 ------------
 
 The LMA Collector Plugin requirements are defined in the [Requirements](
-http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/overview.html#requirements)
+http://fuel-plugin-lma-collector.readthedocs.org/en/latest/overview.html#requirements)
 section of the plugin documentation.
 
 Known issues
@@ -37,7 +37,7 @@ Limitations
 -----------
 
 The LMA Collector Plugin limitations are described in the [Limitations](
-http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/overview.html#limitations)
+http://fuel-plugin-lma-collector.readthedocs.org/en/latest/overview.html#limitations)
 section of the plugin documentation.
 
 Installation
@@ -45,7 +45,7 @@ Installation
 
 The installation instructions of the LMA Collector Plugin are provided
 in the [Installation](
-http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/installation.html#installation)
+http://fuel-plugin-lma-collector.readthedocs.org/en/latest/installation.html#installation)
 section of the plugin documentation.
 
 User Guide
@@ -53,9 +53,9 @@ User Guide
 
 Instructions for how to configure the plugin and the alarms
 are provided in the [Configuration Guide](
-http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/configuration.html)
+http://fuel-plugin-lma-collector.readthedocs.org/en/latest/configuration.html)
 and [Alarms Configuration Guide](
-http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/alarms.html)
+http://fuel-plugin-lma-collector.readthedocs.org/en/latest/alarms.html)
 of the plugin documentation.
 
 Communication
