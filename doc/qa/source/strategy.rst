@@ -46,11 +46,11 @@ Product compatibility matrix
 +====================================+=================+
 | Mirantis OpenStack                 | 7.0             |
 +------------------------------------+-----------------+
-| LMA collector plugin               | 0.8.0           |
+| LMA collector plugin               | 0.9.0           |
 +------------------------------------+-----------------+
-| Elasticsearch-Kibana plugin        | 0.8.0           |
+| Elasticsearch-Kibana plugin        | 0.9.0           |
 +------------------------------------+-----------------+
-| InfluxDB-Grafana plugin            | 0.8.0           |
+| InfluxDB-Grafana plugin            | 0.9.0           |
 +------------------------------------+-----------------+
-| LMA Infrastructure Alerting plugin | 0.8.0           |
+| LMA Infrastructure Alerting plugin | 0.9.0           |
 +------------------------------------+-----------------+
