@@ -48,6 +48,10 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
             elif owner.startswith('compute:'):
                 # The part after 'compute:' is the name of the Nova AZ
                 owner = 'compute'
+            elif owner == '':
+                # If the port is not attached to any device we can see
+                # string like: ports..down
+                owner = 'none'
             status = x.get('status', 'unknown').lower()
             return "ports.%s.%s" % (owner, status)
 
