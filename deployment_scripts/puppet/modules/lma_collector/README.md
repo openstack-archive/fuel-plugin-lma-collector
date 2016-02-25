@@ -631,6 +631,11 @@ Declare this class to configure collectd to collect RabbitMQ statistics. The
 collectd plugin used is a Python script, which uses the `rabbitmqctl` command
 to get statistics from RabbitMQ.
 
+##### Parameters
+
+* `regex_queue_match`: *Optional*. The regex pattern to match queue names to
+  monitor. Valid option: regex string. Default: `undef` (no statistics per queue).
+
 #### Class: `lma_collector::collectd::memcached`
 
 Declare this class to configure collectd to collect Memcached statistics.
