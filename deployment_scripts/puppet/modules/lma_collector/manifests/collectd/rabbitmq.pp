@@ -13,7 +13,18 @@
 #    under the License.
 #
 
-class lma_collector::collectd::rabbitmq {
+class lma_collector::collectd::rabbitmq (
+  $regex_queue_match = undef,
+) {
 
-  lma_collector::collectd::python { 'rabbitmq_info': }
+  if $regex_queue_match {
+    $_regex_queue_match = regsubst($regex_queue_match, '\\', '\\\\')
+  } else {
+    $_regex_queue_match = $regex_queue_match
+  }
+  lma_collector::collectd::python { 'rabbitmq_info':
+    config => {
+      'RegexQueueMatch' => "\"${_regex_queue_match}\"",
+    }
+  }
 }
