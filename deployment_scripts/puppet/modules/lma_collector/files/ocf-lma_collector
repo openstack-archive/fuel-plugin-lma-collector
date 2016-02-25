@@ -245,6 +245,7 @@ service_start() {
         return "$OCF_SUCCESS"
     fi
 
+    ulimit -n 102400 # See https://bugs.launchpad.net/lma-toolchain/+bug/1543289
     su "${OCF_RESKEY_user}" -s /bin/sh -c "${OCF_RESKEY_binary} \
 -config=${OCF_RESKEY_config} >> $OCF_RESKEY_log_file 2>&1"' & echo $!' > "$OCF_RESKEY_pid"
 
