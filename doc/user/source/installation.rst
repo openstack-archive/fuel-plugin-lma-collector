@@ -86,12 +86,12 @@ if you need further instructions about how to build the Fuel Plugin Builder.
 
 5. Check that the plugin is valid::
 
-    [root@home ~] fpb --check ./fuel-plugin-lma_collector
+    [root@home ~] fpb --check ./fuel-plugin-lma-collector
 
 6.  And finally, build the plugin::
 
-    [root@home ~] fpb --build ./fuel-plugin-lma_collector
+    [root@home ~] fpb --build ./fuel-plugin-lma-collector
 
 7. Now that you have created the RPM file, you can install the plugin using the `fuel plugins --install` command::
 
-    [root@fuel ~] fuel plugins --install ./fuel-plugin-lma_collector/*.noarch.rpm
+    [root@fuel ~] fuel plugins --install ./fuel-plugin-lma-collector/*.noarch.rpm
