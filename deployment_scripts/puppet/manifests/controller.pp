@@ -265,7 +265,9 @@ if $influxdb_mode != 'disabled' {
     read_threads => 10,
   }
 
-  class { 'lma_collector::collectd::rabbitmq': }
+  class { 'lma_collector::collectd::rabbitmq':
+    regex_queue_match => $lma_collector::params::rabbitmq_regex_queue_match,
+  }
 
   $pacemaker_master_resource = 'vip__management'
 
