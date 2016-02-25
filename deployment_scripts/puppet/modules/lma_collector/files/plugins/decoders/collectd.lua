@@ -245,7 +245,7 @@ function process_message ()
                 elseif sample['type_instance'] == 'subnets' then
                     msg['Fields']['name'] = 'openstack'  .. sep .. 'neutron' .. sep .. 'subnets'
                 elseif string.match(sample['type_instance'], '^ports') then
-                    local resource, owner, state = string.match(sample['type_instance'], '^([^.]+)%.([^.]+)%.(.+)$')
+                    local resource, owner, state = string.match(sample['type_instance'], '^([^.]+)%.([^.]*)%.(.+)$')
                     msg['Fields']['name'] = 'openstack'  .. sep .. 'neutron' .. sep .. replace_dot_by_sep(resource)
                     msg['Fields']['tag_fields'] = { 'owner', 'state' }
                     msg['Fields']['owner'] = owner
