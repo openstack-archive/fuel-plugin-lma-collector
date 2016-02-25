@@ -13,7 +13,24 @@
 #    under the License.
 #
 
-class lma_collector::collectd::rabbitmq {
+class lma_collector::collectd::rabbitmq (
+  $queue = [],
+) {
 
-  lma_collector::collectd::python { 'rabbitmq_info': }
+  validate_array($queue)
+
+  # Add quotes around the array values
+  $real_queue = suffix(prefix($queue, '"'), '"')
+
+  if $queue {
+    $config = {
+      'Queue' => $real_queue,
+    }
+  } else {
+    $config = {}
+  }
+
+  lma_collector::collectd::python { 'rabbitmq_info':
+    config => $config,
+  }
 }
