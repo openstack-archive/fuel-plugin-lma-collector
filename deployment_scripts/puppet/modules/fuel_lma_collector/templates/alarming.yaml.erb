@@ -613,7 +613,7 @@ lma_collector:
             relational_operator: '=='
             threshold: 3 # red
             window: 60
-            function: max
+            function: min
     - name: 'elasticsearch-health-warning'
       description: 'Elasticsearch health is warning'
       severity: 'warning'
@@ -624,7 +624,7 @@ lma_collector:
             relational_operator: '=='
             threshold: 2 # yellow
             window: 60
-            function: max
+            function: min
     - name: 'elasticsearch-fs-warning'
       description: "The filesystem's free space is low (elasticsearch node)."
       severity: 'warning'
