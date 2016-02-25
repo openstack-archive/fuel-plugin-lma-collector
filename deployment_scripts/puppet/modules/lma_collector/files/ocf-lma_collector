@@ -238,6 +238,7 @@ service_monitor() {
 service_start() {
     local rc
 
+    ulimit -n 102400 # Set the limit for the maximum number of file descriptors
     service_monitor
     rc=$?
     if [ $rc -eq "$OCF_SUCCESS" ]; then
