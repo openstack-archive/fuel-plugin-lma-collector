@@ -49,6 +49,14 @@ class RabbitMqPlugin(base.Base):
         self.pidfile = None
         self.pmap_bin = PMAP_BIN
         self.vhost = VHOST
+        self.report_per_queue = False
+        self.re_queue = None
+        self.queue = None
+
+    def _matching_queue(self, name):
+        if self.re_queue:
+            return self.re_queue.match(name)
+        return self.queue == name
 
     def config_callback(self, conf):
         super(RabbitMqPlugin, self).config_callback(conf)
@@ -62,6 +70,20 @@ class RabbitMqPlugin(base.Base):
                 self.pidfile = node.values[0]
             elif node.key == 'Vhost':
                 self.vhost = node.values[0]
+            elif node.key == 'Queue':
+                val = node.values[0]
+                if val.startswith('/') and val.endswith('/') and len(val) > 2:
+                    regex = val[1:len(val) - 1]
+                    try:
+                        self.re_queue = re.compile(regex)
+                        self.report_per_queue = True
+                    except Exception as e:
+                        self.logger.error(
+                            'Cannot compile regex {}: {}'.format(regex, e))
+                elif len(val) > 0:
+                    self.report_per_queue = True
+                    self.queue = val
+
             else:
                 self.logger.warning('Unknown config key: %s' % node.key)
 
@@ -156,14 +178,18 @@ class RabbitMqPlugin(base.Base):
                 ctl_stats[3] = int(ctl_stats[3])
             except:
                 continue
-            queue_name = ctl_stats[0][:self.MAX_QUEUE_IDENTIFIER_LENGTH]
+
             stats['queues'] += 1
             stats['messages'] += ctl_stats[1]
             stats['memory'] += ctl_stats[2]
             stats['consumers'] += ctl_stats[3]
-            stats['%s.messages' % queue_name] = ctl_stats[1]
-            stats['%s.memory' % queue_name] = ctl_stats[2]
-            stats['%s.consumers' % queue_name] = ctl_stats[3]
+
+            queue_name = ctl_stats[0][:self.MAX_QUEUE_IDENTIFIER_LENGTH]
+            if self.report_per_queue and self._matching_queue(queue_name):
+                stats['%s.messages' % queue_name] = ctl_stats[1]
+                stats['%s.memory' % queue_name] = ctl_stats[2]
+                stats['%s.consumers' % queue_name] = ctl_stats[3]
+
             # we need to check if the list of synchronised slaves is
             # equal to the list of slaves.
             try:
