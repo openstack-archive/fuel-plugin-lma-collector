@@ -22,4 +22,13 @@ describe 'lma_collector::collectd::rabbitmq' do
     describe 'with defaults' do
         it { is_expected.to contain_lma_collector__collectd__python('rabbitmq_info') }
     end
+
+    describe 'with queue parameter' do
+        let(:params) do
+            {:queue => '/^(foo|bar)\\w+$/'}
+        end
+        it { is_expected.to contain_lma_collector__collectd__python('rabbitmq_info') \
+             .with_config({'Queue' => '"/^(foo|bar)\\w+$/"'})
+        }
+    end
 end
