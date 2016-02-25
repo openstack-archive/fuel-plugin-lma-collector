@@ -13,7 +13,19 @@
 #    under the License.
 #
 
-class lma_collector::collectd::rabbitmq {
+class lma_collector::collectd::rabbitmq (
+  $queue = undef,
+) {
 
-  lma_collector::collectd::python { 'rabbitmq_info': }
+  if $queue {
+    $config = {
+      'Queue' => "\"${queue}\"",
+    }
+  } else {
+    $config = {}
+  }
+
+  lma_collector::collectd::python { 'rabbitmq_info':
+    config => $config,
+  }
 }
