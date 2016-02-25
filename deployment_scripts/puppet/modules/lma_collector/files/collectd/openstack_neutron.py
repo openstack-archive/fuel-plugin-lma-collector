@@ -42,12 +42,14 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
             return "routers.%s" % x.get('status', 'unknown').lower()
 
         def groupby_port(x):
-            owner = x.get('device_owner', 'unknown')
+            owner = x.get('device_owner', 'none')
             if owner.startswith('network:'):
                 owner = owner.replace('network:', '')
             elif owner.startswith('compute:'):
                 # The part after 'compute:' is the name of the Nova AZ
                 owner = 'compute'
+            else:
+                owner = 'none'
             status = x.get('status', 'unknown').lower()
             return "ports.%s.%s" % (owner, status)
 
