@@ -84,6 +84,7 @@ class lma_collector::params {
 
   # Parameters for OpenStack notifications
   $rabbitmq_port = '5672'
+  $rabbitmq_regex_queue_match = '^(\\w*notifications\\.(error|info|warn)|[a-z]+)$'
 
   # collectd parameters
   $collectd_port = '8325'
