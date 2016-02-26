@@ -66,9 +66,11 @@ class lma_collector::params {
 
   # The maximum size of 158Kb was observed during a load test with 50 nodes,
   # this is required by elasticsearch buffered output.
-  # Lets configure 192Kb by default.
+  # Update: Maximum size of 227Kb has been oberved by a client.
+  #         https://bugs.launchpad.net/lma-toolchain/+bug/1548093
+  # Lets configure 256Kb by default.
   # see https://github.com/mozilla-services/heka/issues/1389
-  $hekad_max_message_size = 192 * 1024
+  $hekad_max_message_size = 256 * 1024
 
   $buffering_max_file_size = 128 * 1024 * 1024
   $buffering_max_buffer_size = 1024 * 1024 * 1024
