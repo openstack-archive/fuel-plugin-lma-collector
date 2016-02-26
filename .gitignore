@@ -1,3 +1,4 @@
 .bundled_gems/
 .build/
 lma_collector*rpm
+.tox
