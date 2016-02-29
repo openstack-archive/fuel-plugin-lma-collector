@@ -25,6 +25,7 @@ $rabbit          = hiera_hash('rabbit')
 $management_vip  = hiera('management_vip')
 $storage_options = hiera_hash('storage', {})
 $murano          = hiera_hash('murano')
+$sahara          = hiera_hash('sahara')
 $contrail        = hiera('contrail', false)
 
 if $ceilometer['enabled'] {
@@ -54,6 +55,27 @@ class { 'lma_collector::notifications::input':
   port     => hiera('amqp_port', '5673'),
   user     => $rabbitmq_user,
   password => $rabbit['password'],
+}
+
+# Sahara notifications
+if $sahara['enabled'] {
+  include sahara::params
+  $sahara_api_service    = $::sahara::params::api_service_name
+  $sahara_engine_service = $::sahara::params::engine_service_name
+
+  sahara_config { 'DEFAULT/notification_topics':
+    value  => $notification_topics,
+    notify => Service[$sahara_api_service, $sahara_engine_service],
+  }
+  sahara_config { 'DEFAULT/notification_driver':
+    value  => 'messaging',
+    notify => Service[$sahara_api_service, $sahara_engine_service],
+  }
+
+  service { [$sahara_api_service, $sahara_engine_service]:
+    hasstatus  => true,
+    hasrestart => true,
+  }
 }
 
 # Nova notifications
@@ -222,9 +244,15 @@ lma_collector::logs::openstack { 'heat': }
 lma_collector::logs::openstack { 'keystone': }
 class {'lma_collector::logs::keystone_wsgi': }
 lma_collector::logs::openstack { 'horizon': }
+
 if $murano['enabled'] {
   lma_collector::logs::openstack { 'murano': }
 }
+
+if $sahara['enabled'] {
+  lma_collector::logs::openstack { 'sahara': }
+}
+
 if ! $storage_options['objects_ceph'] {
   class { 'lma_collector::logs::swift':
     file_match => 'swift-all\.log\.?(?P<Seq>\d*)$',
