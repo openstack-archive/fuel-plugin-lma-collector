@@ -47,6 +47,8 @@ local logger_map = {
     port = 'neutron',
     router = 'neutron',
     subnet = 'neutron',
+    -- sahara
+    sahara = 'sahara',
 }
 
 -- Mapping table between the attributes in the notification's payload and the
