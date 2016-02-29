@@ -18,6 +18,7 @@ HEAT_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/openstack-heat-7.0.0.
 KEYSTONE_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/openstack-keystone-7.0.0.tar.gz"
 NEUTRON_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/openstack-neutron-7.0.0.tar.gz"
 NOVA_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/openstack-nova-7.0.0.tar.gz"
+SAHARA_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/openstack-sahara-7.0.0.tar.gz"
 OPENSTACKLIB_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/openstack-openstacklib-7.0.0.tar.gz"
 
 download_packages \
@@ -66,4 +67,5 @@ download_puppet_module "heat" "${HEAT_TARBALL_URL}"
 download_puppet_module "keystone" "${KEYSTONE_TARBALL_URL}"
 download_puppet_module "neutron" "${NEUTRON_TARBALL_URL}"
 download_puppet_module "nova" "${NOVA_TARBALL_URL}"
+download_puppet_module "sahara" "${SAHARA_TARBALL_URL}"
 download_puppet_module "openstacklib" "${OPENSTACKLIB_TARBALL_URL}"
