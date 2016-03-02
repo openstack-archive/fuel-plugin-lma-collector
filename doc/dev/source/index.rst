@@ -11,6 +11,7 @@ Welcome to the Mirantis OpenStack LMA Collector Developer Documentation!
    notifications
    metrics
    outputs
+   install_without_fuel
    tests
 
 Indices and Tables
