@@ -27,11 +27,11 @@ class lma_collector::collectd::python_openstack_base {
 
   file { 'openstack.script':
     ensure  => 'present',
-    path    => "${modulepath}/openstack.py",
+    path    => "${modulepath}/collectd_openstack.py",
     owner   => 'root',
     group   => $collectd::params::root_group,
     mode    => '0640',
-    source  => 'puppet:///modules/lma_collector/collectd/openstack.py',
+    source  => 'puppet:///modules/lma_collector/collectd/collectd_openstack.py',
     require => Class['lma_collector::collectd::python_base'],
     notify  => Service['collectd'],
   }

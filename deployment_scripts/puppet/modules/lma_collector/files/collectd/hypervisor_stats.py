@@ -17,7 +17,7 @@
 import collectd
 
 import base
-import openstack
+import collectd_openstack as openstack
 
 PLUGIN_NAME = 'hypervisor_stats'
 INTERVAL = openstack.INTERVAL

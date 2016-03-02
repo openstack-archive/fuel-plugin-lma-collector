@@ -22,7 +22,7 @@ describe 'lma_collector::collectd::python_openstack_base' do
     describe 'with defaults' do
         it { is_expected.to contain_file('openstack.script').with({
             :ensure => 'present',
-            :path => '/usr/lib/collectd/openstack.py',
+            :path => '/usr/lib/collectd/collectd_openstack.py',
             :owner => 'root',
             :group => 'root',
             :mode => '0640',
