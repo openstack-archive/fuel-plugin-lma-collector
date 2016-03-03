@@ -86,7 +86,7 @@ If you see no data in the Kibana and/or Grafana dashboards, use the instructions
     [root@node-1 ~]# crm resource start lma_collector
 
     # On non controller nodes
-    [root@node-1 ~]# status lma_collector
+    [root@node-1 ~]# start lma_collector
 
 3. Look for errors in the LMA Collector log file (located at /var/log/lma_collector.log) on the different nodes.
 
