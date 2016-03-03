@@ -393,8 +393,8 @@ last 5 minutes (window: 120)
 Once you have edited and saved the */etc/hiera/override/alarming.yaml* file, you
 need to re-apply the Puppet module::
 
-    # puppet apply --modulepath=/etc/fuel/plugins/lma_collector-0.8/puppet/modules/ \
-    /etc/fuel/plugins/lma_collector-0.8/puppet/manifests/configure_afd_filters.pp
+    # puppet apply --modulepath=/etc/fuel/plugins/lma_collector-0.9/puppet/modules/ \
+    /etc/fuel/plugins/lma_collector-0.9/puppet/manifests/configure_afd_filters.pp
 
 This will restart the LMA Collector with your change.
 
