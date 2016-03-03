@@ -24,7 +24,7 @@ class lma_collector::logs::rabbitmq {
 
   heka::splitter::regex { 'rabbitmq':
     config_dir    => $lma_collector::params::config_dir,
-    delimiter     => '\n(=[^=]+====)',
+    delimiter     => '\n\n(=[^=]+====)',
     delimiter_eol => false,
     notify        => Class['lma_collector::service'],
   }
