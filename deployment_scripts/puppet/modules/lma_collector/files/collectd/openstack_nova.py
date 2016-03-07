@@ -18,6 +18,7 @@ import collectd
 
 import base
 import collectd_openstack as openstack
+import re
 
 PLUGIN_NAME = 'nova'
 INTERVAL = openstack.INTERVAL
@@ -26,11 +27,48 @@ INTERVAL = openstack.INTERVAL
 class NovaStatsPlugin(openstack.CollectdPlugin):
     """ Class to report the statistics on Nova service.
 
-        number of instances broken down by state
+        status per service and number of instances broken down by state
     """
 
     @base.read_callback_wrapper
     def read_callback(self):
+
+        # Get information of the state per service
+        # State can be up, down or disabled
+        # From API you get: status = 'disabled' or 'enabled'
+        #                   state = 'up' or 'down'
+        data = {}
+        states = {'up': 0, 'down': 1, 'disabled': 2}
+        nova_re = re.compile('^nova-')
+        os_services_r = self.get('nova', 'os-services')
+        r_status = os_services_r.status_code
+        r_json = os_services_r.json()
+
+        if r_status == 200 and 'services' in r_json:
+            for val in r_json['services']:
+                service = nova_re.sub('', val['binary'])
+                meta = {'host': val['host'].split('.')[0],
+                        'service': service}
+
+                if service not in data:
+                    data[service] = {'up': 0, 'down': 0, 'disabled': 0}
+
+                if val['status'] == 'disabled':
+                    meta['state'] = 'disabled'
+                else:
+                    meta['state'] = val['state']
+
+                data[service][meta['state']] += 1
+                self.dispatch_value('nova_service', '', states[meta['state']],
+                                    meta)
+
+            for key, val in data.iteritems():
+                for state, cnt in val.iteritems():
+                    self.dispatch_value('nova_services', '', cnt,
+                                        {'state': state, 'service': key})
+        else:
+            self.logger.warning("service state:{}:{}".format(r_status, r_json))
+
         servers_details = self.get_objects_details('nova', 'servers')
 
         def groupby(d):
@@ -40,7 +78,7 @@ class NovaStatsPlugin(openstack.CollectdPlugin):
         for s, nb in status.iteritems():
             self.dispatch_value('instances', s, nb)
 
-    def dispatch_value(self, plugin_instance, name, value):
+    def dispatch_value(self, plugin_instance, name, value, meta={'0': True}):
         v = collectd.Values(
             plugin=PLUGIN_NAME,  # metric source
             plugin_instance=plugin_instance,
@@ -48,7 +86,7 @@ class NovaStatsPlugin(openstack.CollectdPlugin):
             type_instance=name,
             interval=INTERVAL,
             # w/a for https://github.com/collectd/collectd/issues/716
-            meta={'0': True},
+            meta=meta,
             values=[value]
         )
         v.dispatch()

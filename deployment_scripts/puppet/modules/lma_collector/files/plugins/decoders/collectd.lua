@@ -215,9 +215,22 @@ function process_message ()
                     msg['Fields']['name'] = 'rabbitmq' .. sep .. sample['type_instance']
                 end
             elseif metric_source == 'nova' then
-                msg['Fields']['name'] = 'openstack' .. sep .. 'nova' .. sep .. replace_dot_by_sep(sample['plugin_instance'])
-                msg['Fields']['tag_fields'] = { 'state' }
-                msg['Fields']['state'] = sample['type_instance']
+                if sample['plugin_instance'] == 'nova_services' then
+                    msg['Fields']['name'] = 'openstack_' .. sample['plugin_instance']
+                    msg['Fields']['tag_fields'] = { 'service', 'state' }
+                    msg['Fields']['service'] = sample['meta']['service']
+                    msg['Fields']['state'] = sample['meta']['state']
+                elseif   sample['plugin_instance'] == 'nova_service'  then
+                    msg['Fields']['name'] = 'openstack_' .. sample['plugin_instance']
+                    msg['Fields']['tag_fields'] = { 'service', 'state' }
+                    msg['Fields']['service'] = sample['meta']['service']
+                    msg['Fields']['state'] = sample['meta']['state']
+                    msg['Fields']['hostname'] = sample['meta']['host']
+                else
+                    msg['Fields']['name'] = 'openstack' .. sep .. 'nova' .. sep .. replace_dot_by_sep(sample['plugin_instance'])
+                    msg['Fields']['tag_fields'] = { 'state' }
+                    msg['Fields']['state'] = sample['type_instance']
+                end
             elseif metric_source == 'cinder' then
                 msg['Fields']['name'] = 'openstack' .. sep .. 'cinder' .. sep .. replace_dot_by_sep(sample['plugin_instance'])
                 msg['Fields']['tag_fields'] = { 'state' }
@@ -309,17 +322,6 @@ function process_message ()
                         msg['Fields'][additional_tag] = sample['type_instance']
                     end
                 end
-            elseif metric_source ==  'dbi' and sample['plugin_instance'] == 'services_nova' then
-                local service, state, hostname = split_service_and_state_and_hostname(sample['type_instance'])
-                if hostname then
-                    msg['Fields']['name'] = 'openstack' .. sep .. 'nova' .. sep .. 'service'
-                    msg['Fields']['hostname'] = hostname
-                else
-                    msg['Fields']['name'] = 'openstack' .. sep .. 'nova' .. sep .. 'services'
-                end
-                msg['Fields']['tag_fields'] = { 'service', 'state' }
-                msg['Fields']['service'] = service
-                msg['Fields']['state'] = state
             elseif metric_source ==  'dbi' and sample['plugin_instance'] == 'services_cinder' then
                 local service, state, hostname = split_service_and_state_and_hostname(sample['type_instance'])
                 if hostname then
