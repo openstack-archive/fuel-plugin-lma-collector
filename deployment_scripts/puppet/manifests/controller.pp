@@ -357,14 +357,6 @@ if $influxdb_mode != 'disabled' {
     password => $nova['db_password'],
   }
 
-  lma_collector::collectd::dbi_services { 'nova':
-    username        => 'nova',
-    dbname          => 'nova',
-    password        => $nova['db_password'],
-    report_interval => 60,
-    downtime_factor => 2,
-  }
-
   lma_collector::collectd::dbi_mysql_status{ 'mysql_status':
     username => 'nova',
     dbname   => 'nova',
