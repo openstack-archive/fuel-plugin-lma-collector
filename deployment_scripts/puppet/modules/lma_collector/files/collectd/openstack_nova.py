@@ -18,6 +18,7 @@ import collectd
 
 import base
 import collectd_openstack as openstack
+import re
 
 PLUGIN_NAME = 'nova'
 INTERVAL = openstack.INTERVAL
@@ -26,11 +27,38 @@ INTERVAL = openstack.INTERVAL
 class NovaStatsPlugin(openstack.CollectdPlugin):
     """ Class to report the statistics on Nova service.
 
-        number of instances broken down by state
+        status per service and number of instances broken down by state
     """
 
     @base.read_callback_wrapper
     def read_callback(self):
+
+        # Get information of the state per service
+        # State can be: 'up', 'down' or 'disabled'
+        aggregated_workers = {}
+        states = {'up': 0, 'down': 1, 'disabled': 2}
+        nova_re = re.compile('^nova-')
+
+        for worker in self.iter_workers('nova'):
+            host = worker['host'].split('.')[0]
+            service = nova_re.sub('', worker['service'])
+            state = worker['state']
+
+            if service not in aggregated_workers:
+                aggregated_workers[service] = {'up': 0, 'down': 0,
+                                               'disabled': 0}
+
+            aggregated_workers[service][state] += 1
+            self.dispatch_value('nova_service', '', states[state],
+                                {'host': host,
+                                 'service': service,
+                                 'state': state})
+
+        for key, val in aggregated_workers.iteritems():
+            for state, count in val.iteritems():
+                self.dispatch_value('nova_services', '', count,
+                                    {'state': state, 'service': key})
+
         servers_details = self.get_objects_details('nova', 'servers')
 
         def groupby(d):
@@ -40,7 +68,7 @@ class NovaStatsPlugin(openstack.CollectdPlugin):
         for s, nb in status.iteritems():
             self.dispatch_value('instances', s, nb)
 
-    def dispatch_value(self, plugin_instance, name, value):
+    def dispatch_value(self, plugin_instance, name, value, meta={'0': True}):
         v = collectd.Values(
             plugin=PLUGIN_NAME,  # metric source
             plugin_instance=plugin_instance,
@@ -48,7 +76,7 @@ class NovaStatsPlugin(openstack.CollectdPlugin):
             type_instance=name,
             interval=INTERVAL,
             # w/a for https://github.com/collectd/collectd/issues/716
-            meta={'0': True},
+            meta=meta,
             values=[value]
         )
         v.dispatch()
