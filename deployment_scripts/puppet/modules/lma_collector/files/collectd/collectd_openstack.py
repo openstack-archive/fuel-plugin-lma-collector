@@ -175,6 +175,28 @@ class CollectdPlugin(base.Base):
         return self.os_client.make_request('get', url,
                                            token_required=token_required)
 
+    def workers_state(self, service):
+        """ Return the list of workers and their state
+
+        """
+        ost_services_r = self.get(service, 'os-services')
+        r_status = ost_services_r.status_code
+        r_json = ost_services_r.json()
+
+        if r_status == 200 and 'services' in r_json:
+            for val in r_json['services']:
+                meta = {'host': val['host'], 'service': val['binary']}
+
+                if val['status'] == 'disabled':
+                    meta['state'] = 'disabled'
+                else:
+                    meta['state'] = val['state']
+
+                yield meta
+        else:
+            msg = "Cannot get state of {} workers".format(service)
+            self.logger.warning("{}:{}:{}".format(msg, r_status, r_json))
+
     def get(self, service, resource):
         url = self._build_url(service, resource)
         if not url:
