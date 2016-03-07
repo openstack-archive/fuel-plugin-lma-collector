@@ -179,6 +179,45 @@ class CollectdPlugin(base.Base):
         return self.os_client.make_request('get', url,
                                            token_required=token_required)
 
+    def iter_workers(self, service):
+        """ Return the list of workers and their state
+
+        Here is an example of returned dictionnary:
+        {
+          'host': 'node.example.com',
+          'service': 'nova-compute',
+          'state': 'up'
+        }
+
+        where 'state' can be 'up', 'down' or 'disabled'
+        """
+        ost_services_r = self.get(service, 'os-services')
+        r_status = ost_services_r.status_code
+        try:
+            r_json = ost_services_r.json()
+        except ValueError:
+            r_json = {}
+
+        if r_status == 200 and 'services' in r_json:
+            for val in r_json['services']:
+                data = {'host': val['host'], 'service': val['binary']}
+
+                if val['status'] == 'disabled':
+                    data['state'] = 'disabled'
+                elif val['state'] == 'up' or val['state'] == 'down':
+                    data['state'] = val['state']
+                else:
+                    msg = "Unknown state for {} workers:{}".format(
+                        service, val['state'])
+                    self.logger.warning(msg)
+                    continue
+
+                yield data
+        else:
+            msg = "Cannot get state of {} workers: Got {} ({})".format(
+                service, r_status, ost_services_r.content)
+            self.logger.warning(msg)
+
     def get(self, service, resource):
         url = self._build_url(service, resource)
         if not url:
