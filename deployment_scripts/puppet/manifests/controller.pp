@@ -452,7 +452,14 @@ if $influxdb_mode != 'disabled' {
     $use_local_influxdb = true
     $use_remote_influxdb = false
     $influxdb_vip_name = 'influxdb'
-    $influxdb_server = $network_metadata['vips'][$influxdb_vip_name]['ipaddr']
+    if $network_metadata['vips'][$influxdb_vip_name] {
+      $influxdb_server = $network_metadata['vips'][$influxdb_vip_name]['ipaddr']
+    } else {
+      # compatibility with LMA 0.8/MOS 7
+      $influxdb_grafana = hiera_hash('influxdb_grafana', {})
+      $influxdb_nodes = filter_nodes(hiera('nodes'), 'role', 'influxdb_grafana')
+      $influxdb_server = $influxdb_nodes[0]['internal_address']
+    }
   } else {
     $use_local_influxdb = false
     $use_remote_influxdb = false
@@ -490,7 +497,13 @@ if $alerting_mode == 'remote' {
   if size(keys($infra_alerting_nodes)) > 0 {
     $use_nagios = true
     $lma_infra_alerting = hiera_hash('lma_infrastructure_alerting', false)
-    $nagios_server = $network_metadata['vips']['infrastructure_alerting_mgmt_vip']['ipaddr']
+    if $network_metadata['vips']['infrastructure_alerting_mgmt_vip'] {
+      $nagios_server = $network_metadata['vips']['infrastructure_alerting_mgmt_vip']['ipaddr']
+    } else {
+      # compatibility with LMA 0.8/MOS 7
+      $nagios_nodes = filter_nodes(hiera('nodes'), 'role', 'infrastructure_alerting')
+      $nagios_server = $nagios_nodes[0]['internal_address']
+    }
     $nagios_user = $lma_infra_alerting['nagios_user']
     $nagios_password = $lma_infra_alerting['nagios_password']
 
