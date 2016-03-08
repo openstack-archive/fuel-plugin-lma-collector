@@ -54,7 +54,13 @@ if $alerting_mode == 'remote' {
   $infra_alerting_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting', 'primary-infrastructure_alerting'])
   if size(keys($infra_alerting_nodes)) > 0 {
     $nagios_enabled = true
-    $nagios_server = $network_metadata['vips']['infrastructure_alerting_mgmt_vip']['ipaddr']
+    if $network_metadata['vips']['infrastructure_alerting_mgmt_vip'] {
+      $nagios_server = $network_metadata['vips']['infrastructure_alerting_mgmt_vip']['ipaddr']
+    } else {
+      # compatibility with LMA 0.8/MOS 7
+      $nagios_nodes = filter_nodes(hiera('nodes'), 'role', 'infrastructure_alerting')
+      $nagios_server = $nagios_nodes[0]['internal_address']
+    }
     $nagios_user = $lma_infra_alerting['nagios_user']
     $nagios_password = $lma_infra_alerting['nagios_password']
     $http_port = $lma_collector::params::nagios_http_port

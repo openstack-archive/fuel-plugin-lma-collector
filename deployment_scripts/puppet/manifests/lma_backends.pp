@@ -53,11 +53,13 @@ if $lma_collector_hash['influxdb_mode'] != 'disabled' {
 
   if $is_elasticsearch_node {
     class { 'lma_collector::collectd::elasticsearch':
-      address => hiera('lma::elasticsearch::vip'),
+      address => hiera('lma::elasticsearch::vip', $mgmt_address),
     }
   }
 
-  class { 'lma_collector::collectd::haproxy':
-    socket => '/var/lib/haproxy/stats',
+  if $network_metadata['vips']['influxdb'] or $network_metadata['vips']['es_vip_mgmt'] {
+    class { 'lma_collector::collectd::haproxy':
+      socket => '/var/lib/haproxy/stats',
+    }
   }
 }
