@@ -80,9 +80,15 @@ class ElasticsearchClusterHealthPlugin(base.Base):
             'values': HEALTH_MAP[data['status']]
         }
         for metric in METRICS:
+            value = data.get(metric)
+            if not value:
+                # Depending on the Elasticsearch version, not all metrics are
+                # available
+                self.logger.info("Couldn't find {} metric".format(metric))
+                continue
             yield {
                 'type_instance': metric,
-                'values': data[metric]
+                'values': value
             }
 
 plugin = ElasticsearchClusterHealthPlugin(collectd)
