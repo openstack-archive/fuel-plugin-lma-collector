@@ -18,7 +18,8 @@ define lma_collector::collectd::openstack (
   $password,
   $tenant,
   $keystone_url,
-  $timeout = undef,
+  $timeout = 20,
+  $max_retries = 2,
   $pacemaker_master_resource = undef,
 ) {
 
@@ -32,17 +33,16 @@ define lma_collector::collectd::openstack (
     fail("service '${service}' is not supported")
   }
 
-  $real_timeout = $timeout ? {
-    undef   => $lma_collector::params::openstack_client_timeout,
-    default => $timeout,
-  }
+  validate_integer($timeout)
+  validate_integer($max_retries)
 
   $config = {
     'Username'    => "\"${user}\"",
     'Password'    => "\"${password}\"",
     'Tenant'      => "\"${tenant}\"",
     'KeystoneUrl' => "\"${keystone_url}\"",
-    'Timeout'     => "\"${real_timeout}\"",
+    'Timeout'     => "\"${timeout}\"",
+    'MaxRetries'  => "\"${max_retries}\"",
   }
 
   if $pacemaker_master_resource {
