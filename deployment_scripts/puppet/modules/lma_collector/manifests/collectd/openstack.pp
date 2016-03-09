@@ -19,6 +19,7 @@ define lma_collector::collectd::openstack (
   $tenant,
   $keystone_url,
   $timeout = undef,
+  $max_retries = undef,
   $pacemaker_master_resource = undef,
 ) {
 
@@ -33,9 +34,17 @@ define lma_collector::collectd::openstack (
   }
 
   $real_timeout = $timeout ? {
-    undef   => $lma_collector::params::openstack_client_timeout,
+    undef   => $lma_collector::params::openstack_client_objects_timeout,
     default => $timeout,
   }
+
+  $real_max_retries = $max_retries ? {
+    undef   => $lma_collector::params::openstack_client_objects_max_retries,
+    default => $max_retries,
+  }
+
+  validate_integer($real_timeout)
+  validate_integer($real_max_retries)
 
   $config = {
     'Username'    => "\"${user}\"",
@@ -43,6 +52,7 @@ define lma_collector::collectd::openstack (
     'Tenant'      => "\"${tenant}\"",
     'KeystoneUrl' => "\"${keystone_url}\"",
     'Timeout'     => "\"${real_timeout}\"",
+    'MaxRetries'  => "\"${real_max_retries}\"",
   }
 
   if $pacemaker_master_resource {
