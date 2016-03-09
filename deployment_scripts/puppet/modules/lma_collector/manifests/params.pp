@@ -109,6 +109,10 @@ class lma_collector::params {
   $openstack_tenant = ''
   $openstack_url = 'http://127.0.0.1:5000/v2.0/'
   $openstack_client_timeout = 5
+  # The timeout/max_retries are defined according to the observations on
+  # 200 nodes environments with 600 VMs. See #1554502 for details.
+  $openstack_client_objects_timeout = 20
+  $openstack_client_objects_max_retries = 2
   $nova_cpu_allocation_ratio = 16.0
   $fstypes = ['ext2', 'ext3', 'ext4', 'xfs']
   $collectd_types = [ 'ceph', 'ceph_perf' ]

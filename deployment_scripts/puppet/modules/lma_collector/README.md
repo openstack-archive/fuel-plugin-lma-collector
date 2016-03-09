@@ -952,7 +952,10 @@ The resource title should be set to the service name (e.g. `'nova'`).
   a string.
 * `timeout`: *Optional*. Timeout in seconds beyond which the collector
   considers that the endpoint doesn't respond. Valid options: an integer.
-  Default: 5.
+  Default: 20.
+* `max_retries`: *Optional*. Number of maximum retries when error occur
+  (including timeout). Valid options: an integer.
+  Default: 2.
 * `pacemaker_master_resource`: *Optional*. Name of the pacemaker resource used
   to determine if the collecting of statistics should be active. This is
   a parameter for advanced users. For this to function the
