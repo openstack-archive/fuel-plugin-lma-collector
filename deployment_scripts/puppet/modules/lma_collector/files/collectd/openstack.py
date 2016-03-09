@@ -151,6 +151,10 @@ class CollectdPlugin(base.Base):
 
     def __init__(self, *args, **kwargs):
         super(CollectdPlugin, self).__init__(*args, **kwargs)
+        # The timeout/max_retries are defined according to the observations on
+        # 200 nodes environments with 600 VMs. See #1554502 for details.
+        self.timeout = 20
+        self.max_retries = 2
         self.os_client = None
         self.extra_config = {}
 
