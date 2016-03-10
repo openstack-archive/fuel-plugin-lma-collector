@@ -4,7 +4,7 @@
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/check_environment_configuration.pp
-    puppet_modules: puppet/modules
+    puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 300
 
 # The Hiera data needs to be populated first so that other plugins (eg LMA
@@ -14,7 +14,7 @@
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/hiera_override.pp
-    puppet_modules: puppet/modules
+    puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
 
 # The following tasks are executed in the order they are declared
@@ -27,7 +27,7 @@
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/configure_apt.pp
-    puppet_modules: puppet/modules
+    puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
 
 - role: '*'
@@ -35,7 +35,7 @@
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/base.pp
-    puppet_modules: puppet/modules
+    puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
 
 - role: '*'
@@ -43,7 +43,7 @@
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/aggregator.pp
-    puppet_modules: puppet/modules
+    puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
 
 - role: ['controller', 'primary-controller']
@@ -51,7 +51,7 @@
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/controller.pp
-    puppet_modules: puppet/modules
+    puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
 
 - role: [ 'compute' ]
@@ -59,7 +59,7 @@
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/compute.pp
-    puppet_modules: puppet/modules
+    puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
 
 - role: ['cinder']
@@ -67,7 +67,7 @@
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/cinder.pp
-    puppet_modules: puppet/modules
+    puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
 
 - role: ['ceph-osd']
@@ -75,7 +75,7 @@
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/ceph_osd.pp
-    puppet_modules: puppet/modules
+    puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
 
 - role: '*'
@@ -83,7 +83,7 @@
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/configure_afd_filters.pp
-    puppet_modules: puppet/modules
+    puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
 
 - role:
@@ -95,7 +95,7 @@
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/lma_backends.pp
-    puppet_modules: puppet/modules
+    puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
 
 - role: '*'
@@ -103,6 +103,6 @@
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/cleanup_apt_config.pp
-    puppet_modules: puppet/modules
+    puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
 
