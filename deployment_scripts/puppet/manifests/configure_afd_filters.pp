@@ -64,7 +64,8 @@ if $alerting_mode == 'remote' {
     if ! $lma_infra_alerting {
       notice('Could not get the LMA Infrastructure Alerting parameters. The LMA-Infrastructure-Alerting plugin is probably not installed.')
     } elsif ! $lma_infra_alerting['metadata']['enabled'] {
-      notice('Could not get the LMA Infrastructure Alerting parameters. The LMA-Infrastructure-Alerting plugin is probably not enabled for this environment.')
+      notice(join(['Could not get the LMA Infrastructure Alerting parameters. ',
+        'The LMA-Infrastructure-Alerting plugin is probably not enabled for this environment.'], ''))
     } else {
       notice('The LMA-Infrastructure-Alerting plugin is enabled but no alerting node for this environment.')
     }

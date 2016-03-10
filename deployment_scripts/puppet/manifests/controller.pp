@@ -248,7 +248,8 @@ if $influxdb_mode != 'disabled' {
   $cinder         = hiera_hash('cinder', {})
   $haproxy_socket = '/var/lib/haproxy/stats'
 
-  if $storage_options['volumes_ceph'] or $storage_options['images_ceph'] or $storage_options['objects_ceph'] or $storage_options['ephemeral_ceph']{
+  if $storage_options['volumes_ceph'] or $storage_options['images_ceph'] or
+      $storage_options['objects_ceph'] or $storage_options['ephemeral_ceph']{
     $ceph_enabled = true
   } else {
     $ceph_enabled = false
