@@ -45,7 +45,8 @@ if $influxdb_mode == 'local' {
     fail('Could not get the InfluxDB parameters. The InfluxDB-Grafana plugin is probably not installed.')
   }
   elsif ! $influxdb_grafana['metadata']['enabled'] {
-    fail('Could not get the InfluxDB parameters. The InfluxDB-Grafana plugin is probably not enabled for this environment.')
+    fail(join(['Could not get the InfluxDB parameters. ',
+      'The InfluxDB-Grafana plugin is probably not enabled for this environment.'], ''))
   }
   # Check that the InfluxDB-Grafana node exists in the environment
   $influxdb_nodes = filter_nodes(hiera('nodes'), 'role', 'influxdb_grafana')
@@ -63,7 +64,8 @@ if $alerting_mode == 'local' {
     fail('Could not get the LMA Infrastructure Alerting parameters. The LMA-Infrastructure-Alerting plugin is probably not installed.')
   }
   elsif ! $infra_alerting['metadata']['enabled'] {
-    fail('Could not get the LMA Infrastructure Alerting parameters. The LMA-Infrastructure-Alerting plugin is probably not enabled for this environment.')
+    fail(join(['Could not get the LMA Infrastructure Alerting parameters. ',
+      'The LMA-Infrastructure-Alerting plugin is probably not enabled for this environment.'], ''))
   }
   # Check that the LMA-Infrastructure-Alerting node exists in the environment
   $infra_alerting_nodes = filter_nodes(hiera('nodes'), 'role', 'infrastructure_alerting')

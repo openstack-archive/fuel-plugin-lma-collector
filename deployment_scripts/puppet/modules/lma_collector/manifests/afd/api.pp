@@ -25,7 +25,8 @@ class lma_collector::afd::api () {
   heka::filter::sandbox { 'afd_api_endpoints':
     config_dir      => $lma_collector::params::config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/afd_api_endpoints.lua",
-    message_matcher => '(Type == \'metric\' || Type == \'heka.sandbox.metric\') && Fields[name] =~ /^openstack.*check_api$/',
+    message_matcher => join(['(Type == \'metric\' || Type == \'heka.sandbox.metric\') &&',
+      ' Fields[name] =~ /^openstack.*check_api$/'], ''),
     notify          => Class['lma_collector::service'],
   }
 }

@@ -88,7 +88,8 @@ if $lma_collector['influxdb_mode'] != 'disabled' {
     $haproxy_socket = undef
   }
 
-  if $storage_options['volumes_ceph'] or $storage_options['images_ceph'] or $storage_options['objects_ceph'] or $storage_options['ephemeral_ceph']{
+  if $storage_options['volumes_ceph'] or $storage_options['images_ceph'] or
+      $storage_options['objects_ceph'] or $storage_options['ephemeral_ceph']{
     $ceph_enabled = true
   } else {
     $ceph_enabled = false
