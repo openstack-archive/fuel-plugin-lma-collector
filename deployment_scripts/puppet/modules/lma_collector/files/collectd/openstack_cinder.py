@@ -18,6 +18,7 @@ import collectd
 
 import base
 import collectd_openstack as openstack
+import re
 
 PLUGIN_NAME = 'cinder'
 INTERVAL = openstack.INTERVAL
@@ -26,12 +27,47 @@ INTERVAL = openstack.INTERVAL
 class CinderStatsPlugin(openstack.CollectdPlugin):
     """ Class to report the statistics on Cinder service.
 
+        state of agents
         number of volumes broken down by state
         total size of volumes usable and in error state
     """
 
     @base.read_callback_wrapper
     def read_callback(self):
+
+        # Get information of the state per service
+        # State can be up, down or disabled
+        # From API you get: status = 'disabled' or 'enabled'
+        #                   state = 'up' or 'down'
+        data = {}
+        states = {'up': 0, 'down': 1, 'disabled': 2}
+        cinder_re = re.compile('^cinder-')
+
+        for worker in self.workers_state('cinder'):
+            if isinstance(worker, dict):
+                host = worker['host'].split('.')[0]
+                service = cinder_re.sub('', worker['service'])
+                state = worker['state']
+
+                if service not in data:
+                    data[service] = {'up': 0, 'down': 0, 'disabled': 0}
+
+                if state not in data[service]:
+                    self.logger.warning(
+                        "Wrong cinder worker state {}".format(state))
+                    continue
+
+                data[service][state] += 1
+                self.dispatch_value('cinder_service', '', states[state],
+                                    {'host': host,
+                                     'service': service,
+                                     'state': state})
+
+        for key, val in data.iteritems():
+            for state, count in val.iteritems():
+                self.dispatch_value('cinder_services', '', count,
+                                    {'state': state, 'service': key})
+
         volumes_details = self.get_objects_details('cinder', 'volumes')
 
         def groupby(d):
@@ -63,7 +99,7 @@ class CinderStatsPlugin(openstack.CollectdPlugin):
         for n, size in sizes.iteritems():
             self.dispatch_value('snapshots_size', n, size)
 
-    def dispatch_value(self, plugin_instance, name, value):
+    def dispatch_value(self, plugin_instance, name, value, meta={'0': True}):
         v = collectd.Values(
             plugin=PLUGIN_NAME,  # metric source
             plugin_instance=plugin_instance,
@@ -71,7 +107,7 @@ class CinderStatsPlugin(openstack.CollectdPlugin):
             type_instance=name,
             interval=INTERVAL,
             # w/a for https://github.com/collectd/collectd/issues/716
-            meta={'0': True},
+            meta=meta,
             values=[value]
         )
         v.dispatch()
