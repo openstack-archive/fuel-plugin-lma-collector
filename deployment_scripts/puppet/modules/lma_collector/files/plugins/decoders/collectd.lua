@@ -232,9 +232,22 @@ function process_message ()
                     msg['Fields']['state'] = sample['type_instance']
                 end
             elseif metric_source == 'cinder' then
-                msg['Fields']['name'] = 'openstack' .. sep .. 'cinder' .. sep .. replace_dot_by_sep(sample['plugin_instance'])
-                msg['Fields']['tag_fields'] = { 'state' }
-                msg['Fields']['state'] = sample['type_instance']
+                if sample['plugin_instance'] == 'cinder_services' then
+                    msg['Fields']['name'] = 'openstack_' .. sample['plugin_instance']
+                    msg['Fields']['tag_fields'] = { 'service', 'state' }
+                    msg['Fields']['service'] = sample['meta']['service']
+                    msg['Fields']['state'] = sample['meta']['state']
+                elseif sample['plugin_instance'] == 'cinder_service' then
+                    msg['Fields']['name'] = 'openstack_' .. sample['plugin_instance']
+                    msg['Fields']['tag_fields'] = { 'service', 'state' }
+                    msg['Fields']['service'] = sample['meta']['service']
+                    msg['Fields']['state'] = sample['meta']['state']
+                    msg['Fields']['hostname'] = sample['meta']['host']
+                else
+                    msg['Fields']['name'] = 'openstack' .. sep .. 'cinder' .. sep .. replace_dot_by_sep(sample['plugin_instance'])
+                    msg['Fields']['tag_fields'] = { 'state' }
+                    msg['Fields']['state'] = sample['type_instance']
+                end
             elseif metric_source == 'glance' then
                 -- TODO(pasquier-s): check if the collectd plugin can send state as type_instance
                 local resource, visibility, state = string.match(sample['type_instance'], '^([^.]+)%.([^.]+)%.(.+)$')
@@ -322,17 +335,6 @@ function process_message ()
                         msg['Fields'][additional_tag] = sample['type_instance']
                     end
                 end
-            elseif metric_source ==  'dbi' and sample['plugin_instance'] == 'services_cinder' then
-                local service, state, hostname = split_service_and_state_and_hostname(sample['type_instance'])
-                if hostname then
-                    msg['Fields']['name'] = 'openstack' .. sep .. 'cinder' .. sep .. 'service'
-                    msg['Fields']['hostname'] = hostname
-                else
-                    msg['Fields']['name'] = 'openstack' .. sep .. 'cinder' .. sep .. 'services'
-                end
-                msg['Fields']['tag_fields'] = { 'service', 'state' }
-                msg['Fields']['service'] = service
-                msg['Fields']['state'] = state
             elseif metric_source ==  'dbi' and sample['plugin_instance'] == 'agents_neutron' then
                 local service, state, hostname = split_service_and_state_and_hostname(sample['type_instance'])
                 if hostname then
