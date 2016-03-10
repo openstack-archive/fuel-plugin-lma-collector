@@ -363,14 +363,6 @@ if $influxdb_mode != 'disabled' {
     password => $nova['db_password'],
   }
 
-  lma_collector::collectd::dbi_services { 'cinder':
-    username        => 'cinder',
-    dbname          => 'cinder',
-    password        => $cinder['db_password'],
-    report_interval => 60,
-    downtime_factor => 2,
-  }
-
   unless $contrail {
     lma_collector::collectd::dbi_services { 'neutron':
       username        => 'neutron',
