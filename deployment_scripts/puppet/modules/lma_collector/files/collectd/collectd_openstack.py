@@ -20,6 +20,8 @@ import dateutil.tz
 import requests
 import simplejson as json
 
+from collections import defaultdict
+
 
 # By default, query OpenStack API endpoints every 50 seconds. We choose a value
 # less than the default group by interval (which is 60 seconds) to avoid gaps
@@ -258,13 +260,10 @@ class CollectdPlugin(base.Base):
                                group_by_func,
                                count_func=None):
 
-        """ Dispatch values of object number grouped by criteria."""
+        """ Count the number of items grouped by arbitrary criteria."""
 
-        status = {}
+        counts = defaultdict(int)
         for obj in list_object:
             s = group_by_func(obj)
-            if s in status:
-                status[s] += count_func(obj) if count_func else 1
-            else:
-                status[s] = count_func(obj) if count_func else 1
-        return status
+            counts[s] += count_func(obj) if count_func else 1
+        return counts
