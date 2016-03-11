@@ -194,25 +194,10 @@ function process_message ()
                     msg['Fields']['name'] = msg['Fields']['name'] .. sample['type_instance']
                 end
             elseif metric_source == 'rabbitmq_info' then
-                if sample['type_instance'] ~= 'consumers' and
-                   sample['type_instance'] ~= 'messages' and
-                   sample['type_instance'] ~= 'memory' and
-                   sample['type_instance'] ~= 'used_memory' and
-                   sample['type_instance'] ~= 'unmirrored_queues' and
-                   sample['type_instance'] ~= 'vm_memory_limit' and
-                   sample['type_instance'] ~= 'disk_free_limit' and
-                   sample['type_instance'] ~= 'disk_free' and
-                   sample['type_instance'] ~= 'remaining_memory' and
-                   sample['type_instance'] ~= 'remaining_disk' and
-                   (string.match(sample['type_instance'], '%.consumers$') or
-                   string.match(sample['type_instance'], '%.messages$') or
-                   string.match(sample['type_instance'], '%.memory$')) then
-                    local q, m = string.match(sample['type_instance'], '^(.+)%.([^.]+)$')
-                    msg['Fields']['name'] = 'rabbitmq_queue' .. sep .. m
-                    msg['Fields']['queue'] = q
+                msg['Fields']['name'] = 'rabbitmq' .. sep .. sample['type_instance']
+                if sample['meta'] and sample['meta']['queue'] then
+                    msg['Fields']['queue'] = sample['meta']['queue']
                     msg['Fields']['tag_fields'] = { 'queue' }
-                else
-                    msg['Fields']['name'] = 'rabbitmq' .. sep .. sample['type_instance']
                 end
             elseif metric_source == 'nova' then
                 msg['Fields']['name'] = 'openstack' .. sep .. 'nova' .. sep .. replace_dot_by_sep(sample['plugin_instance'])
