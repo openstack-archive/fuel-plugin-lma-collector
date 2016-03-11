@@ -39,19 +39,6 @@ function replace_dot_by_sep (str)
     return string.gsub(str, '%.', sep)
 end
 
-function split_service_and_state_and_hostname(str)
-    -- Possible values:
-    --   services.compute.down.node-1.test.domain.local
-    --   services.scheduler.up
-    --   agents.dhcp.down.node-44
-    --   agents.dhcp.up
-    --   services.scheduler.disabled.rbd:volumes
-    local service, state, hostname = string.match(str, '^%w+%.([%w-]+)%.([%w-]+)%.?(.-)$')
-    -- remove domain part of the hostname or nil if string is empty
-    hostname = string.match(hostname, '^([^.]+)')
-    return replace_dot_by_sep(service), state, hostname
-end
-
 function process_message ()
     local ok, samples = pcall(cjson.decode, read_message("Payload"))
     if not ok then
@@ -266,6 +253,15 @@ function process_message ()
                     skip_it = true
                 elseif sample['type_instance'] == 'subnets' then
                     msg['Fields']['name'] = 'openstack'  .. sep .. 'neutron' .. sep .. 'subnets'
+                elseif sample['type_instance'] == 'neutron_agents' or
+                       sample['type_instance'] == 'neutron_agent' then
+                    msg['Fields']['name'] = 'openstack_' .. sample['type_instance']
+                    msg['Fields']['tag_fields'] = { 'service', 'state' }
+                    msg['Fields']['service'] = sample['meta']['service']
+                    msg['Fields']['state'] = sample['meta']['state']
+                    if sample['type_instance'] == 'neutron_agent'  then
+                        msg['Fields']['hostname'] = sample['meta']['host']
+                    end
                 elseif string.match(sample['type_instance'], '^ports') then
                     local resource, owner, state = string.match(sample['type_instance'], '^([^.]+)%.([^.]+)%.(.+)$')
                     msg['Fields']['name'] = 'openstack'  .. sep .. 'neutron' .. sep .. replace_dot_by_sep(resource)
@@ -331,17 +327,6 @@ function process_message ()
                         msg['Fields'][additional_tag] = sample['type_instance']
                     end
                 end
-            elseif metric_source ==  'dbi' and sample['plugin_instance'] == 'agents_neutron' then
-                local service, state, hostname = split_service_and_state_and_hostname(sample['type_instance'])
-                if hostname then
-                    msg['Fields']['name'] = 'openstack' .. sep .. 'neutron' .. sep .. 'agent'
-                    msg['Fields']['hostname'] = hostname
-                else
-                    msg['Fields']['name'] = 'openstack' .. sep .. 'neutron' .. sep .. 'agents'
-                end
-                msg['Fields']['tag_fields'] = { 'service', 'state' }
-                msg['Fields']['service'] = service
-                msg['Fields']['state'] = state
             elseif metric_source == 'pacemaker_resource' then
                 msg['Fields']['name'] = 'pacemaker_local_resource_active'
                 msg['Fields']['tag_fields'] = { 'resource' }
