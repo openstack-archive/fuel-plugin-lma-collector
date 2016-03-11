@@ -191,10 +191,24 @@ class RabbitMqPlugin(base.Base):
 
             queue_name = ctl_stats[0]
             if self._matching_queue(queue_name):
-                queue_name = ctl_stats[0][:self.MAX_QUEUE_IDENTIFIER_LENGTH]
-                stats['%s.messages' % queue_name] = ctl_stats[1]
-                stats['%s.memory' % queue_name] = ctl_stats[2]
-                stats['%s.consumers' % queue_name] = ctl_stats[3]
+                meta = {
+                    'queue': ctl_stats[0][:self.MAX_QUEUE_IDENTIFIER_LENGTH]
+                }
+                yield {
+                    'type_instance': 'queue_messages',
+                    'values': ctl_stats[1],
+                    'meta': meta
+                }
+                yield {
+                    'type_instance': 'queue_memory',
+                    'values': ctl_stats[2],
+                    'meta': meta
+                }
+                yield {
+                    'type_instance': 'queue_consumers',
+                    'values': ctl_stats[3],
+                    'meta': meta
+                }
 
             # we need to check if the list of synchronised slaves is
             # equal to the list of slaves.
@@ -238,8 +252,6 @@ class RabbitMqPlugin(base.Base):
                 self.logger.warning('%s returned something strange.' %
                                     self.pmap_bin)
 
-        # TODO(pasquier-s): define and use own types instead of the generic
-        # GAUGE type
         for k, v in stats.iteritems():
             yield {'type_instance': k, 'values': v}
 
