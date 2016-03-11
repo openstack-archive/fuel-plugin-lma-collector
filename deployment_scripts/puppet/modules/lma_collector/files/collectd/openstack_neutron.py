@@ -18,6 +18,9 @@ import collectd
 
 import base
 import collectd_openstack as openstack
+from collections import Counter
+from collections import defaultdict
+import re
 
 PLUGIN_NAME = 'neutron'
 INTERVAL = openstack.INTERVAL
@@ -26,6 +29,7 @@ INTERVAL = openstack.INTERVAL
 class NeutronStatsPlugin(openstack.CollectdPlugin):
     """ Class to report the statistics on Neutron service.
 
+        state of agents
         number of networks broken down by status
         number of subnets
         number of ports broken down by owner and status
@@ -33,8 +37,13 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
         number of floating IP addresses broken down by free/associated
     """
 
+    neutron_re = re.compile('^neutron-')
+    agent_re = re.compile('-agent$')
+    states = {'up': 0, 'down': 1, 'disabled': 2}
+
     @base.read_callback_wrapper
     def read_callback(self):
+
         def groupby_network(x):
             return "networks.%s" % x.get('status', 'unknown').lower()
 
@@ -59,6 +68,29 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
             else:
                 status = 'free'
             return "floatingips.%s" % status
+
+        # Get information of the state per agent
+        # State can be up or down
+        aggregated_agents = defaultdict(Counter)
+
+        for agent in self.iter_workers('neutron'):
+            host = agent['host'].split('.')[0]
+            service = NeutronStatsPlugin.agent_re.sub(
+                '', NeutronStatsPlugin.neutron_re.sub('', agent['service']))
+            state = agent['state']
+
+            aggregated_agents[service][state] += 1
+            self.dispatch_value('neutron_agent',
+                                NeutronStatsPlugin.states[state],
+                                {'host': host,
+                                 'service': service,
+                                 'state': state})
+
+        for service in aggregated_agents:
+            for state in NeutronStatsPlugin.states:
+                self.dispatch_value('neutron_agents',
+                                    aggregated_agents[service][state],
+                                    {'service': service, 'state': state})
 
         # Networks
         networks = self.get_objects('neutron', 'networks', api_version='v2.0')
@@ -97,14 +129,14 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
             self.dispatch_value(s, nb)
         self.dispatch_value('floatingips', len(floatingips))
 
-    def dispatch_value(self, name, value):
+    def dispatch_value(self, name, value, meta=None):
         v = collectd.Values(
             plugin=PLUGIN_NAME,  # metric source
             type='gauge',
             type_instance=name,
             interval=INTERVAL,
             # w/a for https://github.com/collectd/collectd/issues/716
-            meta={'0': True},
+            meta=meta or {'0': True},
             values=[value]
         )
         v.dispatch()
