@@ -106,8 +106,7 @@ class APICheckPlugin(openstack.CollectdPlugin):
                 type_instance=item['region'],
                 interval=INTERVAL,
                 values=[item['status']],
-                # w/a for https://github.com/collectd/collectd/issues/716
-                meta={'0': True}
+                meta={'region': item['region']}
             )
             value.dispatch()
 
