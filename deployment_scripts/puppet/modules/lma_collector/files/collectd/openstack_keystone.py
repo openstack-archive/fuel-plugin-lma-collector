@@ -45,7 +45,7 @@ class KeystoneStatsPlugin(openstack.CollectdPlugin):
         status = self.count_objects_group_by(tenants_details,
                                              group_by_func=groupby)
         for s, nb in status.iteritems():
-            self.dispatch_value('tenants.' + s, nb)
+            self.dispatch_value('tenants', nb, meta={'state': s})
 
         # users
         r = self.get('keystone', 'users')
@@ -56,7 +56,7 @@ class KeystoneStatsPlugin(openstack.CollectdPlugin):
         status = self.count_objects_group_by(users_details,
                                              group_by_func=groupby)
         for s, nb in status.iteritems():
-            self.dispatch_value('users.' + s, nb)
+            self.dispatch_value('users', nb, meta={'state': s})
 
         # roles
         r = self.get('keystone', 'OS-KSADM/roles')
@@ -66,14 +66,14 @@ class KeystoneStatsPlugin(openstack.CollectdPlugin):
         roles = r.json().get('roles', [])
         self.dispatch_value('roles', len(roles))
 
-    def dispatch_value(self, name, value):
+    def dispatch_value(self, name, value, meta=None):
         v = collectd.Values(
             plugin=PLUGIN_NAME,  # metric source
             type='gauge',
             type_instance=name,
             interval=INTERVAL,
             # w/a for https://github.com/collectd/collectd/issues/716
-            meta={'0': True},
+            meta=meta or {'0': True},
             values=[value]
         )
         v.dispatch()
