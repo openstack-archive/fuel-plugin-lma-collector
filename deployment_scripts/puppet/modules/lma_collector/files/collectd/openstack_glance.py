@@ -49,7 +49,9 @@ class GlanceStatsPlugin(openstack.CollectdPlugin):
         status = self.count_objects_group_by(images_details,
                                              group_by_func=groupby)
         for s, nb in status.iteritems():
-            self.dispatch_value(s, nb)
+            (name, visibility, status) = s.split('.')
+            self.dispatch_value(name, nb, meta={'visibility': visibility,
+                                                'status': status})
 
         # sizes
         def count_size_bytes(d):
@@ -66,16 +68,18 @@ class GlanceStatsPlugin(openstack.CollectdPlugin):
                                             group_by_func=groupby_size,
                                             count_func=count_size_bytes)
         for s, nb in sizes.iteritems():
-            self.dispatch_value(s, nb)
+            (name, visibility, status) = s.split('.')
+            self.dispatch_value(name, nb, meta={'visibility': visibility,
+                                                'status': status})
 
-    def dispatch_value(self, name, value):
+    def dispatch_value(self, name, value, meta=None):
         v = collectd.Values(
             plugin=PLUGIN_NAME,  # metric source
             type='gauge',
             type_instance=name,
             interval=INTERVAL,
             # w/a for https://github.com/collectd/collectd/issues/716
-            meta={'0': True},
+            meta=meta or {'0': True},
             values=[value]
         )
         v.dispatch()

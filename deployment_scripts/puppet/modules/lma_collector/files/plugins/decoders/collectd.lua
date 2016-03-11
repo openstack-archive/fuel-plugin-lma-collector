@@ -223,12 +223,10 @@ function process_message ()
                 msg['Fields']['tag_fields'] = { 'state' }
                 msg['Fields']['state'] = sample['type_instance']
             elseif metric_source == 'glance' then
-                -- TODO(pasquier-s): check if the collectd plugin can send state as type_instance
-                local resource, visibility, state = string.match(sample['type_instance'], '^([^.]+)%.([^.]+)%.(.+)$')
-                msg['Fields']['name'] = 'openstack'  .. sep .. 'glance' .. sep .. replace_dot_by_sep(resource)
+                msg['Fields']['name'] = 'openstack'  .. sep .. 'glance' .. sep .. sample['type_instance']
                 msg['Fields']['tag_fields'] = { 'state', 'visibility' }
-                msg['Fields']['state'] = state
-                msg['Fields']['visibility'] = visibility
+                msg['Fields']['state'] = sample['meta']['status']
+                msg['Fields']['visibility'] = sample['meta']['visibility']
             elseif metric_source == 'keystone' then
                 -- TODO(pasquier-s): check if the collectd plugin can send state as type_instance
                 if sample['type_instance'] == 'roles' then
