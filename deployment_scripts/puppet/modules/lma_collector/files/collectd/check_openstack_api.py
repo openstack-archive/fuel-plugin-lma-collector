@@ -103,11 +103,9 @@ class APICheckPlugin(openstack.CollectdPlugin):
                 plugin=PLUGIN_NAME,
                 plugin_instance=item['service'],
                 type='gauge',
-                type_instance=item['region'],
                 interval=INTERVAL,
                 values=[item['status']],
-                # w/a for https://github.com/collectd/collectd/issues/716
-                meta={'0': True}
+                meta={'region': item['region']}
             )
             value.dispatch()
 
