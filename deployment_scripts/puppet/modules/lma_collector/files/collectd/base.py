@@ -92,11 +92,14 @@ class Base(object):
             - 'type_instance' (optional)
             - 'plugin_instance' (optional)
             - 'type' (optional, default='gauge')
+            - 'meta' (optional)
 
         For example:
 
             {'type_instance':'foo', 'values': 1}
             {'type_instance':'bar', 'type': 'DERIVE', 'values': 1}
+            {'type_instance':'bar', 'type': 'DERIVE', 'values': 1,
+                'meta':   {'tagA': 'valA'}}
             {'type': 'dropped_bytes', 'values': [1,2]}
         """
         raise NotImplemented("Must be implemented by the subclass!")
@@ -120,7 +123,7 @@ class Base(object):
             type_instance=type_instance,
             values=values,
             # w/a for https://github.com/collectd/collectd/issues/716
-            meta={'0': True}
+            meta=metric.get('meta', {'0': True})
         )
         v.dispatch()
 
