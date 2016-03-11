@@ -228,15 +228,11 @@ function process_message ()
                 msg['Fields']['state'] = sample['meta']['status']
                 msg['Fields']['visibility'] = sample['meta']['visibility']
             elseif metric_source == 'keystone' then
-                -- TODO(pasquier-s): check if the collectd plugin can send state as type_instance
-                if sample['type_instance'] == 'roles' then
-                    msg['Fields']['name'] = 'openstack'  .. sep .. 'keystone' .. sep .. sample['type_instance']
-                else
-                    local resource, state = string.match(sample['type_instance'], '^([^.]+)%.(.+)$')
-                    msg['Fields']['name'] = 'openstack'  .. sep .. 'keystone' .. sep .. replace_dot_by_sep(resource)
-                    msg['Fields']['tag_fields'] = { 'state' }
-                    msg['Fields']['state'] = state
-                end
+               msg['Fields']['name'] = 'openstack'  .. sep .. 'keystone' .. sep .. sample['type_instance']
+               if sample['meta']['state'] then
+                   msg['Fields']['tag_fields'] = { 'state' }
+                   msg['Fields']['state'] = sample['meta']['state']
+               end
             elseif metric_source == 'neutron' then
                 if sample['type_instance'] == 'networks' or sample['type_instance'] == 'ports' or sample['type_instance'] == 'routers' or sample['type_instance'] == 'floatingips' then
                     skip_it = true
