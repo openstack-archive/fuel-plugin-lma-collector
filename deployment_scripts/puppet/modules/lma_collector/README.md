@@ -203,24 +203,6 @@ class { 'lma_collector::collectd::openstack_checks':
 }
 ```
 
-### Collectd OpenStack service worker statuses
-
-To make the collector collect statuses of workers of an OpenStack service
-declare the `lma_collector::collectd::dbi_services` define:
-
-```puppet
-lma_collector::collectd::dbi_services { 'nova':
-  dbname          => 'nova',
-  username        => 'nova',
-  password        => 'nova',
-  report_interval => 60,
-  downtime_factor => 2,
-}
-```
-
-This define can be used for the following OpenStack services: nova, cinder and
-neutron.
-
 ### Collect HAProxy statistics
 
 To make the collector collect statistics for HAProxy declare the
