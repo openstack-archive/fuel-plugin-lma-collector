@@ -187,26 +187,40 @@ class CollectdPlugin(base.Base):
 
         where 'state' can be 'up', 'down' or 'disabled'
         """
-        ost_services_r = self.get(service, 'os-services')
+
+        if service == 'neutron':
+            endpoint = 'v2.0/agents'
+            entry = 'agents'
+        else:
+            endpoint = 'os-services'
+            entry = 'services'
+
+        ost_services_r = self.get(service, endpoint)
         r_status = ost_services_r.status_code
         try:
             r_json = ost_services_r.json()
         except ValueError:
             r_json = {}
 
-        if r_status == 200 and 'services' in r_json:
-            for val in r_json['services']:
+        if r_status == 200 and entry in r_json:
+            for val in r_json[entry]:
                 data = {'host': val['host'], 'service': val['binary']}
 
-                if val['status'] == 'disabled':
-                    data['state'] = 'disabled'
-                elif val['state'] == 'up' or val['state'] == 'down':
-                    data['state'] = val['state']
+                if service == 'neutron':
+                    if not val['admin_state_up']:
+                        data['state'] = 'disabled'
+                    else:
+                        data['state'] = 'up' if val['alive'] else 'down'
                 else:
-                    msg = "Unknown state for {} workers:{}".format(
-                        service, val['state'])
-                    self.logger.warning(msg)
-                    continue
+                    if val['status'] == 'disabled':
+                        data['state'] = 'disabled'
+                    elif val['state'] == 'up' or val['state'] == 'down':
+                        data['state'] = val['state']
+                    else:
+                        msg = "Unknown state for {} workers:{}".format(
+                            service, val['state'])
+                        self.logger.warning(msg)
+                        continue
 
                 yield data
         else:
