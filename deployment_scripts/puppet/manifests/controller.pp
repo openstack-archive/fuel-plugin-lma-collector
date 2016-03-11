@@ -364,16 +364,6 @@ if $influxdb_mode != 'disabled' {
     password => $nova['db_password'],
   }
 
-  unless $contrail {
-    lma_collector::collectd::dbi_services { 'neutron':
-      username        => 'neutron',
-      dbname          => 'neutron',
-      password        => $neutron['database']['passwd'],
-      report_interval => 15,
-      downtime_factor => 4,
-    }
-  }
-
   class { 'lma_collector::collectd::haproxy':
     socket       => $haproxy_socket,
     # Ignore internal stats ('Stats' for 6.1, 'stats' for 7.0) and lma proxies
