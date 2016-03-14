@@ -15,7 +15,7 @@
 prepare_network_config(hiera('network_scheme', {}))
 $mgmt_address   = get_network_role_property('management', 'ipaddr')
 $lma_collector  = hiera_hash('lma_collector')
-$roles          = node_roles(hiera('nodes'), hiera('uid'))
+$roles          = node_roles(hiera_array('nodes'), hiera('uid'))
 $is_controller  = member($roles, 'controller') or member($roles, 'primary-controller')
 
 $aggregator_address = hiera('management_vip')

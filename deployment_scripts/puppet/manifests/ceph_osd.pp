@@ -15,7 +15,7 @@
 $lma_collector_hash = hiera_hash('lma_collector')
 
 if $lma_collector_hash['influxdb_mode'] != 'disabled' {
-  $nodes_hash = hiera('nodes', {})
+  $nodes_hash = hiera_array('nodes', {})
   $roles = node_roles($nodes_hash, hiera('uid'))
   # Only install this python collectd plugin if ceph-osd is not deployed on a
   # controller node. This is due to a limitation of the python plugin puppet
