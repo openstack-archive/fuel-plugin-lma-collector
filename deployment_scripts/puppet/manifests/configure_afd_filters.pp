@@ -15,7 +15,7 @@
 include lma_collector::params
 
 $lma           = hiera_hash('lma_collector', {})
-$roles         = node_roles(hiera('nodes'), hiera('uid'))
+$roles         = node_roles(hiera_array('nodes'), hiera('uid'))
 $is_controller = member($roles, 'controller') or member($roles, 'primary-controller')
 
 $alarms_definitions = $lma['alarms']
@@ -58,7 +58,7 @@ if $alerting_mode == 'remote' {
       $nagios_server = $network_metadata['vips']['infrastructure_alerting_mgmt_vip']['ipaddr']
     } else {
       # compatibility with the LMA Infrastructure Alerting plugin 0.8
-      $nagios_nodes = filter_nodes(hiera('nodes'), 'role', 'infrastructure_alerting')
+      $nagios_nodes = filter_nodes(hiera_array('nodes'), 'role', 'infrastructure_alerting')
       $nagios_server = $nagios_nodes[0]['internal_address']
     }
     $nagios_user = $lma_infra_alerting['nagios_user']
