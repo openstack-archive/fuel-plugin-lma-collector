@@ -1,2 +1,138 @@
----
-[]
+- id: lma-check-env-configuration
+  type: puppet
+  version: 2.0.0
+  requires: [deploy_start]
+  groups: ['primary-controller']
+  parameters:
+    puppet_manifest: puppet/manifests/check_environment_configuration.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 300
+
+# The Hiera data needs to be populated first so that other plugins (eg LMA
+# Infrastructure Alerting) can use it
+- id: lma-stage1-hiera-override
+  type: puppet
+  version: 2.0.0
+  requires: [lma-check-env-configuration]
+  groups: [/*/]
+  parameters:
+    puppet_manifest: puppet/manifests/hiera_override.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+- id: lma-stage1-configure-apt
+  type: puppet
+  version: 2.0.0
+  requires: [lma-check-env-configuration]
+  groups: [/*/]
+  parameters:
+    puppet_manifest: puppet/manifests/configure_apt.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+- id: lma-base
+  type: puppet
+  version: 2.0.0
+  requires: [lma-stage1-hiera-override, lma-stage1-configure-apt]
+  groups: [/*/]
+  parameters:
+    puppet_manifest: puppet/manifests/base.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+- id: lma-main-controller
+  type: puppet
+  version: 2.0.0
+  requires: [lma-base]
+  groups: ['controller', 'primary-controller']
+  parameters:
+    puppet_manifest: puppet/manifests/controller.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+- id: lma-main-compute
+  type: puppet
+  version: 2.0.0
+  requires: [lma-base]
+  groups: [ 'compute' ]
+  parameters:
+    puppet_manifest: puppet/manifests/compute.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+- id: lma-main-cinder
+  type: puppet
+  version: 2.0.0
+  requires: [lma-base]
+  groups: ['cinder']
+  parameters:
+    puppet_manifest: puppet/manifests/cinder.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+- id: lma-main-ceph-osd
+  type: puppet
+  version: 2.0.0
+  requires: [lma-base]
+  groups: ['ceph-osd']
+  parameters:
+    puppet_manifest: puppet/manifests/ceph_osd.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+- id: lma-aggregator
+  type: puppet
+  version: 2.0.0
+  cross-depends:
+    - name: /lma-main/
+      role: self
+  groups: [/*/]
+  parameters:
+    puppet_manifest: puppet/manifests/aggregator.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+- id: lma-configure-afd-filters
+  type: puppet
+  version: 2.0.0
+  requires: [lma-aggregator]
+  groups: [/*/]
+  parameters:
+    puppet_manifest: puppet/manifests/configure_afd_filters.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+- id: lma-backends
+  type: puppet
+  version: 2.0.0
+  cross-depends:
+    - name: /lma-base/
+      role: self
+    - name: /influxdb-db-configuration/
+      role: /influxdb_grafana/
+    - name: /lma-install-elasticsearch/
+      role: /elasticsearch_kibana/
+  groups:
+    - primary-elasticsearch_kibana
+    - elasticsearch_kibana
+    - primary-influxdb_grafana
+    - influxdb_grafana
+  parameters:
+    puppet_manifest: puppet/manifests/lma_backends.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+# We prefix with "last" because we want to add a dependency with
+# all other lma tasks. This one must be done at the end.
+- id: last-cleanup-apt-config
+  type: puppet
+  version: 2.0.0
+  cross-depends:
+    - name: /^lma/
+      role: self
+  groups: [/*/]
+  parameters:
+    puppet_manifest: puppet/manifests/cleanup_apt_config.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
