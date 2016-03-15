@@ -29,24 +29,47 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+import base
 import collectd
 import csv
+import itertools
 import socket
 
-NAMES_MAPPING = {}
+from collections import defaultdict
+
 NAME = 'haproxy'
 RECV_SIZE = 1024
-METRIC_TYPES = {
-    'bin': ('bytes_in', 'gauge'),
-    'bout': ('bytes_out', 'gauge'),
-    'chkfail': ('failed_checks', 'gauge'),
+SERVER_METRICS = {
     'CurrConns': ('connections', 'gauge'),
     'CurrSslConns': ('ssl_connections', 'gauge'),
+    'PipesUsed': ('pipes_used', 'gauge'),
+    'PipesFree': ('pipes_free', 'gauge'),
+    'Run_queue': ('run_queue', 'gauge'),
+    'Tasks': ('tasks', 'gauge'),
+    'Uptime_sec': ('uptime', 'gauge'),
+}
+FRONTEND_METRIC_TYPES = {
+    'bin': ('bytes_in', 'gauge'),
+    'bout': ('bytes_out', 'gauge'),
+    'dresp': ('denied_responses', 'gauge'),
+    'dreq': ('denied_requests', 'gauge'),
+    'ereq': ('error_requests', 'gauge'),
+    'hrsp_1xx': ('response_1xx', 'gauge'),
+    'hrsp_2xx': ('response_2xx', 'gauge'),
+    'hrsp_3xx': ('response_3xx', 'gauge'),
+    'hrsp_4xx': ('response_4xx', 'gauge'),
+    'hrsp_5xx': ('response_5xx', 'gauge'),
+    'hrsp_other': ('response_other', 'gauge'),
+    'stot': ('session_total', 'gauge'),
+    'scur': ('session_current', 'gauge'),
+}
+BACKEND_METRIC_TYPES = {
+    'bin': ('bytes_in', 'gauge'),
+    'bout': ('bytes_out', 'gauge'),
     'downtime': ('downtime', 'gauge'),
     'dresp': ('denied_responses', 'gauge'),
     'dreq': ('denied_requests', 'gauge'),
     'econ': ('error_connection', 'gauge'),
-    'ereq': ('error_requests', 'gauge'),
     'eresp': ('error_responses', 'gauge'),
     'hrsp_1xx': ('response_1xx', 'gauge'),
     'hrsp_2xx': ('response_2xx', 'gauge'),
@@ -54,19 +77,12 @@ METRIC_TYPES = {
     'hrsp_4xx': ('response_4xx', 'gauge'),
     'hrsp_5xx': ('response_5xx', 'gauge'),
     'hrsp_other': ('response_other', 'gauge'),
-    'PipesUsed': ('pipes_used', 'gauge'),
-    'PipesFree': ('pipes_free', 'gauge'),
     'qcur': ('queue_current', 'gauge'),
-    'Tasks': ('tasks', 'gauge'),
-    'Run_queue': ('run_queue', 'gauge'),
     'stot': ('session_total', 'gauge'),
     'scur': ('session_current', 'gauge'),
     'wredis': ('redistributed', 'gauge'),
     'wretr': ('retries', 'gauge'),
     'status': ('status', 'gauge'),
-    'Uptime_sec': ('uptime', 'gauge'),
-    'up': ('up', 'gauge'),
-    'down': ('down', 'gauge'),
 }
 
 STATUS_MAP = {
@@ -78,22 +94,12 @@ FRONTEND_TYPE = '0'
 BACKEND_TYPE = '1'
 BACKEND_SERVER_TYPE = '2'
 
-METRIC_AGGREGATED = ['bin', 'bout', 'qcur', 'scur', 'eresp',
-                     'hrsp_1xx', 'hrsp_2xx', 'hrsp_3xx', 'hrsp_4xx',
-                     'hrsp_5xx', 'hrsp_other', 'wretr']
-
-
-METRIC_DELIM = '.'  # for the frontend/backend stats
-
 HAPROXY_SOCKET = '/var/lib/haproxy/stats'
 DEFAULT_PROXY_MONITORS = ['server', 'frontend', 'backend', 'backend_server']
-VERBOSE_LOGGING = False
-PROXY_MONITORS = []
-PROXY_IGNORE = []
 
 
 class HAProxySocket(object):
-    def __init__(self, socket_file=HAPROXY_SOCKET):
+    def __init__(self, socket_file):
         self.socket_file = socket_file
 
     def connect(self):
@@ -138,141 +144,144 @@ class HAProxySocket(object):
         return result
 
 
-def get_stats():
-    stats = dict()
-    haproxy = HAProxySocket(HAPROXY_SOCKET)
+class HAProxyPlugin(base.Base):
+    def __init__(self, *args, **kwargs):
+        super(HAProxyPlugin, self).__init__(*args, **kwargs)
+        self.plugin = NAME
+        self.names_mapping = {}
+        self.proxy_monitors = []
+        self.proxy_ignore = []
+        self.socket = HAPROXY_SOCKET
 
-    try:
-        server_info = haproxy.get_server_info()
-        server_stats = haproxy.get_server_stats()
-    except socket.error:
-        logger('warn',
-               "Unable to connect to HAProxy socket at %s" % HAPROXY_SOCKET)
-        return stats
+    def get_proxy_name(self, pxname):
+        if pxname not in self.names_mapping:
+            self.logger.info('Mapping missing for "%s"' % pxname)
+        return self.names_mapping.get(pxname, pxname)
 
-    if 'server' in PROXY_MONITORS:
-        for key, val in server_info.items():
+    def itermetrics(self):
+        haproxy = HAProxySocket(self.socket)
+
+        # Collect server statistics
+        if 'server' in self.proxy_monitors:
             try:
-                stats[key] = int(val)
-            except (TypeError, ValueError):
-                pass
-
-    for statdict in server_stats:
-        if not (statdict['svname'].lower() in PROXY_MONITORS or
-                statdict['pxname'].lower() in PROXY_MONITORS or
-                ('backend_server' in PROXY_MONITORS and
-                 statdict['type'] == BACKEND_SERVER_TYPE)):
-            continue
-
-        if statdict['pxname'] in PROXY_IGNORE:
-            continue
-
-        pxname = statdict['pxname']
-        # Translate to meaningful names
-        if pxname in NAMES_MAPPING:
-            pxname = NAMES_MAPPING.get(pxname)
-        else:
-            logger('verb', 'Mapping missing for "%s"' % pxname)
-
-        if statdict['type'] == BACKEND_SERVER_TYPE:
-            # Count the number of servers per backend and per status
-            for status_val in STATUS_MAP.keys():
-                # Initialize all possible metric keys to zero
-                metricname = METRIC_DELIM.join(['backend',
-                                                pxname,
-                                                'servers',
-                                                status_val.lower()]
-                                               )
-                if metricname not in stats:
-                    stats[metricname] = 0
-                if statdict['status'] == status_val:
-                    stats[metricname] += 1
-            continue
-
-        for key, val in statdict.items():
-            metricname = METRIC_DELIM.join([statdict['svname'].lower(),
-                                            pxname, key]
-                                           )
-            try:
-                if key == 'status' and statdict['type'] == BACKEND_TYPE:
-                    if val in STATUS_MAP:
-                        val = STATUS_MAP[val]
-                    else:
+                stats = haproxy.get_server_info()
+            except socket.error:
+                self.logger.warning(
+                    "Unable to connect to HAProxy socket at %s" % self.socket)
+            else:
+                for k, v in stats.iteritems():
+                    if k not in SERVER_METRICS:
                         continue
-                stats[metricname] = int(val)
-                if key in METRIC_AGGREGATED:
-                    agg_metricname = METRIC_DELIM.join(
-                        [statdict['svname'].lower(), key]
-                    )
-                    if agg_metricname not in stats:
-                        stats[agg_metricname] = 0
-                    stats[agg_metricname] += int(val)
-            except (TypeError, ValueError):
-                pass
-    return stats
+                    type_instance = SERVER_METRICS[k][0]
+                    type_ = SERVER_METRICS[k][1]
+                    yield {
+                        'type_instance': type_instance,
+                        'type': type_,
+                        'values': int(v),
+                    }
+
+        try:
+            stats = haproxy.get_server_stats()
+        except socket.error:
+            self.logger.warning(
+                "Unable to connect to HAProxy socket at %s" % self.socket)
+            return
+
+        def match(x):
+            if x['pxname'] in self.proxy_ignore:
+                return False
+            return (x['svname'].lower() in self.proxy_monitors or
+                    x['pxname'].lower() in self.proxy_monitors or
+                    ('backend_server' in self.proxy_monitors and
+                     x['type'] == BACKEND_SERVER_TYPE))
+        stats = [x for x in stats if match(x)]
+        for stat in stats:
+            stat['pxname'] = self.get_proxy_name(stat['pxname'])
+
+        # Collect statistics for the frontends and the backends
+        for stat in itertools.ifilter(lambda x: x['type'] == FRONTEND_TYPE or
+                                      x['type'] == BACKEND_TYPE, stats):
+            if stat['type'] == FRONTEND_TYPE:
+                metrics = FRONTEND_METRIC_TYPES
+                side = 'frontend'
+            else:
+                metrics = BACKEND_METRIC_TYPES
+                side = 'backend'
+            for k, metric in metrics.iteritems():
+                if k not in stat:
+                    self.logger.warning("Can't find {} metric".format(k))
+                    continue
+                value = stat[k]
+
+                metric_name = '{}_{}'.format(side, metric[0])
+                meta = {
+                    side: stat['pxname']
+                }
+
+                if metric[0] == 'status':
+                    value = STATUS_MAP[value]
+                else:
+                    value = int(value) if value else 0
+
+                yield {
+                    'type_instance': metric_name,
+                    'type': metric[1],
+                    'values': value,
+                    'meta': meta
+                }
+
+        # Count the number of servers per backend and state
+        backend_server_states = {}
+        for stat in itertools.ifilter(lambda x:
+                                      x['type'] == BACKEND_SERVER_TYPE, stats):
+            pxname = stat['pxname']
+            if pxname not in backend_server_states:
+                backend_server_states[pxname] = defaultdict(int)
+            backend_server_states[pxname][stat['status']] += 1
+
+        for pxname, states in backend_server_states.iteritems():
+            for s in STATUS_MAP.keys():
+                yield {
+                    'type_instance': 'backend_servers',
+                    'values': states.get(s, 0),
+                    'meta': {
+                        'backend': pxname,
+                        'state': s.lower()
+                    }
+                }
+
+    def config_callback(self, conf):
+        for node in conf.children:
+            if node.key == "ProxyMonitor":
+                self.proxy_monitors.append(node.values[0])
+            elif node.key == "ProxyIgnore":
+                self.proxy_ignore.append(node.values[0])
+            elif node.key == "Socket":
+                self.socket = node.values[0]
+            elif node.key == "Mapping":
+                self.names_mapping[node.values[0]] = node.values[1]
+            else:
+                self.logger.warning('Unknown config key: %s' % node.key)
+
+        if not self.proxy_monitors:
+            self.proxy_monitors += DEFAULT_PROXY_MONITORS
+        self.proxy_monitors = [p.lower() for p in self.proxy_monitors]
 
 
-def configure_callback(conf):
-    global PROXY_MONITORS, PROXY_IGNORE, HAPROXY_SOCKET, VERBOSE_LOGGING
+plugin = HAProxyPlugin(collectd)
 
-    for node in conf.children:
-        if node.key == "ProxyMonitor":
-            PROXY_MONITORS.append(node.values[0])
-        elif node.key == "ProxyIgnore":
-            PROXY_IGNORE.append(node.values[0])
-        elif node.key == "Socket":
-            HAPROXY_SOCKET = node.values[0]
-        elif node.key == "Verbose":
-            VERBOSE_LOGGING = bool(node.values[0])
-        elif node.key == "Mapping":
-            NAMES_MAPPING[node.values[0]] = node.values[1]
-        else:
-            logger('warn', 'Unknown config key: %s' % node.key)
 
-    if not PROXY_MONITORS:
-        PROXY_MONITORS += DEFAULT_PROXY_MONITORS
-    PROXY_MONITORS = [p.lower() for p in PROXY_MONITORS]
+def init_callback():
+    plugin.restore_sigchld()
+
+
+def config_callback(conf):
+    plugin.config_callback(conf)
 
 
 def read_callback():
-    logger('verb', "beginning read_callback")
-    info = get_stats()
+    plugin.read_callback()
 
-    if not info:
-        logger('warn', "%s: No data received" % NAME)
-        return
-
-    for key, value in info.items():
-        key_prefix = ''
-        key_root = key
-        if value not in METRIC_TYPES:
-            try:
-                key_prefix, key_root = key.rsplit(METRIC_DELIM, 1)
-            except ValueError:
-                pass
-        if key_root not in METRIC_TYPES:
-            continue
-
-        key_root, val_type = METRIC_TYPES[key_root]
-        key_name = METRIC_DELIM.join([n for n in [key_prefix, key_root] if n])
-        val = collectd.Values(plugin=NAME, type=val_type)
-        val.type_instance = key_name
-        val.values = [value]
-        # w/a for https://github.com/collectd/collectd/issues/716
-        val.meta = {'0': True}
-        val.dispatch()
-
-
-def logger(t, msg):
-    if t == 'err':
-        collectd.error('%s: %s' % (NAME, msg))
-    elif t == 'warn':
-        collectd.warning('%s: %s' % (NAME, msg))
-    elif t == 'verb':
-        if VERBOSE_LOGGING:
-            collectd.info('%s: %s' % (NAME, msg))
-    else:
-        collectd.notice('%s: %s' % (NAME, msg))
-
-collectd.register_config(configure_callback)
+collectd.register_init(init_callback)
+collectd.register_config(config_callback)
 collectd.register_read(read_callback)
