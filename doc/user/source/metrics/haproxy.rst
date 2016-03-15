@@ -36,10 +36,6 @@ Server
 Frontends
 ^^^^^^^^^
 
-* ``haproxy_frontend_bytes_in``, the total number of bytes received by all frontends.
-* ``haproxy_frontend_bytes_out``, the total number of bytes transmitted by all frontends.
-* ``haproxy_frontend_session_current``, the total number of current sessions for all frontends.
-
 The following metrics have a ``frontend`` field that contains the name of the frontend server.
 
 * ``haproxy_frontend_bytes_in``, the number of bytes received by the frontend.
@@ -59,12 +55,6 @@ The following metrics have a ``frontend`` field that contains the name of the fr
 Backends
 ^^^^^^^^
 .. _haproxy_backend_metric:
-
-* ``haproxy_backend_bytes_in``, the total number of bytes received by all backends.
-* ``haproxy_backend_bytes_out``, the total number of bytes transmitted by all backends.
-* ``haproxy_backend_queue_current``, the total number of requests in queue for all backends.
-* ``haproxy_backend_session_current``, the total number of current sessions for all backends.
-* ``haproxy_backend_error_responses``, the total number of error responses for all backends.
 
 The following metrics have a ``backend`` field that contains the name of the backend server.
 
