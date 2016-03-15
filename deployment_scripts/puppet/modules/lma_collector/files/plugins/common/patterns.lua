@@ -128,8 +128,8 @@ local openstack_response_time = l.P"time: "^-1 * l.Cg(l.digit^1 * dot^0 * l.digi
 -- Capture for OpenStack HTTP producing six values: http_method, http_url,
 -- http_version, http_status, http_response_size and http_response_time.
 openstack_http = anywhere(l.Ct(
-    quote * http_request * quote * sp *
-    openstack_http_status * sp * openstack_response_size * sp *
+    quote * http_request * quote * sp^1 *
+    openstack_http_status * sp^1 * openstack_response_size * sp^1 *
     openstack_response_time
 ))
 
