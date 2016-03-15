@@ -29,10 +29,11 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-import base
 import collectd
 import csv
 import socket
+
+import collectd_base as base
 
 from collections import defaultdict
 
