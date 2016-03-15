@@ -16,7 +16,7 @@
 # Collectd plugin for checking the status of OpenStack API services
 import collectd
 
-import base
+import collectd_base as base
 import collectd_openstack as openstack
 
 from urlparse import urlparse
