@@ -95,6 +95,19 @@ TestPatterns = {}
              http_response_time = 0.0006731})
     end
 
+    function TestPatterns:test_openstack_http_with_extra_space()
+        assertEquals(patt.openstack_http:match(
+            '"OPTIONS / HTTP/1.0" status: 200  len: 497 time: 0.0006731'),
+            {http_method = 'OPTIONS', http_url = '/', http_version = '1.0',
+             http_status = '200', http_response_size = 497,
+             http_response_time = 0.0006731})
+        assertEquals(patt.openstack_http:match(
+            'foo "OPTIONS / HTTP/1.0" status: 200  len: 497 time: 0.0006731 bar'),
+            {http_method = 'OPTIONS', http_url = '/', http_version = '1.0',
+             http_status = '200', http_response_size = 497,
+             http_response_time = 0.0006731})
+    end
+
     function TestPatterns:test_ip_address()
         assertEquals(patt.ip_address:match('192.168.1.2'),
             {ip_address = '192.168.1.2'})
