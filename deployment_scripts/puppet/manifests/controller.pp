@@ -395,6 +395,7 @@ if $influxdb_mode != 'disabled' {
     # Ignore internal stats ('Stats' for 6.1, 'stats' for 7.0) and lma proxies
     proxy_ignore => ['Stats', 'stats', 'lma'],
     proxy_names  => {
+      'ceilometer'          => 'ceilometer-api',
       'cinder-api'          => 'cinder-api',
       'glance-api'          => 'glance-api',
       'glance-registry'     => 'glance-registry-api',
