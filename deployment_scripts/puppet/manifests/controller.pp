@@ -299,7 +299,7 @@ if $influxdb_mode != 'disabled' {
   }
 
   class { 'lma_collector::collectd::rabbitmq':
-    queue => ['/^(\\w*notifications\\.(error|info|warn)|[a-z]+)$/'],
+    queue => ['/^(\\w*notifications\\.(error|info|warn)|[a-z]+|(metering|event)\.sample)$/'],
   }
 
   $pacemaker_master_resource = 'vip__management'
