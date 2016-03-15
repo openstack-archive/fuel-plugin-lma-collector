@@ -238,22 +238,18 @@ function process_message ()
             elseif metric_source == 'memcached' then
                 msg['Fields']['name'] = 'memcached' .. sep .. string.gsub(metric_name, 'memcached_', '')
             elseif metric_source == 'haproxy' then
-                if not string.match(sample['type_instance'], '^frontend') and
-                   not string.match(sample['type_instance'], '^backend') then
-                    msg['Fields']['name'] = 'haproxy' .. sep .. sample['type_instance']
-                elseif string.match(sample['type_instance'], '^[^.]+%.[^.]+$') then
-                    skip_it = true
-                else
-                    local side, name, m, state = string.match(sample['type_instance'], '^([^.]+)%.([^.]+)%.([^.]+)%.([^.]+)$')
-                    if not side then
-                        side, name, m = string.match(sample['type_instance'], '^([^.]+)%.([^.]+)%.([^.]+)$')
-                    end
-                    msg['Fields']['name'] = 'haproxy' .. sep .. side .. sep .. m
-                    msg['Fields']['tag_fields'] = { side } -- backend or frontend
-                    msg['Fields'][side] = name
-                    if state then
-                        msg['Fields']['tag_fields'][2] = 'state'
-                        msg['Fields']['state'] = state
+                msg['Fields']['name'] = 'haproxy' .. sep .. sample['type_instance']
+                if sample['meta'] then
+                    if sample['meta']['backend'] then
+                        msg['Fields']['tag_fields'] = { 'backend' }
+                        msg['Fields']['backend'] = sample['meta']['backend']
+                        if sample['meta']['state'] then
+                            msg['Fields']['tag_fields'][2] = 'state'
+                            msg['Fields']['state'] = sample['meta']['state']
+                        end
+                    elseif sample['meta']['frontend'] then
+                        msg['Fields']['tag_fields'] = { 'frontend' }
+                        msg['Fields']['frontend'] = sample['meta']['frontend']
                     end
                 end
             elseif metric_source == 'apache' then
