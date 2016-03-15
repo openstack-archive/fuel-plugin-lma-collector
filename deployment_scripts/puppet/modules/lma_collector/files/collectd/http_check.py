@@ -14,9 +14,9 @@
 # limitations under the License.
 
 import collectd
-
-import base
 import requests
+
+import collectd_base as base
 
 
 NAME = 'http_check'

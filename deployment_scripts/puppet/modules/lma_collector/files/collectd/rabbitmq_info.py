@@ -21,7 +21,7 @@
 import collectd
 import re
 
-import base
+import collectd_base as base
 
 
 NAME = 'rabbitmq_info'

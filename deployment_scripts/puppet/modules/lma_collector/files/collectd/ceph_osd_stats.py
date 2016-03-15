@@ -13,8 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import base
 import collectd
+
+import collectd_base as base
 
 INTERVAL = 60
 

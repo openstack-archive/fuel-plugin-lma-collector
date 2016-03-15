@@ -16,7 +16,7 @@
 # Collectd plugin for getting resource statistics from Neutron
 import collectd
 
-import base
+import collectd_base as base
 import collectd_openstack as openstack
 
 PLUGIN_NAME = 'neutron'
