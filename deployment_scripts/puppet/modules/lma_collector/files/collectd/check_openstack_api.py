@@ -31,21 +31,21 @@ class APICheckPlugin(openstack.CollectdPlugin):
     # TODO(all): sahara, murano
     CHECK_MAP = {
         'keystone': {
-            'path': '/', 'expect': 300, 'name': 'keystone-public-api'},
-        'heat': {'path': '/', 'expect': 300, 'name': 'heat-api'},
-        'heat-cfn': {'path': '/', 'expect': 300, 'name': 'heat-cfn-api'},
-        'glance': {'path': '/', 'expect': 300, 'name': 'glance-api'},
-        'cinder': {'path': '/', 'expect': 200, 'name': 'cinder-api'},
-        'cinderv2': {'path': '/', 'expect': 200, 'name': 'cinder-v2-api'},
-        'neutron': {'path': '/', 'expect': 200, 'name': 'neutron-api'},
-        'nova': {'path': '/', 'expect': 200, 'name': 'nova-api'},
+            'path': '/', 'expect': [300], 'name': 'keystone-public-api'},
+        'heat': {'path': '/', 'expect': [300], 'name': 'heat-api'},
+        'heat-cfn': {'path': '/', 'expect': [300], 'name': 'heat-cfn-api'},
+        'glance': {'path': '/', 'expect': [300], 'name': 'glance-api'},
+        'cinder': {'path': '/', 'expect': [200, 300], 'name': 'cinder-api'},
+        'cinderv2': {'path': '/', 'expect': [200, 300], 'name': 'cinder-v2-api'},
+        'neutron': {'path': '/', 'expect': [200], 'name': 'neutron-api'},
+        'nova': {'path': '/', 'expect': [200], 'name': 'nova-api'},
         # Ceilometer requires authentication for all paths
         'ceilometer': {
-            'path': 'v2/capabilities', 'expect': 200, 'auth': True,
+            'path': 'v2/capabilities', 'expect': [200], 'auth': True,
             'name': 'ceilometer-api'},
-        'swift': {'path': 'healthcheck', 'expect': 200, 'name': 'swift-api'},
+        'swift': {'path': 'healthcheck', 'expect': [200], 'name': 'swift-api'},
         'swift_s3': {
-            'path': 'healthcheck', 'expect': 200, 'name': 'swift-s3-api'},
+            'path': 'healthcheck', 'expect': [200], 'name': 'swift-s3-api'},
     }
 
     def _service_url(self, endpoint, path):
@@ -73,7 +73,7 @@ class APICheckPlugin(openstack.CollectdPlugin):
                 url = self._service_url(service['url'], check['path'])
                 r = self.raw_get(url, token_required=check.get('auth', False))
 
-                if r is None or r.status_code != check['expect']:
+                if r is None or r.status_code not in check['expect']:
                     def _status(ret):
                         return 'N/A' if r is None else r.status_code
 
