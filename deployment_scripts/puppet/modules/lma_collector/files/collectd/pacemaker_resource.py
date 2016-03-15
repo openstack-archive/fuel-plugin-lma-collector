@@ -16,7 +16,7 @@
 import collectd
 import socket
 
-import base
+import collectd_base as base
 
 NAME = 'pacemaker_resource'
 CRM_RESOURCE_BIN = '/usr/sbin/crm_resource'
