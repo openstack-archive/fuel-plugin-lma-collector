@@ -13,15 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import base
 import datetime
 import dateutil.parser
 import dateutil.tz
 import requests
 import simplejson as json
 
-from collections import defaultdict
+import collectd_base as base
 
+from collections import defaultdict
 
 # By default, query OpenStack API endpoints every 50 seconds. We choose a value
 # less than the default group by interval (which is 60 seconds) to avoid gaps

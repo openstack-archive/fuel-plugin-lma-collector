@@ -19,7 +19,7 @@ from collections import Counter
 from collections import defaultdict
 import re
 
-import base
+import collectd_base as base
 import collectd_openstack as openstack
 
 PLUGIN_NAME = 'neutron'
