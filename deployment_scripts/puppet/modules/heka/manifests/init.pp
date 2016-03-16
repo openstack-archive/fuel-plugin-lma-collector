@@ -94,7 +94,7 @@ class heka (
   $heka_user     = $heka::params::user
 
   package { $heka::params::package_name:
-    ensure => present,
+    ensure => latest,
     alias  => 'heka',
   }
 
