@@ -93,7 +93,7 @@ class heka (
   $run_as_root   = $heka_user == 'root'
 
   package { $heka::params::package_name:
-    ensure => present,
+    ensure => latest,
     alias  => 'heka',
   }
 
