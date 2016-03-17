@@ -24,10 +24,10 @@ $current_roles     = hiera('roles')
 $network_metadata  = hiera_hash('network_metadata')
 
 $elasticsearch_kibana = hiera_hash('elasticsearch_kibana', {})
-$es_nodes = filter_nodes(hiera('nodes'), 'role', 'elasticsearch_kibana')
+$es_nodes = get_nodes_hash_by_roles($network_metadata, ['elasticsearch_kibana'])
 
 $influxdb_grafana = hiera_hash('influxdb_grafana', {})
-$influxdb_nodes = filter_nodes(hiera('nodes'), 'role', 'influxdb_grafana')
+$influxdb_nodes = get_nodes_hash_by_roles($network_metadata, ['influxdb_grafana'])
 
 if $lma_collector['environment_label'] != '' {
   $environment_label = $lma_collector['environment_label']
