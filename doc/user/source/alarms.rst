@@ -57,7 +57,7 @@ The health status of a cluster is inferred by the GSE plugins using
 aggregation and correlation rules and facts contained in the
 *AFD metrics* it receives from the Collectors.
 
-In the current version of the LMA Toolchain, three :ref:`gse_plugins` are configured:
+In the current version of the LMA Toolchain, three :ref:`GSE plugins <gse_plugins>` are configured:
 
 * The Service Cluster GSE which receives metrics from the AFD plugins monitoring
   the services and emits health status for the clusters of services (nova-api, nova-scheduler and so on).
@@ -102,7 +102,7 @@ The *AFD metrics* and *GSE metrics* are new types of metrics introduced
 in LMA v 0.8. They contain detailed information about the entities
 being monitored.
 Please refer to the `Metrics section of the Developer Guide
-<http://fuel-plugin-lma-collector.readthedocs.org/en/latest/dev/metrics.html>`_
+<http://fuel-plugin-lma-collector.readthedocs.org/en/latest/appendix_b.html>`_
 for further information about the structure of those messages.
 
 Any backend system that has a *Persister* plugged
@@ -149,8 +149,7 @@ as shown in the example below::
           periods: 0
           function: min
 
-Where:
-~~~~~~
+**Where**
 
 | name:
 |   Type: unicode
@@ -208,8 +207,6 @@ Where:
 |   Type: integer
 |   The number of prior time-series analysis window to compare the window with (this is
 |   not implemented yet)
-
-.. _alarm_functions:
 
 | function
 |   Type: enum('last' | 'min' | 'max' | 'sum' | 'count' | 'avg' | 'median' | 'mode' | 'roc' | 'mww' | 'mww_nonparametric')

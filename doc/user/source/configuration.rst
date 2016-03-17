@@ -8,7 +8,7 @@ Configuration Guide
 Plugin configuration
 --------------------
 
-To configure your plugin, you need to follow the folling steps:
+To configure your plugin, you need to follow the following steps:
 
 1. `Create a new environment <http://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#launch-wizard-to-create-new-environment>`_ with the Fuel web user interface.
 
@@ -18,7 +18,7 @@ To configure your plugin, you need to follow the folling steps:
    Alerting (LMA) Collector Plugin' section. You should see a page like this.
 
 .. image:: ../../images/collector_settings.png
-   :scale: 50 %
+   :width: 350pt
    :alt: The LMA Collector settings
    :align: center
 
@@ -35,7 +35,7 @@ To configure your plugin, you need to follow the folling steps:
      InfluxDB database name you want to use, a username and password that has read and write
      access permissions.
   d. For 'Alerting', select 'Alerts sent by email' if you want to receive alerts sent by email
-     from the Collector. Otherwise, select 'Alerts sent to a local node' if you plan to
+     from the Collector. Otherwise, select 'Alerts sent to a local cluster' if you plan to
      use the Infrastructure Alerting Plugin in this environment.
      Alternatively, you can select 'Alerts sent to a remote Nagios server'.
   e. For 'Alerts sent by email', you can specify the SMTP authentication method you want to use. Then,
