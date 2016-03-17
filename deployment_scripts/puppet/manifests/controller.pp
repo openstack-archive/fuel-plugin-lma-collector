@@ -458,7 +458,7 @@ if $influxdb_mode != 'disabled' {
     } else {
       # compatibility with the InfluxDB-Grafana plugin 0.8
       $influxdb_grafana = hiera_hash('influxdb_grafana', {})
-      $influxdb_nodes = filter_nodes(hiera('nodes'), 'role', 'influxdb_grafana')
+      $influxdb_nodes = get_nodes_hash_by_roles($network_metadata, ['influxdb_grafana'])
       $influxdb_server = $influxdb_nodes[0]['internal_address']
     }
   } else {
@@ -502,7 +502,7 @@ if $alerting_mode == 'remote' {
       $nagios_server = $network_metadata['vips']['infrastructure_alerting_mgmt_vip']['ipaddr']
     } else {
       # compatibility with the LMA Infrastructure Alerting plugin 0.8
-      $nagios_nodes = filter_nodes(hiera('nodes'), 'role', 'infrastructure_alerting')
+      $nagios_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting'])
       $nagios_server = $nagios_nodes[0]['internal_address']
     }
     $nagios_user = $lma_infra_alerting['nagios_user']

@@ -58,7 +58,7 @@ if $alerting_mode == 'remote' {
       $nagios_server = $network_metadata['vips']['infrastructure_alerting_mgmt_vip']['ipaddr']
     } else {
       # compatibility with the LMA Infrastructure Alerting plugin 0.8
-      $nagios_nodes = filter_nodes(hiera('nodes'), 'role', 'infrastructure_alerting')
+      $nagios_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting'])
       $nagios_server = $nagios_nodes[0]['internal_address']
     }
     $nagios_user = $lma_infra_alerting['nagios_user']
