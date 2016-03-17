@@ -22,7 +22,7 @@ I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) source
 SVG2PDF       = inkscape
 SVG2PDF_FLAGS =
 # Build a list of SVG files to convert to PDF
-PDF_FILES := $(foreach dir, images, $(patsubst %.svg,%.pdf,$(wildcard $(dir)/*.svg)))
+PDF_FILES := $(foreach dir, ../images, $(patsubst %.svg,%.pdf,$(wildcard $(dir)/*.svg)))
 
 
 .PHONY: help clean html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest gettext
