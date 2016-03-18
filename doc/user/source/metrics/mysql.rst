@@ -28,8 +28,8 @@ Handlers
 ^^^^^^^^
 
 ``mysql_handler``, the number of times per second a given handler has been
-executed. The metric has a ``handler`` field that contains the handler to which
-it applies. The values can be:
+executed. The metric has a ``handler`` field that contains the handler
+it applies to. The values can be:
 
 * ``commit`` for the internal COMMIT statements.
 * ``delete`` for the internal DELETE statements.
@@ -72,8 +72,8 @@ for further details.
 
 * ``mysql_cluster_size``, current number of nodes in the cluster.
 * ``mysql_cluster_status``, ``1`` when the node is 'Primary', ``2`` if 'Non-Primary' and ``3`` if 'Disconnected'.
-* ``mysql_cluster_connected``, ``1`` when the node is connected to the cluster, ``0`` otherwise.
-* ``mysql_cluster_ready``, ``1`` when the node is ready to accept queries, ``0`` otherwise.
+* ``mysql_cluster_connected``, ``1`` when the node is connected to the cluster, if not ``0``.
+* ``mysql_cluster_ready``, ``1`` when the node is ready to accept queries, if not ``0``.
 * ``mysql_cluster_local_commits``, number of writesets commited on the node.
 * ``mysql_cluster_received_bytes``, total size in bytes of writesets received from other nodes.
 * ``mysql_cluster_received``, total number of writesets received from other nodes.

@@ -8,7 +8,7 @@ Configuration Guide
 Plugin configuration
 --------------------
 
-To configure your plugin, you need to follow the folling steps:
+To configure your plugin, you need to follow these steps:
 
 1. `Create a new environment <http://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#launch-wizard-to-create-new-environment>`_ with the Fuel web user interface.
 
@@ -22,7 +22,7 @@ To configure your plugin, you need to follow the folling steps:
    :alt: The LMA Collector settings
    :align: center
 
-4. Check the 'The Logging, Monitoring and Alerting (LMA) Collector Plugin' box and
+4. Tick the 'The Logging, Monitoring and Alerting (LMA) Collector Plugin' box and
    fill-in the required fields as indicated below.
 
   a. Provide an 'Environment Label' of your choice to tag your data (optional).
@@ -39,9 +39,9 @@ To configure your plugin, you need to follow the folling steps:
      use the Infrastructure Alerting Plugin in this environment.
      Alternatively, you can select 'Alerts sent to a remote Nagios server'.
   e. For 'Alerts sent by email', you can specify the SMTP authentication method you want to use. Then,
-     specify the SMTP server fully qualified name or IP address, the SMTP username and password that
-     the permissions to send emails.
-  f. Finaly, specify the Nagios server URL, username and password if you have chosen to send 
+     specify the SMTP server fully qualified name or IP address, the SMTP username and password who
+     have the permissions to send emails.
+  f. Finally, specify the Nagios server URL, username and password if you have chosen to send 
      alerts to an external Nagios server.
 
 5. `Configure your environment <http://docs.mirantis.com/openstack/fuel/fuel-8.0/user-guide.html#configure-your-environment>`_ as needed.
