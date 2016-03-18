@@ -18,7 +18,7 @@ Each Collector is individually responsible for supporting the sensing,
 measurement, collection, analysis and alarm functions for the node
 it is running on.
 
-A wealth of operational data are collected from a variety of sources including
+A wealth of operational data is collected from a variety of sources including
 log files, collectd and RabbitMQ for the OpenStack notifications.
 
 .. note:: The Collector which runs on the active controller of the control plane
@@ -69,7 +69,7 @@ The output of the Collector / Aggregator is of four kinds:
 * The health status metrics for the OpenStack services which are sent to Nagios
   (or via SMTP) for alerting and escalation purposes.
 * The annotation messages which are sent to InfluxDB. The annotation messages contain
-  information about what caused a service cluster or node cluster to change a state.
+  information about what caused a service cluster or node cluster to change state.
   The annotation messages provide root cause analysis hints whenever possible.
   The annotation messages are also used to construct the alert notifications that are
   sent via SMTP or to Nagios.
@@ -94,4 +94,4 @@ Requirements
 Limitations
 -----------
 
-The plugin is not compatible with OpenStack environments deployed with Nova-Network.
+The plugin is not compatible with an OpenStack environment deployed with Nova-Network.

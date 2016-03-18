@@ -18,7 +18,7 @@ Metrics have a ``cpu_number`` field that contains the CPU number to which the me
 Disk
 ^^^^
 
-Metrics have a ``device`` field that contains the disk device number to which the metric applies (eg 'sda', 'sdb' and so on).
+Metrics have a ``device`` field that contains the disk device number the metric applies to (eg 'sda', 'sdb' and so on).
 
 * ``disk_merged_read``, the number of read operations per second that could be merged with already queued operations.
 * ``disk_merged_write``, the number of write operations per second that could be merged with already queued operations.
@@ -65,13 +65,13 @@ Memory
 Network
 ^^^^^^^
 
-Metrics have a ``interface`` field that contains the interface name to which the metric applies (eg 'eth0', 'eth1' and so on).
+Metrics have a ``interface`` field that contains the interface name the metric applies to (eg 'eth0', 'eth1' and so on).
 
 * ``if_errors_rx``, the number of errors per second detected when receiving from the interface.
-* ``if_errors_tx``, the number of errors per second detected when transmitting from the interace.
-* ``if_octets_rx``, the number of octets (bytes) received per second by the interace.
+* ``if_errors_tx``, the number of errors per second detected when transmitting from the interface.
+* ``if_octets_rx``, the number of octets (bytes) received per second by the interface.
 * ``if_octets_tx``, the number of octets (bytes) transmitted per second by the interface.
-* ``if_packets_rx``, the number of packets received per second by the interace.
+* ``if_packets_rx``, the number of packets received per second by the interface.
 * ``if_packets_tx``, the number of packets transmitted per second by the interface.
 
 Processes

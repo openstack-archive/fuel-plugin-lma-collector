@@ -9,10 +9,10 @@ Overview
 --------
 
 The process of running alarms in LMA is not centralized
-(like it is often the case in conventional monitoring systems)
+(as it is often the case in conventional monitoring systems)
 but distributed across all the Collectors.
 
-Each Collector is individuallly responsible for monitoring the
+Each Collector is individually responsible for monitoring the
 resources and the services that are deployed on the node and for reporting
 any anomaly or fault it may have detected to the *Aggregator*.
 
@@ -24,15 +24,15 @@ The *facts* are the messages ingested by the Collector
 into the Heka pipeline.
 The rules are either threshold monitoring alarms or aggregation
 and correlation rules. Both are declaratively defined in YAML(tm) files
-that you can modify.
+that can be modified.
 Those rules are executed by a collection of Heka filter plugins written in Lua
-that are organised according to a configurable processing workflow.
+organised according to a configurable processing workflow.
 
-We call these plugins the *AFD plugins* for Anomaly and Fault Detection plugins
-and the *GSE plugins* for Global Status Evaluation plugins.
+These plugins are called *AFD plugins* for Anomaly and Fault Detection plugins
+and *GSE plugins* for Global Status Evaluation plugins.
 
-Both the AFD and GSE plugins in turn create metrics called the *AFD metrics*
-and the *GSE metrics* respectively.
+Both the AFD and GSE plugins create metrics called respectively the *AFD metrics*
+and the *GSE metrics*.
 
 
 .. figure:: ../../images/AFD_and_GSE_message_flow.*
@@ -43,33 +43,33 @@ and the *GSE metrics* respectively.
    Message flow for the AFD and GSE metrics
 
 The *AFD metrics* contain information about the health status of a
-resource like a device, a system component like a filesystem, or service
+resource such as a device, a system component like a filesystem, or service
 like an API endpoint, at the node level.
 Then, those *AFD metrics* are sent on a regular basis by each Collector
 to the Aggregator where they can be aggregated and correlated hence the
-name of aggregator.
+name 'aggregator'.
 
 The *GSE metrics* contain information about the health status
-of a service cluster, like the Nova API endpoints cluster, or the RabbitMQ
+of a service cluster, such as the Nova API endpoints cluster, or the RabbitMQ
 cluster as well as the clusters of nodes, like the Compute cluster or
 Controller cluster.
 The health status of a cluster is inferred by the GSE plugins using
 aggregation and correlation rules and facts contained in the
-*AFD metrics* it receives from the Collectors.
+*AFD metrics* it received from the Collectors.
 
-In the current version of the LMA Toolchain, three :ref:`gse_plugins` are configured:
+In the current version of the LMA Toolchain, there are three :ref:`gse_plugins`:
 
 * The Service Cluster GSE which receives metrics from the AFD plugins monitoring
-  the services and emits health status for the clusters of services (nova-api, nova-scheduler and so on).
+  the services and emits health status for the clusters of services (nova-api, nova-scheduler and so forth).
 * The Node Cluster GSE which receives metrics from the AFD plugins monitoring
-  the system and emits health status for the clusters of nodes (controllers, computes and so on).
+  the system and emits health status for the clusters of nodes (controllers, computes and so forth).
 * The Global Cluster GSE which receives metrics from the two other GSE plugins
-  and emits health status for the top-level clusters (Nova, MySQL and so on).
+  and emits health status for the top-level clusters (Nova, MySQL and so forth).
 
-The meaning associated with a health status is the following:
+The meaning for each health status is as follow:
 
-* **Down**: One or several primary functions of a cluster are failed. For example,
-  the API service for Nova or Cinder isn't accessible.
+* **Down**: One or several primary functions of a cluster has failed or is failing.
+  For example, the API service for Nova or Cinder isn't accessible.
 * **Critical**: One or several primary functions of a
   cluster are severely degraded. The quality
   of service delivered to the end-user should be severely
@@ -83,17 +83,17 @@ The meaning associated with a health status is the following:
 * **Okay**: None of the above was found to be true.
 
 The *AFD and GSE metrics* are also consumed by other groups
-of Heka plugins we call the *Persisters*.
+of Heka plugins called the *Persisters*.
 
-* There is a *Persister* for InfluxDB which turns the *GSE metric*
+* A *Persister* for InfluxDB turns the *GSE metric*
   messages into InfluxDB data-points and Grafana annotations. They
   are displayed in Grafana dashboards to represent the
   health status of the OpenStack services and clusters.
-* There is a *Persister* for Elasticsearch which turns the *AFD metrics*
+* A *Persister* for Elasticsearch turns the *AFD metrics*
   messages into AFD events which are indexed in Elasticsearch to
   be able to search and display the faults and anomalies that occured
   in the OpenStack environment.
-* There is a *Persister* for Nagios which turns the *GSE metrics*
+* A *Persister* for Nagios turns the *GSE metrics*
   messages into passive checks that are sent to Nagios which in turn
   will send alert notifications when there is a change of state for
   the services and clusters being monitored.
@@ -193,7 +193,7 @@ Where:
 |   List of field name / value pairs (a.k.a dimensions) used to select
     a particular device for the metric such as a network interface name or file
     system mount point. If value is specified as an empty string (""), then the rule
-    is applied to all the aggregated values for the specified field name like for example
+    is applied to all the aggregated values for the specified field name. For example
     the file system mount point.
     If value is specified as the '*' wildcard character,
     then the rule is applied to each of the metrics matching the metric name and field name.
@@ -295,7 +295,7 @@ file. This file has three different sections:
     * compute,
     * and storage
 
-* The third section defines how the alarms are assingned to clusters.
+* The third section defines how the alarms are assigned to clusters.
   In the example below, the *controller* cluster is assigned to four alarms:
 
     * Two alarms ['cpu-critical-controller', 'cpu-warning-controller'] grouped as *system* alarms.
@@ -375,7 +375,7 @@ In this example, you can see that the alarm *cpu-critical-controller* is
 assigned to the *controller* cluster (or in other words) to the nodes assigned
 to the *primary-controller* or *controller* roles.
 
-This alarm tells the system that any node that is associated with the *controller*
+This alarm tells the system that any node associated with the *controller*
 cluster is claimed to be critical (severity: 'critical') if any of the rules in
 the alarm evaluates to true.
 
@@ -386,7 +386,7 @@ last 5 minutes (window: 120)
 
 Or (logical_operator: 'or')
 
-if the metric *cpu_wait* has been in average (function: avg) superiror or equal
+if the metric *cpu_wait* has been in average (function: avg) superior or equal
 (relational_operator: >=) to 35 (this metric is expressed in percentage) for the
 last 5 minutes (window: 120)
 
@@ -525,7 +525,8 @@ Where
 |
 |     hostname:
 |       aggregation by hostname then by member.
-|       This setting is typically used for AFD metrics that are host-centric such those working on filesystem or CPU usage metrics.
+|       This setting is typically used for AFD metrics that are host-centric such as
+|       those working on filesystem or CPU usage metrics.
 
 | policy:
 |   Type: unicode
@@ -546,8 +547,8 @@ status across all members.
 Cluster policies
 ~~~~~~~~~~~~~~~~
 
-The correlation logic implemented by the GSE plugins is policy-based. It is the
-cluster policies which define how the GSE plugins infer the health status of a
+The correlation logic implemented by the GSE plugins is policy-based.
+The cluster policies define how the GSE plugins infer the health status of a
 cluster.
 
 By default, two policies are defined:

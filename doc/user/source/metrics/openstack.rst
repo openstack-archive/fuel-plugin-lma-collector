@@ -4,7 +4,7 @@ Service checks
 ^^^^^^^^^^^^^^
 .. _service_checks:
 
-* ``openstack_check_api``, the service's API status, 1 if it is responsive, 0 otherwise.
+* ``openstack_check_api``, the service's API status, 1 if it is responsive, if not 0.
     The metric contains a ``service`` field that identifies the OpenStack service being checked.
 
 ``<service>`` is one of the following values with their respective resource checks:
@@ -29,11 +29,12 @@ Compute
 These metrics are emitted per compute node.
 
 * ``openstack_nova_instance_creation_time``, the time (in seconds) it took to launch a new instance.
-* ``openstack_nova_instance_state``, the count of instances which entered a given state (the value is always 1). The metric contains a ``state`` field.
-* ``openstack_nova_free_disk``, the amount of disk space (in GB) available for new instances.
-* ``openstack_nova_used_disk``, the amount of disk space (in GB) used by the instances.
-* ``openstack_nova_free_ram``, the amount of memory (in MB) available for new instances.
-* ``openstack_nova_used_ram``, the amount of memory (in MB) used by the instances.
+* ``openstack_nova_instance_state``, the number of instances which entered a given state (the value is always 1).
+  The metric contains a ``state`` field.
+* ``openstack_nova_free_disk``, the disk space (in GB) available for new instances.
+* ``openstack_nova_used_disk``, the disk space (in GB) used by the instances.
+* ``openstack_nova_free_ram``, the  memory (in MB) available for new instances.
+* ``openstack_nova_used_ram``, the memory (in MB) used by the instances.
 * ``openstack_nova_free_vcpus``, the number of virtual CPU available for new instances.
 * ``openstack_nova_used_vcpus``, the number of virtual CPU used by the instances.
 * ``openstack_nova_running_instances``, the number of running instances.
@@ -162,7 +163,7 @@ These metrics are retrieved from the Neutron database.
 API response times
 ^^^^^^^^^^^^^^^^^^
 
-* ``openstack_<service>_http_responses``, the time (in second) it took to serve the HTTP request. The metric contains ``http_method`` (eg 'GET', 'POST', and so on) and ``http_status`` (eg '200', '404', and so on) fields.
+* ``openstack_<service>_http_responses``, the time (in second) it took to serve the HTTP request. The metric contains ``http_method`` (eg 'GET', 'POST', and so forth) and ``http_status`` (eg '200', '404', and so forth) fields.
 
 ``<service>`` is one of 'cinder', 'glance', 'heat' 'keystone', 'neutron' or 'nova'.
 

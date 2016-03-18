@@ -10,7 +10,7 @@ services the Collector depends on. These backend services include:
 * InfluxDB
 * Nagios
 
-You have two options for that.
+There are two options:
 
 1. Install these backend services automatically using the Fuel Plugins listed below.
 
@@ -22,11 +22,11 @@ You have two options for that.
    This installation must comply with the LMA Collector Plugin's :ref:`requirements <plugin_requirements>`.
 
 
-LMA Collector Fuel Plugin install using the RPM file of the Fuel Plugins Catalog
---------------------------------------------------------------------------------
+LMA Collector Fuel Plugin installation using the RPM file of the Fuel Plugins Catalog
+-------------------------------------------------------------------------------------
 
 To install the LMA Collector Fuel Plugin using the RPM file of the Fuel Plugins
-Catalog, you need to follow these steps:
+Catalog, follow these steps:
 
 1. Download the RPM file from the `Fuel Plugins Catalog <https://software.mirantis.com/download-mirantis-openstack-fuel-plug-ins/>`_.
 
@@ -47,8 +47,8 @@ Catalog, you need to follow these steps:
     1  | lma_collector        | 0.9.0   | 4.0.0
 
 
-LMA Collector Fuel Plugin install from source
----------------------------------------------
+LMA Collector Fuel Plugin installation from source
+--------------------------------------------------
 
 Alternatively, you may want to build the RPM file of the plugin from source
 if, for example, you want to test the latest features, modify some built-in
@@ -60,7 +60,7 @@ environement to build the RPM file.
 The recommended approach is to build the RPM file directly onto the Fuel Master
 node so that you won't have to copy that file later on.
 
-**Prepare an environment for building the plugin on the Fuel Master Node**
+**Prepare an environment to build the plugin on the Fuel Master Node**
 
 1. Install the standard Linux development tools::
 
@@ -75,7 +75,7 @@ node so that you won't have to copy that file later on.
     [root@home ~] pip install fuel-plugin-builder
 
 **Note**: You may also need to build the Fuel Plugin Builder if the package version of the
-plugin is higher than package version supported by the Fuel Plugin Builder you get from `pypi`.
+plugin is higher than the package version supported by the Fuel Plugin Builder you get from `pypi`.
 In this case, please refer to the section "Preparing an environment for plugin development"
 of the `Fuel Plugins wiki <https://wiki.openstack.org/wiki/Fuel/Plugins>`_
 if you need further instructions about how to build the Fuel Plugin Builder.
