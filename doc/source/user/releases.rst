@@ -3,6 +3,25 @@
 Release Notes
 =============
 
+Version 0.8.1
+-------------
+
+* Bug fixes
+
+  * Reconnect to the local RabbitMQ instance if the connection has been lost
+    (`#1503251 <https://bugs.launchpad.net/lma-toolchain/+bug/1503251>`_).
+
+  * Enable buffering for Elasticsearch, InfluxDB, Nagios and TCP outputs to reduce
+    congestion in the Heka pipeline (`#1488717
+    <https://bugs.launchpad.net/lma-toolchain/+bug/1488717>`_, `#1557388
+    <https://bugs.launchpad.net/lma-toolchain/+bug/1557388>`_).
+
+  * Return the correct status for Nova when Midonet is used (`#1531541
+    <https://bugs.launchpad.net/lma-toolchain/+bug/1531541>`_).
+
+  * Return the correct status for Neutron when Contrail is used (`#1546017
+    <https://bugs.launchpad.net/lma-toolchain/+bug/1546017>`_).
+
 Version 0.8.0
 -------------
 
