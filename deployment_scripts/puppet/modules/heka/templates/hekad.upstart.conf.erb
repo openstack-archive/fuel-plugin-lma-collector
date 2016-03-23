@@ -17,5 +17,5 @@ end script
 script
     # https://bugs.launchpad.net/lma-toolchain/+bug/1543289
     ulimit -n 102400
-    exec <%= @run_as_root ? "" : "sudo -u #{ @heka_user }" %> <%= @hekad_wrapper %> 2>><%= @log_file %>
+    exec start-stop-daemon --start <%= @run_as_root ? "" : " --user #{ @heka_user }" %> --exec <%= @hekad_wrapper %> 2>><%= @log_file %>
 end script
