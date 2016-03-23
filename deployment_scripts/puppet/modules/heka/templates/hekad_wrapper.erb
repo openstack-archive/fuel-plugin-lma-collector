@@ -6,4 +6,4 @@ HEKAD="/usr/bin/hekad"
 <%= @pre_script %>
 <% end -%>
 
-$HEKAD -config=<%= @config_dir %>
+exec $HEKAD -config=<%= @config_dir %>
