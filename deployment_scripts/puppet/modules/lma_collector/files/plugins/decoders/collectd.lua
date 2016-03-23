@@ -165,8 +165,8 @@ function process_message ()
                 msg['Fields']['name'] = 'openstack_check_api'
                 msg['Fields']['service'] = sample['plugin_instance']
                 msg['Fields']['tag_fields'] = { 'service' }
-                if sample['type_instance'] ~= nil and sample['type_instance'] ~= '' then
-                    msg['Fields']['os_region'] = sample['type_instance']
+                if sample['meta'] then
+                    msg['Fields']['os_region'] = sample['meta']['region']
                 end
             elseif metric_source == 'hypervisor_stats' then
                 -- Metrics from the OpenStack hypervisor metrics where
