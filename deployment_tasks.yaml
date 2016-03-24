@@ -1,2 +1,135 @@
----
-[]
+- id: lma-check-env-configuration
+  type: puppet
+  version: 2.0.0
+  requires: [deploy_start]
+  role: [primary-controller]
+  parameters:
+    puppet_manifest: puppet/manifests/check_environment_configuration.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 300
+
+# The Hiera data needs to be populated first so that other plugins (eg LMA
+# Infrastructure Alerting) can use it
+- id: lma-hiera-override
+  type: puppet
+  version: 2.0.0
+  requires: [hiera]
+  required_for: [deploy_end]
+  role: '*'
+  parameters:
+    puppet_manifest: puppet/manifests/hiera_override.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+- id: lma-configure-apt
+  type: puppet
+  version: 2.0.0
+  requires: [post_deployment_start]
+  role: '*'
+  parameters:
+    puppet_manifest: puppet/manifests/configure_apt.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+- id: lma-base
+  type: puppet
+  version: 2.0.0
+  requires: [lma-hiera-override, lma-configure-apt]
+  role: '*'
+  parameters:
+    puppet_manifest: puppet/manifests/base.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+- id: lma-main-controller
+  type: puppet
+  version: 2.0.0
+  requires: [lma-base]
+  required_for: [lma-aggregator]
+  role: [controller, primary-controller]
+  parameters:
+    puppet_manifest: puppet/manifests/controller.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+- id: lma-main-compute
+  type: puppet
+  version: 2.0.0
+  requires: [lma-base]
+  required_for: [lma-aggregator]
+  role: [compute]
+  parameters:
+    puppet_manifest: puppet/manifests/compute.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+- id: lma-main-cinder
+  type: puppet
+  version: 2.0.0
+  requires: [lma-base]
+  required_for: [lma-aggregator]
+  role: [cinder]
+  parameters:
+    puppet_manifest: puppet/manifests/cinder.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+- id: lma-main-ceph-osd
+  type: puppet
+  version: 2.0.0
+  requires: [lma-base]
+  required_for: [lma-aggregator]
+  role: [ceph-osd]
+  parameters:
+    puppet_manifest: puppet/manifests/ceph_osd.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+- id: lma-aggregator
+  type: puppet
+  version: 2.0.0
+  requires: [lma-base]
+  role: '*'
+  parameters:
+    puppet_manifest: puppet/manifests/aggregator.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+# We must wait that the aggregators on controllers are ready to receive
+# data before pushing.
+- id: lma-configure-afd-filters
+  type: puppet
+  version: 2.0.0
+  requires: [lma-aggregator]
+  required_for: [lma-cleanup-apt-config]
+  role: '*'
+  cross-depends:
+    - name: lma-aggregator
+      role: [primary-controller, controller]
+  parameters:
+    puppet_manifest: puppet/manifests/configure_afd_filters.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+- id: lma-backends
+  type: puppet
+  version: 2.0.0
+  requires: [lma-base, influxdb-configuration, elasticsearch-kibana-configuration]
+  required_for: [lma-cleanup-apt-config]
+  role: [primary-elasticsearch_kibana, primary-influxdb_grafana]
+  parameters:
+    puppet_manifest: puppet/manifests/lma_backends.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
+# This task must be executed at the very end of the deployment.
+- id: lma-cleanup-apt-config
+  type: puppet
+  version: 2.0.0
+  required_for: [post_deployment_end]
+  role: '*'
+  parameters:
+    puppet_manifest: puppet/manifests/cleanup_apt_config.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+
