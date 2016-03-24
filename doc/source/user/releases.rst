@@ -22,6 +22,16 @@ Version 0.8.1
   * Return the correct status for Neutron when Contrail is used (`#1546017
     <https://bugs.launchpad.net/lma-toolchain/+bug/1546017>`_).
 
+  * Increase the maximum number of file descriptors (`#1543289
+    <https://bugs.launchpad.net/lma-toolchain/+bug/1543289>`_).
+
+  * Avoid spawning several hekad processes (`#1561109
+    <https://bugs.launchpad.net/lma-toolchain/+bug/1561109>`_).
+
+* Changes
+
+  * Upgrade to Heka 0.10.0
+
 Version 0.8.0
 -------------
 
