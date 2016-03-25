@@ -19,7 +19,7 @@ define heka::output::tcp (
   $message_matcher   = 'FALSE',
   $use_buffering     = true,
   $max_buffer_size   = 1024 * 1024 * 1024, # 1GiB
-  $queue_full_action = 'drop',
+  $queue_full_action = 'block',
   $max_file_size     = undef,
   $ensure            = present,
 ) {
