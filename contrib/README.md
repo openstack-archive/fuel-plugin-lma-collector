@@ -29,3 +29,9 @@ The LMA dashboards are based on:
 * [Grafana](http://grafana.org/) for displaying and querying data in InfluxDB.
 
 To install the dahsboards, see (ui/README.md).
+
+# Tools
+
+Scripts in this directory are:
+  - diagnostics tools
+  - helper scripts
