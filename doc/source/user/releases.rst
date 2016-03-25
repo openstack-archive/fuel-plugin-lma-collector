@@ -28,6 +28,9 @@ Version 0.8.1
   * Avoid spawning several hekad processes (`#1561109
     <https://bugs.launchpad.net/lma-toolchain/+bug/1561109>`_).
 
+  * Remove the monitoring of all queues individally (`#1549721
+    <https://bugs.launchpad.net/lma-toolchain/+bug/1549721>`_).
+
 * Changes
 
   * Upgrade to Heka 0.10.0
