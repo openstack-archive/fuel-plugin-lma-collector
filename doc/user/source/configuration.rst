@@ -52,6 +52,12 @@ To configure your plugin, you need to follow these steps:
 
 8. `Deploy <http://docs.mirantis.com/openstack/fuel/fuel-8.0/user-guide.html#deploy-changes>`_ your changes.
 
+.. note:: The LMA Collector Plugin is *hot-pluggable* plugin which means that it is possible to install 
+   plugin in an environment that is already deployed.
+   To install the LMA Collector Plugin in an environment that is already deployed, you need to run
+   the command below from the *Fuel master node*, for every node of the initial deployment::
+     $ fuel nodes --env <env_id> --node <node_id> --deploy
+
 .. _plugin_verification:
 
 Plugin verification
