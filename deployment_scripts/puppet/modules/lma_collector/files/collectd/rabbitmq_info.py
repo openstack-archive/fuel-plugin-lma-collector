@@ -159,9 +159,15 @@ class RabbitMqPlugin(base.Base):
             stats['messages'] += ctl_stats[1]
             stats['memory'] += ctl_stats[2]
             stats['consumers'] += ctl_stats[3]
-            stats['%s.messages' % queue_name] = ctl_stats[1]
-            stats['%s.memory' % queue_name] = ctl_stats[2]
-            stats['%s.consumers' % queue_name] = ctl_stats[3]
+            # The following three lines are commented out because per-queue
+            # metrics may result in collectd dropping metrics due to
+            # over-flooding. See bug
+            # https://bugs.launchpad.net/lma-toolchain/+bug/1549721
+            # To reactivate this feature just uncomment them.
+            #stats['%s.messages' % queue_name] = ctl_stats[1]
+            #stats['%s.memory' % queue_name] = ctl_stats[2]
+            #stats['%s.consumers' % queue_name] = ctl_stats[3]
+
             # we need to check if the list of synchronised slaves is
             # equal to the list of slaves.
             try:
