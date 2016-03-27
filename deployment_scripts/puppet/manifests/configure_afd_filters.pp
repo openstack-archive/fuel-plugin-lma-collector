@@ -26,10 +26,13 @@ if $alarms_definitions == undef {
 }
 
 if $is_controller {
-  # On controllers make sure the LMA service is configured
+  # On controllers make sure the Log collector service is configured
   # with the "pacemaker" provider
   include lma_collector::params
-  Service<| title == $lma_collector::params::service_name |> {
+  Service<| title == $lma_collector::params::log_service_name |> {
+    provider => 'pacemaker'
+  }
+  Service<| title == $lma_collector::params::metric_service_name |> {
     provider => 'pacemaker'
   }
 }
