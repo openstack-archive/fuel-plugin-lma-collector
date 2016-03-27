@@ -20,6 +20,8 @@ describe 'lma_collector' do
     end
 
     describe 'with defaults' do
-        it { is_expected.to contain_class('Heka') }
+        it { is_expected.to contain_heka('metrics') }
+        it { is_expected.to contain_heka('logs') }
+        #it { is_expected.to contain_heka('alerting') }
     end
 end

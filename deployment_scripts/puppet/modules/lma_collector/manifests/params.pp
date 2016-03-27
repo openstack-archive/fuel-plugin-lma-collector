@@ -14,7 +14,10 @@
 #
 class lma_collector::params {
   $service_name = 'lma_collector'
-  $config_dir = "/etc/${service_name}"
+  $metric_service_name = 'm_collector'
+  $log_service_name = 'l_collector'
+  $metric_config_dir = "/etc/${metric_service_name}"
+  $log_config_dir = "/etc/${log_service_name}"
   $plugins_dir = "/usr/share/${service_name}"
 
   $apt_config_file = '/etc/apt/apt.conf.d/99norecommends'
@@ -24,6 +27,10 @@ class lma_collector::params {
   # Address and port of the Heka dashboard for health reports.
   $dashboard_address = '127.0.0.1'
   $dashboard_port    = '4352'
+
+  # Address and port of the metric input
+  $metric_input_address = '127.0.0.1'
+  $metric_input_port = '4351'
 
   $aggregator_address = '127.0.0.1'
   $aggregator_port    = 5565
@@ -69,11 +76,25 @@ class lma_collector::params {
   # https://bugs.launchpad.net/lma-toolchain/+bug/1548093
   $hekad_max_message_size = 256 * 1024
 
-  $buffering_max_file_size = 128 * 1024 * 1024
-  $buffering_max_buffer_size = 1024 * 1024 * 1024
+  $buffering_max_file_metric_size = 128 * 1024 * 1024
+  $buffering_max_buffer_metric_size = 1536 * 1024 * 1024
+  $queue_full_action_metric = 'drop'
 
-  $buffering_max_file_tiny_size = 1 * 1024 * 1024
-  $buffering_max_buffer_tiny_size = 2 * 1024 * 1024
+  $buffering_max_file_aggregator_size = 64 * 1024 * 1024
+  $buffering_max_buffer_aggregator_size = 256 * 1024 * 1024
+  $queue_full_action_aggregator  = 'drop'
+
+  $buffering_max_file_log_size = 64 * 1024 * 1024
+  $buffering_max_buffer_log_size = 256 * 1024 * 1024
+  $queue_full_action_log = 'block'
+
+  $buffering_max_file_log_metric_size = 128 * 1024 * 1024
+  $buffering_max_buffer_log_metric_size = 1024 * 1024 * 1024
+  $queue_full_action_log_metric = 'drop'
+
+  $buffering_max_file_nagios_size = 512 * 1024
+  $buffering_max_buffer_nagios_size = 1 * 1024 * 1024
+  $queue_full_action_nagios = 'drop'
 
   # Heka's default value is 1
   $hekad_max_process_inject = 1

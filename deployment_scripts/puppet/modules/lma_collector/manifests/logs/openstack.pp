@@ -30,11 +30,11 @@ define lma_collector::logs::openstack (
   # Note: $log_directory could be made configurable in the future.
 
   include lma_collector::params
-  include lma_collector::service
+  include lma_collector::service::log
   include lma_collector::logs::openstack_decoder_splitter
 
   heka::input::logstreamer { $title:
-    config_dir     => $lma_collector::params::config_dir,
+    config_dir     => $lma_collector::params::log_config_dir,
     log_directory  => "/var/log/${title}",
     decoder        => 'openstack',
     splitter       => 'openstack',
@@ -42,6 +42,6 @@ define lma_collector::logs::openstack (
     differentiator => "['${title}', '_', 'Service']",
     priority       => '["^Seq"]',
     require        => Class['lma_collector::logs::openstack_decoder_splitter'],
-    notify         => Class['lma_collector::service'],
+    notify         => Class['lma_collector::service::log'],
   }
 }

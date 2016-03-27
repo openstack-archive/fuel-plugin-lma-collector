@@ -1,5 +1,5 @@
 #!/bin/bash
-#    Copyright 2015 Mirantis, Inc.
+#    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -33,11 +33,11 @@
 
 # Fill in some defaults if no values are specified
 
-SERVICE_NAME="LMA collector"
+SERVICE_NAME="Log collector"
 
 OCF_RESKEY_binary_default="/usr/bin/hekad"
-OCF_RESKEY_config_default="/etc/lma_collector"
-OCF_RESKEY_log_file_default="/var/log/lma_collector.log"
+OCF_RESKEY_config_default="/etc/l_collector"
+OCF_RESKEY_log_file_default="/var/log/l_collector.log"
 OCF_RESKEY_pid_default="${HA_RSCTMP}/${__SCRIPT_NAME}/${__SCRIPT_NAME}.pid"
 OCF_RESKEY_user_default="root"
 OCF_RESKEY_watchdog_file_default=
@@ -73,52 +73,52 @@ meta_data() {
     cat <<END
 <?xml version="1.0"?>
 <!DOCTYPE resource-agent SYSTEM "ra-api-1.dtd">
-<resource-agent name="lma_collector">
+<resource-agent name="l_collector">
 <version>1.0</version>
 
 <longdesc lang="en">
-Manages the LMA collector daemon as a Pacemaker Resource.
+Manages the Log collector daemon as a Pacemaker Resource.
 </longdesc>
-<shortdesc lang="en">Manages LMA collector</shortdesc>
+<shortdesc lang="en">Manages Log collector</shortdesc>
 <parameters>
 
 <parameter name="binary" unique="0" required="0">
 <longdesc lang="en">
-Path of the LMA collector binary file that will be run.
+Path of the Log collector binary file that will be run.
 </longdesc>
-<shortdesc lang="en">LMA collector binary file</shortdesc>
+<shortdesc lang="en">Log collector binary file</shortdesc>
 <content type="string" default="${OCF_RESKEY_binary_default}" />
 </parameter>
 
 <parameter name="config" unique="0" required="0">
 <longdesc lang="en">
-Path to the LMA collector configuration file or directory
+Path to the Log collector configuration file or directory
 </longdesc>
-<shortdesc lang="en">LMA collector configuration</shortdesc>
+<shortdesc lang="en">Log collector configuration</shortdesc>
 <content type="string" default="${OCF_RESKEY_config_default}" />
 </parameter>
 
 <parameter name="log_file" unique="0" required="0">
 <longdesc lang="en">
-Path to the LMA collector log file
+Path to the Log collector log file
 </longdesc>
-<shortdesc lang="en">LMA collector log file</shortdesc>
+<shortdesc lang="en">Log collector log file</shortdesc>
 <content type="string" default="${OCF_RESKEY_log_file_default}" />
 </parameter>
 
 <parameter name="pid" unique="0" required="0">
 <longdesc lang="en">
-The pid file to use for the LMA collector service
+The pid file to use for the Log collector service
 </longdesc>
-<shortdesc lang="en">LMA collector pid file</shortdesc>
+<shortdesc lang="en">Log collector pid file</shortdesc>
 <content type="string" default="${OCF_RESKEY_pid_default}" />
 </parameter>
 
 <parameter name="user" unique="0" required="0">
 <longdesc lang="en">
-User running the LMA collector process
+User running the Log collector process
 </longdesc>
-<shortdesc lang="en">LMA collector user</shortdesc>
+<shortdesc lang="en">Log collector user</shortdesc>
 <content type="string" default="${OCF_RESKEY_user_default}" />
 </parameter>
 
@@ -126,7 +126,7 @@ User running the LMA collector process
 <longdesc lang="en">
 The file to monitor that the process is up and running
 </longdesc>
-<shortdesc lang="en">LMA collector watchdog file</shortdesc>
+<shortdesc lang="en">Log collector watchdog file</shortdesc>
 <content type="string" default="${OCF_RESKEY_watchdog_file_default}" />
 </parameter>
 
@@ -135,7 +135,7 @@ The file to monitor that the process is up and running
 How much time the watchdog file can be left unmodified before claiming that
 the process is unresponsive.
 </longdesc>
-<shortdesc lang="en">LMA collector watchdog timeout</shortdesc>
+<shortdesc lang="en">Log collector watchdog timeout</shortdesc>
 <content type="string" default="${OCF_RESKEY_watchdog_timeout_default}" />
 </parameter>
 
@@ -191,7 +191,7 @@ service_status() {
     fi
 
     if [ ! -f "$OCF_RESKEY_pid" ]; then
-        ocf_log info "LMA collector is not running"
+        ocf_log info "Log collector is not running"
         return "$OCF_NOT_RUNNING"
     else
         pid=$(cat "$OCF_RESKEY_pid")
@@ -201,7 +201,7 @@ service_status() {
         ocf_run -warn kill -s 0 "$pid"
         rc=$?
         if [ $rc -ne 0 ]; then
-            ocf_log info "Old PID file found, but LMA collector process isn't running"
+            ocf_log info "Old PID file found, but Log collector process isn't running"
             return "$OCF_NOT_RUNNING"
         fi
     else

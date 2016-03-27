@@ -13,14 +13,26 @@
 #    under the License.
 require 'spec_helper'
 
-describe 'lma_collector::service' do
+describe 'lma_collector::service::log' do
     let(:facts) do
         {:kernel => 'Linux', :operatingsystem => 'Ubuntu',
          :osfamily => 'Debian'}
     end
 
     describe 'default params' do
-        it { is_expected.to contain_service('lma_collector') \
+        it { is_expected.to contain_service('l_collector') \
+             .with({'ensure' => 'running', 'enable' => true}) }
+    end
+end
+
+describe 'lma_collector::service::metric' do
+    let(:facts) do
+        {:kernel => 'Linux', :operatingsystem => 'Ubuntu',
+         :osfamily => 'Debian'}
+    end
+
+    describe 'default params' do
+        it { is_expected.to contain_service('m_collector') \
              .with({'ensure' => 'running', 'enable' => true}) }
     end
 end

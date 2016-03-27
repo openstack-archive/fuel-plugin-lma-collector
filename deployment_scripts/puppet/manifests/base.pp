@@ -100,8 +100,8 @@ if $is_controller {
 
   include lma_collector::params
 
-  $service_name = $lma_collector::params::service_name
-  $config_dir = $lma_collector::params::config_dir
+  $service_name = $lma_collector::params::log_service_name
+  $config_dir = $lma_collector::params::log_config_dir
   $rabbitmq_resource = 'master_p_rabbitmq-server'
 
   pacemaker_wrappers::service { $service_name:
@@ -162,6 +162,7 @@ if $is_controller {
   }
 }
 
+$influxdb_mode = $lma_collector['influxdb_mode']
 if $elasticsearch_mode != 'disabled' {
   class { 'lma_collector::logs::system':
     require => Class['lma_collector'],
@@ -178,9 +179,14 @@ if $elasticsearch_mode != 'disabled' {
     server  => $es_server,
     require => Class['lma_collector'],
   }
+
+  if $influxdb_mode != 'disabled'{
+    class { 'lma_collector::metrics::tcp_output':
+      require => Class['lma_collector'],
+    }
+  }
 }
 
-$influxdb_mode = $lma_collector['influxdb_mode']
 case $influxdb_mode {
   'remote','local': {
     if $influxdb_mode == 'remote' {
@@ -224,6 +230,10 @@ case $influxdb_mode {
     }
 
     class { 'lma_collector::metrics::heka_monitoring':
+      require => Class['lma_collector']
+    }
+
+    class { 'lma_collector::metrics::tcp_input':
       require => Class['lma_collector']
     }
 

@@ -1,15 +1,15 @@
 [hekad]
-maxprocs=<%= @maxprocs %>
+maxprocs=<%= @_maxprocs %>
 base_dir="<%= @base_dir %>"
-<% if @hostname %>
-hostname="<%= @hostname %>"
+<% if @_hostname %>
+hostname="<%= @_hostname %>"
 <% end %>
-<% if @max_message_size -%>
-max_message_size = <%= @max_message_size %>
+<% if @_max_message_size -%>
+max_message_size = <%= @_max_message_size %>
 <% end -%>
-<% if @max_process_inject -%>
-max_process_inject = <%= @max_process_inject %>
+<% if @_max_process_inject -%>
+max_process_inject = <%= @_max_process_inject %>
 <% end -%>
-<% if @max_timer_inject -%>
-max_timer_inject = <%= @max_timer_inject %>
+<% if @_max_timer_inject -%>
+max_timer_inject = <%= @_max_timer_inject %>
 <% end -%>
