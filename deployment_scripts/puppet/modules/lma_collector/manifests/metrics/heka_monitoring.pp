@@ -15,21 +15,23 @@
 class lma_collector::metrics::heka_monitoring (
   $dashboard_address = $lma_collector::params::dashboard_address,
   $dashboard_port    = $lma_collector::params::dashboard_port,
-){
-  include lma_collector::service
+) inherits lma_collector::params {
+
+  include lma_collector::service::metric
+  $config_dir = $lma_collector::params::metric_config_dir
 
   heka::filter::sandbox { 'heka_monitoring':
-    config_dir      => $lma_collector::params::config_dir,
+    config_dir      => $config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/heka_monitoring.lua",
     message_matcher => "Type == 'heka.all-report'",
-    notify          => Class['lma_collector::service'],
+    notify          => Class['lma_collector::service::metric'],
   }
 
   # Dashboard is required to enable monitoring messages
   heka::output::dashboard { 'dashboard':
-    config_dir        => $lma_collector::params::config_dir,
+    config_dir        => $config_dir,
     dashboard_address => $dashboard_address,
     dashboard_port    => $dashboard_port,
-    notify            => Class['lma_collector::service'],
+    notify            => Class['lma_collector::service::metric'],
   }
 }

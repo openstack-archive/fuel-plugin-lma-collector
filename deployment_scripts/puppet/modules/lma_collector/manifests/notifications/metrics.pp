@@ -14,21 +14,23 @@
 #
 class lma_collector::notifications::metrics {
   include lma_collector::params
-  include lma_collector::service
+  include lma_collector::service::log
+
+  $config_dir = $lma_collector::params::log_config_dir
 
   # Filter to compute resource's creation time metric
   heka::filter::sandbox { 'resource_creation_time':
-    config_dir      => $lma_collector::params::config_dir,
+    config_dir      => $config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/resource_creation_time.lua",
     message_matcher => 'Type == \'notification\' && Fields[event_type] =~ /^(compute.instance|volume).create.end$/',
-    notify          => Class['lma_collector::service'],
+    notify          => Class['lma_collector::service::log'],
   }
 
   # Filter to compute the instance state change metric
   heka::filter::sandbox { 'instance_state':
-    config_dir      => $lma_collector::params::config_dir,
+    config_dir      => $config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/instance_state.lua",
     message_matcher => 'Type == \'notification\' && Fields[event_type] == \'compute.instance.update\' && Fields[state] != NIL',
-    notify          => Class['lma_collector::service'],
+    notify          => Class['lma_collector::service::log'],
   }
 }

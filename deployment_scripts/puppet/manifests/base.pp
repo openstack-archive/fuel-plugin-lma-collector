@@ -100,15 +100,17 @@ if $is_controller {
 
   include lma_collector::params
 
-  $service_name = $lma_collector::params::service_name
-  $config_dir = $lma_collector::params::config_dir
+  $log_service_name = $lma_collector::params::log_service_name
+  $metric_service_name = $lma_collector::params::metric_service_name
+  $log_config_dir = $lma_collector::params::log_config_dir
+  $metric_config_dir = $lma_collector::params::metric_config_dir
   $rabbitmq_resource = 'master_p_rabbitmq-server'
 
-  pacemaker_wrappers::service { $service_name:
+  pacemaker_wrappers::service { $log_service_name:
     ensure          => present,
     prefix          => false,
     primitive_class => 'ocf',
-    primitive_type  => 'ocf-lma_collector',
+    primitive_type  => 'ocf-log_collector',
     complex_type    => 'clone',
     use_handler     => false,
     ms_metadata     => {
@@ -119,8 +121,9 @@ if $is_controller {
       'failure-timeout'     => '120',
     },
     parameters      => {
-      'config'   => $config_dir,
-      'log_file' => "/var/log/${service_name}.log",
+      'config'   => $log_config_dir,
+      'log_file' => "/var/log/${log_service_name}.log",
+      'pid'      => "/var/run/${log_service_name}.pid",
       'user'     => $heka_user,
     },
     operations      => {
@@ -138,30 +141,65 @@ if $is_controller {
     ocf_script_file => 'lma_collector/ocf-lma_collector',
   }
 
-  cs_rsc_colocation { "${service_name}-with-rabbitmq":
+  cs_rsc_colocation { "${log_service_name}-with-rabbitmq":
     ensure     => present,
-    alias      => $service_name,
-    primitives => ["clone_${service_name}", $rabbitmq_resource],
+    alias      => $log_service_name,
+    primitives => ["clone_${log_service_name}", $rabbitmq_resource],
     score      => 0,
-    require    => Pacemaker_wrappers::Service[$service_name],
+    require    => Pacemaker_wrappers::Service[$log_service_name],
   }
 
-  cs_rsc_order { "${service_name}-after-rabbitmq":
+  cs_rsc_order { "${log_service_name}-after-rabbitmq":
     ensure  => present,
-    alias   => $service_name,
+    alias   => $log_service_name,
     first   => $rabbitmq_resource,
-    second  => "clone_${service_name}",
+    second  => "clone_${log_service_name}",
     # Heka cannot start if RabbitMQ isn't ready to accept connections. But
     # once it is initialized, it can recover from a RabbitMQ outage. This is
     # why we set score to 0 (interleave) meaning that the collector should
     # start once RabbitMQ is active but a restart of RabbitMQ
     # won't trigger a restart of the LMA collector.
     score   => 0,
-    require => Cs_rsc_colocation[$service_name],
+    require => Cs_rsc_colocation[$log_service_name],
     before  => Class['lma_collector'],
   }
+
+  pacemaker_wrappers::service { $metric_service_name:
+    ensure          => present,
+    prefix          => false,
+    primitive_class => 'ocf',
+    primitive_type  => 'ocf-metric_collector',
+    complex_type    => 'clone',
+    use_handler     => false,
+    ms_metadata     => {
+      'interleave'          => false,
+      'migration-threshold' => '3',
+      'failure-timeout'     => '120',
+    },
+    parameters      => {
+      'config'   => $metric_config_dir,
+      'log_file' => "/var/log/${metric_service_name}.log",
+      'pid'      => "/var/run/${metric_service_name}.pid",
+      'user'     => $heka_user,
+    },
+    operations      => {
+      'monitor' => {
+        'interval' => '20',
+        'timeout'  => '10',
+      },
+      'start'   => {
+        'timeout' => '30',
+      },
+      'stop'    => {
+        'timeout' => '30',
+      },
+    },
+    ocf_script_file => 'lma_collector/ocf-lma_collector',
+  }
+
 }
 
+$influxdb_mode = $lma_collector['influxdb_mode']
 if $elasticsearch_mode != 'disabled' {
   class { 'lma_collector::logs::system':
     require => Class['lma_collector'],
@@ -178,9 +216,14 @@ if $elasticsearch_mode != 'disabled' {
     server  => $es_server,
     require => Class['lma_collector'],
   }
+
+  if $influxdb_mode != 'disabled'{
+    class { 'lma_collector::metrics::tcp_output':
+      require => Class['lma_collector'],
+    }
+  }
 }
 
-$influxdb_mode = $lma_collector['influxdb_mode']
 case $influxdb_mode {
   'remote','local': {
     if $influxdb_mode == 'remote' {
@@ -224,6 +267,10 @@ case $influxdb_mode {
     }
 
     class { 'lma_collector::metrics::heka_monitoring':
+      require => Class['lma_collector']
+    }
+
+    class { 'lma_collector::metrics::tcp_input':
       require => Class['lma_collector']
     }
 
