@@ -14,23 +14,25 @@
 #
 class lma_collector::logs::mysql {
   include lma_collector::params
-  include lma_collector::service
+  include lma_collector::service::log
+
+  $config_dir = $lma_collector::params::log_config_dir
 
   heka::decoder::sandbox { 'mysql':
-    config_dir => $lma_collector::params::config_dir,
+    config_dir => $config_dir,
     filename   => "${lma_collector::params::plugins_dir}/decoders/mysql_log.lua" ,
     config     => {
       syslog_pattern => $lma_collector::params::syslog_pattern
     },
-    notify     => Class['lma_collector::service'],
+    notify     => Class['lma_collector::service::log'],
   }
 
   heka::input::logstreamer { 'mysql':
-    config_dir     => $lma_collector::params::config_dir,
+    config_dir     => $config_dir,
     decoder        => 'mysql',
     file_match     => 'mysqld\.log$',
     differentiator => '[\'mysql\']',
     require        => Heka::Decoder::Sandbox['mysql'],
-    notify         => Class['lma_collector::service'],
+    notify         => Class['lma_collector::service::log'],
   }
 }
