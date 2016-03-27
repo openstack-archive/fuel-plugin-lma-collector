@@ -20,6 +20,7 @@ describe 'heka' do
     end
 
     describe 'with defaults' do
+        let(:title) { :log}
         it { is_expected.to contain_user('heka') }
         it { is_expected.to contain_file('/etc/init/hekad.conf') \
              .with_content(/--chuid heka/) }
@@ -29,6 +30,8 @@ describe 'heka' do
         let(:params) do
             {:user => 'root'}
         end
+        let(:title) { :foo}
+
         it { is_expected.to contain_user('root') }
         it { is_expected.to contain_file('/etc/init/hekad.conf') }
         it { is_expected.not_to contain_file('/etc/init/hekad.conf') \

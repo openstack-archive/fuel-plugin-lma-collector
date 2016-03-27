@@ -49,28 +49,29 @@ class lma_collector::logs::swift (
   $priority = undef,
   $log_directory = $lma_collector::params::log_directory,
 ) inherits lma_collector::params {
-  include lma_collector::service
+  include lma_collector::service::log
 
   # Note: syslog_pattern could be made configurable in the future.
 
+  $config_dir = $lma_collector::params::log_config_dir
   heka::decoder::sandbox { 'swift':
-    config_dir => $lma_collector::params::config_dir,
+    config_dir => $config_dir,
     filename   => "${lma_collector::params::plugins_dir}/decoders/generic_syslog.lua",
     config     => {
       syslog_pattern          => $lma_collector::params::syslog_pattern,
       fallback_syslog_pattern => $lma_collector::params::fallback_syslog_pattern
     },
-    notify     => Class['lma_collector::service'],
+    notify     => Class['lma_collector::service::log'],
   }
 
   heka::input::logstreamer { 'swift':
-    config_dir     => $lma_collector::params::config_dir,
+    config_dir     => $config_dir,
     decoder        => 'swift',
     log_directory  => $log_directory,
     file_match     => $file_match,
     differentiator => '[\'openstack.swift\']',
     priority       => $priority,
     require        => Heka::Decoder::Sandbox['swift'],
-    notify         => Class['lma_collector::service'],
+    notify         => Class['lma_collector::service::log'],
   }
 }
