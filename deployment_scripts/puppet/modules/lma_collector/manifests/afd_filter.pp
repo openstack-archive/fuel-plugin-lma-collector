@@ -22,7 +22,7 @@ define lma_collector::afd_filter (
     $message_matcher,
 ) {
     include lma_collector::params
-    include lma_collector::service
+    include lma_collector::service::metric
     include heka::params
 
     $alarms_dir = $heka::params::lua_modules_dir
@@ -35,12 +35,12 @@ define lma_collector::afd_filter (
     file { $afd_filename:
       ensure  => present,
       content => template('lma_collector/lma_alarms.lua.erb'),
-      notify  => Class['lma_collector::service'],
+      notify  => Class['lma_collector::service::metric'],
     }
 
     # Create the confguration file for Heka
     heka::filter::sandbox { "afd_${type}_${cluster_name}_${logical_name}":
-      config_dir      => $lma_collector::params::config_dir,
+      config_dir      => $lma_collector::params::metric_config_dir,
       filename        => "${lma_collector::params::plugins_dir}/filters/afd.lua",
       message_matcher => "(Type == \'metric\' || Type == \'heka.sandbox.metric\') && (${message_matcher})",
       ticker_interval => 10,
@@ -52,7 +52,7 @@ define lma_collector::afd_filter (
         afd_logical_name => $logical_name,
       },
       require         => File[$afd_filename],
-      notify          => Class['lma_collector::service'],
+      notify          => Class['lma_collector::service::metric'],
     }
 }
 

@@ -20,7 +20,7 @@ class lma_collector::notifications::input (
     $port = $lma_collector::params::rabbitmq_port,
 ) inherits lma_collector::params {
 
-  include lma_collector::service
+  include lma_collector::service::log
 
   validate_string($topic)
   validate_string($user)
@@ -33,13 +33,14 @@ class lma_collector::notifications::input (
   # case it doesn't exist yet.
   $exchange = 'nova'
 
+  $config_dir = $lma_collector::params::log_config_dir
   heka::decoder::sandbox { 'notification':
-    config_dir => $lma_collector::params::config_dir,
+    config_dir => $config_dir,
     filename   => "${lma_collector::params::plugins_dir}/decoders/notification.lua" ,
     config     => {
       include_full_notification => false
     },
-    notify     => Class['lma_collector::service'],
+    notify     => Class['lma_collector::service::log'],
   }
 
   create_resources(
@@ -59,7 +60,7 @@ class lma_collector::notifications::input (
       },
     },
     {
-      config_dir           => $lma_collector::params::config_dir,
+      config_dir           => $config_dir,
       decoder              => 'notification',
       user                 => $user,
       password             => $password,
@@ -70,7 +71,7 @@ class lma_collector::notifications::input (
       exchange_auto_delete => false,
       queue_auto_delete    => false,
       exchange_type        => 'topic',
-      notify               => Class['lma_collector::service'],
+      notify               => Class['lma_collector::service::log'],
     }
   )
 }
