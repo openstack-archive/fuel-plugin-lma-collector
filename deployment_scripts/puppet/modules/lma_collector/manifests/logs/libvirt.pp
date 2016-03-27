@@ -15,8 +15,11 @@
 # Class lma_collector::logs::libvirt
 
 class lma_collector::logs::libvirt {
+
   include lma_collector::params
-  include lma_collector::service
+  include lma_collector::service::log
+
+  $config_dir = $lma_collector::params::log_config_dir
 
   $libvirt_dir       = '/var/log/libvirt'
   $libvirt_log       = 'libvirtd.log'
@@ -42,18 +45,18 @@ class lma_collector::logs::libvirt {
   }
 
   heka::decoder::sandbox { 'libvirt':
-    config_dir => $lma_collector::params::config_dir,
+    config_dir => $config_dir,
     filename   => "${lma_collector::params::plugins_dir}/decoders/libvirt_log.lua",
-    notify     => Class['lma_collector::service'],
+    notify     => Class['lma_collector::service::log'],
   }
 
   heka::input::logstreamer { 'libvirt':
-    config_dir     => $lma_collector::params::config_dir,
+    config_dir     => $config_dir,
     log_directory  => $libvirt_dir,
     file_match     => $libvirt_log,
     decoder        => 'libvirt',
     differentiator => '["libvirt"]',
     require        => Heka::Decoder::Sandbox['libvirt'],
-    notify         => Class['lma_collector::service'],
+    notify         => Class['lma_collector::service::log'],
   }
 }

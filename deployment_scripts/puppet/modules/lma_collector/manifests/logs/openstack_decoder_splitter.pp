@@ -21,17 +21,17 @@
 #
 class lma_collector::logs::openstack_decoder_splitter {
   include lma_collector::params
-  include lma_collector::service
+  include lma_collector::service::log
 
   heka::decoder::sandbox { 'openstack':
-    config_dir => $lma_collector::params::config_dir,
+    config_dir => $lma_collector::params::log_config_dir,
     filename   => "${lma_collector::params::plugins_dir}/decoders/openstack_log.lua",
-    notify     => Class['lma_collector::service'],
+    notify     => Class['lma_collector::service::log'],
   }
 
   heka::splitter::token { 'openstack':
-    config_dir => $lma_collector::params::config_dir,
+    config_dir => $lma_collector::params::log_config_dir,
     delimiter  => '\n',
-    notify     => Class['lma_collector::service'],
+    notify     => Class['lma_collector::service::log'],
   }
 }
