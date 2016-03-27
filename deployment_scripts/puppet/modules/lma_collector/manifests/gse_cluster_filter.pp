@@ -24,7 +24,7 @@ define lma_collector::gse_cluster_filter (
   $ensure = present,
 ) {
   include lma_collector::params
-  include lma_collector::service
+  include lma_collector::service::metric
 
   $lua_modules_dir = $lma_collector::params::lua_modules_dir
 
@@ -51,7 +51,7 @@ define lma_collector::gse_cluster_filter (
   ], '')
 
   heka::filter::sandbox { "gse_${title}":
-    config_dir       => $lma_collector::params::config_dir,
+    config_dir       => $lma_collector::params::metric_config_dir,
     filename         => "${lma_collector::params::plugins_dir}/filters/gse_cluster_filter.lua",
     message_matcher  => $message_matcher,
     ticker_interval  => 1,
@@ -69,7 +69,7 @@ define lma_collector::gse_cluster_filter (
     },
     module_directory => $lua_modules_dir,
     require          => File[$topology_file],
-    notify           => Class['lma_collector::service']
+    notify           => Class['lma_collector::service::metric']
   }
 
   file { $topology_file:

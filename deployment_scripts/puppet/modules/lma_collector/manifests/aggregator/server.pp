@@ -17,55 +17,57 @@ class lma_collector::aggregator::server (
   $listen_port     = $lma_collector::params::aggregator_port,
   $http_check_port = undef,
 ) inherits lma_collector::params {
-  include lma_collector::service
+  include lma_collector::service::metric
 
   $lua_modules_dir = $lma_collector::params::lua_modules_dir
 
   validate_string($listen_address)
   validate_integer($listen_port)
 
+  $config_dir = $lma_collector::params::metric_config_dir
+
   heka::decoder::scribbler { 'aggregator_flag':
-    config_dir => $lma_collector::params::config_dir,
+    config_dir => $config_dir,
     config     => {
       "${lma_collector::params::aggregator_flag}" => 'present',
     },
-    notify     => Class['lma_collector::service'],
+    notify     => Class['lma_collector::service::metric'],
   }
 
   heka::decoder::multidecoder { 'aggregator':
-    config_dir       => $lma_collector::params::config_dir,
+    config_dir       => $config_dir,
     subs             => ['ProtobufDecoder', 'aggregator_flag_decoder'],
     log_sub_errors   => true,
     cascade_strategy => 'all',
-    notify           => Class['lma_collector::service'],
+    notify           => Class['lma_collector::service::metric'],
   }
 
   heka::input::tcp { 'aggregator':
-    config_dir => $lma_collector::params::config_dir,
+    config_dir => $config_dir,
     address    => $listen_address,
     port       => $listen_port,
     decoder    => 'aggregator',
-    notify     => Class['lma_collector::service'],
+    notify     => Class['lma_collector::service::metric'],
   }
 
   if $http_check_port {
     heka::decoder::sandbox { 'http-check':
-      config_dir       => $lma_collector::params::config_dir,
+      config_dir       => $config_dir,
       filename         => "${lma_collector::params::plugins_dir}/decoders/noop.lua" ,
       config           => {
         msg_type => 'lma.http-check',
       },
       module_directory => $lua_modules_dir,
-      notify           => Class['lma_collector::service'],
+      notify           => Class['lma_collector::service::metric'],
     }
 
     heka::input::httplisten { 'http-check':
-      config_dir => $lma_collector::params::config_dir,
+      config_dir => $config_dir,
       address    => $listen_address,
       port       => $http_check_port,
       decoder    => 'http-check',
       require    => Heka::Decoder::Sandbox['http-check'],
-      notify     => Class['lma_collector::service'],
+      notify     => Class['lma_collector::service::metric'],
     }
   }
 }
