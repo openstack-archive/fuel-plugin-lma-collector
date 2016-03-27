@@ -14,22 +14,20 @@
 #
 # Class: lma_collector::service
 #
-# Manages the LMA collector daemon
+# Manages the M(metric) collector daemon
 #
 # Sample Usage:
 #
 # sometype { 'foo':
-#   notify => Class['lma_collector::service'],
+#   notify => Class['lma_collector::service::metric'],
 # }
 #
 #
-class lma_collector::service {
-
+class lma_collector::service::metric {
   include lma_collector::params
 
-  service { $lma_collector::params::service_name:
+  service { $::lma_collector::params::metric_service_name:
     ensure => 'running',
     enable => true,
   }
-
 }
