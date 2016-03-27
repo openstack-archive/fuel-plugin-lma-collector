@@ -1,5 +1,5 @@
 #!/bin/bash
-#    Copyright 2015 Mirantis, Inc.
+#    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -79,7 +79,7 @@ meta_data() {
 <longdesc lang="en">
 Manages the LMA collector daemon as a Pacemaker Resource.
 </longdesc>
-<shortdesc lang="en">Manages LMA collector</shortdesc>
+<shortdesc lang="en">Manages Log or Metric collector</shortdesc>
 <parameters>
 
 <parameter name="binary" unique="0" required="0">

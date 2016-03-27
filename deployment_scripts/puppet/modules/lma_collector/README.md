@@ -865,15 +865,19 @@ Declare this class to configure the GSE cluster policies on the aggregator node.
   in the [Cluster Policies](http://fuel-plugin-lma-collector.readthedocs.org/en/latest/alarms.html#cluster-policies)
   documentation. Valid options: a hash.
 
-#### Class: `lma_collector::metrics::heka_monitoring`
+#### Class: `lma_collector::metrics::heka_monitoring`
 
-Declare this class to collect metrics for the Heka service itself.
+Declare this class to collect metrics for the Heka services themselves.
 
 ##### Parameters
 
-* `dashboard_address`: *Optional*. The address the Heka dashboard listens on.
+* `dashboard_address`: *Optional*. The address Heka dashboards listens on.
   Valid options: a string. Default: `127.0.0.1`.
-* `dashboard_port`: *Optional*. The port the Heka dashboard listens on.
+* `metric_dashboard_port`: *Optional*. The port the Heka dashboard of
+  metric collector listens on.
+  Valid options: a string. Default: `4353`.
+* `log_dashboard_port`: *Optional*. The port the Heka dashboard of
+  log collector listens on.
   Valid options: a string. Default: `4352`.
 
 #### Class: `lma_collector::metrics::service_heartbeat`

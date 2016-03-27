@@ -11,21 +11,23 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-class lma_collector::gse_policies (
-  $policies
-) {
-  include heka::params
+#
+# Class: lma_collector::service:metric
+#
+# Manages the Metric collector daemon
+#
+# Sample Usage:
+#
+# sometype { 'foo':
+#   notify => Class['lma_collector::service::metric'],
+# }
+#
+#
+class lma_collector::service::metric {
   include lma_collector::params
-  include lma_collector::service::metric
 
-  validate_hash($policies)
-
-  $gse_policies_path = "${heka::params::lua_modules_dir}/${lma_collector::params::gse_policies_module}.lua"
-
-  file { 'gse_policies':
-    ensure  => present,
-    path    => $gse_policies_path,
-    content => template('lma_collector/gse_policies.lua.erb'),
-    notify  => Class['lma_collector::service::metric'],
+  service { $::lma_collector::params::metric_service_name:
+    ensure => 'running',
+    enable => true,
   }
 }

@@ -13,23 +13,41 @@
 #    under the License.
 #
 class lma_collector::metrics::heka_monitoring (
-  $dashboard_address = $lma_collector::params::dashboard_address,
-  $dashboard_port    = $lma_collector::params::dashboard_port,
-){
-  include lma_collector::service
+  $dashboard_address     = $lma_collector::params::dashboard_address,
+  $log_dashboard_port    = $lma_collector::params::log_dashboard_port,
+  $metric_dashboard_port = $lma_collector::params::metric_dashboard_port,
+) inherits lma_collector::params {
 
-  heka::filter::sandbox { 'heka_monitoring':
-    config_dir      => $lma_collector::params::config_dir,
+  include lma_collector::service::metric
+  include lma_collector::service::log
+
+  $metric_config_dir = $lma_collector::params::metric_config_dir
+  $log_config_dir = $lma_collector::params::log_config_dir
+
+  heka::filter::sandbox { 'heka_monitoring_metric':
+    config_dir      => $metric_config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/heka_monitoring.lua",
     message_matcher => "Type == 'heka.all-report'",
-    notify          => Class['lma_collector::service'],
+    notify          => Class['lma_collector::service::metric'],
+  }
+  heka::filter::sandbox { 'heka_monitoring_log':
+    config_dir      => $log_config_dir,
+    filename        => "${lma_collector::params::plugins_dir}/filters/heka_monitoring.lua",
+    message_matcher => "Type == 'heka.all-report'",
+    notify          => Class['lma_collector::service::log'],
   }
 
   # Dashboard is required to enable monitoring messages
-  heka::output::dashboard { 'dashboard':
-    config_dir        => $lma_collector::params::config_dir,
+  heka::output::dashboard { 'dashboard_metric':
+    config_dir        => $metric_config_dir,
     dashboard_address => $dashboard_address,
-    dashboard_port    => $dashboard_port,
-    notify            => Class['lma_collector::service'],
+    dashboard_port    => $metric_dashboard_port,
+    notify            => Class['lma_collector::service::metric'],
+  }
+  heka::output::dashboard { 'dashboard_log':
+    config_dir        => $log_config_dir,
+    dashboard_address => $dashboard_address,
+    dashboard_port    => $log_dashboard_port,
+    notify            => Class['lma_collector::service::log'],
   }
 }

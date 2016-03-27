@@ -17,10 +17,10 @@ class lma_collector::logs::counter (
   $interval = 60,
 ) {
   include lma_collector::params
-  include lma_collector::service
+  include lma_collector::service::log
 
   heka::filter::sandbox { 'logs_counter':
-    config_dir      => $lma_collector::params::config_dir,
+    config_dir      => $lma_collector::params::log_config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/logs_counter.lua",
     message_matcher => 'Type == \'log\' && Logger =~ /^openstack\\./',
     ticker_interval => 1,
@@ -29,6 +29,6 @@ class lma_collector::logs::counter (
       interval => $interval,
       hostname => $hostname,
     },
-    notify          => Class['lma_collector::service'],
+    notify          => Class['lma_collector::service::log'],
   }
 }
