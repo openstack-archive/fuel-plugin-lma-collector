@@ -22,7 +22,7 @@ define lma_collector::afd_nagios(
   $message_type = 'afd_node_metric',
 ){
   include lma_collector::params
-  include lma_collector::service
+  include lma_collector::service::metric
 
   if $url == undef {
     fail('url parameter is undef!')
@@ -31,28 +31,29 @@ define lma_collector::afd_nagios(
   $config = {'nagios_host' => $hostname, 'service_template' => $service_template}
   heka::encoder::sandbox { "nagios_afd_${title}":
     ensure     => $ensure,
-    config_dir => $lma_collector::params::config_dir,
+    config_dir => $lma_collector::params::metric_config_dir,
     filename   => "${lma_collector::params::plugins_dir}/encoders/status_nagios.lua",
     config     => $config,
-    notify     => Class['lma_collector::service'],
+    notify     => Class['lma_collector::service::metric'],
   }
 
   heka::output::http { "nagios_afd_${title}":
-    ensure          => $ensure,
-    config_dir      => $lma_collector::params::config_dir,
-    url             => $url,
-    message_matcher => "Fields[${lma_collector::params::aggregator_flag}] == NIL && Type == 'heka.sandbox.${message_type}'",
-    username        => $user,
-    password        => $password,
-    encoder         => "nagios_afd_${title}",
-    timeout         => $lma_collector::params::nagios_timeout,
-    headers         => {
+    ensure            => $ensure,
+    config_dir        => $lma_collector::params::metric_config_dir,
+    url               => $url,
+    message_matcher   => "Fields[${lma_collector::params::aggregator_flag}] == NIL && Type == 'heka.sandbox.${message_type}'",
+    username          => $user,
+    password          => $password,
+    encoder           => "nagios_afd_${title}",
+    timeout           => $lma_collector::params::nagios_timeout,
+    headers           => {
       'Content-Type' => 'application/x-www-form-urlencoded'
     },
-    use_buffering   => $lma_collector::params::buffering_enabled,
-    max_buffer_size => $lma_collector::params::buffering_max_buffer_tiny_size,
-    max_file_size   => $lma_collector::params::buffering_max_file_tiny_size,
-    require         => Heka::Encoder::Sandbox["nagios_afd_${title}"],
-    notify          => Class['lma_collector::service'],
+    use_buffering     => $lma_collector::params::buffering_enabled,
+    max_buffer_size   => $lma_collector::params::buffering_max_buffer_size_for_nagios,
+    max_file_size     => $lma_collector::params::buffering_max_file_size_for_nagios,
+    queue_full_action => $lma_collector::params::queue_full_action_for_nagios,
+    require           => Heka::Encoder::Sandbox["nagios_afd_${title}"],
+    notify            => Class['lma_collector::service::metric'],
   }
 }

@@ -24,7 +24,7 @@ class lma_collector::smtp_alert (
   $ensure          = present,
 ) inherits lma_collector::params {
 
-  include lma_collector::service
+  include lma_collector::service::metric
 
   if $host == undef {
     fail('host parameter is undef!')
@@ -37,13 +37,13 @@ class lma_collector::smtp_alert (
   }
 
   heka::encoder::sandbox { 'smtp_alert':
-    config_dir => $lma_collector::params::config_dir,
+    config_dir => $lma_collector::params::metric_config_dir,
     filename   => "${lma_collector::params::plugins_dir}/encoders/status_smtp.lua",
-    notify     => Class['lma_collector::service'],
+    notify     => Class['lma_collector::service::metric'],
   }
 
   heka::output::smtp { 'smtp_alert':
-    config_dir      => $lma_collector::params::config_dir,
+    config_dir      => $lma_collector::params::metric_config_dir,
     send_from       => $send_from,
     send_to         => $send_to,
     message_matcher => 'Type == \'heka.sandbox.gse_cluster_metric\' || Type == \'heka.sandbox.gse_node_cluster_metric\'',
@@ -54,6 +54,6 @@ class lma_collector::smtp_alert (
     user            => $user,
     password        => $password,
     send_interval   => $send_interval,
-    notify          => Class['lma_collector::service'],
+    notify          => Class['lma_collector::service::metric'],
   }
 }

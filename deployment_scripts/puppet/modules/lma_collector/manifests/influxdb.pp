@@ -21,7 +21,7 @@ class lma_collector::influxdb (
   $tag_fields     = $lma_collector::params::influxdb_tag_fields,
   $time_precision = $lma_collector::params::influxdb_time_precision,
 ) inherits lma_collector::params {
-  include lma_collector::service
+  include lma_collector::service::metric
 
   validate_string($database)
   validate_string($user)
@@ -30,7 +30,7 @@ class lma_collector::influxdb (
   validate_array($tag_fields)
 
   heka::filter::sandbox { 'influxdb_accumulator':
-    config_dir      => $lma_collector::params::config_dir,
+    config_dir      => $lma_collector::params::metric_config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/influxdb_accumulator.lua",
     message_matcher => $lma_collector::params::influxdb_message_matcher,
     ticker_interval => 1,
@@ -43,38 +43,39 @@ class lma_collector::influxdb (
       # parameters but this requires to request Keystone since we only have
       # access to the tenant name and user name for services
     },
-    notify          => Class['lma_collector::service'],
+    notify          => Class['lma_collector::service::metric'],
   }
 
   heka::filter::sandbox { 'influxdb_annotation':
-    config_dir      => $lma_collector::params::config_dir,
+    config_dir      => $lma_collector::params::metric_config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/influxdb_annotation.lua",
     message_matcher => 'Type == \'heka.sandbox.gse_cluster_metric\'',
     config          => {
       serie_name => $lma_collector::params::annotations_serie_name
     },
-    notify          => Class['lma_collector::service'],
+    notify          => Class['lma_collector::service::metric'],
   }
 
   heka::encoder::payload { 'influxdb':
-    config_dir => $lma_collector::params::config_dir,
-    notify     => Class['lma_collector::service'],
+    config_dir => $lma_collector::params::metric_config_dir,
+    notify     => Class['lma_collector::service::metric'],
   }
 
   heka::output::http { 'influxdb':
-    config_dir      => $lma_collector::params::config_dir,
-    url             => "http://${server}:${port}/write?db=${database}&precision=${time_precision}",
-    message_matcher => 'Fields[payload_type] == \'txt\' && Fields[payload_name] == \'influxdb\'',
-    username        => $user,
-    password        => $password,
-    timeout         => $lma_collector::params::influxdb_timeout,
-    headers         => {
+    config_dir        => $lma_collector::params::metric_config_dir,
+    url               => "http://${server}:${port}/write?db=${database}&precision=${time_precision}",
+    message_matcher   => 'Fields[payload_type] == \'txt\' && Fields[payload_name] == \'influxdb\'',
+    username          => $user,
+    password          => $password,
+    timeout           => $lma_collector::params::influxdb_timeout,
+    headers           => {
       'Content-Type' => 'application/x-www-form-urlencoded'
     },
-    use_buffering   => $lma_collector::params::buffering_enabled,
-    max_file_size   => $lma_collector::params::buffering_max_file_size,
-    max_buffer_size => $lma_collector::params::buffering_max_buffer_size,
-    require         => Heka::Encoder::Payload['influxdb'],
-    notify          => Class['lma_collector::service'],
+    use_buffering     => $lma_collector::params::buffering_enabled,
+    max_file_size     => $lma_collector::params::buffering_max_file_size_for_metric,
+    max_buffer_size   => $lma_collector::params::buffering_max_buffer_size_for_metric,
+    queue_full_action => $lma_collector::params::queue_full_action_for_metric,
+    require           => Heka::Encoder::Payload['influxdb'],
+    notify            => Class['lma_collector::service::metric'],
   }
 }
