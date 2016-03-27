@@ -16,7 +16,7 @@ class lma_collector::aggregator::client (
   $port                = $lma_collector::params::aggregator_port,
 ) inherits lma_collector::params {
 
-  include lma_collector::service
+  include lma_collector::service::metric
 
   if $address == undef {
     fail('address parameter should be defined!')
@@ -24,16 +24,15 @@ class lma_collector::aggregator::client (
 
   validate_string($address)
 
-  $config_dir = $lma_collector::params::config_dir
-
   heka::output::tcp { 'aggregator':
-    config_dir      => $config_dir,
-    address         => $address,
-    port            => $port,
-    use_buffering   => $lma_collector::params::buffering_enabled,
-    max_buffer_size => $lma_collector::params::buffering_max_buffer_size,
-    max_file_size   => $lma_collector::params::buffering_max_file_size,
-    message_matcher => $lma_collector::params::aggregator_client_message_matcher,
-    notify          => Class['lma_collector::service'],
+    config_dir        => $lma_collector::params::metric_config_dir,
+    address           => $address,
+    port              => $port,
+    use_buffering     => $lma_collector::params::buffering_enabled,
+    max_buffer_size   => $lma_collector::params::buffering_max_buffer_aggregator_size,
+    max_file_size     => $lma_collector::params::buffering_max_file_aggregator_size,
+    message_matcher   => $lma_collector::params::aggregator_client_message_matcher,
+    queue_full_action => $lma_collector::params::queue_full_action_aggregator,
+    notify            => Class['lma_collector::service::metric'],
   }
 }

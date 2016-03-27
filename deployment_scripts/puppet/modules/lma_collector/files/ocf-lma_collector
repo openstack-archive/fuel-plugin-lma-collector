@@ -1,5 +1,5 @@
 #!/bin/bash
-#    Copyright 2015 Mirantis, Inc.
+#    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -36,8 +36,8 @@
 SERVICE_NAME="LMA collector"
 
 OCF_RESKEY_binary_default="/usr/bin/hekad"
-OCF_RESKEY_config_default="/etc/lma_collector"
-OCF_RESKEY_log_file_default="/var/log/lma_collector.log"
+OCF_RESKEY_config_default="/etc/l_collector"
+OCF_RESKEY_log_file_default="/var/log/l_collector.log"
 OCF_RESKEY_pid_default="${HA_RSCTMP}/${__SCRIPT_NAME}/${__SCRIPT_NAME}.pid"
 OCF_RESKEY_user_default="root"
 OCF_RESKEY_watchdog_file_default=
@@ -73,7 +73,7 @@ meta_data() {
     cat <<END
 <?xml version="1.0"?>
 <!DOCTYPE resource-agent SYSTEM "ra-api-1.dtd">
-<resource-agent name="lma_collector">
+<resource-agent name="l_collector">
 <version>1.0</version>
 
 <longdesc lang="en">

@@ -19,25 +19,25 @@
 class lma_collector::logs::keystone_wsgi (
   $log_directory = $lma_collector::params::apache_log_directory,
 ) inherits lma_collector::params {
-  include lma_collector::service
+  include lma_collector::service::log
 
   heka::decoder::sandbox { 'keystone_wsgi':
-    config_dir => $lma_collector::params::config_dir,
+    config_dir => $lma_collector::params::log_config_dir,
     filename   => "${lma_collector::params::plugins_dir}/decoders/keystone_wsgi_log.lua",
     config     => {
       apache_log_pattern => $lma_collector::params::apache_log_pattern,
     },
-    notify     => Class['lma_collector::service'],
+    notify     => Class['lma_collector::service::log'],
   }
 
   heka::input::logstreamer { 'keystone_wsgi':
-    config_dir     => $lma_collector::params::config_dir,
+    config_dir     => $lma_collector::params::log_config_dir,
     decoder        => 'keystone_wsgi',
     log_directory  => $log_directory,
     file_match     => 'keystone_wsgi_(?P<Service>.+)_access\.log\.?(?P<Seq>\d*)$',
     differentiator => "['keystone-wsgi-', 'Service']",
     priority       => '["^Seq"]',
     require        => Heka::Decoder::Sandbox['keystone_wsgi'],
-    notify         => Class['lma_collector::service'],
+    notify         => Class['lma_collector::service::log'],
   }
 }
