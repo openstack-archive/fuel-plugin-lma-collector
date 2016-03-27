@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# == Class: heka
+# == Define: heka
 #
 # Install and configure the core of the Heka service.
 #
@@ -66,61 +66,123 @@
 #
 # Copyright 2015 Mirantis Inc, unless otherwise noted.
 #
-class heka (
-  $service_name = $heka::params::service_name,
-  $config_dir = $heka::params::config_dir,
-  $user = $heka::params::user,
-  $additional_groups = $heka::params::additional_groups,
-  $hostname = $heka::params::hostname,
-  $maxprocs = $heka::params::maxprocs,
-  $max_message_size = $heka::params::max_message_size,
-  $max_process_inject = $heka::params::max_process_inject,
-  $max_timer_inject = $heka::params::max_timer_inject,
+define heka (
+  $service_name = undef,
+  $config_dir = undef,
+  $user = undef,
+  $additional_groups = undef,
+  $hostname = undef,
+  $maxprocs = undef,
+  $max_message_size = undef,
+  $max_process_inject = undef,
+  $max_timer_inject = undef,
   $poolsize = undef,
   $pre_script = undef,
-  $internal_statistics = $heka::params::internal_statistics,
-) inherits heka::params {
+  $internal_statistics = undef,
+) {
+
+  include heka::params
 
   if $poolsize {
     validate_integer($poolsize)
   }
 
-  $hekad_wrapper = "/usr/local/bin/${service_name}_wrapper"
-  $base_dir      = "/var/cache/${service_name}"
-  $log_file      = "/var/log/${service_name}.log"
-  $heka_user     = $user
+  if $user {
+    $heka_user = $user
+  } else {
+    $heka_user = $heka::params::user
+  }
   $run_as_root   = $heka_user == 'root'
 
-  package { $heka::params::package_name:
-    ensure => latest,
-    alias  => 'heka',
+  if $service_name {
+    $_service_name = $service_name
+  } else {
+    $_service_name = $heka::params::service_name
+  }
+  if $config_dir {
+    $_config_dir = $config_dir
+  } else {
+    $_config_dir = $heka::params::config_dir
+  }
+  if $run_as_root {
+    $_run_as_root = $run_as_root
+  } else {
+    $_run_as_root = $heka::params::run_as_root
+  }
+  if $additional_groups {
+    $_additional_groups = $additional_groups
+  } else {
+    $_additional_groups = $heka::params::additional_groups
+  }
+  if $hostname {
+    $_hostname = $hostname
+  } else {
+    $_hostname = $heka::params::hostname
+  }
+  if $maxprocs {
+    $_maxprocs = $maxprocs
+  } else {
+    $_maxprocs = $heka::params::maxprocs
+  }
+  if $max_message_size {
+    $_max_message_size = $max_message_size
+  } else {
+    $_max_message_size = $heka::params::max_message_size
+  }
+  if $max_process_inject {
+    $_max_process_inject = $max_process_inject
+  } else {
+    $_max_process_inject = $heka::params::max_process_inject
+  }
+  if $max_timer_inject {
+    $_max_timer_inject = $max_timer_inject
+  } else {
+    $_max_timer_inject = $heka::params::max_timer_inject
+  }
+  if $internal_statistics {
+    $_internal_statistics = $internal_statistics
+  } else {
+    $_internal_statistics = $heka::params::internal_statistics
   }
 
-  if $::osfamily == 'Debian' {
-    # Starting from Heka 0.10.0, the Debian package provides a SysV init
-    # script so we need to stop the service and disable it.
-    exec { 'stop_heka_daemon':
-      command => '/etc/init.d/heka stop',
-      onlyif  => '/usr/bin/test -f /etc/init.d/heka',
-      require => Package['heka'],
-      notify  => Exec['disable_heka_daemon']
+  $hekad_wrapper = "/usr/local/bin/${_service_name}_wrapper"
+  $base_dir      = "/var/cache/${_service_name}"
+  $log_file      = "/var/log/${_service_name}.log"
+
+  if ! defined(Package[$heka::params::package_name]) {
+    package { $heka::params::package_name:
+      ensure => latest,
+      alias  => 'heka',
     }
 
-    exec { 'disable_heka_daemon':
-      command     => '/usr/sbin/update-rc.d heka disable',
-      refreshonly => true,
+    if $::osfamily == 'Debian' {
+      # Starting from Heka 0.10.0, the Debian package provides a SysV init
+      # script so we need to stop the service and disable it.
+      exec { 'stop_heka_daemon':
+        command => '/etc/init.d/heka stop',
+        onlyif  => '/usr/bin/test -f /etc/init.d/heka',
+        require => Package['heka'],
+        notify  => Exec['disable_heka_daemon']
+      }
+
+      exec { 'disable_heka_daemon':
+        command     => '/usr/sbin/update-rc.d heka disable',
+        refreshonly => true,
+      }
     }
   }
 
   # This Puppet User resource is used by other manifests even if the hekad
   # process runs as 'root'.
-  user { $heka_user:
-    shell  => $heka::params::nologin_bin,
-    home   => $base_dir,
-    system => true,
-    groups => $additional_groups,
-    alias  => 'heka',
-    before => Package['heka'],
+  if ! defined(User[$heka_user]) {
+    user { $heka_user:
+      shell  => $heka::params::nologin_bin,
+      home   => $base_dir,
+      system => true,
+      groups => $_additional_groups,
+      alias  => 'heka',
+      before => Package['heka'],
+    }
   }
 
   file { $base_dir:
@@ -131,7 +193,7 @@ class heka (
     require => [User[$heka_user], Package['heka']],
   }
 
-  file { $config_dir:
+  file { $_config_dir:
     ensure  => directory,
     owner   => $heka_user,
     group   => $heka_user,
@@ -147,7 +209,7 @@ class heka (
     require => [User[$heka_user], Package['heka']],
   }
 
-  $logrotate_conf = "/etc/logrotate_${service_name}.conf"
+  $logrotate_conf = "/etc/logrotate_${_service_name}.conf"
   file { $logrotate_conf:
     ensure  => present,
     content => template('heka/logrotate.conf.erb'),
@@ -157,7 +219,7 @@ class heka (
     require => Package['heka'],
   }
 
-  $logrotate_bin = "/usr/local/bin/logrotate_${service_name}"
+  $logrotate_bin = "/usr/local/bin/logrotate_${_service_name}"
   file { $logrotate_bin:
     ensure  => present,
     owner   => 'root',
@@ -167,7 +229,7 @@ class heka (
     require => File[$logrotate_conf],
   }
 
-  cron { "${service_name} logrotate":
+  cron { "${_service_name} logrotate":
     ensure   => present,
     command  => $logrotate_bin,
     minute   => '*/30',
@@ -183,26 +245,27 @@ class heka (
     group   => 'root',
     mode    => '0755',
     content => template('heka/hekad_wrapper.erb'),
+    require => Package['heka'],
   }
 
   case $::osfamily {
     'Debian': {
-      file {"/etc/init/${service_name}.conf":
+      file {"/etc/init/${_service_name}.conf":
         ensure  => present,
         content => template('heka/hekad.upstart.conf.erb'),
-        notify  => Service[$service_name],
-        alias   => 'heka_init_script',
+        notify  => Service[$_service_name],
+        alias   => "${_service_name}_heka_init_script",
         require => File[$hekad_wrapper],
       }
     }
 
     'RedHat': {
-      file { "/etc/init.d/${service_name}":
+      file { "/etc/init.d/${_service_name}":
         ensure  => present,
         content => template('heka/hekad.initd.erb'),
         mode    => '0755',
-        notify  => Service[$service_name],
-        alias   => 'heka_init_script',
+        notify  => Service[$_service_name],
+        alias   => "${_service_name}_heka_init_script",
         require => File[$hekad_wrapper],
       }
     }
@@ -211,14 +274,14 @@ class heka (
     }
   }
 
-  file { "${config_dir}/global.toml":
+  file { "${_config_dir}/global.toml":
     ensure  => present,
     content => template('heka/global.toml.erb'),
     mode    => '0600',
     owner   => $heka_user,
     group   => $heka_user,
-    require => File[$config_dir],
-    notify  => Service[$service_name],
+    require => File[$_config_dir],
+    notify  => Service[$_service_name],
   }
 
   if $internal_statistics {
