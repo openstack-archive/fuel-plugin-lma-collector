@@ -16,27 +16,28 @@ class lma_collector::elasticsearch (
   $server = $lma_collector::params::elasticsearch_server,
   $port = $lma_collector::params::elasticsearch_port,
 ) inherits lma_collector::params {
-  include lma_collector::service
+  include lma_collector::service::log
 
   validate_string($server)
 
   heka::encoder::es_json { 'elasticsearch':
-    config_dir              => $lma_collector::params::config_dir,
+    config_dir              => $lma_collector::params::log_config_dir,
     index                   => '%{Type}-%{%Y.%m.%d}',
     es_index_from_timestamp => true,
     fields                  => $lma_collector::params::elasticsearch_fields,
-    notify                  => Class['lma_collector::service'],
+    notify                  => Class['lma_collector::service::log'],
   }
 
   heka::output::elasticsearch { 'elasticsearch':
-    config_dir      => $lma_collector::params::config_dir,
-    server          => $server,
-    port            => $port,
-    message_matcher => 'Type == \'log\' || Type  == \'notification\'',
-    use_buffering   => $lma_collector::params::buffering_enabled,
-    max_buffer_size => $lma_collector::params::buffering_max_buffer_size,
-    max_file_size   => $lma_collector::params::buffering_max_file_size,
-    require         => Heka::Encoder::Es_json['elasticsearch'],
-    notify          => Class['lma_collector::service'],
+    config_dir        => $lma_collector::params::log_config_dir,
+    server            => $server,
+    port              => $port,
+    message_matcher   => 'Type == \'log\' || Type  == \'notification\'',
+    use_buffering     => $lma_collector::params::buffering_enabled,
+    max_buffer_size   => $lma_collector::params::buffering_max_buffer_size_for_log,
+    max_file_size     => $lma_collector::params::buffering_max_file_size_for_log,
+    queue_full_action => $lma_collector::params::queue_full_action_for_log,
+    require           => Heka::Encoder::Es_json['elasticsearch'],
+    notify            => Class['lma_collector::service::log'],
   }
 }

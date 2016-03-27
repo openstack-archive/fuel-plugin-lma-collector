@@ -14,27 +14,29 @@
 #
 class lma_collector::logs::system {
   include lma_collector::params
-  include lma_collector::service
+  include lma_collector::service::log
+
+  $config_dir = $lma_collector::params::log_config_dir
 
   $lua_modules_dir = $lma_collector::params::lua_modules_dir
 
   heka::decoder::sandbox { 'system':
-    config_dir       => $lma_collector::params::config_dir,
+    config_dir       => $config_dir,
     filename         => "${lma_collector::params::plugins_dir}/decoders/generic_syslog.lua" ,
     config           => {
       syslog_pattern          => $lma_collector::params::syslog_pattern,
       fallback_syslog_pattern => $lma_collector::params::fallback_syslog_pattern
     },
     module_directory => $lua_modules_dir,
-    notify           => Class['lma_collector::service'],
+    notify           => Class['lma_collector::service::log'],
   }
 
   heka::input::logstreamer { 'system':
-    config_dir     => $lma_collector::params::config_dir,
+    config_dir     => $config_dir,
     decoder        => 'system',
     file_match     => '(?P<Service>daemon\.log|cron\.log|haproxy\.log|kern\.log|auth\.log|syslog|messages|debug)',
     differentiator => '[ \'system.\', \'Service\' ]',
     require        => Heka::Decoder::Sandbox['system'],
-    notify         => Class['lma_collector::service'],
+    notify         => Class['lma_collector::service::log'],
   }
 }

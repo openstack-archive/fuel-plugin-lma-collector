@@ -24,10 +24,18 @@ The following versions of Heka and collectd are known to work for LMA:
 ### Setup
 
 To install and configure the main components, declare the `lma_collector`
-class:
+class and `lma_collector::heka` defines:
 
 ```puppet
 class { 'lma_collector': }
+
+lma_collector::heka { 'log_collector':
+  require  => Class['lma_collector'],
+}
+
+lma_collector::heka { 'metric_collector':
+  require  => Class['lma_collector'],
+}
 ```
 
 This installs Heka and configures it with Heka plugins necessary for LMA.
@@ -464,14 +472,24 @@ Private Classes:
 
 #### Class: `lma_collector`
 
-Main class. Install and configure the main components of the LMA collector.
+Install the common Lua modules used by LMA collectors.
 
 ##### Parameters
 
 * `tags`: *Optional*. Fields added to Heka messages. Valid options: a hash. Default: `{}`.
+
+#### Define: `lma_collector::heka`
+
+Main Define. Install and configure the Log and Metric collector.
+The title must be either `log_collector` or `metric_collector`.
+
+##### Parameters
+
 * `user`: *Optional*. User the Heka service is run as. You may have to use `'root'` on some systems for the Heka service to be able to access log files, run additional commands, ... Valid options: a string.  Default: `'heka'`.
 * `groups`: *Optional*. Additional groups to add to the user running the Heka service. Ignored if the Heka service is run as "root". Valid options: an array of strings. Default: `['syslog', 'adm']`.
 * `poolsize`: *Optional*. The pool size of maximum messages that can exist (default: 100).
+* `heka_monitoring`: *Optional*. Enable the hekad plugins monitoring by configuring
+  the Heka dashboard and a filter plugin. (default: true, valid option: boolean).
 
 #### Class: `lma_collector::elasticsearch`
 
@@ -865,15 +883,19 @@ Declare this class to configure the GSE cluster policies on the aggregator node.
   in the [Cluster Policies](http://fuel-plugin-lma-collector.readthedocs.org/en/latest/alarms.html#cluster-policies)
   documentation. Valid options: a hash.
 
-#### Class: `lma_collector::metrics::heka_monitoring`
+#### Class: `lma_collector::metrics::heka_monitoring`
 
-Declare this class to collect metrics for the Heka service itself.
+Declare this class to collect metrics for the Heka services themselves.
 
 ##### Parameters
 
-* `dashboard_address`: *Optional*. The address the Heka dashboard listens on.
+* `dashboard_address`: *Optional*. The address Heka dashboards listen on.
   Valid options: a string. Default: `127.0.0.1`.
-* `dashboard_port`: *Optional*. The port the Heka dashboard listens on.
+* `metric_dashboard_port`: *Optional*. The port the Heka dashboard of
+  metric collector listens on.
+  Valid options: a string. Default: `4353`.
+* `log_dashboard_port`: *Optional*. The port the Heka dashboard of
+  log collector listens on.
   Valid options: a string. Default: `4352`.
 
 #### Class: `lma_collector::metrics::service_heartbeat`

@@ -14,7 +14,6 @@
 #
 class heka::params {
   $package_name = 'heka'
-  $service_name = 'hekad'
   $user = 'heka'
   $additional_groups = []
 
@@ -25,7 +24,7 @@ class heka::params {
   $max_timer_inject = undef
   $internal_statistics = false
 
-  $config_dir = "/etc/${service_name}"
+  $config_dir = '/etc/hekad'
   $share_dir = '/usr/share/heka'
   $lua_modules_dir = '/usr/share/heka/lua_modules'
 
