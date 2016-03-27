@@ -71,10 +71,11 @@ Plugin verification
 -------------------
 
 Once the OpenStack environment is ready, you may want to check that both
-the 'collectd' and 'hekad' processes of the LMA Collector are running on the OpenStack nodes::
+the 'collectd' and 'hekad' processes are running on the OpenStack nodes::
 
     [root@node-1 ~]# pidof hekad
     5568
+    5569
     [root@node-1 ~]# pidof collectd
     5684
 
@@ -85,23 +86,28 @@ Troubleshooting
 
 If you see no data in the Kibana and/or Grafana dashboards, use the instructions below to troubleshoot the problem:
 
-1. Check if the LMA Collector service is up and running::
+1. Check if LMA Collector services are up and running::
 
     # On the controller node(s)
-    [root@node-1 ~]# crm resource status lma_collector
+    [root@node-1 ~]# crm resource status metric_collector
+    [root@node-1 ~]# crm resource status log_collector
 
     # On non controller nodes
-    [root@node-1 ~]# status lma_collector
+    [root@node-2 ~]# status log_collector
+    [root@node-2 ~]# status metric_collector
 
-2. If the LMA Collector is down, restart it::
+2. If one of the LMA Collectors is down, restart it::
 
     # On the controller node(s)
-    [root@node-1 ~]# crm resource start lma_collector
+    [root@node-1 ~]# crm resource start log_collector
+    [root@node-1 ~]# crm resource start metric_collector
 
     # On non controller nodes
-    [root@node-1 ~]# start lma_collector
+    [root@node-2 ~]# start log_collector
+    [root@node-2 ~]# start metric_collector
 
-3. Look for errors in the LMA Collector log file (located at /var/log/lma_collector.log) on the different nodes.
+3. Look for errors in the LMA Collector log file (located at /var/log/log_collector.log and /var/log/metric_collector.log)
+   on the different nodes.
 
 4. Look for errors in the collectd log file (located at /var/log/collectd.log) on the different nodes.
 

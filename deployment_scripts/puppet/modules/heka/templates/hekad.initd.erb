@@ -26,12 +26,12 @@ HEKA_USER=root
 start() {
     [ -x $exec ] || exit 5
     [ -f $CONF_FILE ] || exit 6
-<% unless @run_as_root -%>
+<% unless @_run_as_root -%>
     touch <%= @log_file %>
     chown <%= @heka_user %>:<%= @heka_user %> <%= @log_file %>
 <% end -%>
     echo -n $"Starting $prog: "
-    daemonize -p $pidfile -e <%= @log_file %> <%= @run_as_root ? "" : "-u #{ @heka_user }" %> -l $lockfile $exec
+    daemonize -p $pidfile -e <%= @log_file %> <%= @_run_as_root ? "" : "-u #{ @heka_user }" %> -l $lockfile $exec
     retval=$?
     [ $retval -eq 0 ] && success || failure
     echo

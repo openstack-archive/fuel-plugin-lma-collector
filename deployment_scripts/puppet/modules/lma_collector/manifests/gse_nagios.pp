@@ -23,7 +23,7 @@ define lma_collector::gse_nagios (
   $virtual_hostname = undef,
 ) {
   include lma_collector::params
-  include lma_collector::service
+  include lma_collector::service::metric
 
   $lua_modules_dir = $lma_collector::params::lua_modules_dir
 
@@ -44,29 +44,30 @@ define lma_collector::gse_nagios (
   $config = {'nagios_host' => $_nagios_host, 'service_template' => $service_template}
   heka::encoder::sandbox { "nagios_gse_${title}":
     ensure           => $ensure,
-    config_dir       => $lma_collector::params::config_dir,
+    config_dir       => $lma_collector::params::metric_config_dir,
     filename         => "${lma_collector::params::plugins_dir}/encoders/status_nagios.lua",
     config           => $config,
     module_directory => $lua_modules_dir,
-    notify           => Class['lma_collector::service'],
+    notify           => Class['lma_collector::service::metric'],
   }
 
   heka::output::http { "nagios_gse_${title}":
-    ensure          => $ensure,
-    config_dir      => $lma_collector::params::config_dir,
-    url             => $url,
-    message_matcher => "Type == 'heka.sandbox.${message_type}'",
-    username        => $user,
-    password        => $password,
-    encoder         => "nagios_gse_${title}",
-    timeout         => $lma_collector::params::nagios_timeout,
-    headers         => {
+    ensure            => $ensure,
+    config_dir        => $lma_collector::params::metric_config_dir,
+    url               => $url,
+    message_matcher   => "Type == 'heka.sandbox.${message_type}'",
+    username          => $user,
+    password          => $password,
+    encoder           => "nagios_gse_${title}",
+    timeout           => $lma_collector::params::nagios_timeout,
+    headers           => {
       'Content-Type' => 'application/x-www-form-urlencoded'
     },
-    use_buffering   => $lma_collector::params::buffering_enabled,
-    max_buffer_size => $lma_collector::params::buffering_max_buffer_tiny_size,
-    max_file_size   => $lma_collector::params::buffering_max_file_tiny_size,
-    require         => Heka::Encoder::Sandbox["nagios_gse_${title}"],
-    notify          => Class['lma_collector::service'],
+    use_buffering     => $lma_collector::params::buffering_enabled,
+    max_buffer_size   => $lma_collector::params::buffering_max_buffer_size_for_nagios,
+    max_file_size     => $lma_collector::params::buffering_max_file_size_for_nagios,
+    queue_full_action => $lma_collector::params::queue_full_action_for_nagios,
+    require           => Heka::Encoder::Sandbox["nagios_gse_${title}"],
+    notify            => Class['lma_collector::service::metric'],
   }
 }

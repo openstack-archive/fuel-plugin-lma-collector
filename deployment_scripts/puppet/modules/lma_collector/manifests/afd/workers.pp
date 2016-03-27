@@ -23,10 +23,10 @@ class lma_collector::afd::workers () {
   ], '')
 
   heka::filter::sandbox { 'afd_workers':
-    config_dir       => $lma_collector::params::config_dir,
+    config_dir       => $lma_collector::params::metric_config_dir,
     filename         => "${lma_collector::params::plugins_dir}/filters/afd_workers.lua",
     message_matcher  => $metrics_matcher,
     module_directory => $lua_modules_dir,
-    notify           => Class['lma_collector::service'],
+    notify           => Class['lma_collector::service::metric'],
   }
 }
