@@ -16,17 +16,17 @@ class lma_collector::afd::api () {
   include lma_collector::params
 
   heka::filter::sandbox { 'afd_api_backends':
-    config_dir      => $lma_collector::params::config_dir,
+    config_dir      => $lma_collector::params::metric_config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/afd_api_backends.lua",
     message_matcher => '(Type == \'metric\' || Type == \'heka.sandbox.metric\') && Fields[name] == \'haproxy_backend_servers\'',
-    notify          => Class['lma_collector::service'],
+    notify          => Class['lma_collector::service::metric'],
   }
 
   heka::filter::sandbox { 'afd_api_endpoints':
-    config_dir      => $lma_collector::params::config_dir,
+    config_dir      => $lma_collector::params::metric_config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/afd_api_endpoints.lua",
     message_matcher => join(['(Type == \'metric\' || Type == \'heka.sandbox.metric\') &&',
       ' (Fields[name] =~ /^openstack.*check_api$/ || Fields[name] == \'http_check\')'], ''),
-    notify          => Class['lma_collector::service'],
+    notify          => Class['lma_collector::service::metric'],
   }
 }
