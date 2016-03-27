@@ -20,7 +20,8 @@ class lma_collector::collectd::base (
   $hostname = undef,
   $purge = false,
 ) inherits lma_collector::params {
-  include lma_collector::service
+
+  include lma_collector::service::metric
 
   $type_directory = "${lma_collector::params::plugins_dir}/collectd_types/"
   $type_files = suffix(prefix($lma_collector::params::collectd_types, $type_directory), '.db')
@@ -118,21 +119,21 @@ class lma_collector::collectd::base (
     $real_hostname = $::hostname
   }
   heka::decoder::sandbox { 'collectd':
-    config_dir       => $lma_collector::params::config_dir,
+    config_dir       => $lma_collector::params::metric_config_dir,
     filename         => "${lma_collector::params::plugins_dir}/decoders/collectd.lua" ,
     config           => {
       hostname => $real_hostname
     },
     module_directory => $lua_modules_dir,
-    notify           => Class['lma_collector::service'],
+    notify           => Class['lma_collector::service::metric'],
   }
 
   heka::input::httplisten { 'collectd':
-    config_dir => $lma_collector::params::config_dir,
+    config_dir => $lma_collector::params::metric_config_dir,
     address    => '127.0.0.1',
     port       => $port,
     decoder    => 'collectd',
     require    => Heka::Decoder::Sandbox['collectd'],
-    notify     => Class['lma_collector::service'],
+    notify     => Class['lma_collector::service::metric'],
   }
 }
