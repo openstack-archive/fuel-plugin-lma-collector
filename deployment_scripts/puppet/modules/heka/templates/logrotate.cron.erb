@@ -3,7 +3,7 @@
 
 test -x /usr/sbin/logrotate || exit 0
 
-LOCK_FILE="/var/lock/logrotate.<%= @service_name %>.lock"
+LOCK_FILE="/var/lock/logrotate.<%= @_service_name %>.lock"
 
 lock() {
     exec 903>$LOCK_FILE
@@ -26,7 +26,7 @@ fail() {
     exit 1
 }
 
-lock || fail "WARNING <%= @service_name %> logrotate flock failed, exiting"
+lock || fail "WARNING <%= @_service_name %> logrotate flock failed, exiting"
 
 
 TMP_FILE=$(/bin/mktemp)

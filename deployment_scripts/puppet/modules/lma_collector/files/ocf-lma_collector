@@ -1,5 +1,5 @@
 #!/bin/bash
-#    Copyright 2015 Mirantis, Inc.
+#    Copyright 2016 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -19,7 +19,6 @@
 #   OCF_RESKEY_binary
 #   OCF_RESKEY_config
 #   OCF_RESKEY_log_file
-#   OCF_RESKEY_pid
 #   OCF_RESKEY_user
 #   OCF_RESKEY_watchdog_file
 #   OCF_RESKEY_watchdog_timeout
@@ -33,20 +32,12 @@
 
 # Fill in some defaults if no values are specified
 
-SERVICE_NAME="LMA collector"
-
 OCF_RESKEY_binary_default="/usr/bin/hekad"
-OCF_RESKEY_config_default="/etc/lma_collector"
-OCF_RESKEY_log_file_default="/var/log/lma_collector.log"
-OCF_RESKEY_pid_default="${HA_RSCTMP}/${__SCRIPT_NAME}/${__SCRIPT_NAME}.pid"
 OCF_RESKEY_user_default="root"
 OCF_RESKEY_watchdog_file_default=
 OCF_RESKEY_watchdog_timeout_default=20
 
 : ${OCF_RESKEY_binary=${OCF_RESKEY_binary_default}}
-: ${OCF_RESKEY_config=${OCF_RESKEY_config_default}}
-: ${OCF_RESKEY_log_file=${OCF_RESKEY_log_file_default}}
-: ${OCF_RESKEY_pid=${OCF_RESKEY_pid_default}}
 : ${OCF_RESKEY_user=${OCF_RESKEY_user_default}}
 : ${OCF_RESKEY_watchdog_file=${OCF_RESKEY_watchdog_file_default}}
 : ${OCF_RESKEY_watchdog_timeout=${OCF_RESKEY_watchdog_timeout_default}}
@@ -57,14 +48,14 @@ usage() {
     cat <<UEND
         usage: $0 (start|stop|validate-all|meta-data|status|monitor)
 
-        $0 manages the ${SERVICE_NAME} process as an HA resource
+        $0 manages the collector process as an HA resource
 
-        The 'start' operation starts the ${SERVICE_NAME}
-        The 'stop' operation stops the ${SERVICE_NAME}
+        The 'start' operation starts the collector
+        The 'stop' operation stops the collector
         The 'validate-all' operation reports whether the parameters are valid
         The 'meta-data' operation reports this RA's meta-data information
-        The 'status' operation reports whether the ${SERVICE_NAME} is running
-        The 'monitor' operation reports whether the ${SERVICE_NAME} is running
+        The 'status' operation reports whether the collector is running
+        The 'monitor' operation reports whether the collector is running
 
 UEND
 }
@@ -79,8 +70,16 @@ meta_data() {
 <longdesc lang="en">
 Manages the LMA collector daemon as a Pacemaker Resource.
 </longdesc>
-<shortdesc lang="en">Manages LMA collector</shortdesc>
+<shortdesc lang="en">Manages Log or Metric collector</shortdesc>
 <parameters>
+
+<parameter name="service_name" unique="0" required="1">
+<longdesc lang="en">
+Name of the collector service.
+</longdesc>
+<shortdesc lang="en">Collector service name</shortdesc>
+<content type="string" />
+</parameter>
 
 <parameter name="binary" unique="0" required="0">
 <longdesc lang="en">
@@ -90,28 +89,20 @@ Path of the LMA collector binary file that will be run.
 <content type="string" default="${OCF_RESKEY_binary_default}" />
 </parameter>
 
-<parameter name="config" unique="0" required="0">
+<parameter name="config" unique="0" required="1">
 <longdesc lang="en">
 Path to the LMA collector configuration file or directory
 </longdesc>
 <shortdesc lang="en">LMA collector configuration</shortdesc>
-<content type="string" default="${OCF_RESKEY_config_default}" />
+<content type="string" />
 </parameter>
 
-<parameter name="log_file" unique="0" required="0">
+<parameter name="log_file" unique="0" required="1">
 <longdesc lang="en">
 Path to the LMA collector log file
 </longdesc>
 <shortdesc lang="en">LMA collector log file</shortdesc>
-<content type="string" default="${OCF_RESKEY_log_file_default}" />
-</parameter>
-
-<parameter name="pid" unique="0" required="0">
-<longdesc lang="en">
-The pid file to use for the LMA collector service
-</longdesc>
-<shortdesc lang="en">LMA collector pid file</shortdesc>
-<content type="string" default="${OCF_RESKEY_pid_default}" />
+<content type="string" />
 </parameter>
 
 <parameter name="user" unique="0" required="0">
@@ -159,6 +150,8 @@ END
 service_validate() {
     local rc
 
+    PID_FILE="${HA_RSCTMP}/${__SCRIPT_NAME}/${OCF_RESKEY_service_name}.pid"
+
     check_binary "$OCF_RESKEY_binary"
 
     if [[ ! -f $OCF_RESKEY_config && ! -d $OCF_RESKEY_config ]]; then
@@ -182,7 +175,7 @@ service_status() {
 
     # check and make PID file dir
     local PID_DIR
-    PID_DIR=$( dirname "${OCF_RESKEY_pid}" )
+    PID_DIR=$( dirname "${PID_FILE}" )
     if [ ! -d "${PID_DIR}" ] ; then
         ocf_log debug "Create pid file dir: ${PID_DIR} and chown to ${OCF_RESKEY_user}"
         mkdir -p "${PID_DIR}"
@@ -190,11 +183,11 @@ service_status() {
         chmod 755 "${PID_DIR}"
     fi
 
-    if [ ! -f "$OCF_RESKEY_pid" ]; then
+    if [ ! -f "$PID_FILE" ]; then
         ocf_log info "LMA collector is not running"
         return "$OCF_NOT_RUNNING"
     else
-        pid=$(cat "$OCF_RESKEY_pid")
+        pid=$(cat "$PID_FILE")
     fi
 
     if [ -n "${pid}" ]; then
@@ -205,7 +198,7 @@ service_status() {
             return "$OCF_NOT_RUNNING"
         fi
     else
-        ocf_log err "PID file ${OCF_RESKEY_pid} is empty!"
+        ocf_log err "PID file ${PID_FILE} is empty!"
         return "$OCF_ERR_GENERIC"
     fi
 
@@ -241,7 +234,7 @@ service_start() {
     service_monitor
     rc=$?
     if [ $rc -eq "$OCF_SUCCESS" ]; then
-        ocf_log info "${SERVICE_NAME} is already running"
+        ocf_log info "${OCF_RESKEY_service_name} is already running"
         return "$OCF_SUCCESS"
     fi
 
@@ -249,7 +242,7 @@ service_start() {
     ulimit -n 102400
 
     su "${OCF_RESKEY_user}" -s /bin/sh -c "${OCF_RESKEY_binary} \
--config=${OCF_RESKEY_config} >> $OCF_RESKEY_log_file 2>&1"' & echo $!' > "$OCF_RESKEY_pid"
+-config=${OCF_RESKEY_config} >> $OCF_RESKEY_log_file 2>&1"' & echo $!' > "$PID_FILE"
 
     # Spin waiting for the server to come up
     while true; do
@@ -257,13 +250,13 @@ service_start() {
         rc=$?
         [ $rc -eq "$OCF_SUCCESS" ] && break
         if [ $rc -ne "$OCF_NOT_RUNNING" ]; then
-            ocf_log err "${SERVICE_NAME} start failed"
+            ocf_log err "${OCF_RESKEY_service_name} start failed"
             exit "$OCF_ERR_GENERIC"
         fi
         sleep 3
     done
 
-    ocf_log info "${SERVICE_NAME} started"
+    ocf_log info "${OCF_RESKEY_service_name} started"
     return "$OCF_SUCCESS"
 }
 
@@ -274,16 +267,16 @@ service_stop() {
     service_monitor
     rc=$?
     if [ $rc -eq "$OCF_NOT_RUNNING" ]; then
-        ocf_log info "${SERVICE_NAME} is already stopped"
+        ocf_log info "${OCF_RESKEY_service_name} is already stopped"
         return "$OCF_SUCCESS"
     fi
 
     # Try SIGTERM
-    pid=$(cat "$OCF_RESKEY_pid")
+    pid=$(cat "$PID_FILE")
     ocf_run kill -s TERM "$pid"
     rc=$?
     if [ $rc -ne 0 ]; then
-        ocf_log err "${SERVICE_NAME} couldn't be stopped"
+        ocf_log err "${OCF_RESKEY_service_name} couldn't be stopped"
         exit "$OCF_ERR_GENERIC"
     fi
 
@@ -301,21 +294,21 @@ service_stop() {
         fi
         count=$(( count + 1))
         sleep 1
-        ocf_log debug "${SERVICE_NAME} still hasn't stopped yet. Waiting ..."
+        ocf_log debug "${OCF_RESKEY_service_name} still hasn't stopped yet. Waiting ..."
     done
 
     service_monitor
     rc=$?
     if [ "${rc}" -ne "${OCF_NOT_RUNNING}" ]; then
         # SIGTERM didn't help either, try SIGKILL
-        ocf_log info "${SERVICE_NAME} failed to stop after ${shutdown_timeout}s using SIGTERM. Trying SIGKILL ..."
+        ocf_log info "${OCF_RESKEY_service_name} failed to stop after ${shutdown_timeout}s using SIGTERM. Trying SIGKILL ..."
         ocf_run kill -s KILL "${pid}"
     fi
 
-    ocf_log info "${SERVICE_NAME} stopped"
+    ocf_log info "${OCF_RESKEY_service_name} stopped"
 
-    ocf_log debug "Delete pid file: ${OCF_RESKEY_pid} with content $(cat "${OCF_RESKEY_pid}")"
-    rm -f "${OCF_RESKEY_pid}"
+    ocf_log debug "Delete pid file: ${PID_FILE} with content $(cat "${PID_FILE}")"
+    rm -f "${PID_FILE}"
 
     return "${OCF_SUCCESS}"
 }
