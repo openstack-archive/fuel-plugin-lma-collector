@@ -22,7 +22,7 @@ describe 'heka' do
     describe 'with defaults' do
         it { is_expected.to contain_user('heka') }
         it { is_expected.to contain_file('/etc/init/hekad.conf') \
-             .with_content(/--user heka/) }
+             .with_content(/--chuid heka/) }
     end
 
     describe 'with user => "root"' do
@@ -31,6 +31,6 @@ describe 'heka' do
         end
         it { is_expected.to contain_file('/etc/init/hekad.conf') }
         it { is_expected.not_to contain_file('/etc/init/hekad.conf') \
-             .with_content(/--user/) }
+             .with_content(/--chuid/) }
     end
 end
