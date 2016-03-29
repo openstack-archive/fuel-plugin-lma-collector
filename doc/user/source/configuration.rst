@@ -56,7 +56,8 @@ To configure your plugin, you need to follow these steps:
    the *LMA Collector* in an environment that is already deployed.
    To install the *LMA Collector* in an environment that is already deployed, you need to run
    the command below from the *Fuel master node*, for every OpenStack node of the current deployment::
-     $ fuel nodes --env <env_id> --node <node_id> --deploy
+
+     [root@nailgun ~]# fuel nodes --env <env_id> --node <node_id> --deploy
 
 .. _plugin_verification:
 
