@@ -9,6 +9,7 @@ Welcome to the Mirantis OpenStack LMA Collector Documentation!
    releases
    installation
    configuration
+   upgrade_from_0_8_0_to_0_8_1
    alarms
    licenses
    appendix_a
