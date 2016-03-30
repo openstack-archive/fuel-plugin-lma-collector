@@ -148,9 +148,34 @@ class heka (
     require => [User[$heka_user], Package['heka']],
   }
 
-  file { "/etc/logrotate.d/${service_name}":
+  $logrotate_conf = "/etc/logrotate_${service_name}.conf"
+  file { $logrotate_conf:
     ensure  => present,
     content => template('heka/logrotate.conf.erb'),
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    require => Package['heka'],
+  }
+
+  $logrotate_bin = "/usr/local/bin/logrotate_${service_name}"
+  file { $logrotate_bin:
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    content => template('heka/logrotate.cron.erb'),
+    require => File[$logrotate_conf],
+  }
+
+  cron { "${service_name} logrotate":
+    ensure   => present,
+    command  => $logrotate_bin,
+    minute   => '*/30',
+    hour     => '*',
+    month    => '*',
+    monthday => '*',
+    require  => File[$logrotate_bin],
   }
 
   file { $hekad_wrapper:
