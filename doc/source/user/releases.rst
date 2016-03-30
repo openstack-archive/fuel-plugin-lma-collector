@@ -31,6 +31,9 @@ Version 0.8.1
   * Remove the monitoring of individual queue of RabbitMQ (`#1549721
     <https://bugs.launchpad.net/lma-toolchain/+bug/1549721>`_).
 
+  * Rotate hekad logs every 30 minutes if necessary (`#1561603
+    <https://bugs.launchpad.net/lma-toolchain/+bug/1561603>`_).
+
 * Changes
 
   * Upgrade to Heka 0.10.0
