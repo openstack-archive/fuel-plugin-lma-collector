@@ -149,6 +149,12 @@ class heka (
     require => [User[$heka_user], Package['heka']],
   }
 
+  # To avoid logrotate concurrency run, the old logrotate configuration set
+  # by 0.8.0 must be removed
+  file { '/etc/logrotate.d/lma_collector':
+    ensure => absent,
+  }
+
   $logrotate_conf = "/etc/logrotate_${service_name}.conf"
   file { $logrotate_conf:
     ensure  => present,
