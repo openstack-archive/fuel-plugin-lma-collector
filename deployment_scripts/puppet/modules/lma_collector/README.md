@@ -30,6 +30,7 @@ class { 'lma_collector::elasticsearch':
 }
 ```
 
+* `poolsize`: *Optional*. The pool size of maximum messages that can exist (default: 100).
 Limitations
 -----------
 
