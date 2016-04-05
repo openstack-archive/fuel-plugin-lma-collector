@@ -331,6 +331,7 @@ lma_collector:
       description: 'Some errors have been detected in Nova logs'
       severity: 'warning'
       enabled: 'true'
+      discard_missing_data: 'true'
       trigger:
         logical_operator: 'or'
         rules:
@@ -362,6 +363,7 @@ lma_collector:
       description: 'Some errors have been detected in Heat logs'
       severity: 'warning'
       enabled: 'true'
+      discard_missing_data: 'true'
       trigger:
         logical_operator: 'or'
         rules:
@@ -410,6 +412,7 @@ lma_collector:
       description: 'Some errors have been detected in Cinder logs'
       severity: 'warning'
       enabled: 'true'
+      discard_missing_data: 'true'
       trigger:
         logical_operator: 'or'
         rules:
@@ -441,6 +444,7 @@ lma_collector:
       description: 'Some errors have been detected in Glance logs'
       severity: 'warning'
       enabled: 'true'
+      discard_missing_data: 'true'
       trigger:
         logical_operator: 'or'
         rules:
@@ -472,6 +476,7 @@ lma_collector:
       description: 'Some errors have been detected in Neutron logs'
       severity: 'warning'
       enabled: 'true'
+      discard_missing_data: 'true'
       trigger:
         logical_operator: 'or'
         rules:
@@ -518,6 +523,7 @@ lma_collector:
       description: 'Some errors have been detected in Keystone logs'
       severity: 'warning'
       enabled: 'true'
+      discard_missing_data: 'true'
       trigger:
         logical_operator: 'or'
         rules:

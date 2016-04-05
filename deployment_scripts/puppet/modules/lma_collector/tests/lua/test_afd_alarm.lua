@@ -240,6 +240,24 @@ local alarms = {
         },
         severity = 'warning',
     },
+    { -- 11
+        name = 'nova_logs_errors_rate_discard_missing_data',
+        description = 'Errors in nova logs',
+        discard_missing_data = true,
+        enabled = true,
+        trigger = {
+            rules = {
+                {
+                    metric = 'log_messages',
+                    window = 60,
+                    ['function'] = 'max',
+                    threshold = 2,
+                    relational_operator = '>=',
+                },
+            },
+        },
+        severity = 'warning',
+    },
 }
 
 TestLMAAlarm = {}
@@ -539,6 +557,22 @@ function TestLMAAlarm:test_diff()
     -- missing data
     local state, result = errors_5xx:evaluate(next_time(60))
     assertEquals(state, consts.UNKW)
+end
+
+function TestLMAAlarm:test_discard_missing_data()
+    lma_alarm.load_alarms(alarms)
+    local logs = lma_alarm.get_alarm('nova_logs_errors_rate_discard_missing_data')
+    local state, result = logs:evaluate(current_time)
+    assertEquals(state, consts.UNKW) -- NO_DATA
+
+    assertEquals(logs.severity, consts.WARN)
+    lma_alarm.add_value(next_time(11), 'log_messages', 10)
+    lma_alarm.add_value(next_time(51), 'log_messages', 10)
+    state, result = logs:evaluate(current_time)
+    assertEquals(state, consts.WARN)
+
+    state, result = logs:evaluate(next_time(100))
+    assertEquals(state, consts.OKAY)-- MISSING_DATA but discarded
 end
 
 function TestLMAAlarm:test_roc()
