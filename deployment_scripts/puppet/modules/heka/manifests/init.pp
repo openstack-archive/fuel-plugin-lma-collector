@@ -53,6 +53,9 @@
 # [*dashboard_port*]
 #   The listening port for the Heka dashboard (default: 4352).
 #
+# [*poolsize*]
+#   The pool size of maximum messages that can exist (default: 100).
+#
 # [*internal_statistics*]
 #   Whether or not to dump Heka internal statistics to stdout at a regular
 #   interval (currently every hour).
@@ -84,9 +87,14 @@ class heka (
   $max_timer_inject = $heka::params::max_timer_inject,
   $dashboard_address = $heka::params::dashboard_address,
   $dashboard_port = $heka::params::dashboard_port,
+  $poolsize = undef,
   $pre_script = undef,
   $internal_statistics = $heka::params::internal_statistics,
 ) inherits heka::params {
+
+  if $poolsize {
+    validate_integer($poolsize)
+  }
 
   $hekad_wrapper = "/usr/local/bin/${service_name}_wrapper"
   $base_dir      = "/var/cache/${service_name}"
