@@ -10,6 +10,9 @@ local alarms = {
     ['name'] = '<%= alarm_name %>',
     ['description'] = '<%= alarm["description"].to_s().gsub("'"){"\\'"} %>',
     ['severity'] = '<%= alarm["severity"] %>',
+    <% if alarm['discard_missing_data'] -%>
+    ['discard_missing_data'] = 'true'
+    <% end -%>
     ['trigger'] = {
       ['logical_operator'] = '<%= alarm["trigger"]["logical_operator"] || 'or' %>',
       ['rules'] = {

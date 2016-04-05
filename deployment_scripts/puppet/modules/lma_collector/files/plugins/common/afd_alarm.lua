@@ -61,6 +61,7 @@ function Alarm.new(alarm)
         end
     end
     a.start_time_ns = 0
+    a.discard_missing_data = alarm.discard_missing_data or false
 
     return a
 end
@@ -151,8 +152,12 @@ function Alarm:evaluate(ns)
             state = self.severity
             msg = self.description
         elseif eval == afd.MISSING_DATA then
-           msg = 'No datapoint have been received over the last ' .. rule.observation_window .. ' seconds'
-           one_unknown = true
+            if self.discard_missing_data then
+                state = consts.OKAY
+            else
+                msg = 'No datapoint have been received over the last ' .. rule.observation_window .. ' seconds'
+                one_unknown = true
+            end
         elseif eval == afd.NO_DATA then
            msg = 'No datapoint have been received ever'
            one_unknown = true
