@@ -72,7 +72,6 @@ case $elasticsearch_mode {
   }
 }
 
-# Notifications are always collected even when event indexation is disabled
 if $is_controller{
   #$pre_script        = '/usr/local/bin/wait_for_rabbitmq'
   # Params used by the script.
@@ -82,6 +81,11 @@ if $is_controller{
   $rabbitmq_user     = 'nova'
   $rabbitmq_password = $rabbit['password']
   $wait_delay        = 30
+
+  # On controller nodes the log parsing can generate a lot of http_metrics
+  # which can block heka (idle packs). It was observed that a poolsize set to 200
+  # solves the issue.
+  $poolsize = 200
 
   #  file { $pre_script:
   #    ensure  => present,
@@ -93,6 +97,8 @@ if $is_controller{
   #  }
 } else {
   $pre_script = undef
+  # For other nodes, the poolsize is set to 100 (the Heka default value)
+  $poolsize = 100
 }
 
 class { 'lma_collector':
@@ -100,6 +106,7 @@ class { 'lma_collector':
   groups            => $additional_groups,
   pacemaker_managed => $pacemaker_managed,
   rabbitmq_resource => $rabbitmq_resource,
+  poolsize          => $poolsize,
 }
 
 if $elasticsearch_mode != 'disabled' {

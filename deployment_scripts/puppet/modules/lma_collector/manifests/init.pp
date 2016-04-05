@@ -33,6 +33,7 @@ class lma_collector (
   $tags = $lma_collector::params::tags,
   $groups = [],
   $pre_script = undef,
+  $poolsize = 100,
   $pacemaker_managed = $lma_collector::params::pacemaker_managed,
   $rabbitmq_resource = undef,
   $aggregator_address = undef,
@@ -41,6 +42,7 @@ class lma_collector (
   include heka::params
 
   validate_hash($tags)
+  validate_integer($poolsize)
 
   $service_name = $lma_collector::params::service_name
   $config_dir = $lma_collector::params::config_dir
@@ -58,6 +60,7 @@ class lma_collector (
     max_message_size    => $lma_collector::params::hekad_max_message_size,
     max_process_inject  => $lma_collector::params::hekad_max_process_inject,
     max_timer_inject    => $lma_collector::params::hekad_max_timer_inject,
+    poolsize            => $poolsize,
   }
 
   if $pacemaker_managed {
