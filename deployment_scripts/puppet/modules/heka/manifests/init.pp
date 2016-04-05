@@ -45,12 +45,6 @@
 # [*max_timer_inject*]
 #   The maximum number of messages that a sandbox filter's TimerEvent function can inject in a single call (default: undef to use default Heka value).
 #
-# [*dashboard_address*]
-#   The listening adddress for the Heka dashboard (default: undef).
-#
-# [*dashboard_port*]
-#   The listening port for the Heka dashboard (default: 4352).
-#
 # [*poolsize*]
 #   The pool size of maximum messages that can exist (default: 100).
 #
@@ -62,7 +56,6 @@
 #
 #  class { 'heka':
 #    hostname => 'foobar'
-#    dashboard_address => '127.0.0.1',
 #  }
 #
 # === Authors
@@ -83,8 +76,6 @@ class heka (
   $max_message_size = $heka::params::max_message_size,
   $max_process_inject = $heka::params::max_process_inject,
   $max_timer_inject = $heka::params::max_timer_inject,
-  $dashboard_address = $heka::params::dashboard_address,
-  $dashboard_port = $heka::params::dashboard_port,
   $poolsize = undef,
   $pre_script = undef,
   $internal_statistics = $heka::params::internal_statistics,
@@ -228,18 +219,6 @@ class heka (
     group   => $heka_user,
     require => File[$config_dir],
     notify  => Service[$service_name],
-  }
-
-  if $dashboard_address {
-    file { "${config_dir}/dashboard.toml":
-      ensure  => present,
-      content => template('heka/output/dashboard.toml.erb'),
-      mode    => '0600',
-      owner   => $heka_user,
-      group   => $heka_user,
-      require => File[$config_dir],
-      notify  => Service[$service_name],
-    }
   }
 
   if $internal_statistics {
