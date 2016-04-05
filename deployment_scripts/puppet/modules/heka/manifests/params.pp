@@ -20,6 +20,7 @@ class heka::params {
 
   $hostname = undef
   $maxprocs = $::processorcount
+  $poolsize = 100
   $max_message_size = undef
   $max_process_inject = undef
   $max_timer_inject = undef
