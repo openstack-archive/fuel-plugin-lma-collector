@@ -87,10 +87,17 @@ case $::osfamily {
   }
 }
 
+if roles_include(['controller', 'primary-controller']){
+  $poolsize = 200
+} else {
+  $poolsize = 100
+}
+
 class { 'lma_collector':
-  tags   => $tags,
-  user   => $heka_user,
-  groups => $additional_groups,
+  tags     => $tags,
+  user     => $heka_user,
+  groups   => $additional_groups,
+  poolsize => $poolsize,
 }
 
 # On controller nodes the LMA collector service is managed by Pacemaker, so we

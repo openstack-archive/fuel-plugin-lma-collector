@@ -82,9 +82,12 @@ class heka (
   $max_timer_inject = $heka::params::max_timer_inject,
   $dashboard_address = $heka::params::dashboard_address,
   $dashboard_port = $heka::params::dashboard_port,
+  $poolsize = 100,
   $pre_script = undef,
   $internal_statistics = $heka::params::internal_statistics,
 ) inherits heka::params {
+
+  validate_integer($poolsize)
 
   $hekad_wrapper = "/usr/local/bin/${service_name}_wrapper"
   $base_dir      = "/var/cache/${service_name}"
