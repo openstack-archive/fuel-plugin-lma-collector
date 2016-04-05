@@ -471,6 +471,7 @@ Main class. Install and configure the main components of the LMA collector.
 * `tags`: *Optional*. Fields added to Heka messages. Valid options: a hash. Default: `{}`.
 * `user`: *Optional*. User the Heka service is run as. You may have to use `'root'` on some systems for the Heka service to be able to access log files, run additional commands, ... Valid options: a string.  Default: `'heka'`.
 * `groups`: *Optional*. Additional groups to add to the user running the Heka service. Ignored if the Heka service is run as "root". Valid options: an array of strings. Default: `['syslog', 'adm']`.
+* `poolsize`: *Optional*. The pool size of maximum messages that can exist (default: 100).
 
 #### Class: `lma_collector::elasticsearch`
 
