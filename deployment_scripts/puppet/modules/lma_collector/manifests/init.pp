@@ -33,6 +33,7 @@ class lma_collector (
   $tags = $lma_collector::params::tags,
   $user = undef,
   $groups = [],
+  $poolsize = undef,
 ) inherits lma_collector::params {
   include heka::params
 
@@ -58,6 +59,7 @@ class lma_collector (
     max_message_size    => $lma_collector::params::hekad_max_message_size,
     max_process_inject  => $lma_collector::params::hekad_max_process_inject,
     max_timer_inject    => $lma_collector::params::hekad_max_timer_inject,
+    poolsize            => $poolsize,
   }
 
   # Copy our Lua modules to Heka's modules directory so they're available for
