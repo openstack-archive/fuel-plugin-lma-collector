@@ -48,6 +48,12 @@ class lma_collector (
     default => union($lma_collector::params::groups, $groups),
   }
 
+  if roles_include(['controller', 'primary-controller']){
+    $poolsize = 200
+  } else {
+    $poolsize = 100
+  }
+
   class { 'heka':
     service_name        => $service_name,
     config_dir          => $config_dir,
@@ -58,6 +64,7 @@ class lma_collector (
     max_message_size    => $lma_collector::params::hekad_max_message_size,
     max_process_inject  => $lma_collector::params::hekad_max_process_inject,
     max_timer_inject    => $lma_collector::params::hekad_max_timer_inject,
+    poolsize            => $poolsize,
   }
 
   # Copy our Lua modules to Heka's modules directory so they're available for
