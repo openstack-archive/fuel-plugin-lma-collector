@@ -18,9 +18,14 @@ define heka::input::tcp (
   $port    = 5565,
   $decoder = 'ProtobufDecoder',
   $ensure  = present,
+  $keep_alive = false,
+  $keep_alive_period = 7200,
 ) {
 
   include heka::params
+
+  $_keep_alive = bool2str($keep_alive)
+  validate_integer($keep_alive_period)
 
   if $decoder == 'ProtobufDecoder' {
     $decoder_instance = $decoder

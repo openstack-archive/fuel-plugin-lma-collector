@@ -3,3 +3,5 @@ type="TcpInput"
 address = "<%= @address %>:<%= @port %>"
 decoder = "<%= @decoder_instance %>"
 splitter = "HekaFramingSplitter"
+keep_alive = <%= @_keep_alive %>
+keep_alive_period = <%= @keep_alive_period %>
