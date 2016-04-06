@@ -3,6 +3,8 @@ type="TcpOutput"
 address = "<%= @address %>:<%= @port %>"
 encoder = "ProtobufEncoder"
 message_matcher = "<%= @message_matcher %>"
+keep_alive = <%= @_keep_alive %>
+keep_alive_period = <%= @keep_alive_period %>
 
 use_buffering = <%= @use_buffering %>
 <% if @use_buffering -%>

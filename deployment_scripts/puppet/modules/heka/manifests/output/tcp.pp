@@ -21,10 +21,15 @@ define heka::output::tcp (
   $max_buffer_size   = 1024 * 1024 * 1024, # 1GiB
   $queue_full_action = 'drop',
   $max_file_size     = undef,
+  $keep_alive        = false,
+  $keep_alive_period = 7200,
   $ensure            = present,
 ) {
 
   include heka::params
+
+  $_keep_alive = bool2str($keep_alive)
+  validate_integer($keep_alive_period)
 
   if $use_buffering {
     validate_buffering($max_buffer_size, $max_file_size, $queue_full_action)
