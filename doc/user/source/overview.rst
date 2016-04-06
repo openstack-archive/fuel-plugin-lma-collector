@@ -94,4 +94,11 @@ Requirements
 Limitations
 -----------
 
-The plugin is not compatible with an OpenStack environment deployed with Nova-Network.
+* The plugin is not compatible with an OpenStack environment deployed with Nova-Network.
+
+* The Elasticsearch output plugin of the Collector is configured to use the **drop** policy
+  which implies that the Collector will start dropping the logs and the OpenStack
+  notifications when the output plugin has reached a buffering limit that is currently
+  set to 1GB by default. This situation can typically happen when the Elasticsearch server
+  has been inaccessible for a long period of time.
+  This limitation will be addressed in a future release of the LMA Collector Plugin.
