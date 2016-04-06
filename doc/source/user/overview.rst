@@ -94,11 +94,11 @@ Requirements
 Limitations
 -----------
 
-The plugin is only compatible with OpenStack environments deployed with Neutron
-as the networking configuration.
+* The plugin is not compatible with an OpenStack environment deployed with Nova-Network.
 
-The log and notification messages aren't buffered anymore by the LMA collector service
-before being sent to Elasticsearch (see `#1488717
-<https://bugs.launchpad.net/fuel-plugins/+bug/1488717>`_ for details). This
-means that the data may be lost when the Elasticsearch server is
-unreachable. It will be fixed in a future maintenance release of the plugin.
+* The Elasticsearch output plugin of the Collector is configured to use the **drop** policy
+  which implies that the Collector will start dropping the logs and the OpenStack
+  notifications when the output plugin has reached a buffering limit that is currently
+  set to 1GB by default. This situation can typically happen when the Elasticsearch server
+  has been inaccessible for a long period of time.
+  This limitation will be addressed in a future release of the LMA Collector Plugin.
