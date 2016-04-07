@@ -89,7 +89,7 @@ class lma_collector::logs::openstack_7_0 {
     # We cannot use /var/log/keystone because it is owned by the keystone user.
     log_directory  => '/var/log/',
     file_match     => 'user\.log$',
-    differentiator => '[ \'openstack.keystone\' ]',
+    differentiator => '[ \'openstack.keystone_wsgi\' ]',
     require        => [Heka::Decoder::Sandbox['keystone_wsgi'], Heka::Splitter::Regex['openstack']],
     notify         => Class['lma_collector::service'],
   }
