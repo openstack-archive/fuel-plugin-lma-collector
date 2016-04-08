@@ -54,7 +54,7 @@ configuration or implement your own customization.
 But note that running a Fuel plugin that you have built yourself is at your own risk.
 
 To install LMA Collector Plugin from source, you first need to prepare an
-environement to build the RPM file.
+environment to build the RPM file.
 The recommended approach is to build the RPM file directly onto the Fuel Master
 node so that you won't have to copy that file later on.
 

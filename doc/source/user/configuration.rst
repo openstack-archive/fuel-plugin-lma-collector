@@ -8,7 +8,7 @@ Configuration Guide
 Plugin configuration
 --------------------
 
-To configure your plugin, you need to follow the folling steps:
+To configure your plugin, you need to follow the following steps:
 
 1. `Create a new environment <http://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#launch-wizard-to-create-new-environment>`_ with the Fuel web user interface.
 
