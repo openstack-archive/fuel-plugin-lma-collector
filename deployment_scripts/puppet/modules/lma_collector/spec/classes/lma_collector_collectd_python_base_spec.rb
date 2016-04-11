@@ -26,7 +26,7 @@ describe 'lma_collector::collectd::python_base' do
         it { is_expected.to contain_file('base.script') \
              .with(
                'ensure' => 'present',
-               'path' => '/usr/lib/collectd/base.py',
+               'path' => '/usr/lib/collectd/collectd_base.py',
                'owner' => 'root',
                'group' => 'root',
                'mode' => '0640',
