@@ -80,7 +80,7 @@ class ElasticsearchClusterHealthPlugin(base.Base):
             'values': HEALTH_MAP[data['status']]
         }
         for metric in METRICS:
-            value = data.get(metric)
+            value = data.get(metric, False)
             if not value:
                 # Depending on the Elasticsearch version, not all metrics are
                 # available
