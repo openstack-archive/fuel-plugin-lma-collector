@@ -81,7 +81,7 @@ class ElasticsearchClusterHealthPlugin(base.Base):
         }
         for metric in METRICS:
             value = data.get(metric)
-            if not value:
+            if value is None:
                 # Depending on the Elasticsearch version, not all metrics are
                 # available
                 self.logger.info("Couldn't find {} metric".format(metric))
