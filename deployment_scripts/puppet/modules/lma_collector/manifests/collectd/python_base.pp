@@ -33,11 +33,11 @@ class lma_collector::collectd::python_base {
 
   file { 'base.script':
     ensure  => 'present',
-    path    => "${modulepath}/base.py",
+    path    => "${modulepath}/collectd_base.py",
     owner   => 'root',
     group   => $collectd::params::root_group,
     mode    => '0640',
-    source  => 'puppet:///modules/lma_collector/collectd/base.py',
+    source  => 'puppet:///modules/lma_collector/collectd/collectd_base.py',
     require => Class['collectd::plugin::python'],
     notify  => Service['collectd'],
   }
