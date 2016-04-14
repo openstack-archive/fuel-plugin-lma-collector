@@ -11,7 +11,9 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-#
+
+notice('StackLight: configure_afd_fitlers.pp')
+
 include lma_collector::params
 
 $lma           = hiera_hash('lma_collector', {})

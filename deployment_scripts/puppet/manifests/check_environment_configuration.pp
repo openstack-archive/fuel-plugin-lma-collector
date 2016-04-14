@@ -11,7 +11,9 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-#
+
+notice('StackLight: check_environment_configuration.pp')
+
 # This manifest is only executed on the primrary-controller to verify that the
 # plugin's configuration matches with the environment.
 

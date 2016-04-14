@@ -11,7 +11,9 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-#
+
+notice('StackLight: ceph_osd.pp')
+
 $lma_collector_hash = hiera_hash('lma_collector')
 
 if $lma_collector_hash['influxdb_mode'] != 'disabled' {
