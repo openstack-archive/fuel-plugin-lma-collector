@@ -102,3 +102,7 @@ Limitations
   set to 1GB by default. This situation can typically happen when the Elasticsearch server
   has been inaccessible for a long period of time.
   This limitation will be addressed in a future release of the LMA Collector Plugin.
+
+* Because of `#1527539
+  <https://bugs.launchpad.net/fuel/+bug/1527539>_`, the plugin couldn't have
+  been tested with ``fuel-createmirror``.
