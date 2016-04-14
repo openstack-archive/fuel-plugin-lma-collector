@@ -12,6 +12,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+notice('StackLight: lma_collector/cleanup_apt_config.pp')
+
 include lma_collector::params
 
 case $::osfamily {

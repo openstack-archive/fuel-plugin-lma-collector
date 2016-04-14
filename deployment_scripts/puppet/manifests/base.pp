@@ -14,6 +14,8 @@
 #
 # TODO(spasquier): fail if Neutron isn't used
 
+notice('StackLight: lma_collector/base.pp')
+
 prepare_network_config(hiera('network_scheme', {}))
 $fuel_version      = 0 + hiera('fuel_version')
 $lma_collector     = hiera_hash('lma_collector')

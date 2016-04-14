@@ -12,6 +12,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+notice('StackLight: lma_collector/configure_apt.pp')
+
 include lma_collector::params
 
 $str = 'APT::Install-Suggests "0";

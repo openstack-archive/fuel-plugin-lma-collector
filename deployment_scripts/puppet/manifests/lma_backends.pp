@@ -13,6 +13,8 @@
 #    under the License.
 #
 
+notice('StackLight: lma_backends.pp')
+
 prepare_network_config(hiera('network_scheme', {}))
 $mgmt_address = get_network_role_property('management', 'ipaddr')
 

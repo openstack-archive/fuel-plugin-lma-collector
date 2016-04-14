@@ -12,6 +12,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+notice('StackLight: lma_collector/hiera_override.pp')
+
 $plugin_data = hiera_hash('lma_collector', undef)
 
 if ($plugin_data) {

@@ -11,7 +11,9 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-#
+
+notice('StackLight: lma_collector/aggregator.pp')
+
 prepare_network_config(hiera('network_scheme', {}))
 $mgmt_address   = get_network_role_property('management', 'ipaddr')
 $lma_collector  = hiera_hash('lma_collector')
