@@ -12,6 +12,8 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
+require 'math'
+require 'os'
 require 'string'
 local utils = require 'lma_utils'
 
@@ -24,6 +26,7 @@ local last_timer_events = {}
 local current_service = 1
 local enter_at
 local interval_in_ns = interval * 1e9
+local start_time_in_ns = os.time() * 1e9
 local msg = {
     Type = "metric",
     Timestamp = nil,
@@ -39,11 +42,15 @@ function process_message ()
         return -1, "Cannot match any services from " .. logger
     end
 
+    if read_message('Timestamp') < max(last_timer_events[service] or 0, start_time_in_ns) then
+        -- the log message doesn't fall into the current interval, skip it
+        return 0
+    end
+
     if not logs_counters[service] then
         -- a new service has been discovered
         discovered_services[#discovered_services + 1] = service
         logs_counters[service] = {}
-        last_timer_events[service] = 0
         for _, label in pairs(utils.severity_to_label_map) do
             logs_counters[service][label] = 0
         end
@@ -74,7 +81,7 @@ function timer_event(ns)
     -- all metrics.
     if ns - enter_at < interval_in_ns and current_service <= #discovered_services then
         local service_name = discovered_services[current_service]
-        local last_timer_event = last_timer_events[service_name]
+        local last_timer_event = last_timer_events[service_name] or 0
         local delta_sec = (ns - last_timer_event) / 1e9
 
         for level, val in pairs(logs_counters[service_name]) do
