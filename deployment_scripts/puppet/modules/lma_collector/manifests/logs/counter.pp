@@ -15,6 +15,7 @@
 class lma_collector::logs::counter (
   $hostname,
   $interval = 60,
+  $grace_interval = 30,
 ) {
   include lma_collector::params
   include lma_collector::service
@@ -28,8 +29,9 @@ class lma_collector::logs::counter (
     ticker_interval  => 1,
     preserve_data    => true,
     config           => {
-      interval => $interval,
-      hostname => $hostname,
+      interval       => $interval,
+      hostname       => $hostname,
+      grace_interval => $grace_interval,
     },
     module_directory => $lua_modules_dir,
     notify           => Class['lma_collector::service'],
