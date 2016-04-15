@@ -12,11 +12,17 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
+require 'math'
+require 'os'
 require 'string'
 local utils = require 'lma_utils'
 
 local hostname = read_config('hostname') or error('hostname must be specified')
-local interval = (read_config('interval') or error('interval must be specified!')) + 0
+local interval = (read_config('interval') or error('interval must be specified')) + 0
+-- Heka cannot guarantee that logs are processed in real-time so the
+-- grace_interval parameter allows to take into account log messages that are
+-- received in the current interval but emitted before it.
+local grace_interval = (read_config('grace_interval') or 0) + 0
 
 local discovered_services = {}
 local logs_counters = {}
@@ -24,11 +30,16 @@ local last_timer_events = {}
 local current_service = 1
 local enter_at
 local interval_in_ns = interval * 1e9
+local start_time = os.time()
 local msg = {
     Type = "metric",
     Timestamp = nil,
     Severity = 6,
 }
+
+function convert_to_sec(ns)
+    return math.floor(ns/1e9)
+end
 
 function process_message ()
     local severity = read_message("Fields[severity_label]")
@@ -39,11 +50,17 @@ function process_message ()
         return -1, "Cannot match any services from " .. logger
     end
 
+    -- timestamp values should be converted to seconds because log timestamps
+    -- have a precision of one second (or millisecond sometimes)
+    if convert_to_sec(read_message('Timestamp')) + grace_interval < math.max(convert_to_sec(last_timer_events[service] or 0), start_time) then
+        -- skip the the log message if it doesn't fall into the current interval
+        return 0
+    end
+
     if not logs_counters[service] then
         -- a new service has been discovered
         discovered_services[#discovered_services + 1] = service
         logs_counters[service] = {}
-        last_timer_events[service] = 0
         for _, label in pairs(utils.severity_to_label_map) do
             logs_counters[service][label] = 0
         end
@@ -74,7 +91,7 @@ function timer_event(ns)
     -- all metrics.
     if ns - enter_at < interval_in_ns and current_service <= #discovered_services then
         local service_name = discovered_services[current_service]
-        local last_timer_event = last_timer_events[service_name]
+        local last_timer_event = last_timer_events[service_name] or 0
         local delta_sec = (ns - last_timer_event) / 1e9
 
         for level, val in pairs(logs_counters[service_name]) do

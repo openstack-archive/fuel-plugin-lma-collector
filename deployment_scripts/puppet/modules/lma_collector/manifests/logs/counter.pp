@@ -28,8 +28,9 @@ class lma_collector::logs::counter (
     ticker_interval  => 1,
     preserve_data    => true,
     config           => {
-      interval => $interval,
-      hostname => $hostname,
+      interval       => $interval,
+      hostname       => $hostname,
+      grace_interval => $interval,
     },
     module_directory => $lua_modules_dir,
     notify           => Class['lma_collector::service'],
