@@ -102,3 +102,8 @@ Limitations
   set to 1GB by default. This situation can typically happen when the Elasticsearch server
   has been inaccessible for a long period of time.
   This limitation will be addressed in a future release of the LMA Collector Plugin.
+
+* When you re-execute tasks on deployed nodes using the Fuel CLI, hekad and
+  collectd services will be restarted on these nodes during the post-deployment
+  phase. See `bug #1570850
+  <https://bugs.launchpad.net/lma-toolchain/+bug/1570850>`_ for details.
