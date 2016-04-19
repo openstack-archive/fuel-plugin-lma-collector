@@ -71,10 +71,13 @@ function process_message ()
         Type = 'multivalue_metric',
         Severity = utils.label_to_severity_map.INFO,
         Hostname = read_message('Hostname'),
-        Payload = utils.safe_json_encode({title=title, tags=cluster, text=text}) or '',
         Fields = {
             name = measurement_name,
             tag_fields = { 'cluster' },
+            value_fields = { 'title', 'tags', 'text' },
+            title = title,
+            tags = cluster,
+            text = text,
             cluster = cluster,
             source = 'influxdb_annotation'
       }
