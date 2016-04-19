@@ -75,9 +75,22 @@ function process_single_metric()
     end
 
     if read_message('Type'):match('multivalue_metric$') then
-        value = decode_json_payload()
+        value = read_message('Fields[value_fields]')
         if not value then
-            return 'Invalid payload value'
+            return 'Fields[value_fields] is missing'
+        end
+        value = {}
+        local i = 0
+        while true do
+            local v = read_message("Fields[value_fields]", 0, i)
+            if not v then
+                break
+            end
+            value[v] = read_message(string.format('Fields[%s]', v))
+            i = i + 1
+        end
+        if i == 0 then
+           return 'no value found'
         end
     else
         value = read_message("Fields[value]")
