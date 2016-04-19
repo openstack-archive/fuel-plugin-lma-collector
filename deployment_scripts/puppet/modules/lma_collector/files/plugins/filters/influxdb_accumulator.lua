@@ -74,10 +74,23 @@ function process_single_metric()
         return 'Fields[name] is missing'
     end
 
-    if read_message('Type'):match('multivalue_metric$') then
-        value = decode_json_payload()
-        if not value then
-            return 'Invalid payload value'
+    if read_message('Fields[value_fields]') then
+        value = {}
+        local i = 0
+        local val
+        while true do
+            local f = read_message("Fields[value_fields]", 0, i)
+            if not f then
+                break
+            end
+            val = read_message(string.format('Fields[%s]', f))
+            if val ~= nil then
+                value[f] = val
+                i = i + 1
+            end
+        end
+        if i == 0 then
+           return 'Fields[value_fields] does not list any valid field'
         end
     else
         value = read_message("Fields[value]")
