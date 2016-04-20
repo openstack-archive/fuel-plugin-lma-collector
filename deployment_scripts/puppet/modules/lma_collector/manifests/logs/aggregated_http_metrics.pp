@@ -12,17 +12,28 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-class lma_collector::logs::http_metrics {
+class lma_collector::logs::aggregated_http_metrics (
+  $interval = 10,
+  $hostname = $::hostname,
+  $bulk_size = 500,
+  $max_timer_inject = $lma_collector::params::hekad_max_timer_inject,
+  $percentile = 90,
+) inherits lma_collector::params {
 
-  include lma_collector::params
   include lma_collector::service::log
 
-  # This sandbox has been replaced by the aggregated_http_metrics one.
-  heka::filter::sandbox { 'http_metrics':
-    ensure          => absent,
+  heka::filter::sandbox { 'aggregated_http_metrics':
     config_dir      => $lma_collector::params::log_config_dir,
-    filename        => "${lma_collector::params::plugins_dir}/filters/http_metrics.lua",
+    filename        => "${lma_collector::params::plugins_dir}/filters/http_metrics_aggregator.lua",
     message_matcher => 'Type == \'log\' && Fields[http_response_time] != NIL',
+    ticker_interval => $interval,
+    config          => {
+      hostname         => $hostname,
+      interval         => $interval,
+      max_timer_inject => $max_timer_inject,
+      bulk_size        => $bulk_size,
+      percentile       => $percentile,
+    },
     notify          => Class['lma_collector::service::log'],
   }
 }
