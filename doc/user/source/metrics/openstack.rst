@@ -163,7 +163,9 @@ These metrics are retrieved from the Neutron database.
 API response times
 ^^^^^^^^^^^^^^^^^^
 
-* ``openstack_<service>_http_responses``, the time (in second) it took to serve the HTTP request. The metric contains ``http_method`` (eg 'GET', 'POST', and so forth) and ``http_status`` (eg '200', '404', and so forth) fields.
+* ``openstack_<service>_http_response_times``, HTTP response time statistics.
+  The statistics are ``min``, ``max``, ``sum``, ``count``, ``upper_90`` (90 percentile) over 10 seconds.
+  The metric contains ``http_method`` (eg 'GET', 'POST', and so forth) and ``http_status`` (eg '2xx', '4xx', and so forth) fields.
 
 ``<service>`` is one of 'cinder', 'glance', 'heat' 'keystone', 'neutron' or 'nova'.
 
