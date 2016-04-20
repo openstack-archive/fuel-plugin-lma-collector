@@ -21,6 +21,8 @@ class lma_collector::logs::http_metrics {
     config_dir      => $lma_collector::params::log_config_dir,
     filename        => "${lma_collector::params::plugins_dir}/filters/http_metrics.lua",
     message_matcher => 'Type == \'log\' && Fields[http_response_time] != NIL',
+    # This sandbox has been replaced by the aggregated_http_metrics one.
+    ensure          => absent,
     notify          => Class['lma_collector::service::log'],
   }
 }
