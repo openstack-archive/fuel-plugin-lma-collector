@@ -66,6 +66,15 @@ function add_to_bulk_metric(name, value, tags)
     }
 end
 
+-- Add a datapoint to the bulk multi-value metric message
+function add_to_bulk_multivalue_metric(name, values, tags)
+    bulk_datapoints[#bulk_datapoints+1] = {
+        name = name,
+        values = values,
+        tags = tags or {},
+    }
+end
+
 -- Send the bulk metric message to the Heka pipeline
 function inject_bulk_metric(ts, hostname, source)
     if #bulk_datapoints == 0 then
