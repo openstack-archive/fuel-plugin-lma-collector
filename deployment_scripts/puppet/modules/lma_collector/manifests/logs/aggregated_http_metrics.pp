@@ -12,16 +12,14 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-class lma_collector::logs::http_metrics {
+class lma_collector::logs::aggregated_http_metrics {
 
   include lma_collector::params
   include lma_collector::service::log
 
-  # This sandbox has been replaced by the aggregated_http_metrics one.
-  heka::filter::sandbox { 'http_metrics':
-    ensure          => absent,
-    config_dir      => $lma_collector::params::log_config_dir,
-    filename        => "${lma_collector::params::plugins_dir}/filters/http_metrics.lua",
+  heka::filter::sandbox { 'aggregated_http_metrics':
+    config_dir      => $lma_collector::params::config_dir,
+    filename        => "${lma_collector::params::plugins_dir}/filters/http_metrics_aggregator.lua",
     message_matcher => 'Type == \'log\' && Fields[http_response_time] != NIL',
     notify          => Class['lma_collector::service::log'],
   }

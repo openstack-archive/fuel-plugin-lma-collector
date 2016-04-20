@@ -128,10 +128,10 @@ class { 'lma_collector::logs::rabbitmq': }
 
 To make the collector create HTTP metrics from OpenStack log messages that
 include HTTP information (method, status, and response time) declare the
-`lma_collector::logs::http_metrics` class:
+`lma_collector::logs::aggregated_http_metrics` class:
 
 ```puppet
-class { 'lma_collector::logs::http_metrics': }
+class { 'lma_collector::logs::aggregated_http_metrics': }
 ```
 
 ### Store logs into Elasticsearch
@@ -424,7 +424,7 @@ Public Classes:
 * [`lma_collector::logs::rabbitmq`](#class-lma_collectorlogsrabbitmq)
 * [`lma_collector::logs::system`](#class-lma_collectorlogssystem)
 * [`lma_collector::logs::swift`](#class-lma_collectorlogsswift)
-* [`lma_collector::logs::http_metrics`](#class-lma_collectorlogshttp_metrics)
+* [`lma_collector::logs::aggregated_http_metrics`](#class-lma_collectorlogsaggregated_http_metrics)
 * [`lma_collector::collectd::base`](#class-lma_collectorcollectdbase)
 * [`lma_collector::collectd::haproxy`](#class-lma_collectorcollectdhaproxy)
 * [`lma_collector::collectd::rabbitmq`](#class-lma_collectorcollectdrabbitmq)
@@ -576,14 +576,14 @@ a Syslog file.
   for more information.
 * `log_directory`: *Optional*. The log directory. Default: `/var/log`.
 
-#### Class: `lma_collector::logs::http_metrics`
+#### Class: `lma_collector::logs::aggregated_http_metrics`
 
 Declare this class to create an Heka filter that derives HTTP metrics from
 OpenStack log messages that include HTTP information (method, status and
 response time).
 
-The metric name is `openstack_<service>_http_responses` where `<service>` is
-the OpenStack service name (e.g. "neutron").
+The metric name is `openstack_<service>_http_response_times` where `<service>`
+is the OpenStack service name (e.g. "neutron").
 
 #### Class: `lma_collector::collectd::base`
 
