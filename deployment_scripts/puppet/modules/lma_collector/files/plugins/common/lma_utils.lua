@@ -58,12 +58,17 @@ local default_severity = 7
 local bulk_datapoints = {}
 
 -- Add a datapoint to the bulk metric message
+-- The 'value' parameter can be a table to support multi-value metric
 function add_to_bulk_metric(name, value, tags)
     bulk_datapoints[#bulk_datapoints+1] = {
         name = name,
-        value = value,
         tags = tags or {},
     }
+    if type(value) == 'table' then
+        bulk_datapoints[#bulk_datapoints].values = value
+    else
+        bulk_datapoints[#bulk_datapoints].value = value
+    end
 end
 
 -- Send the bulk metric message to the Heka pipeline

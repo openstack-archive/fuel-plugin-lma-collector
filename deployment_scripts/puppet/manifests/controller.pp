@@ -408,7 +408,11 @@ if $influxdb_mode != 'disabled' {
 
   class { 'lma_collector::collectd::apache': }
 
+  # TODO(all): This class is still called to ensure the sandbox deletion
+  # when upgrading the plugin. Can be removed for next release after 0.10.0.
   class { 'lma_collector::logs::http_metrics': }
+
+  class { 'lma_collector::logs::aggregated_http_metrics': }
 
   # Notification are always collected, lets extract metrics from there
   class { 'lma_collector::notifications::metrics': }

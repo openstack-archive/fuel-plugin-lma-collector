@@ -100,6 +100,12 @@ class lma_collector::params {
   $buffering_max_buffer_size_for_nagios = 1 * 1024 * 1024
   $queue_full_action_for_nagios = 'drop'
 
+  # HTTP aggregated metrics bulk_size parameter depends on hekad_max_message_size.
+  # The bulk_size is calculated considering that one metric bucket is a string
+  # of 300B size and we pick 60% of the theorical value.
+  # With the hekad_max_message_size set to 256KB, the bulk_size is 524 metrics.
+  $http_aggregated_metrics_bulk_size = floor($hekad_max_message_size / 300 * 0.6)
+
   # Heka's default value is 1
   $hekad_max_process_inject = 1
 
