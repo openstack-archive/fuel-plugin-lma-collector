@@ -24,7 +24,7 @@ class lma_collector::metrics::tcp_output (
     config_dir        => $config_dir,
     address           => $address,
     port              => $port,
-    message_matcher   => '(Type == \'metric\' || Type == \'heka.sandbox.metric\')',
+    message_matcher   => '(Type == \'metric\' || Type == \'heka.sandbox.metric\' || Type == \'heka.sandbox.bulk_metric\')',
     keep_alive        => true,
     max_buffer_size   => $lma_collector::params::buffering_max_buffer_log_metric_size,
     max_file_size     => $lma_collector::params::buffering_max_file_log_metric_size,
