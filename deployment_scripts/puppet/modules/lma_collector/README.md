@@ -582,8 +582,8 @@ Declare this class to create an Heka filter that derives HTTP metrics from
 OpenStack log messages that include HTTP information (method, status and
 response time).
 
-The metric name is `openstack_<service>_http_responses` where `<service>` is
-the OpenStack service name (e.g. "neutron").
+The metric name is `openstack_<service>_http_response_times` where `<service>`
+is the OpenStack service name (e.g. "neutron").
 
 #### Class: `lma_collector::collectd::base`
 
