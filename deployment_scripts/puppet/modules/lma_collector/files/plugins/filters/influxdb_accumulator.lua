@@ -122,7 +122,7 @@ function process_bulk_metric()
     end
 
     for _, point in ipairs(datapoints) do
-        encode_datapoint(point.name, point.value, point.tags or {})
+        encode_datapoint(point.name, point.value or point.values, point.tags or {})
     end
 end
 
