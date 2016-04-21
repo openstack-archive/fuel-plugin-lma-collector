@@ -169,7 +169,10 @@ function encode_datapoint(name, value, tags)
 
     local tags_array = {}
     for k,v in pairs(tags) do
-        table.insert(tags_array, escape_string(k) .. '=' .. escape_string(v))
+        if k ~= '' and v ~= '' then
+            -- empty tag name and value aren't allowed
+            table.insert(tags_array, escape_string(k) .. '=' .. escape_string(v))
+        end
     end
     -- for performance reasons, it is recommended to always send the tags
     -- in the same order.
