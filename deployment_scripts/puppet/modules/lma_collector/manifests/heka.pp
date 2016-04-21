@@ -61,12 +61,23 @@ define lma_collector::heka (
     $service_class = 'lma_collector::service::metric'
     $dashboard_port = $lma_collector::params::metric_dashboard_port
 
+    heka::decoder::sandbox { 'metric':
+      config_dir       => $config_dir,
+      filename         => "${lma_collector::params::plugins_dir}/decoders/metric.lua",
+      module_directory => $lua_modules_dir,
+      # NOTE: to deserialize 'bulk_metric' messages, a string pattern (compliant with Lua 'string.match')
+      # must be provided to the decoder to match the Logger message field.
+      # For example for HTTP metrics:
+      config           => {'deserialize_bulk_metric_for_loggers' => 'aggregated_http_metrics_filter'},
+      notify           => Class[$service_class],
+    }
+
     heka::input::tcp { 'metric':
       config_dir => $config_dir,
       address    => $lma_collector::params::metric_input_address,
       port       => $lma_collector::params::metric_input_port,
-      decoder    => 'ProtobufDecoder',
-      require    => ::Heka[$title],
+      decoder    => 'metric',
+      require    => [::Heka[$title], Heka::Decoder::Sandbox['metric']],
       notify     => Class[$service_class],
     }
 
