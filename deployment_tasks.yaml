@@ -5,7 +5,7 @@
   version: 2.0.0
   requires: [post_deployment_start]
   required_for: [post_deployment_end]
-  role: '*'
+  role: ['/.*/']
   parameters:
     puppet_manifest: puppet/manifests/hiera_override.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -27,7 +27,7 @@
   version: 2.0.0
   requires: [post_deployment_start]
   required_for: [post_deployment_end]
-  role: '*'
+  role: ['/.*/']
   parameters:
     puppet_manifest: puppet/manifests/configure_apt.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -38,7 +38,7 @@
   version: 2.0.0
   requires: [lma-hiera-override, lma-configure-apt]
   required_for: [post_deployment_end]
-  role: '*'
+  role: ['/.*/']
   parameters:
     puppet_manifest: puppet/manifests/base.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -96,7 +96,7 @@
   version: 2.0.0
   requires: [lma-base]
   required_for: [post_deployment_end]
-  role: '*'
+  role: ['/.*/']
   parameters:
     puppet_manifest: puppet/manifests/aggregator.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -108,7 +108,7 @@
   requires: [lma-aggregator]
   # Required for post_deployment_end is induced by lma-cleanup-apt-config
   required_for: [lma-cleanup-apt-config]
-  role: '*'
+  role: ['/.*/']
   # The AFD filters shouldn't send data before the aggregator service is
   # configured on all the controllers, hence the cross-depends parameter that
   # is required when running in a task-based deployment mode.
@@ -143,7 +143,7 @@
   type: puppet
   version: 2.0.0
   required_for: [post_deployment_end]
-  role: '*'
+  role: ['/.*/']
   parameters:
     puppet_manifest: puppet/manifests/cleanup_apt_config.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
