@@ -16,7 +16,7 @@ require 'string'
 local utils = require 'lma_utils'
 
 local hostname = read_config('hostname') or error('hostname must be specified')
-local interval = (read_config('interval') or error('interval must be specified!')) + 0
+local interval = (read_config('interval') or error('interval must be specified')) + 0
 
 local discovered_services = {}
 local logs_counters = {}
@@ -92,7 +92,6 @@ function timer_event(ns)
                    tag_fields = {'service', 'level'},
                }
 
-               utils.inject_tags(msg)
                ok, err = utils.safe_inject_message(msg)
                if ok ~= 0 then
                  return -1, err
