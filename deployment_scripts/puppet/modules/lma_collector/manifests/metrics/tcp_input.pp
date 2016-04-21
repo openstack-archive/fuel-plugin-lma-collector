@@ -15,17 +15,33 @@
 class lma_collector::metrics::tcp_input (
   $listen_address  = $lma_collector::params::metric_input_address,
   $listen_port     = $lma_collector::params::metric_input_port,
+  $deserialize_bulk_metric_for_loggers = undef,
 ) inherits lma_collector::params {
   include lma_collector::service::metric
 
   $config_dir = $lma_collector::params::metric_config_dir
 
+  if $deserialize_bulk_metric_for_loggers {
+    validate_string($deserialize_bulk_metric_for_loggers)
+    $decoder_config = { deserialize_bulk_metric_for_loggers => $deserialize_bulk_metric_for_loggers }
+  } else {
+    $decoder_config = {}
+  }
+
+  heka::decoder::sandbox { 'metric':
+    config_dir => $config_dir,
+    filename   => "${lma_collector::params::plugins_dir}/decoders/metric.lua",
+    config     => $decoder_config,
+    notify     => Class['lma_collector::service::metric'],
+  }
+
   heka::input::tcp { 'metric':
     config_dir => $config_dir,
     address    => $listen_address,
     port       => $listen_port,
-    decoder    => 'ProtobufDecoder',
+    decoder    => 'metric',
     keep_alive => true,
+    require    => Heka::Decoder::Sandbox['metric'],
     notify     => Class['lma_collector::service::metric'],
   }
 
