@@ -45,6 +45,7 @@ class lma_collector::aggregator::server (
     address    => $listen_address,
     port       => $listen_port,
     decoder    => 'aggregator',
+    keep_alive => true,
     notify     => Class['lma_collector::service::metric'],
   }
 

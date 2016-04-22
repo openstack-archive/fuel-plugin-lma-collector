@@ -33,6 +33,7 @@ class lma_collector::aggregator::client (
     max_file_size     => $lma_collector::params::buffering_max_file_aggregator_size,
     message_matcher   => $lma_collector::params::aggregator_client_message_matcher,
     queue_full_action => $lma_collector::params::queue_full_action_aggregator,
+    keep_alive        => true,
     notify            => Class['lma_collector::service::metric'],
   }
 }
