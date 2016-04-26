@@ -65,6 +65,44 @@ lma_collector:
             window: 120
             periods: 0
             function: avg
+    - name: 'cpu-critical-rabbitmq'
+      description: 'The CPU usage is too high (RabbitMQ node).'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: cpu_idle
+            relational_operator: '<='
+            threshold: 5
+            window: 120
+            periods: 0
+            function: avg
+          - metric: cpu_wait
+            relational_operator: '>='
+            threshold: 35
+            window: 120
+            periods: 0
+            function: avg
+    - name: 'cpu-warning-rabbitmq'
+      description: 'The CPU usage is high (RabbitMQ node).'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: cpu_idle
+            relational_operator: '<='
+            threshold: 15
+            window: 120
+            periods: 0
+            function: avg
+          - metric: cpu_wait
+            relational_operator: '>='
+            threshold: 25
+            window: 120
+            periods: 0
+            function: avg
     - name: 'cpu-critical-storage'
       description: 'The CPU usage is too high (storage node).'
       severity: 'critical'
@@ -699,7 +737,11 @@ lma_collector:
 <% end -%>
 
   service_cluster_roles:
+<% if @detach_rabbitmq_enabled -%>
+    rabbitmq: ['primary-standalone-rabbitmq', 'standalone-rabbitmq']
+<% else -%>
     rabbitmq: ['primary-controller', 'controller']
+<% end -%>
     mysql: ['primary-controller', 'controller']
     apache: ['primary-controller', 'controller']
     nova-api: ['primary-controller', 'controller']
@@ -730,6 +772,11 @@ lma_collector:
       cpu: ['cpu-critical-controller', 'cpu-warning-controller']
       root-fs: ['root-fs-critical', 'root-fs-warning']
       log-fs: ['log-fs-critical', 'log-fs-warning']
+<% if @detach_rabbitmq_enabled -%>
+    rabbitmq-nodes:
+      cpu: ['cpu-critical-rabbitmq', 'cpu-warning-rabbitmq']
+      root-fs: ['root-fs-critical', 'root-fs-warning']
+<% end -%>
     mysql-nodes:
       mysql-fs: ['mysql-fs-critical', 'mysql-fs-warning']
     compute:
