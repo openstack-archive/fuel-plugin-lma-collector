@@ -29,6 +29,7 @@ $storage_options = hiera_hash('storage', {})
 $murano          = hiera_hash('murano')
 $sahara          = hiera_hash('sahara')
 $contrail        = hiera('contrail', false)
+$detach_rabbitmq = hiera('detach-rabbitmq', undef)
 
 if $ceilometer['enabled'] {
   $notification_topics = ['notifications', 'lma_notifications']
@@ -48,15 +49,6 @@ else {
 include lma_collector::params
 Service<| title == $lma_collector::params::service_name |> {
   provider => 'pacemaker'
-}
-
-# OpenStack notifications are always useful for indexation and metrics collection
-class { 'lma_collector::notifications::input':
-  topic    => 'lma_notifications',
-  host     => $messaging_address,
-  port     => hiera('amqp_port', '5673'),
-  user     => $rabbitmq_user,
-  password => $rabbit['password'],
 }
 
 # Sahara notifications
@@ -269,7 +261,6 @@ if ! $storage_options['objects_ceph'] {
 # Logs
 if $lma_collector['elasticsearch_mode'] != 'disabled' {
   class { 'lma_collector::logs::mysql': }
-  class { 'lma_collector::logs::rabbitmq': }
   class { 'lma_collector::logs::pacemaker': }
 }
 
@@ -300,8 +291,14 @@ if $influxdb_mode != 'disabled' {
     read_threads => 10,
   }
 
-  class { 'lma_collector::collectd::rabbitmq':
-    queue => ['/^(\\w*notifications\\.(error|info|warn)|[a-z]+|(metering|event)\.sample)$/'],
+  # If detach_rabbitmq is defined then the deployment of collectd scripts to
+  # monitor rabbitmq is managed into base.pp. Otherwise we must manage the
+  # deployment of the scripts here because it has to be in the same manifest
+  # as the other collectd Python plugins.
+  unless $detach_rabbitmq {
+    class { 'lma_collector::collectd::rabbitmq':
+      queue => ['/^(\\w*notifications\\.(error|info|warn)|[a-z]+|(metering|event)\.sample)$/'],
+    }
   }
 
   $pacemaker_master_resource = 'vip__management'
@@ -405,9 +402,6 @@ if $influxdb_mode != 'disabled' {
   class { 'lma_collector::collectd::apache': }
 
   class { 'lma_collector::logs::http_metrics': }
-
-  # Notification are always collected, lets extract metrics from there
-  class { 'lma_collector::notifications::metrics': }
 
   # Enable Apache status module
   class { 'lma_collector::mod_status': }
