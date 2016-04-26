@@ -699,7 +699,11 @@ lma_collector:
 <% end -%>
 
   service_cluster_roles:
+<% if @detach_rabbitmq_enabled -%>
+    rabbitmq: ['standalone-rabbitmq']
+<% else -%>
     rabbitmq: ['primary-controller', 'controller']
+<% end -%>
     mysql: ['primary-controller', 'controller']
     apache: ['primary-controller', 'controller']
     nova-api: ['primary-controller', 'controller']
