@@ -15,19 +15,20 @@
 notice('fuel-plugin-lma-collector: aggregator.pp')
 
 prepare_network_config(hiera('network_scheme', {}))
-$mgmt_address   = get_network_role_property('management', 'ipaddr')
-$lma_collector  = hiera_hash('lma_collector')
-$roles          = node_roles(hiera('nodes'), hiera('uid'))
-$is_controller  = member($roles, 'controller') or member($roles, 'primary-controller')
+$mgmt_address  = get_network_role_property('management', 'ipaddr')
+$lma_collector = hiera_hash('lma_collector')
+$roles         = node_roles(hiera('nodes'), hiera('uid'))
+$is_controller = member($roles, 'controller') or member($roles, 'primary-controller')
+$is_rabbitmq   = roles_include(['standalone-rabbitmq', 'primary-standalone-rabbitmq'])
 
 $aggregator_address = hiera('management_vip')
 $management_network = hiera('management_network_range')
 $aggregator_port    = 5565
 $check_port         = 5566
 
-if $is_controller {
-  # On controllers make sure the LMA service is configured
-  # with the "pacemaker" provider
+if $is_controller or $is_rabbitmq {
+  # On nodes where pacemaker is deployed, make sure the LMA service is
+  # configured with the "pacemaker" provider
   include lma_collector::params
   Service<| title == $lma_collector::params::service_name |> {
     provider => 'pacemaker'
