@@ -23,6 +23,14 @@ if ($plugin_data) {
   $ceilometer_enabled = pick($ceilometer['enabled'], false)
   $contrail_plugin = hiera('contrail', false)
 
+  # detach_rabbitmq_enabled is used in alarming.yaml.erb
+  $detach_rabbitmq = hiera('detach-rabbitmq', {})
+  if $detach_rabbitmq['metadata'] {
+    $detach_rabbitmq_enabled = $detach_rabbitmq['metadata']['enabled']
+  } else {
+    $detach_rabbitmq_enabled = false
+  }
+
   $elasticsearch_mode = $plugin_data['elasticsearch_mode']
   $monitor_elasticsearch = $elasticsearch_mode ? {
     'local' => true,
