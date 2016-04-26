@@ -29,6 +29,9 @@ $storage_options = hiera_hash('storage', {})
 $murano          = hiera_hash('murano')
 $sahara          = hiera_hash('sahara')
 $contrail        = hiera('contrail', false)
+$detach_rabbitmq = hiera('detach-rabbitmq', {})
+
+$detach_rabbitmq_enabled = $detach_rabbitmq['metadata'] and $detach_rabbitmq['metadata']['enabled']
 
 if $ceilometer['enabled'] {
   $notification_topics = ['notifications', 'lma_notifications']
@@ -52,15 +55,6 @@ Service<| title == $lma_collector::params::log_service_name |> {
 }
 Service<| title == $lma_collector::params::metric_service_name |> {
   provider => 'pacemaker'
-}
-
-# OpenStack notifications are always useful for indexation and metrics collection
-class { 'lma_collector::notifications::input':
-  topic    => 'lma_notifications',
-  host     => $messaging_address,
-  port     => hiera('amqp_port', '5673'),
-  user     => $rabbitmq_user,
-  password => $rabbit['password'],
 }
 
 # Sahara notifications
@@ -273,7 +267,6 @@ if ! $storage_options['objects_ceph'] {
 # Logs
 if $lma_collector['elasticsearch_mode'] != 'disabled' {
   class { 'lma_collector::logs::mysql': }
-  class { 'lma_collector::logs::rabbitmq': }
   class { 'lma_collector::logs::pacemaker': }
 }
 
@@ -304,8 +297,14 @@ if $influxdb_mode != 'disabled' {
     read_threads => 10,
   }
 
-  class { 'lma_collector::collectd::rabbitmq':
-    queue => ['/^(\\w*notifications\\.(error|info|warn)|[a-z]+|(metering|event)\.sample)$/'],
+  # All collectd Python plugins must be configured in the same manifest.
+  # This limitation is imposed by the upstream collectd Puppet module.
+  # That's why we declare the RabbitMQ plugin if it is running on the
+  # controller.
+  unless $detach_rabbitmq_enabled {
+    class { 'lma_collector::collectd::rabbitmq':
+      queue => ['/^(\\w*notifications\\.(error|info|warn)|[a-z]+|(metering|event)\.sample)$/'],
+    }
   }
 
   $pacemaker_master_resource = 'vip__management'
