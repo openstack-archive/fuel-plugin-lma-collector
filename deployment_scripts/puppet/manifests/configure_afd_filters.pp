@@ -19,14 +19,15 @@ include lma_collector::params
 $lma           = hiera_hash('lma_collector', {})
 $roles         = node_roles(hiera('nodes'), hiera('uid'))
 $is_controller = member($roles, 'controller') or member($roles, 'primary-controller')
+$is_rabbitmq   = roles_include(['standalone-rabbitmq', 'primary-standalone-rabbitmq'])
 
 $alarms_definitions = $lma['alarms']
 if $alarms_definitions == undef {
     fail('Alarms definitions not found. Check files in /etc/hiera/override.')
 }
 
-if $is_controller {
-  # On controllers make sure the Log and Metric collector services are
+if $is_controller or $is_rabbitmq {
+  # On nodes where pacemaker is deployed, make sure the LMA service is
   # configured with the "pacemaker" provider
   include lma_collector::params
   Service<| title == $lma_collector::params::log_service_name |> {
