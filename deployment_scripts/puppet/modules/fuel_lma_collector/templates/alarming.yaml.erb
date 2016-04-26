@@ -699,7 +699,11 @@ lma_collector:
 <% end -%>
 
   service_cluster_roles:
+<% if @detach_rabbitmq_enabled -%>
+    rabbitmq: ['primary-standalone-rabbitmq', 'standalone-rabbitmq']
+<% else -%>
     rabbitmq: ['primary-controller', 'controller']
+<% end -%>
     mysql: ['primary-controller', 'controller']
     apache: ['primary-controller', 'controller']
     nova-api: ['primary-controller', 'controller']
@@ -730,6 +734,11 @@ lma_collector:
       cpu: ['cpu-critical-controller', 'cpu-warning-controller']
       root-fs: ['root-fs-critical', 'root-fs-warning']
       log-fs: ['log-fs-critical', 'log-fs-warning']
+<% if @detach_rabbitmq_enabled -%>
+    rabbitmq-nodes:
+      cpu: ['cpu-critical-controller', 'cpu-warning-controller']
+      root-fs: ['root-fs-critical', 'root-fs-warning']
+<% end -%>
     mysql-nodes:
       mysql-fs: ['mysql-fs-critical', 'mysql-fs-warning']
     compute:
