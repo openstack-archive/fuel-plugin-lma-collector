@@ -24,6 +24,14 @@ $is_base_os        = member($roles, 'base-os')
 $current_node_name = hiera('user_node_name')
 $current_roles     = hiera('roles')
 $network_metadata  = hiera_hash('network_metadata')
+$detach_rabbitmq   = hiera('detach-rabbitmq', {})
+
+if $detach_rabbitmq['metadata'] and $detach_rabbitmq['metadata']['enabled'] {
+  $monitor_rabbitmq = member($roles, 'standalone-rabbitmq')
+} else {
+  $monitor_rabbitmq = $is_controller
+}
+
 
 $elasticsearch_kibana = hiera_hash('elasticsearch_kibana', {})
 $es_nodes = get_nodes_hash_by_roles($network_metadata, ['elasticsearch_kibana'])
@@ -106,10 +114,10 @@ class { 'lma_collector':
   poolsize => $poolsize,
 }
 
-# On controller nodes the LMA collector service is managed by Pacemaker, so we
-# use pacemaker_wrappers::service to reconfigure the service resource to use
-# the "pacemaker" service provider
-if $is_controller {
+# On nodes that are running RabbitMQ, the LMA collector service is managed by
+# Pacemaker, so we use pacemaker_wrappers::service to reconfigure the service
+# resource to use the "pacemaker" service provider
+if $monitor_rabbitmq {
 
   include lma_collector::params
 
@@ -236,6 +244,10 @@ if $elasticsearch_mode != 'disabled' {
     server  => $es_server,
     require => Class['lma_collector'],
   }
+
+  if $monitor_rabbitmq {
+    class { 'lma_collector::logs::rabbitmq': }
+  }
 }
 
 $influxdb_mode = $lma_collector['influxdb_mode']
@@ -291,5 +303,31 @@ case $influxdb_mode {
   }
   default: {
     fail("'${influxdb_mode}' mode not supported for InfluxDB")
+  }
+}
+
+if $monitor_rabbitmq {
+  # OpenStack notifications are always useful for indexation and metrics
+  # collection
+  $messaging_address = get_network_role_property('mgmt/messaging', 'ipaddr')
+  $rabbit = hiera_hash('rabbit')
+
+  class { 'lma_collector::notifications::input':
+    topic    => 'lma_notifications',
+    host     => $messaging_address,
+    port     => hiera('amqp_port', '5673'),
+    user     => 'nova',
+    password => $rabbit['password'],
+  }
+
+
+  if ($influxdb_mode != 'disabled') {
+    class { 'lma_collector::notifications::metrics': }
+
+    unless is_controller {
+      class { 'lma_collector::collectd::rabbitmq':
+        queue => ['/^(\\w*notifications\\.(error|info|warn)|[a-z]+|(metering|event)\.sample)$/'],
+      }
+    }
   }
 }
