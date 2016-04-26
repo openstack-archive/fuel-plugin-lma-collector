@@ -24,6 +24,13 @@ $is_base_os        = member($roles, 'base-os')
 $current_node_name = hiera('user_node_name')
 $current_roles     = hiera('roles')
 $network_metadata  = hiera_hash('network_metadata')
+$detach_rabbitmq   = hiera('detach-rabbitmq', {})
+
+if $detach_rabbitmq['metadata'] and $detach_rabbitmq['metadata']['enabled'] {
+  $is_rabbitmq = roles_include(['standalone-rabbitmq', 'primary-standalone-rabbitmq'])
+} else {
+  $is_rabbitmq = $is_controller
+}
 
 $elasticsearch_kibana = hiera_hash('elasticsearch_kibana', {})
 $es_nodes = get_nodes_hash_by_roles($network_metadata, ['elasticsearch_kibana'])
@@ -106,10 +113,11 @@ class { 'lma_collector':
   poolsize => $poolsize,
 }
 
-# On controller nodes the LMA collector service is managed by Pacemaker, so we
-# use pacemaker_wrappers::service to reconfigure the service resource to use
-# the "pacemaker" service provider
-if $is_controller {
+# The LMA collector service is managed by Pacemaker on nodes that are
+# running RabbitMQ and on controller nodes.
+# We use pacemaker_wrappers::service to reconfigure the service resource
+# to use the "pacemaker" service provider
+if $is_rabbitmq or $is_controller {
 
   include lma_collector::params
 
@@ -152,27 +160,29 @@ if $is_controller {
       ocf_script_file => 'lma_collector/ocf-lma_collector',
     }
 
-    cs_rsc_colocation { "${service_name}-with-rabbitmq":
-      ensure     => present,
-      alias      => $service_name,
-      primitives => ["clone_${service_name}", $rabbitmq_resource],
-      score      => 0,
-      require    => Pacemaker_wrappers::Service[$service_name],
-    }
+    if $is_rabbitmq {
+      cs_rsc_colocation { "${service_name}-with-rabbitmq":
+        ensure     => present,
+        alias      => $service_name,
+        primitives => ["clone_${service_name}", $rabbitmq_resource],
+        score      => 0,
+        require    => Pacemaker_wrappers::Service[$service_name],
+      }
 
-    cs_rsc_order { "${service_name}-after-rabbitmq":
-      ensure  => present,
-      alias   => $service_name,
-      first   => $rabbitmq_resource,
-      second  => "clone_${service_name}",
-      # Heka cannot start if RabbitMQ isn't ready to accept connections. But
-      # once it is initialized, it can recover from a RabbitMQ outage. This is
-      # why we set score to 0 (interleave) meaning that the collector should
-      # start once RabbitMQ is active but a restart of RabbitMQ
-      # won't trigger a restart of the LMA collector.
-      score   => 0,
-      require => Cs_rsc_colocation[$service_name],
-      before  => Class['lma_collector'],
+      cs_rsc_order { "${service_name}-after-rabbitmq":
+        ensure  => present,
+        alias   => $service_name,
+        first   => $rabbitmq_resource,
+        second  => "clone_${service_name}",
+        # Heka cannot start if RabbitMQ isn't ready to accept connections. But
+        # once it is initialized, it can recover from a RabbitMQ outage. This is
+        # why we set score to 0 (interleave) meaning that the collector should
+        # start once RabbitMQ is active but a restart of RabbitMQ
+        # won't trigger a restart of the LMA collector.
+        score   => 0,
+        require => Cs_rsc_colocation[$service_name],
+        before  => Class['lma_collector'],
+      }
     }
   } else {
     pacemaker::service { $service_name:
@@ -209,13 +219,15 @@ if $is_controller {
       ocf_script_file  => 'lma_collector/ocf-lma_collector',
     }
 
-    pcmk_colocation { "${service_name}-with-rabbitmq":
-      ensure  => present,
-      alias   => $service_name,
-      first   => $rabbitmq_resource,
-      second  => "clone_${service_name}",
-      score   => 0,
-      require => Pacemaker::Service[$service_name],
+    if $is_rabbitmq {
+      pcmk_colocation { "${service_name}-with-rabbitmq":
+        ensure  => present,
+        alias   => $service_name,
+        first   => $rabbitmq_resource,
+        second  => "clone_${service_name}",
+        score   => 0,
+        require => Pacemaker::Service[$service_name],
+      }
     }
   }
 }
@@ -235,6 +247,12 @@ if $elasticsearch_mode != 'disabled' {
   class { 'lma_collector::elasticsearch':
     server  => $es_server,
     require => Class['lma_collector'],
+  }
+
+  if $is_rabbitmq {
+    class { 'lma_collector::logs::rabbitmq':
+      require => Class['lma_collector'],
+    }
   }
 }
 
@@ -261,15 +279,14 @@ case $influxdb_mode {
       $influxdb_password = $influxdb_grafana['influxdb_userpass']
     }
 
-    if ! $is_controller {
-
-      class { 'lma_collector::collectd::base':
-        processes    => ['hekad', 'collectd'],
-        read_threads => 5,
-        # Purge the default configuration shipped with the collectd package
-        purge        => true,
-        require      => Class['lma_collector'],
-      }
+    # TODO(all): this class is also applied by other role-specific manifests.
+    # This is sub-optimal and error prone. It needs to be fixed by having all
+    # collectd resources managed by a single manifest.
+    class { 'lma_collector::collectd::base':
+      processes => ['hekad', 'collectd'],
+      # Purge the default configuration shipped with the collectd package
+      purge     => true,
+      require   => Class['lma_collector'],
     }
 
     class { 'lma_collector::influxdb':
@@ -291,5 +308,35 @@ case $influxdb_mode {
   }
   default: {
     fail("'${influxdb_mode}' mode not supported for InfluxDB")
+  }
+}
+
+if $is_rabbitmq {
+  # OpenStack notifications are always useful for indexation and metrics
+  # collection
+  $messaging_address = get_network_role_property('mgmt/messaging', 'ipaddr')
+  $rabbit = hiera_hash('rabbit')
+
+  class { 'lma_collector::notifications::input':
+    topic    => 'lma_notifications',
+    host     => $messaging_address,
+    port     => hiera('amqp_port', '5673'),
+    user     => 'nova',
+    password => $rabbit['password'],
+  }
+
+
+  if ($influxdb_mode != 'disabled') {
+    class { 'lma_collector::notifications::metrics': }
+
+    # If the node has the controller role, the collectd Python plugins will be
+    # configured in controller.pp. This limitation is imposed by the upstream
+    # collectd Puppet module.
+    unless $is_controller {
+      class { 'lma_collector::collectd::rabbitmq':
+        queue   => ['/^(\\w*notifications\\.(error|info|warn)|[a-z]+|(metering|event)\.sample)$/'],
+        require => Class['lma_collector::collectd::base'],
+      }
+    }
   }
 }
