@@ -397,6 +397,14 @@ lma_collector:
           - cpu
           - root-fs
           - log-fs
+<% if @detach_rabbitmq_enabled -%>
+      rabbitmq-nodes:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - cpu
+          - root-fs
+<% end -%>
       mysql-nodes:
         policy: majority_of_members
         group_by: hostname
@@ -477,7 +485,11 @@ lma_collector:
         group_by: member
         members:
           - rabbitmq
+<% if @detach_rabbitmq_enabled -%>
+          - rabbitmq-nodes
+<% else -%>
           - controller
+<% end -%>
       nova:
         policy: highest_severity
         group_by: member
