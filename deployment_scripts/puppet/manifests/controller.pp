@@ -29,6 +29,13 @@ $storage_options = hiera_hash('storage', {})
 $murano          = hiera_hash('murano')
 $sahara          = hiera_hash('sahara')
 $contrail        = hiera('contrail', false)
+$detach_rabbitmq = hiera('detach-rabbitmq', {})
+
+if $detach_rabbitmq['metadata'] {
+  $detach_rabbitmq_enabled = $detach_rabbitmq['metadata']['enabled']
+} else {
+  $detach_rabbitmq_enabled = false
+}
 
 if $ceilometer['enabled'] {
   $notification_topics = ['notifications', 'lma_notifications']
@@ -51,12 +58,14 @@ Service<| title == $lma_collector::params::service_name |> {
 }
 
 # OpenStack notifications are always useful for indexation and metrics collection
-class { 'lma_collector::notifications::input':
-  topic    => 'lma_notifications',
-  host     => $messaging_address,
-  port     => hiera('amqp_port', '5673'),
-  user     => $rabbitmq_user,
-  password => $rabbit['password'],
+unless $detach_rabbitmq_enabled {
+  class { 'lma_collector::notifications::input':
+    topic    => 'lma_notifications',
+    host     => $messaging_address,
+    port     => hiera('amqp_port', '5673'),
+    user     => $rabbitmq_user,
+    password => $rabbit['password'],
+  }
 }
 
 # Sahara notifications
@@ -269,8 +278,10 @@ if ! $storage_options['objects_ceph'] {
 # Logs
 if $lma_collector['elasticsearch_mode'] != 'disabled' {
   class { 'lma_collector::logs::mysql': }
-  class { 'lma_collector::logs::rabbitmq': }
   class { 'lma_collector::logs::pacemaker': }
+  unless $detach_rabbitmq_enabled {
+    class { 'lma_collector::logs::rabbitmq': }
+  }
 }
 
 # Metrics
@@ -300,8 +311,10 @@ if $influxdb_mode != 'disabled' {
     read_threads => 10,
   }
 
-  class { 'lma_collector::collectd::rabbitmq':
-    queue => ['/^(\\w*notifications\\.(error|info|warn)|[a-z]+|(metering|event)\.sample)$/'],
+  unless $detach_rabbitmq_enabled {
+    class { 'lma_collector::collectd::rabbitmq':
+      queue => ['/^(\\w*notifications\\.(error|info|warn)|[a-z]+|(metering|event)\.sample)$/'],
+    }
   }
 
   $pacemaker_master_resource = 'vip__management'
@@ -407,7 +420,9 @@ if $influxdb_mode != 'disabled' {
   class { 'lma_collector::logs::http_metrics': }
 
   # Notification are always collected, lets extract metrics from there
-  class { 'lma_collector::notifications::metrics': }
+  unless $detach_rabbitmq_enabled {
+    class { 'lma_collector::notifications::metrics': }
+  }
 
   # Enable Apache status module
   class { 'lma_collector::mod_status': }
