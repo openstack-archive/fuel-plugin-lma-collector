@@ -21,6 +21,7 @@ $lma_collector     = hiera_hash('lma_collector')
 $roles             = node_roles(hiera('nodes'), hiera('uid'))
 $is_controller     = member($roles, 'controller') or member($roles, 'primary-controller')
 $is_base_os        = member($roles, 'base-os')
+$is_rabbitmq       = member($roles, 'standalone-rabbitmq')
 $current_node_name = hiera('user_node_name')
 $current_roles     = hiera('roles')
 $network_metadata  = hiera_hash('network_metadata')
@@ -291,5 +292,24 @@ case $influxdb_mode {
   }
   default: {
     fail("'${influxdb_mode}' mode not supported for InfluxDB")
+  }
+}
+
+if $is_rabbitmq {
+  $messaging_address = get_network_role_property('mgmt/messaging', 'ipaddr')
+  $rabbit = hiera_hash('rabbit')
+
+  class { 'lma_collector::notifications::input':
+    topic    => 'lma_notifications',
+    host     => $messaging_address,
+    port     => hiera('amqp_port', '5673'),
+    user     => 'nova',
+    password => $rabbit['password'],
+  }
+
+  class { 'lma_collector::logs::rabbitmq': }
+
+  class { 'lma_collector::collectd::rabbitmq':
+    queue => ['/^(\\w*notifications\\.(error|info|warn)|[a-z]+|(metering|event)\.sample)$/'],
   }
 }
