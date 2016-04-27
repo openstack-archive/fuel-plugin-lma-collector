@@ -401,6 +401,11 @@ lma_collector:
         policy: majority_of_members
         group_by: hostname
         members:
+<% if @detach_database_enabled -%>
+          - cpu
+          - root-fs
+          - log-fs
+<% end -%>
           - mysql-fs
       compute:
         policy: majority_of_members
@@ -453,7 +458,9 @@ lma_collector:
           - mysqld-tcp
           - mysql
           - mysql-nodes
+<% if not @detach_database_enabled -%>
           - controller
+<% end -%>
       haproxy:
         policy: highest_severity
         group_by: member
