@@ -15,11 +15,12 @@
 notice('fuel-plugin-lma-collector: aggregator.pp')
 
 prepare_network_config(hiera('network_scheme', {}))
-$mgmt_address  = get_network_role_property('management', 'ipaddr')
-$lma_collector = hiera_hash('lma_collector')
-$roles         = node_roles(hiera('nodes'), hiera('uid'))
-$is_controller = member($roles, 'controller') or member($roles, 'primary-controller')
-$is_rabbitmq   = roles_include(['standalone-rabbitmq', 'primary-standalone-rabbitmq'])
+$mgmt_address    = get_network_role_property('management', 'ipaddr')
+$lma_collector   = hiera_hash('lma_collector')
+$roles           = node_roles(hiera('nodes'), hiera('uid'))
+$is_controller   = member($roles, 'controller') or member($roles, 'primary-controller')
+$is_rabbitmq     = roles_include(['standalone-rabbitmq', 'primary-standalone-rabbitmq'])
+$is_mysql_server = roles_include(['standalone-database', 'primary-standalone-database'])
 
 $network_metadata = hiera_hash('network_metadata')
 $controllers      = get_nodes_hash_by_roles($network_metadata, ['primary-controller', 'controller'])
@@ -29,7 +30,7 @@ $management_network = hiera('management_network_range')
 $aggregator_port    = 5565
 $check_port         = 5566
 
-if $is_controller or $is_rabbitmq {
+if $is_controller or $is_rabbitmq or $is_mysql_server {
   # On nodes where pacemaker is deployed, make sure the LMA service is
   # configured with the "pacemaker" provider
   include lma_collector::params
