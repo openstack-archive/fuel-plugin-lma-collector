@@ -25,13 +25,19 @@ $current_node_name = hiera('user_node_name')
 $current_roles     = hiera('roles')
 $network_metadata  = hiera_hash('network_metadata')
 $detach_rabbitmq   = hiera('detach-rabbitmq', {})
+$detach_database   = hiera('detach-database', {})
+
+if $detach_database['metadata'] and $detach_database['metadata']['enabled'] {
+  $is_mysql_server = member($roles, 'standalone-database') or member($roles, 'primary-standalone-database')
+} else {
+  $is_mysql_server = $is_controller
+}
 
 if $detach_rabbitmq['metadata'] and $detach_rabbitmq['metadata']['enabled'] {
   $is_rabbitmq = member($roles, 'standalone-rabbitmq') or member($roles, 'primary-standalone-rabbitmq')
 } else {
   $is_rabbitmq = $is_controller
 }
-
 
 $elasticsearch_kibana = hiera_hash('elasticsearch_kibana', {})
 $es_nodes = get_nodes_hash_by_roles($network_metadata, ['elasticsearch_kibana'])
@@ -246,6 +252,12 @@ if $elasticsearch_mode != 'disabled' {
     require => Class['lma_collector'],
   }
 
+  if $is_mysql_server {
+    class { 'lma_collector::logs::mysql':
+      require => Class['lma_collector'],
+    }
+  }
+
   if $is_rabbitmq {
     class { 'lma_collector::logs::rabbitmq':
       require => Class['lma_collector'],
@@ -284,6 +296,21 @@ case $influxdb_mode {
       # Purge the default configuration shipped with the collectd package
       purge     => true,
       require   => Class['lma_collector'],
+    }
+
+    if $is_mysql_server {
+      $nova = hiera_hash('nova', {})
+
+      class { 'lma_collector::collectd::mysql':
+        username => 'nova',
+        password => $nova['db_password'],
+      }
+
+      lma_collector::collectd::dbi_mysql_status { 'mysql_status':
+        username => 'nova',
+        dbname   => 'nova',
+        password => $nova['db_password'],
+      }
     }
 
     class { 'lma_collector::influxdb':
