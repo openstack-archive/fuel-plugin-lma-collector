@@ -22,6 +22,8 @@ class lma_collector::notifications::input (
 
   include lma_collector::service
 
+  $lua_modules_dir = $lma_collector::params::lua_modules_dir
+
   validate_string($topic)
   validate_string($user)
   validate_string($password)
@@ -34,12 +36,13 @@ class lma_collector::notifications::input (
   $exchange = 'nova'
 
   heka::decoder::sandbox { 'notification':
-    config_dir => $lma_collector::params::config_dir,
-    filename   => "${lma_collector::params::plugins_dir}/decoders/notification.lua" ,
-    config     => {
+    config_dir       => $lma_collector::params::config_dir,
+    filename         => "${lma_collector::params::plugins_dir}/decoders/notification.lua" ,
+    config           => {
       include_full_notification => false
     },
-    notify     => Class['lma_collector::service'],
+    module_directory => $lua_modules_dir,
+    notify           => Class['lma_collector::service'],
   }
 
   create_resources(

@@ -25,7 +25,8 @@ define lma_collector::gse_cluster_filter (
 ) {
   include lma_collector::params
   include lma_collector::service
-  include heka::params
+
+  $lua_modules_dir = $lma_collector::params::lua_modules_dir
 
   validate_array($input_message_types)
   validate_string($cluster_field)
@@ -35,7 +36,6 @@ define lma_collector::gse_cluster_filter (
     fail('input_message_types cannot be empty')
   }
 
-  $lua_modules_dir = $heka::params::lua_modules_dir
   $topology_file = sanitize_name_for_lua("gse_${title}_topology")
   if $aggregator_flag {
     $aggregator_flag_operator = '!='
@@ -51,11 +51,11 @@ define lma_collector::gse_cluster_filter (
   ], '')
 
   heka::filter::sandbox { "gse_${title}":
-    config_dir      => $lma_collector::params::config_dir,
-    filename        => "${lma_collector::params::plugins_dir}/filters/gse_cluster_filter.lua",
-    message_matcher => $message_matcher,
-    ticker_interval => 1,
-    config          => {
+    config_dir       => $lma_collector::params::config_dir,
+    filename         => "${lma_collector::params::plugins_dir}/filters/gse_cluster_filter.lua",
+    message_matcher  => $message_matcher,
+    ticker_interval  => 1,
+    config           => {
       output_message_type => $output_message_type,
       output_metric_name  => $output_metric_name,
       source              => "gse_${title}_filter",
@@ -67,8 +67,9 @@ define lma_collector::gse_cluster_filter (
       max_inject          => $lma_collector::params::hekad_max_timer_inject,
       warm_up_period      => $warm_up_period,
     },
-    require         => File[$topology_file],
-    notify          => Class['lma_collector::service']
+    module_directory => $lua_modules_dir,
+    require          => File[$topology_file],
+    notify           => Class['lma_collector::service']
   }
 
   file { $topology_file:

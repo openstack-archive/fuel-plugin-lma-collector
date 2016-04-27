@@ -23,6 +23,8 @@ class lma_collector::influxdb (
 ) inherits lma_collector::params {
   include lma_collector::service
 
+  $lua_modules_dir = $lma_collector::params::lua_modules_dir
+
   validate_string($database)
   validate_string($user)
   validate_string($password)
@@ -30,11 +32,11 @@ class lma_collector::influxdb (
   validate_array($tag_fields)
 
   heka::filter::sandbox { 'influxdb_accumulator':
-    config_dir      => $lma_collector::params::config_dir,
-    filename        => "${lma_collector::params::plugins_dir}/filters/influxdb_accumulator.lua",
-    message_matcher => $lma_collector::params::influxdb_message_matcher,
-    ticker_interval => 1,
-    config          => {
+    config_dir       => $lma_collector::params::config_dir,
+    filename         => "${lma_collector::params::plugins_dir}/filters/influxdb_accumulator.lua",
+    message_matcher  => $lma_collector::params::influxdb_message_matcher,
+    ticker_interval  => 1,
+    config           => {
       flush_interval => $lma_collector::params::influxdb_flush_interval,
       flush_count    => $lma_collector::params::influxdb_flush_count,
       tag_fields     => join(sort(concat(['hostname'], $tag_fields)), ' '),
@@ -43,17 +45,19 @@ class lma_collector::influxdb (
       # parameters but this requires to request Keystone since we only have
       # access to the tenant name and user name for services
     },
-    notify          => Class['lma_collector::service'],
+    module_directory => $lua_modules_dir,
+    notify           => Class['lma_collector::service'],
   }
 
   heka::filter::sandbox { 'influxdb_annotation':
-    config_dir      => $lma_collector::params::config_dir,
-    filename        => "${lma_collector::params::plugins_dir}/filters/influxdb_annotation.lua",
-    message_matcher => 'Type == \'heka.sandbox.gse_cluster_metric\'',
-    config          => {
+    config_dir       => $lma_collector::params::config_dir,
+    filename         => "${lma_collector::params::plugins_dir}/filters/influxdb_annotation.lua",
+    message_matcher  => 'Type == \'heka.sandbox.gse_cluster_metric\'',
+    config           => {
       serie_name => $lma_collector::params::annotations_serie_name
     },
-    notify          => Class['lma_collector::service'],
+    module_directory => $lua_modules_dir,
+    notify           => Class['lma_collector::service'],
   }
 
   heka::encoder::payload { 'influxdb':

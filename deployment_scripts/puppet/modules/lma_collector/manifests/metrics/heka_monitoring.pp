@@ -18,11 +18,14 @@ class lma_collector::metrics::heka_monitoring (
 ){
   include lma_collector::service
 
+  $lua_modules_dir = $lma_collector::params::lua_modules_dir
+
   heka::filter::sandbox { 'heka_monitoring':
-    config_dir      => $lma_collector::params::config_dir,
-    filename        => "${lma_collector::params::plugins_dir}/filters/heka_monitoring.lua",
-    message_matcher => "Type == 'heka.all-report'",
-    notify          => Class['lma_collector::service'],
+    config_dir       => $lma_collector::params::config_dir,
+    filename         => "${lma_collector::params::plugins_dir}/filters/heka_monitoring.lua",
+    message_matcher  => "Type == 'heka.all-report'",
+    module_directory => $lua_modules_dir,
+    notify           => Class['lma_collector::service'],
   }
 
   # Dashboard is required to enable monitoring messages

@@ -14,13 +14,12 @@
 class lma_collector::gse_policies (
   $policies
 ) {
-  include heka::params
   include lma_collector::params
   include lma_collector::service
 
   validate_hash($policies)
 
-  $gse_policies_path = "${heka::params::lua_modules_dir}/${lma_collector::params::gse_policies_module}.lua"
+  $gse_policies_path = "${lma_collector::params::lua_modules_dir}/${lma_collector::params::gse_policies_module}.lua"
 
   file { 'gse_policies':
     ensure  => present,

@@ -26,6 +26,8 @@ class lma_collector::smtp_alert (
 
   include lma_collector::service
 
+  $lua_modules_dir = $lma_collector::params::lua_modules_dir
+
   if $host == undef {
     fail('host parameter is undef!')
   }
@@ -37,9 +39,10 @@ class lma_collector::smtp_alert (
   }
 
   heka::encoder::sandbox { 'smtp_alert':
-    config_dir => $lma_collector::params::config_dir,
-    filename   => "${lma_collector::params::plugins_dir}/encoders/status_smtp.lua",
-    notify     => Class['lma_collector::service'],
+    config_dir       => $lma_collector::params::config_dir,
+    filename         => "${lma_collector::params::plugins_dir}/encoders/status_smtp.lua",
+    module_directory => $lua_modules_dir,
+    notify           => Class['lma_collector::service'],
   }
 
   heka::output::smtp { 'smtp_alert':

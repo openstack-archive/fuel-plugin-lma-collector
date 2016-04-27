@@ -15,15 +15,18 @@
 class lma_collector::afd::workers () {
   include lma_collector::params
 
+  $lua_modules_dir = $lma_collector::params::lua_modules_dir
+
   $metrics_matcher = join([
     '(Type == \'metric\' || Type == \'heka.sandbox.metric\')', ' && ',
     'Fields[name] =~ /^openstack_(nova|cinder|neutron)_(services|agents)$/',
   ], '')
 
   heka::filter::sandbox { 'afd_workers':
-    config_dir      => $lma_collector::params::config_dir,
-    filename        => "${lma_collector::params::plugins_dir}/filters/afd_workers.lua",
-    message_matcher => $metrics_matcher,
-    notify          => Class['lma_collector::service'],
+    config_dir       => $lma_collector::params::config_dir,
+    filename         => "${lma_collector::params::plugins_dir}/filters/afd_workers.lua",
+    message_matcher  => $metrics_matcher,
+    module_directory => $lua_modules_dir,
+    notify           => Class['lma_collector::service'],
   }
 }

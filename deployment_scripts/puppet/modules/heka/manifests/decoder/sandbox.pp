@@ -16,6 +16,7 @@ define heka::decoder::sandbox (
   $config_dir,
   $filename,
   $config = {},
+  $module_directory = undef,
   $ensure = present,
 ) {
 

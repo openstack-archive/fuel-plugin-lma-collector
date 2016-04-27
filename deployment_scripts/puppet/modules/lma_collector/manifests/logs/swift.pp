@@ -51,16 +51,18 @@ class lma_collector::logs::swift (
 ) inherits lma_collector::params {
   include lma_collector::service
 
-  # Note: syslog_pattern could be made configurable in the future.
+  $lua_modules_dir = $lma_collector::params::lua_modules_dir
 
+  # Note: syslog_pattern could be made configurable in the future.
   heka::decoder::sandbox { 'swift':
-    config_dir => $lma_collector::params::config_dir,
-    filename   => "${lma_collector::params::plugins_dir}/decoders/generic_syslog.lua",
-    config     => {
+    config_dir       => $lma_collector::params::config_dir,
+    filename         => "${lma_collector::params::plugins_dir}/decoders/generic_syslog.lua",
+    config           => {
       syslog_pattern          => $lma_collector::params::syslog_pattern,
       fallback_syslog_pattern => $lma_collector::params::fallback_syslog_pattern
     },
-    notify     => Class['lma_collector::service'],
+    module_directory => $lua_modules_dir,
+    notify           => Class['lma_collector::service'],
   }
 
   heka::input::logstreamer { 'swift':

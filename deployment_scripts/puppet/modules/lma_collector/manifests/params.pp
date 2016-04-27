@@ -16,6 +16,7 @@ class lma_collector::params {
   $service_name = 'lma_collector'
   $config_dir = "/etc/${service_name}"
   $plugins_dir = "/usr/share/${service_name}"
+  $lua_modules_dir = '/usr/share/lma_collector_modules'
 
   $apt_config_file = '/etc/apt/apt.conf.d/99norecommends'
 

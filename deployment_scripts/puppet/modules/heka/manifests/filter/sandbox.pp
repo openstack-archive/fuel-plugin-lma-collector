@@ -19,6 +19,7 @@ define heka::filter::sandbox (
   $message_matcher = 'FALSE',
   $ticker_interval = undef,
   $config = {},
+  $module_directory = undef,
   $ensure = present,
 ) {
 
