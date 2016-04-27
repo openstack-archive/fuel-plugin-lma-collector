@@ -20,13 +20,14 @@ $lma           = hiera_hash('lma_collector', {})
 $roles         = node_roles(hiera('nodes'), hiera('uid'))
 $is_controller = member($roles, 'controller') or member($roles, 'primary-controller')
 $is_rabbitmq   = roles_include(['standalone-rabbitmq', 'primary-standalone-rabbitmq'])
+$is_mysql_server = roles_include(['standalone-database', 'primary-standalone-database'])
 
 $alarms_definitions = $lma['alarms']
 if $alarms_definitions == undef {
     fail('Alarms definitions not found. Check files in /etc/hiera/override.')
 }
 
-if $is_controller or $is_rabbitmq {
+if $is_controller or $is_rabbitmq or $is_mysql_server {
   # On nodes where pacemaker is deployed, make sure the LMA service is
   # configured with the "pacemaker" provider
   include lma_collector::params
