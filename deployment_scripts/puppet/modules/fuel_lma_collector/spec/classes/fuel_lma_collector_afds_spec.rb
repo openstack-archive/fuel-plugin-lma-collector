@@ -54,10 +54,10 @@ describe 'fuel_lma_collector::afds' do
         end
 
         it { is_expected.to contain_heka__filter__sandbox('afd_node_controller_cpu') }
-        it { is_expected.to contain_file('/usr/share/heka/lua_modules/lma_alarms_controller_cpu.lua') }
+        it { is_expected.to contain_file('/usr/share/lma_collector_modules/lma_alarms_controller_cpu.lua') }
 
         it { is_expected.to contain_heka__filter__sandbox('afd_service_mysql_all') }
-        it { is_expected.to contain_file('/usr/share/heka/lua_modules/lma_alarms_mysql_all.lua') }
+        it { is_expected.to contain_file('/usr/share/lma_collector_modules/lma_alarms_mysql_all.lua') }
     end
 
     describe 'with enabled false' do
@@ -83,7 +83,7 @@ describe 'fuel_lma_collector::afds' do
                        "function"=>"avg"}]}}]}
         end
 
-        it { is_expected.to contain_file('/usr/share/heka/lua_modules/lma_alarms_controller_cpu.lua').with_content(/local alarms = {\n}/) }
+        it { is_expected.to contain_file('/usr/share/lma_collector_modules/lma_alarms_controller_cpu.lua').with_content(/local alarms = {\n}/) }
 
     end
 end

@@ -23,13 +23,12 @@ define lma_collector::afd_filter (
 ) {
     include lma_collector::params
     include lma_collector::service
-    include heka::params
 
-    $alarms_dir = $heka::params::lua_modules_dir
+    $lua_modules_dir = $lma_collector::params::lua_modules_dir
+
     # name cannot contain '-'
     $afd_file = join(['lma_alarms_', sanitize_name_for_lua($name)], '')
-    $afd_filename = "${alarms_dir}/${afd_file}.lua"
-
+    $afd_filename = "${lua_modules_dir}/${afd_file}.lua"
 
     # Create the Lua structures that describe alarms
     file { $afd_filename:
@@ -40,19 +39,20 @@ define lma_collector::afd_filter (
 
     # Create the confguration file for Heka
     heka::filter::sandbox { "afd_${type}_${cluster_name}_${logical_name}":
-      config_dir      => $lma_collector::params::config_dir,
-      filename        => "${lma_collector::params::plugins_dir}/filters/afd.lua",
-      message_matcher => "(Type == \'metric\' || Type == \'heka.sandbox.metric\') && (${message_matcher})",
-      ticker_interval => 10,
-      config          => {
+      config_dir       => $lma_collector::params::config_dir,
+      filename         => "${lma_collector::params::plugins_dir}/filters/afd.lua",
+      message_matcher  => "(Type == \'metric\' || Type == \'heka.sandbox.metric\') && (${message_matcher})",
+      ticker_interval  => 10,
+      config           => {
         hostname         => $::hostname,
         afd_type         => $type,
         afd_file         => $afd_file,
         afd_cluster_name => $cluster_name,
         afd_logical_name => $logical_name,
       },
-      require         => File[$afd_filename],
-      notify          => Class['lma_collector::service'],
+      module_directory => $lua_modules_dir,
+      require          => File[$afd_filename],
+      notify           => Class['lma_collector::service'],
     }
 }
 

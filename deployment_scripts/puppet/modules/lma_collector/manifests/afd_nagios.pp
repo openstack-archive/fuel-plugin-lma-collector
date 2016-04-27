@@ -24,17 +24,20 @@ define lma_collector::afd_nagios(
   include lma_collector::params
   include lma_collector::service
 
+  $lua_modules_dir = $lma_collector::params::lua_modules_dir
+
   if $url == undef {
     fail('url parameter is undef!')
   }
 
   $config = {'nagios_host' => $hostname, 'service_template' => $service_template}
   heka::encoder::sandbox { "nagios_afd_${title}":
-    ensure     => $ensure,
-    config_dir => $lma_collector::params::config_dir,
-    filename   => "${lma_collector::params::plugins_dir}/encoders/status_nagios.lua",
-    config     => $config,
-    notify     => Class['lma_collector::service'],
+    ensure           => $ensure,
+    config_dir       => $lma_collector::params::config_dir,
+    filename         => "${lma_collector::params::plugins_dir}/encoders/status_nagios.lua",
+    config           => $config,
+    module_directory => $lua_modules_dir,
+    notify           => Class['lma_collector::service'],
   }
 
   heka::output::http { "nagios_afd_${title}":

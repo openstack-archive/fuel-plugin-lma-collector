@@ -16,10 +16,13 @@ class lma_collector::logs::http_metrics {
   include lma_collector::params
   include lma_collector::service
 
+  $lua_modules_dir = $lma_collector::params::lua_modules_dir
+
   heka::filter::sandbox { 'http_metrics':
-    config_dir      => $lma_collector::params::config_dir,
-    filename        => "${lma_collector::params::plugins_dir}/filters/http_metrics.lua",
-    message_matcher => 'Type == \'log\' && Fields[http_response_time] != NIL',
-    notify          => Class['lma_collector::service'],
+    config_dir       => $lma_collector::params::config_dir,
+    filename         => "${lma_collector::params::plugins_dir}/filters/http_metrics.lua",
+    message_matcher  => 'Type == \'log\' && Fields[http_response_time] != NIL',
+    module_directory => $lua_modules_dir,
+    notify           => Class['lma_collector::service'],
   }
 }

@@ -19,16 +19,19 @@ class lma_collector::logs::counter (
   include lma_collector::params
   include lma_collector::service
 
+  $lua_modules_dir = $lma_collector::params::lua_modules_dir
+
   heka::filter::sandbox { 'logs_counter':
-    config_dir      => $lma_collector::params::config_dir,
-    filename        => "${lma_collector::params::plugins_dir}/filters/logs_counter.lua",
-    message_matcher => 'Type == \'log\' && Logger =~ /^openstack\\./',
-    ticker_interval => 1,
-    preserve_data   => true,
-    config          => {
+    config_dir       => $lma_collector::params::config_dir,
+    filename         => "${lma_collector::params::plugins_dir}/filters/logs_counter.lua",
+    message_matcher  => 'Type == \'log\' && Logger =~ /^openstack\\./',
+    ticker_interval  => 1,
+    preserve_data    => true,
+    config           => {
       interval => $interval,
       hostname => $hostname,
     },
-    notify          => Class['lma_collector::service'],
+    module_directory => $lua_modules_dir,
+    notify           => Class['lma_collector::service'],
   }
 }

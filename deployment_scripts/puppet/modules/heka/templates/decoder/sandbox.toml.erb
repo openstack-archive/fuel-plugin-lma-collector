@@ -1,6 +1,9 @@
 [<%= @title %>_decoder]
 type = "SandboxDecoder"
 filename = "<%= @filename %>"
+<% if @module_directory -%>
+module_directory = "<%= @module_directory %>;/usr/share/heka/lua_modules"
+<% end -%>
 
 <% if @config.size() > 0 %>
 [<%= @title %>_decoder.config]

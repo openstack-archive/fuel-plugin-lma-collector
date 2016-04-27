@@ -17,6 +17,7 @@ define heka::output::sandbox (
   $filename,
   $message_matcher = 'FALSE',
   $config = {},
+  $module_directory = undef,
   $ensure = present,
 ) {
 

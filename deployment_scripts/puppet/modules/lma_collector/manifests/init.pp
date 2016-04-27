@@ -35,7 +35,6 @@ class lma_collector (
   $groups = [],
   $poolsize = 100,
 ) inherits lma_collector::params {
-  include heka::params
 
   validate_hash($tags)
   validate_integer($poolsize)
@@ -43,7 +42,7 @@ class lma_collector (
   $service_name = $lma_collector::params::service_name
   $config_dir = $lma_collector::params::config_dir
   $plugins_dir = $lma_collector::params::plugins_dir
-  $lua_modules_dir = $heka::params::lua_modules_dir
+  $lua_modules_dir = $lma_collector::params::lua_modules_dir
 
   $additional_groups = $user ? {
     'root'  => [],
@@ -63,14 +62,12 @@ class lma_collector (
     poolsize            => $poolsize,
   }
 
-  # Copy our Lua modules to Heka's modules directory so they're available for
-  # the sandboxes
   file { $lua_modules_dir:
     ensure  => directory,
     source  => 'puppet:///modules/lma_collector/plugins/common',
     recurse => remote,
     notify  => Class['lma_collector::service'],
-    require => Class['heka'],
+    require => File[$plugins_dir]
   }
 
   file { "${lua_modules_dir}/extra_fields.lua":

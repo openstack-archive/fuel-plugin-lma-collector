@@ -24,6 +24,7 @@ class lma_collector::collectd::base (
 
   $type_directory = "${lma_collector::params::plugins_dir}/collectd_types/"
   $type_files = suffix(prefix($lma_collector::params::collectd_types, $type_directory), '.db')
+  $lua_modules_dir = $lma_collector::params::lua_modules_dir
 
   file { $type_directory:
     ensure  => directory,
@@ -117,12 +118,13 @@ class lma_collector::collectd::base (
     $real_hostname = $::hostname
   }
   heka::decoder::sandbox { 'collectd':
-    config_dir => $lma_collector::params::config_dir,
-    filename   => "${lma_collector::params::plugins_dir}/decoders/collectd.lua" ,
-    config     => {
+    config_dir       => $lma_collector::params::config_dir,
+    filename         => "${lma_collector::params::plugins_dir}/decoders/collectd.lua" ,
+    config           => {
       hostname => $real_hostname
     },
-    notify     => Class['lma_collector::service'],
+    module_directory => $lua_modules_dir,
+    notify           => Class['lma_collector::service'],
   }
 
   heka::input::httplisten { 'collectd':
