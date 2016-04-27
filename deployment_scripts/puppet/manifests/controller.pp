@@ -368,17 +368,6 @@ if $influxdb_mode != 'disabled' {
     cpu_allocation_ratio      => 8.0,
   }
 
-  class { 'lma_collector::collectd::mysql':
-    username => 'nova',
-    password => $nova['db_password'],
-  }
-
-  lma_collector::collectd::dbi_mysql_status{ 'mysql_status':
-    username => 'nova',
-    dbname   => 'nova',
-    password => $nova['db_password'],
-  }
-
   class { 'lma_collector::collectd::haproxy':
     socket       => $haproxy_socket,
     # Ignore internal stats ('Stats' for 6.1, 'stats' for 7.0) and lma proxies
