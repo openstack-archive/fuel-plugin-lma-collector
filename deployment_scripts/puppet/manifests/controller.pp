@@ -260,7 +260,6 @@ if ! $storage_options['objects_ceph'] {
 
 # Logs
 if $lma_collector['elasticsearch_mode'] != 'disabled' {
-  class { 'lma_collector::logs::mysql': }
   class { 'lma_collector::logs::pacemaker': }
 }
 
@@ -350,17 +349,6 @@ if $influxdb_mode != 'disabled' {
     pacemaker_master_resource => $openstack_service_config[pacemaker_master_resource],
     # Fuel sets cpu_allocation_ratio to 8.0 in nova.conf
     cpu_allocation_ratio      => 8.0,
-  }
-
-  class { 'lma_collector::collectd::mysql':
-    username => 'nova',
-    password => $nova['db_password'],
-  }
-
-  lma_collector::collectd::dbi_mysql_status{ 'mysql_status':
-    username => 'nova',
-    dbname   => 'nova',
-    password => $nova['db_password'],
   }
 
   class { 'lma_collector::collectd::haproxy':
