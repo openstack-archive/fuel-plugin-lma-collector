@@ -688,7 +688,11 @@ lma_collector:
 
   node_cluster_roles:
     controller: ['primary-controller', 'controller']
+<% if @detach_database_enabled -%>
+    mysql-nodes: ['primary-standalone-database', 'standalone-database']
+<% else -%>
     mysql-nodes: ['primary-controller', 'controller']
+<% end -%>
     compute: ['compute']
     storage: ['cinder', 'ceph-osd']
 <% if @monitor_elasticsearch -%>
@@ -704,7 +708,11 @@ lma_collector:
 <% else -%>
     rabbitmq: ['primary-controller', 'controller']
 <% end -%>
+<% if @detach_database_enabled -%>
+    mysql: ['primary-standalone-database', 'standalone-database']
+<% else -%>
     mysql: ['primary-controller', 'controller']
+<% end -%>
     apache: ['primary-controller', 'controller']
     nova-api: ['primary-controller', 'controller']
     nova-logs: ['primary-controller', 'controller', 'compute']
@@ -740,6 +748,11 @@ lma_collector:
       root-fs: ['root-fs-critical', 'root-fs-warning']
 <% end -%>
     mysql-nodes:
+<% if @detach_database_enabled -%>
+      cpu: ['cpu-critical-controller', 'cpu-warning-controller']
+      root-fs: ['root-fs-critical', 'root-fs-warning']
+      log-fs: ['log-fs-critical', 'log-fs-warning']
+<% end -%>
       mysql-fs: ['mysql-fs-critical', 'mysql-fs-warning']
     compute:
       cpu: ['cpu-critical-compute', 'cpu-warning-compute']
