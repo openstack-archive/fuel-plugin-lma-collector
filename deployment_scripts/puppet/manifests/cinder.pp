@@ -16,13 +16,14 @@ notice('fuel-plugin-lma-collector: cinder.pp')
 
 include lma_collector::params
 
-$ceilometer    = hiera_hash('ceilometer', {})
-$lma_collector = hiera_hash('lma_collector')
-$roles         = node_roles(hiera('nodes'), hiera('uid'))
-$is_controller = member($roles, 'controller') or member($roles, 'primary-controller')
-$is_rabbitmq   = roles_include(['standalone-rabbitmq', 'primary-standalone-rabbitmq'])
+$ceilometer      = hiera_hash('ceilometer', {})
+$lma_collector   = hiera_hash('lma_collector')
+$roles           = node_roles(hiera('nodes'), hiera('uid'))
+$is_controller   = member($roles, 'controller') or member($roles, 'primary-controller')
+$is_rabbitmq     = roles_include(['standalone-rabbitmq', 'primary-standalone-rabbitmq'])
+$is_mysql_server = roles_include(['standalone-database', 'primary-standalone-database'])
 
-if $is_controller or $is_rabbitmq {
+if $is_controller or $is_rabbitmq or $is_mysql_server {
   # On nodes where pacemaker is deployed, make sure the LMA service is
   # configured with the "pacemaker" provider
   include lma_collector::params

@@ -27,6 +27,10 @@ if ($plugin_data) {
   $detach_rabbitmq = hiera('detach-rabbitmq', {})
   $detach_rabbitmq_enabled = $detach_rabbitmq['metadata'] and $detach_rabbitmq['metadata']['enabled']
 
+  # detach_database_enabled is used in templates
+  $detach_database = hiera('detach-database', {})
+  $detach_database_enabled = $detach_database['metadata'] and $detach_database['metadata']['enabled']
+
   $elasticsearch_mode = $plugin_data['elasticsearch_mode']
   $monitor_elasticsearch = $elasticsearch_mode ? {
     'local' => true,
