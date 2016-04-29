@@ -104,7 +104,7 @@ lma_collector:
             periods: 0
             function: avg
     - name: 'cpu-critical-default'
-      description: 'CPU critical'
+      description: 'The CPU usage is too high.'
       severity: 'critical'
       enabled: 'true'
       trigger:
@@ -313,7 +313,7 @@ lma_collector:
             periods: 0
             function: min
     - name: 'nova-api-http-errors'
-      description: 'Some 5xx HTTP errors have been detected on nova-api'
+      description: 'Too many 5xx HTTP errors have been detected on nova-api.'
       severity: 'warning'
       enabled: 'true'
       trigger:
@@ -328,7 +328,7 @@ lma_collector:
             periods: 1
             function: diff
     - name: 'nova-logs-error'
-      description: 'Some errors have been detected in Nova logs'
+      description: 'Too many errors have been detected in Nova logs.'
       severity: 'warning'
       enabled: 'true'
       trigger:
@@ -344,7 +344,7 @@ lma_collector:
             periods: 0
             function: max
     - name: 'heat-api-http-errors'
-      description: 'Some 5xx HTTP errors have been detected on heat-api'
+      description: 'Too many 5xx HTTP errors have been detected on heat-api.'
       severity: 'warning'
       enabled: 'true'
       trigger:
@@ -359,7 +359,7 @@ lma_collector:
             periods: 1
             function: diff
     - name: 'heat-logs-error'
-      description: 'Some errors have been detected in Heat logs'
+      description: 'Too many errors have been detected in Heat logs.'
       severity: 'warning'
       enabled: 'true'
       trigger:
@@ -376,7 +376,7 @@ lma_collector:
             function: max
 <% if not @storage_options["objects_ceph"] then -%>
     - name: 'swift-api-http-errors'
-      description: 'Some 5xx HTTP errors have been detected on swift-api'
+      description: 'Too many 5xx HTTP errors have been detected on swift-api.'
       severity: 'warning'
       enabled: 'true'
       trigger:
@@ -392,7 +392,7 @@ lma_collector:
             function: diff
 <% end -%>
     - name: 'cinder-api-http-errors'
-      description: 'Some 5xx HTTP errors have been detected on cinder-api'
+      description: 'Too many 5xx HTTP errors have been detected on cinder-api.'
       severity: 'warning'
       enabled: 'true'
       trigger:
@@ -407,7 +407,7 @@ lma_collector:
             periods: 1
             function: diff
     - name: 'cinder-logs-error'
-      description: 'Some errors have been detected in Cinder logs'
+      description: 'Too many errors have been detected in Cinder logs.'
       severity: 'warning'
       enabled: 'true'
       trigger:
@@ -423,7 +423,7 @@ lma_collector:
             periods: 0
             function: max
     - name: 'glance-api-http-errors'
-      description: 'Some 5xx HTTP errors have been detected on glance-api'
+      description: 'Too many 5xx HTTP errors have been detected on glance-api.'
       severity: 'warning'
       enabled: 'true'
       trigger:
@@ -438,7 +438,7 @@ lma_collector:
             periods: 1
             function: diff
     - name: 'glance-logs-error'
-      description: 'Some errors have been detected in Glance logs'
+      description: 'Too many errors have been detected in Glance logs.'
       severity: 'warning'
       enabled: 'true'
       trigger:
@@ -454,7 +454,7 @@ lma_collector:
             periods: 0
             function: max
     - name: 'neutron-api-http-errors'
-      description: 'Some 5xx HTTP errors have been detected on neutron-api'
+      description: 'Too many 5xx HTTP errors have been detected on neutron-api.'
       severity: 'warning'
       enabled: 'true'
       trigger:
@@ -469,7 +469,7 @@ lma_collector:
             periods: 1
             function: diff
     - name: 'neutron-logs-error'
-      description: 'Some errors have been detected in Neutron logs'
+      description: 'Too many errors have been detected in Neutron logs.'
       severity: 'warning'
       enabled: 'true'
       trigger:
@@ -485,7 +485,7 @@ lma_collector:
             periods: 0
             function: max
     - name: 'keystone-public-api-http-errors'
-      description: 'Some 5xx HTTP errors have been detected on keystone-public-api'
+      description: 'Too many 5xx HTTP errors have been detected on keystone-public-api.'
       severity: 'warning'
       enabled: 'true'
       trigger:
@@ -500,7 +500,7 @@ lma_collector:
             periods: 1
             function: diff
     - name: 'keystone-admin-api-http-errors'
-      description: 'Some 5xx HTTP errors have been detected on keystone-admin-api'
+      description: 'Too many 5xx HTTP errors have been detected on keystone-admin-api.'
       severity: 'warning'
       enabled: 'true'
       trigger:
@@ -515,7 +515,7 @@ lma_collector:
             periods: 1
             function: diff
     - name: 'keystone-logs-error'
-      description: 'Some errors have been detected in Keystone logs'
+      description: 'Too many errors have been detected in Keystone logs.'
       severity: 'warning'
       enabled: 'true'
       trigger:
@@ -558,7 +558,7 @@ lma_collector:
             function: min
 <% if @storage_options["volumes_ceph"] then -%>
     - name: 'ceph-health-critical'
-      description: 'Ceph health is critical'
+      description: 'Ceph health is critical.'
       severity: 'critical'
       enabled: 'true'
       trigger:
@@ -569,7 +569,7 @@ lma_collector:
             window: 60
             function: max
     - name: 'ceph-health-warning'
-      description: 'Ceph health is warning'
+      description: 'Ceph health is warning.'
       severity: 'warning'
       enabled: 'true'
       trigger:
@@ -604,7 +604,7 @@ lma_collector:
 <% end -%>
 <% if @monitor_elasticsearch -%>
     - name: 'elasticsearch-health-critical'
-      description: 'Elasticsearch cluster health is critical'
+      description: 'Elasticsearch cluster health is critical.'
       severity: 'critical'
       enabled: 'true'
       trigger:
@@ -615,7 +615,7 @@ lma_collector:
             window: 60
             function: min
     - name: 'elasticsearch-health-warning'
-      description: 'Elasticsearch health is warning'
+      description: 'Elasticsearch health is warning.'
       severity: 'warning'
       enabled: 'true'
       trigger:
@@ -626,7 +626,7 @@ lma_collector:
             window: 60
             function: min
     - name: 'elasticsearch-fs-warning'
-      description: "The filesystem's free space is low (elasticsearch node)."
+      description: "The filesystem's free space is low (Elasticsearch node)."
       severity: 'warning'
       enabled: 'true'
       trigger:
@@ -640,7 +640,7 @@ lma_collector:
             periods: 0
             function: min
     - name: 'elasticsearch-fs-critical'
-      description: "The filesystem's free space is too low (elasticsearch node)."
+      description: "The filesystem's free space is too low (Elasticsearch node)."
       severity: 'critical'
       enabled: 'true'
       trigger:
@@ -657,7 +657,7 @@ lma_collector:
 
 <% if @monitor_influxdb-%>
     - name: 'influxdb-fs-warning'
-      description: "The filesystem's free space is low (influxdb node)."
+      description: "The filesystem's free space is low (InfluxDB node)."
       severity: 'warning'
       enabled: 'true'
       trigger:
@@ -671,7 +671,7 @@ lma_collector:
             periods: 0
             function: min
     - name: 'influxdb-fs-critical'
-      description: "The filesystem's free space is too low (influxdb node)."
+      description: "The filesystem's free space is too low (InfluxDB node)."
       severity: 'critical'
       enabled: 'true'
       trigger:
