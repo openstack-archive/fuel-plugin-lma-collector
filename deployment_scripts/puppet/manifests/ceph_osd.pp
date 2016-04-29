@@ -17,14 +17,12 @@ notice('fuel-plugin-lma-collector: ceph_osd.pp')
 $lma_collector_hash = hiera_hash('lma_collector')
 
 if $lma_collector_hash['influxdb_mode'] != 'disabled' {
-  $nodes_hash = hiera('nodes', {})
-  $roles = node_roles($nodes_hash, hiera('uid'))
   # Only install this python collectd plugin if ceph-osd is not deployed on a
   # controller node. This is due to a limitation of the python plugin puppet
   # module which can be run only by one manifest otherwise the collectd configuration is
   # overwritten by the next run. Currently only controller nodes have python
   # plugins installed so it's safe to install on all other roles .. for now.
-  if ! ('controller' in $roles or 'primary-controller' in $roles){
+  if ! roles_include(['controller', 'primary-controller']) {
     class { 'lma_collector::collectd::base':
       processes    => ['hekad', 'collectd'],
     }
