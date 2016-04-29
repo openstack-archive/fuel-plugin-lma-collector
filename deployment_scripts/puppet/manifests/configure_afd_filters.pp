@@ -17,8 +17,7 @@ notice('fuel-plugin-lma-collector: configure_afd_filters.pp')
 include lma_collector::params
 
 $lma           = hiera_hash('lma_collector', {})
-$roles         = node_roles(hiera('nodes'), hiera('uid'))
-$is_controller = member($roles, 'controller') or member($roles, 'primary-controller')
+$is_controller = roles_include(['controller', 'primary-controller'])
 
 $alarms_definitions = $lma['alarms']
 if $alarms_definitions == undef {

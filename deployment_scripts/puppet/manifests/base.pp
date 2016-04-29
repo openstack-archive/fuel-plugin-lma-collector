@@ -18,11 +18,8 @@ notice('fuel-plugin-lma-collector: base.pp')
 prepare_network_config(hiera('network_scheme', {}))
 $fuel_version      = 0 + hiera('fuel_version')
 $lma_collector     = hiera_hash('lma_collector')
-$roles             = node_roles(hiera('nodes'), hiera('uid'))
-$is_controller     = member($roles, 'controller') or member($roles, 'primary-controller')
-$is_base_os        = member($roles, 'base-os')
-$current_node_name = hiera('user_node_name')
-$current_roles     = hiera('roles')
+$is_controller     = roles_include(['controller', 'primary-controller'])
+$is_base_os        = roles_include('base-os')
 $network_metadata  = hiera_hash('network_metadata')
 
 $elasticsearch_kibana = hiera_hash('elasticsearch_kibana', {})
@@ -40,7 +37,7 @@ $tags = {
   deployment_id     => hiera('deployment_id'),
   openstack_region  => 'RegionOne',
   openstack_release => hiera('openstack_version'),
-  openstack_roles   => join($roles, ','),
+  openstack_roles   => join(hiera('roles'), ','),
   environment_label => $environment_label,
 }
 

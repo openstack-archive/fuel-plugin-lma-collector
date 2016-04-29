@@ -18,8 +18,7 @@ include lma_collector::params
 
 $ceilometer    = hiera_hash('ceilometer', {})
 $lma_collector = hiera_hash('lma_collector')
-$roles         = node_roles(hiera('nodes'), hiera('uid'))
-$is_controller = member($roles, 'controller') or member($roles, 'primary-controller')
+$is_controller = roles_include(['controller', 'primary-controller'])
 
 if $is_controller {
   # On controllers make sure the Log and Metric collector services are
