@@ -27,8 +27,6 @@ import collectd_base as base
 NAME = 'rabbitmq_info'
 # Override in config by specifying 'RmqcBin'.
 RABBITMQCTL_BIN = '/usr/sbin/rabbitmqctl'
-# Override in config by specifying 'PmapBin'
-PMAP_BIN = '/usr/bin/pmap'
 # Override in config by specifying 'Vhost'.
 VHOST = "/"
 
@@ -46,8 +44,6 @@ class RabbitMqPlugin(base.Base):
         super(RabbitMqPlugin, self).__init__(*args, **kwargs)
         self.plugin = NAME
         self.rabbitmqctl_bin = RABBITMQCTL_BIN
-        self.pidfile = None
-        self.pmap_bin = PMAP_BIN
         self.vhost = VHOST
         self.re_queues = []
         self.queues = []
@@ -69,10 +65,6 @@ class RabbitMqPlugin(base.Base):
         for node in conf.children:
             if node.key == 'RmqcBin':
                 self.rabbitmqctl_bin = node.values[0]
-            elif node.key == 'PmapBin':
-                self.pmap_bin = node.values[0]
-            elif node.key == 'PidFile':
-                self.pidfile = node.values[0]
             elif node.key == 'Vhost':
                 self.vhost = node.values[0]
             elif node.key == 'Queue':
@@ -99,9 +91,6 @@ class RabbitMqPlugin(base.Base):
         stats['consumers'] = 0
         stats['queues'] = 0
         stats['unmirrored_queues'] = 0
-        stats['pmap_mapped'] = 0
-        stats['pmap_used'] = 0
-        stats['pmap_shared'] = 0
 
         out, err = self.execute([self.rabbitmqctl_bin, '-q', 'status'],
                                 shell=False)
@@ -225,32 +214,6 @@ class RabbitMqPlugin(base.Base):
             self.logger.warning(
                 '%s reports 0 memory usage. This is probably incorrect.' %
                 self.rabbitmqctl_bin)
-
-        # pmap metrics are only collected if the location of the pid file is
-        # explicitly configured
-        if self.pidfile:
-            try:
-                with open(self.pidfile, 'r') as f:
-                    pid = f.read().strip()
-            except:
-                self.logger.error('Unable to read %s' % self.pidfile)
-                return
-
-            # use pmap to get proper memory stats
-            out, err = self.execute([self.pmap_bin, '-d', pid], shell=False)
-            if not out:
-                self.logger.error('Failed to run %s' % self.pmap_bin)
-                return
-
-            out = out.split('\n')[-1]
-            if re.match('mapped', out):
-                m = re.match(r"\D+(\d+)\D+(\d+)\D+(\d+)", out)
-                stats['pmap_mapped'] = int(m.group(1))
-                stats['pmap_used'] = int(m.group(2))
-                stats['pmap_shared'] = int(m.group(3))
-            else:
-                self.logger.warning('%s returned something strange.' %
-                                    self.pmap_bin)
 
         for k, v in stats.iteritems():
             yield {'type_instance': k, 'values': v}
