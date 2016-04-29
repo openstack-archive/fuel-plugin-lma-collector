@@ -374,7 +374,6 @@ lma_collector:
             window: 70
             periods: 0
             function: max
-<% if not @storage_options["objects_ceph"] then -%>
     - name: 'swift-api-http-errors'
       description: 'Too many 5xx HTTP errors have been detected on swift-api.'
       severity: 'warning'
@@ -390,7 +389,6 @@ lma_collector:
             window: 60
             periods: 1
             function: diff
-<% end -%>
     - name: 'cinder-api-http-errors'
       description: 'Too many 5xx HTTP errors have been detected on cinder-api.'
       severity: 'warning'
@@ -556,7 +554,6 @@ lma_collector:
             window: 30
             periods: 1
             function: min
-<% if @storage_options["volumes_ceph"] then -%>
     - name: 'ceph-health-critical'
       description: 'Ceph health is critical.'
       severity: 'critical'
@@ -601,8 +598,6 @@ lma_collector:
             threshold: 5
             window: 60
             function: max
-<% end -%>
-<% if @monitor_elasticsearch -%>
     - name: 'elasticsearch-health-critical'
       description: 'Elasticsearch cluster health is critical.'
       severity: 'critical'
@@ -653,9 +648,6 @@ lma_collector:
             window: 60
             periods: 0
             function: min
-<% end -%>
-
-<% if @monitor_influxdb-%>
     - name: 'influxdb-fs-warning'
       description: "The filesystem's free space is low (InfluxDB node)."
       severity: 'warning'
@@ -684,7 +676,6 @@ lma_collector:
             window: 60
             periods: 0
             function: min
-<% end -%>
 
   node_cluster_roles:
     controller: ['primary-controller', 'controller']
