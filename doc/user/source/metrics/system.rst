@@ -35,17 +35,17 @@ File system
 Metrics have a ``fs`` field that contains the partition's mount point to which the metric applies (eg '/', '/var/lib' and so on).
 
 * ``fs_inodes_free``, the number of free inodes on the file system.
-* ``fs_inodes_reserved``, the number of reserved inodes.
-* ``fs_inodes_used``, the number of used inodes.
-* ``fs_space_free``, the number of free bytes.
-* ``fs_space_reserved``, the number of reserved bytes.
-* ``fs_space_used``, the number of used bytes.
 * ``fs_inodes_percent_free``, the percentage of free inodes on the file system.
 * ``fs_inodes_percent_reserved``, the percentage of reserved inodes.
 * ``fs_inodes_percent_used``, the percentage of used inodes.
+* ``fs_inodes_reserved``, the number of reserved inodes.
+* ``fs_inodes_used``, the number of used inodes.
+* ``fs_space_free``, the number of free bytes.
 * ``fs_space_percent_free``, the percentage of free bytes.
 * ``fs_space_percent_reserved``, the percentage of reserved bytes.
 * ``fs_space_percent_used``, the percentage of used bytes.
+* ``fs_space_reserved``, the number of reserved bytes.
+* ``fs_space_used``, the number of used bytes.
 
 System load
 ^^^^^^^^^^^
@@ -77,20 +77,19 @@ Metrics have a ``interface`` field that contains the interface name the metric a
 Processes
 ^^^^^^^^^
 
-* ``processes_fork_rate``, the number of processes forked per second.
 * ``processes_count``, the number of processes in a given state. The metric has
   a ``state`` field (one of 'blocked', 'paging', 'running', 'sleeping', 'stopped'
   or 'zombies').
+* ``processes_fork_rate``, the number of processes forked per second.
 
 Swap
 ^^^^
 
 * ``swap_cached``, the amount of cached memory (in bytes) which is in the swap.
 * ``swap_free``, the amount of free memory (in bytes) which is in the swap.
-* ``swap_used``, the amount of used memory (in bytes) which is in the swap.
-
 * ``swap_io_in``, the number of swap pages written per second.
 * ``swap_io_out``, the number of swap pages read per second.
+* ``swap_used``, the amount of used memory (in bytes) which is in the swap.
 
 Users
 ^^^^^
