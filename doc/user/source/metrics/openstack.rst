@@ -170,4 +170,4 @@ API response times
 Logs
 ^^^^
 
-* ``log_messages``, the number of log messages per second for the given service and severity level. The metric contains ``service`` and ``severity`` (one of 'debug', 'info', ... ) fields.
+* ``log_messages``, the number of log messages per second for the given service and severity level. The metric contains ``service`` and ``level`` (one of 'debug', 'info', ... ) fields.
