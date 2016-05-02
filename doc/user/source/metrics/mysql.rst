@@ -61,8 +61,8 @@ Threads
 
 * ``mysql_threads_cached``, the number of threads in the thread cache.
 * ``mysql_threads_connected``, the number of currently open connections.
-* ``mysql_threads_running``, the number of threads that are not sleeping.
 * ``mysql_threads_created``, the number of threads created per second to handle connections.
+* ``mysql_threads_running``, the number of threads that are not sleeping.
 
 Cluster
 ^^^^^^^
@@ -70,18 +70,18 @@ Cluster
 These metrics are collected with statement 'SHOW STATUS'. see `Percona documentation`_
 for further details.
 
+* ``mysql_cluster_connected``, ``1`` when the node is connected to the cluster, if not ``0``.
+* ``mysql_cluster_local_cert_failures``, number of writesets that failed the certification test.
+* ``mysql_cluster_local_commits``, number of writesets commited on the node.
+* ``mysql_cluster_local_recv_queue``, the number of writesets waiting to be applied.
+* ``mysql_cluster_local_send_queue``, the number of writesets waiting to be sent.
+* ``mysql_cluster_ready``, ``1`` when the node is ready to accept queries, if not ``0``.
+* ``mysql_cluster_received``, total number of writesets received from other nodes.
+* ``mysql_cluster_received_bytes``, total size in bytes of writesets received from other nodes.
+* ``mysql_cluster_replicated``, total number of writesets sent to other nodes.
+* ``mysql_cluster_replicated_bytes`` total size in bytes of writesets sent to other nodes.
 * ``mysql_cluster_size``, current number of nodes in the cluster.
 * ``mysql_cluster_status``, ``1`` when the node is 'Primary', ``2`` if 'Non-Primary' and ``3`` if 'Disconnected'.
-* ``mysql_cluster_connected``, ``1`` when the node is connected to the cluster, if not ``0``.
-* ``mysql_cluster_ready``, ``1`` when the node is ready to accept queries, if not ``0``.
-* ``mysql_cluster_local_commits``, number of writesets commited on the node.
-* ``mysql_cluster_received_bytes``, total size in bytes of writesets received from other nodes.
-* ``mysql_cluster_received``, total number of writesets received from other nodes.
-* ``mysql_cluster_replicated_bytes`` total size in bytes of writesets sent to other nodes.
-* ``mysql_cluster_replicated``, total number of writesets sent to other nodes.
-* ``mysql_cluster_local_cert_failures``, number of writesets that failed the certification test.
-* ``mysql_cluster_local_send_queue``, the number of writesets waiting to be sent.
-* ``mysql_cluster_local_recv_queue``, the number of writesets waiting to be applied.
 
 .. _Percona documentation: http://www.percona.com/doc/percona-xtradb-cluster/5.6/wsrep-status-index.html
 

@@ -2,11 +2,11 @@
 
 The cluster metrics are emitted by the GSE plugins (See the :ref:`alarm_guide` for details).
 
-* ``cluster_service_status``, the status of the service cluster.
-  The metric contains a ``cluster_name`` field that identifies the service cluster.
-
 * ``cluster_node_status``, the status of the node cluster.
   The metric contains a ``cluster_name`` field that identifies the node cluster.
+
+* ``cluster_service_status``, the status of the service cluster.
+  The metric contains a ``cluster_name`` field that identifies the service cluster.
 
 * ``cluster_status``, the status of the global cluster.
   The metric contains a ``cluster_name`` field that identifies the global cluster.

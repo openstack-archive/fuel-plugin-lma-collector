@@ -1,9 +1,9 @@
 .. _Apache_metrics:
 
 * ``apache_bytes``, the number of bytes per second transmitted by the server.
-* ``apache_requests``, the number of requests processed per second.
 * ``apache_connections``, the current number of active connections.
 * ``apache_idle_workers``, the current number of idle workers.
+* ``apache_requests``, the number of requests processed per second.
 * ``apache_workers_closing``, the number of workers in closing state.
 * ``apache_workers_dnslookup``, the number of workers in DNS lookup state.
 * ``apache_workers_finishing``, the number of workers in finishing state.

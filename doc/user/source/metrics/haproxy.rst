@@ -26,10 +26,10 @@ Server
 ^^^^^^
 
 * ``haproxy_connections``, the number of current connections.
-* ``haproxy_ssl_connections``, the number of current SSL connections.
 * ``haproxy_pipes_free``, the number of free pipes.
 * ``haproxy_pipes_used``, the number of used pipes.
 * ``haproxy_run_queue``, the number of connections waiting in the queue.
+* ``haproxy_ssl_connections``, the number of current SSL connections.
 * ``haproxy_tasks``, the number of tasks.
 * ``haproxy_uptime``, the HAProxy server uptime in seconds.
 
@@ -63,7 +63,6 @@ The following metrics have a ``backend`` field that contains the name of the bac
 * ``haproxy_backend_denied_requests``, the number of denied requests.
 * ``haproxy_backend_denied_responses``, the number of denied responses.
 * ``haproxy_backend_downtime``, the total downtime in second.
-* ``haproxy_backend_status``, the global backend status where values ``0`` and ``1`` represent respectively ``DOWN`` (all backends are down) and ``UP`` (at least one backend is up).
 * ``haproxy_backend_error_connection``, the number of error connections.
 * ``haproxy_backend_error_responses``, the number of error responses.
 * ``haproxy_backend_queue_current``, the number of requests in queue.
@@ -78,3 +77,4 @@ The following metrics have a ``backend`` field that contains the name of the bac
 * ``haproxy_backend_servers``, the count of servers grouped by state. This metric has an additional ``state`` field that contains the state of the backends (either 'down' or 'up').
 * ``haproxy_backend_session_current``, the number of current sessions.
 * ``haproxy_backend_session_total``, the cumulative number of sessions.
+* ``haproxy_backend_status``, the global backend status where values ``0`` and ``1`` represent respectively ``DOWN`` (all backends are down) and ``UP`` (at least one backend is up).
