@@ -98,16 +98,16 @@ class heka (
 
   if $::osfamily == 'Debian' {
     # Starting from Heka 0.10.0, the Debian package provides a SysV init
-    # script so we need to stop the service and disable it.
+    # script so we need to stop the service and remove the init script.
     exec { 'stop_heka_daemon':
       command => '/etc/init.d/heka stop',
       onlyif  => '/usr/bin/test -f /etc/init.d/heka',
       require => Package['heka'],
-      notify  => Exec['disable_heka_daemon']
+      notify  => Exec['remove_heka_service']
     }
 
-    exec { 'disable_heka_daemon':
-      command     => '/usr/sbin/update-rc.d heka disable',
+    exec { 'remove_heka_service':
+      command     => '/bin/rm -f /etc/init.d/heka',
       refreshonly => true,
     }
   }
