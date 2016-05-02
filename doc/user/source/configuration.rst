@@ -52,12 +52,18 @@ To configure your plugin, you need to follow these steps:
 
 8. `Deploy <http://docs.mirantis.com/openstack/fuel/fuel-8.0/user-guide.html#deploy-changes>`_ your changes.
 
-.. note:: The *LMA Collector Plugin* is a *hot-pluggable* plugin which means that it is possible to deploy
-   the *LMA Collector* in an environment that is already deployed.
-   To deploy the *LMA Collector* in an environment that is already deployed, you need to run
-   the command below from the *Fuel master node*, for every OpenStack node of the current deployment::
+.. note:: The *LMA Collector Plugin* is a *hot-pluggable* plugin which means
+   that it is possible to install and deploy the *LMA Collector* in an
+   environment that is already deployed. After the installation of the *LMA
+   Collector* plugin, you need to configure the plugin and run the command
+   below from the *Fuel master node* for every OpenStack node of the current
+   deployment, starting with the controller nodes::
 
-     [root@nailgun ~]# fuel nodes --env <env_id> --node <node_id> --deploy
+     [root@nailgun ~]# fuel nodes --env <env_id> --node <node_id> --start \
+       post_deployment_start
+
+   If you want to deploy new nodes at the same time (for instance to run
+   InfluxDB, Elasticsearch and/or Nagios), you should deploy them first.
 
 .. _plugin_verification:
 
