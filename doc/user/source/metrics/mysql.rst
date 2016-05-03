@@ -4,7 +4,7 @@ Commands
 ^^^^^^^^
 
 ``mysql_commands``, the number of times per second a given statement has been
-executed.  The metric has a ``command`` field that contains the statement to
+executed.  The metric has a ``statement`` field that contains the statement to
 which it applies. The values can be:
 
 * ``change_db`` for the USE statement.
