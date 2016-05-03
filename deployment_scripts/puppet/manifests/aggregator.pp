@@ -15,15 +15,19 @@
 notice('fuel-plugin-lma-collector: aggregator.pp')
 
 prepare_network_config(hiera('network_scheme', {}))
-$mgmt_address   = get_network_role_property('management', 'ipaddr')
-$lma_collector  = hiera_hash('lma_collector')
-$roles          = node_roles(hiera('nodes'), hiera('uid'))
-$is_controller  = member($roles, 'controller') or member($roles, 'primary-controller')
+$mgmt_address  = get_network_role_property('management', 'ipaddr')
+$lma_collector = hiera_hash('lma_collector')
+$roles         = node_roles(hiera('nodes'), hiera('uid'))
+$is_controller = member($roles, 'controller') or member($roles, 'primary-controller')
+
+$network_metadata = hiera_hash('network_metadata')
+$controllers      = get_nodes_hash_by_roles($network_metadata, ['primary-controller', 'controller'])
 
 $aggregator_address = hiera('management_vip')
 $management_network = hiera('management_network_range')
 $aggregator_port    = 5565
 $check_port         = 5566
+
 
 if $is_controller {
   # On controllers make sure the LMA service is configured
@@ -34,9 +38,13 @@ if $is_controller {
   }
 }
 
-class { 'lma_collector::aggregator::client':
-  address => $aggregator_address,
-  port    => $aggregator_port,
+# On a dedicated environment, without controllers, we don't deploy the
+# aggregator client.
+if size(keys($controllers)) > 0 {
+  class { 'lma_collector::aggregator::client':
+    address => $aggregator_address,
+    port    => $aggregator_port,
+  }
 }
 
 if $is_controller {
