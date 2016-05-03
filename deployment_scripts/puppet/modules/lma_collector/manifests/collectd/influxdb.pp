@@ -16,6 +16,7 @@ class lma_collector::collectd::influxdb (
   $username,
   $password,
   $address,
+  $port = 8086,
 ) {
 
   lma_collector::collectd::python { 'influxdb':
@@ -23,6 +24,7 @@ class lma_collector::collectd::influxdb (
       'Username' => "\"${username}\"",
       'Password' => "\"${password}\"",
       'Address'  => "\"${address}\"",
+      'Port'     => "\"${port}\"",
     }
   }
 }
