@@ -463,6 +463,7 @@ Private Classes:
 
 ### Defines
 
+* [`lma_collector::heka`](#define-lma_collectorheka)
 * [`lma_collector::logs::openstack`](#define-lma_collectorlogsopenstack)
 * [`lma_collector::collectd::openstack`](#define-lma_collectorcollectdopenstack)
 * [`lma_collector::afd_filter`](#define-lma_collectorafd_filter)
@@ -477,19 +478,6 @@ Install the common Lua modules used by LMA collectors.
 ##### Parameters
 
 * `tags`: *Optional*. Fields added to Heka messages. Valid options: a hash. Default: `{}`.
-
-#### Define: `lma_collector::heka`
-
-Main Define. Install and configure the Log and Metric collector.
-The title must be either `log_collector` or `metric_collector`.
-
-##### Parameters
-
-* `user`: *Optional*. User the Heka service is run as. You may have to use `'root'` on some systems for the Heka service to be able to access log files, run additional commands, ... Valid options: a string.  Default: `'heka'`.
-* `groups`: *Optional*. Additional groups to add to the user running the Heka service. Ignored if the Heka service is run as "root". Valid options: an array of strings. Default: `['syslog', 'adm']`.
-* `poolsize`: *Optional*. The pool size of maximum messages that can exist (default: 100).
-* `heka_monitoring`: *Optional*. Enable the hekad plugins monitoring by configuring
-  the Heka dashboard and a filter plugin. (default: true, valid option: boolean).
 
 #### Class: `lma_collector::elasticsearch`
 
@@ -938,6 +926,22 @@ metrics.
 * `password`: *Optional*. SMTP Password. Valid options: a string. Default: `undef`.
 * `send_interval`: *Optional*. Minimum time interval in seconds between each
   email. Valid options: an integer. Default: `0`.
+
+#### Define: `lma_collector::heka`
+
+Main Define. Install and configure the Log and Metric collector.
+The title must be either `log_collector` or `metric_collector`.
+
+##### Parameters
+
+* `user`: *Optional*. User the Heka service is run as. You may have to use `'root'` on some systems for the Heka service to be able to access log files, run additional commands, ... Valid options: a string.  Default: `'heka'`.
+* `groups`: *Optional*. Additional groups to add to the user running the Heka service. Ignored if the Heka service is run as "root". Valid options: an array of strings. Default: `['syslog', 'adm']`.
+* `poolsize`: *Optional*. The pool size of maximum messages that can exist (default: 100).
+* `heka_monitoring`: *Optional*. Enable the hekad plugins monitoring by configuring
+  the Heka dashboard and a filter plugin. (default: true, valid option: boolean).
+* `install_init_script`: *Optional*. Whether or not install the init script (Upstart or Systemd).
+  This is typically used when the service is managed by Pacemaker for example.
+  (default: true, valid option: boolean).
 
 #### Define: `lma_collector::logs::openstack`
 

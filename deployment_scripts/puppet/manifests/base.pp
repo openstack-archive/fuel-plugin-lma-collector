@@ -93,16 +93,24 @@ class { 'lma_collector':
   tags => $tags,
 }
 
+if $is_controller {
+  $install_heka_init_script = false
+} else {
+  $install_heka_init_script = true
+}
+
 lma_collector::heka { 'log_collector':
-  user    => $heka_user,
-  groups  => $additional_groups,
-  require => Class['lma_collector'],
+  user                => $heka_user,
+  groups              => $additional_groups,
+  install_init_script => $install_heka_init_script,
+  require             => Class['lma_collector'],
 }
 
 lma_collector::heka { 'metric_collector':
-  user    => $heka_user,
-  groups  => $additional_groups,
-  require => Class['lma_collector'],
+  user                => $heka_user,
+  groups              => $additional_groups,
+  install_init_script => $install_heka_init_script,
+  require             => Class['lma_collector'],
 }
 
 # On controller nodes the LMA collector service is managed by Pacemaker, so we
