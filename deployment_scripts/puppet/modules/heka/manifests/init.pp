@@ -75,6 +75,7 @@ define heka (
   $poolsize = undef,
   $pre_script = undef,
   $internal_statistics = undef,
+  $install_init_script = true,
 ) {
 
   include heka::params
@@ -228,38 +229,40 @@ define heka (
     require  => File[$logrotate_bin],
   }
 
-  file { $hekad_wrapper:
-    ensure  => present,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
-    content => template('heka/hekad_wrapper.erb'),
-    require => Package['heka'],
-  }
-
-  case $::osfamily {
-    'Debian': {
-      file {"/etc/init/${service_name}.conf":
-        ensure  => present,
-        content => template('heka/hekad.upstart.conf.erb'),
-        notify  => Service[$service_name],
-        alias   => "${service_name}_heka_init_script",
-        require => File[$hekad_wrapper],
-      }
+  if $install_init_script {
+    file { $hekad_wrapper:
+      ensure  => present,
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0755',
+      content => template('heka/hekad_wrapper.erb'),
+      require => Package['heka'],
     }
 
-    'RedHat': {
-      file { "/etc/init.d/${service_name}":
-        ensure  => present,
-        content => template('heka/hekad.initd.erb'),
-        mode    => '0755',
-        notify  => Service[$service_name],
-        alias   => "${service_name}_heka_init_script",
-        require => File[$hekad_wrapper],
+    case $::osfamily {
+      'Debian': {
+        file {"/etc/init/${service_name}.conf":
+          ensure  => present,
+          content => template('heka/hekad.upstart.conf.erb'),
+          notify  => Service[$service_name],
+          alias   => "${service_name}_heka_init_script",
+          require => File[$hekad_wrapper],
+        }
       }
-    }
-    default: {
-      fail("${::osfamily} not supported")
+
+      'RedHat': {
+        file { "/etc/init.d/${service_name}":
+          ensure  => present,
+          content => template('heka/hekad.initd.erb'),
+          mode    => '0755',
+          notify  => Service[$service_name],
+          alias   => "${service_name}_heka_init_script",
+          require => File[$hekad_wrapper],
+        }
+      }
+      default: {
+        fail("${::osfamily} not supported")
+      }
     }
   }
 

@@ -34,6 +34,7 @@ define lma_collector::heka (
   $groups = [],
   $heka_monitoring = true,
   $poolsize = 100,
+  $install_init_script = true,
 ) {
 
   include lma_collector::params
@@ -100,14 +101,15 @@ define lma_collector::heka (
   }
 
   ::heka { $title:
-    config_dir         => $config_dir,
-    user               => $user,
-    additional_groups  => $additional_groups,
-    hostname           => $::hostname,
-    max_message_size   => $lma_collector::params::hekad_max_message_size,
-    max_process_inject => $lma_collector::params::hekad_max_process_inject,
-    max_timer_inject   => $lma_collector::params::hekad_max_timer_inject,
-    poolsize           => $poolsize,
+    config_dir          => $config_dir,
+    user                => $user,
+    additional_groups   => $additional_groups,
+    hostname            => $::hostname,
+    max_message_size    => $lma_collector::params::hekad_max_message_size,
+    max_process_inject  => $lma_collector::params::hekad_max_process_inject,
+    max_timer_inject    => $lma_collector::params::hekad_max_timer_inject,
+    poolsize            => $poolsize,
+    install_init_script => $install_init_script,
   }
 
   # Heka self-monitoring
