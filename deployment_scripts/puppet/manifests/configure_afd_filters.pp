@@ -20,6 +20,8 @@ $lma           = hiera_hash('lma_collector', {})
 $roles         = node_roles(hiera('nodes'), hiera('uid'))
 $is_controller = member($roles, 'controller') or member($roles, 'primary-controller')
 
+$last_controller = hiera('last_controller', undef)
+
 $alarms_definitions = $lma['alarms']
 if $alarms_definitions == undef {
     fail('Alarms definitions not found. Check files in /etc/hiera/override.')
@@ -34,13 +36,18 @@ if $is_controller {
   }
 }
 
-class { 'fuel_lma_collector::afds':
-    roles                  => hiera('roles'),
-    node_cluster_roles     => $lma['node_cluster_roles'],
-    service_cluster_roles  => $lma['service_cluster_roles'],
-    node_cluster_alarms    => $lma['node_cluster_alarms'],
-    service_cluster_alarms => $lma['service_cluster_alarms'],
-    alarms                 => $alarms_definitions,
+
+# On a dedicated environment, without controllers, there are no aggregators
+# that are running so we don't need to deploy AFDs.
+if $last_controller {
+  class { 'fuel_lma_collector::afds':
+      roles                  => hiera('roles'),
+      node_cluster_roles     => $lma['node_cluster_roles'],
+      service_cluster_roles  => $lma['service_cluster_roles'],
+      node_cluster_alarms    => $lma['node_cluster_alarms'],
+      service_cluster_alarms => $lma['service_cluster_alarms'],
+      alarms                 => $alarms_definitions,
+  }
 }
 
 # Forward AFD status to Nagios if deployed

@@ -25,6 +25,8 @@ $management_network = hiera('management_network_range')
 $aggregator_port    = 5565
 $check_port         = 5566
 
+$last_controller = hiera('last_controller', undef)
+
 if $is_controller {
   # On controllers make sure the LMA service is configured
   # with the "pacemaker" provider
@@ -34,9 +36,13 @@ if $is_controller {
   }
 }
 
-class { 'lma_collector::aggregator::client':
-  address => $aggregator_address,
-  port    => $aggregator_port,
+# On a dedicated environment, without controllers, we don't deploy the
+# aggregator client.
+if $last_controller {
+  class { 'lma_collector::aggregator::client':
+    address => $aggregator_address,
+    port    => $aggregator_port,
+  }
 }
 
 if $is_controller {
