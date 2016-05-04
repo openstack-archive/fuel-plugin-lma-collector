@@ -115,14 +115,15 @@ end
 
 function process_bulk_metric()
     -- The payload contains a list of datapoints, each point being formatted
-    -- like this: {name='foo',value=1,tags={k1=v1,...}}
+    -- either like this: {name='foo',value=1,tags={k1=v1,...}}
+    -- or for multi_values: {name='bar',values={k1=v1, ..},tags={k1=v1,...}
     local datapoints = decode_json_payload()
     if not datapoints then
         return 'Invalid payload value'
     end
 
     for _, point in ipairs(datapoints) do
-        encode_datapoint(point.name, point.value, point.tags or {})
+        encode_datapoint(point.name, point.value or point.values, point.tags or {})
     end
 end
 
