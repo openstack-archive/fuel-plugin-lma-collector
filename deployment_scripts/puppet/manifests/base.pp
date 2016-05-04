@@ -89,25 +89,14 @@ case $::osfamily {
   }
 }
 
-if $is_controller {
-  # On controller nodes the log parsing can generate a lot of http_metrics
-  # which can block heka (idle packs). It was observed that a poolsize set to 200
-  # solves the issue.
-  $log_poolsize = 200
-} else {
-  # For other nodes, the poolsize is set to 100 (the Heka default value)
-  $log_poolsize = 100
-}
-
 class { 'lma_collector':
   tags => $tags,
 }
 
 lma_collector::heka { 'log_collector':
-  user     => $heka_user,
-  groups   => $additional_groups,
-  poolsize => $log_poolsize,
-  require  => Class['lma_collector'],
+  user    => $heka_user,
+  groups  => $additional_groups,
+  require => Class['lma_collector'],
 }
 
 lma_collector::heka { 'metric_collector':
