@@ -26,6 +26,7 @@ class lma_collector::logs::libvirt {
   $libvirt_hooks_dir = '/etc/libvirt/hooks'
   $libvirt_hook      = "${libvirt_hooks_dir}/daemon"
   $libvirt_service   = $::libvirt_daemon
+  $lua_modules_dir   = $lma_collector::params::lua_modules_dir
 
   service {$libvirt_service: }
 
@@ -45,9 +46,10 @@ class lma_collector::logs::libvirt {
   }
 
   heka::decoder::sandbox { 'libvirt':
-    config_dir => $config_dir,
-    filename   => "${lma_collector::params::plugins_dir}/decoders/libvirt_log.lua",
-    notify     => Class['lma_collector::service::log'],
+    config_dir       => $config_dir,
+    filename         => "${lma_collector::params::plugins_dir}/decoders/libvirt_log.lua",
+    module_directory => $lua_modules_dir,
+    notify           => Class['lma_collector::service::log'],
   }
 
   heka::input::logstreamer { 'libvirt':
