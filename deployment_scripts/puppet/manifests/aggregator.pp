@@ -32,11 +32,10 @@ $check_port         = 5566
 if $is_controller or $is_rabbitmq or $is_mysql_server {
   # On nodes where pacemaker is deployed, make sure the Log and Metric collector services
   # are configured with the "pacemaker" provider
-  include lma_collector::params
-  Service<| title == $lma_collector::params::log_service_name |> {
+  Service<| title == 'log_collector' |> {
     provider => 'pacemaker'
   }
-  Service<| title == $lma_collector::params::metric_service_name |> {
+  Service<| title == 'metric_collector' |> {
     provider => 'pacemaker'
   }
 }
