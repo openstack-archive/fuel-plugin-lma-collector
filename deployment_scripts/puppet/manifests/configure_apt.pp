@@ -14,15 +14,13 @@
 
 notice('fuel-plugin-lma-collector: configure_apt.pp')
 
-include lma_collector::params
-
 $str = 'APT::Install-Suggests "0";
 APT::Install-Recommends "0";
 '
 
 case $::osfamily {
     'Debian': {
-        file { $::lma_collector::params::apt_config_file:
+        file { '/etc/apt/apt.conf.d/99norecommends':
             ensure  => file,
             content => $str,
         }

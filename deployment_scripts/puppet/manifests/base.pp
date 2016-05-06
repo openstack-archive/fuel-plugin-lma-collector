@@ -130,17 +130,10 @@ lma_collector::heka { 'metric_collector':
 # to use the "pacemaker" service provider
 if $is_controller or $is_rabbitmq or $is_mysql_server {
 
-  # TODO(all): remove this include from the manifest
-  include lma_collector::params
-
-  $log_service_name = $lma_collector::params::log_service_name
-  $metric_service_name = $lma_collector::params::metric_service_name
-  $log_config_dir = $lma_collector::params::log_config_dir
-  $metric_config_dir = $lma_collector::params::metric_config_dir
   $rabbitmq_resource = 'master_p_rabbitmq-server'
 
   if $fuel_version < 9.0 {
-    pacemaker_wrappers::service { $log_service_name:
+    pacemaker_wrappers::service { 'log_collector':
       ensure          => present,
       prefix          => false,
       primitive_class => 'ocf',
@@ -155,9 +148,9 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
         'failure-timeout'     => '120',
       },
       parameters      => {
-        'service_name' => $log_service_name,
-        'config'       => $log_config_dir,
-        'log_file'     => "/var/log/${log_service_name}.log",
+        'service_name' => 'log_collector',
+        'config'       => '/etc/log_collector',
+        'log_file'     => '/var/log/log_collector.log',
         'user'         => $heka_user,
       },
       operations      => {
@@ -178,29 +171,29 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
     if $is_rabbitmq {
       cs_rsc_colocation { "${log_service_name}-with-rabbitmq":
         ensure     => present,
-        alias      => $log_service_name,
-        primitives => ["clone_${log_service_name}", $rabbitmq_resource],
+      alias      => 'log_collector',
+      primitives => ['clone_log_collector', $rabbitmq_resource],
         score      => 0,
-        require    => Pacemaker_wrappers::Service[$log_service_name],
+      require    => Pacemaker_wrappers::Service['log_collector'],
       }
 
-      cs_rsc_order { "${log_service_name}-after-rabbitmq":
+      cs_rsc_order { 'log_collector-after-rabbitmq':
         ensure  => present,
-        alias   => $log_service_name,
+        alias   => 'log_collector',
         first   => $rabbitmq_resource,
-        second  => "clone_${log_service_name}",
+        second  => 'clone_log_collector',
         # Heka cannot start if RabbitMQ isn't ready to accept connections. But
         # once it is initialized, it can recover from a RabbitMQ outage. This is
         # why we set score to 0 (interleave) meaning that the collector should
         # start once RabbitMQ is active but a restart of RabbitMQ
         # won't trigger a restart of the LMA collector.
         score   => 0,
-        require => Cs_rsc_colocation[$log_service_name],
+        require => Cs_rsc_colocation['log_collector'],
         before  => Class['lma_collector'],
       }
     }
 
-    pacemaker_wrappers::service { $metric_service_name:
+    pacemaker_wrappers::service { 'metric_collector':
       ensure          => present,
       prefix          => false,
       primitive_class => 'ocf',
@@ -214,9 +207,9 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
         'failure-timeout'     => '120',
       },
       parameters      => {
-        'service_name' => $metric_service_name,
-        'config'       => $metric_config_dir,
-        'log_file'     => "/var/log/${metric_service_name}.log",
+        'service_name' => 'metric_collector',
+        'config'       => '/etc/metric_collector',
+        'log_file'     => '/var/log/metric_collector.log',
         'user'         => $heka_user,
       },
       operations      => {
@@ -233,7 +226,7 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
       ocf_script_file => 'lma_collector/ocf-lma_collector',
     }
   } else {
-    pacemaker::service { $log_service_name:
+    pacemaker::service { 'log_collector':
       ensure           => present,
       prefix           => false,
       primitive_class  => 'ocf',
@@ -248,9 +241,9 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
         'failure-timeout'     => '120',
       },
       parameters       => {
-        'service_name' => $log_service_name,
-        'config'       => $log_config_dir,
-        'log_file'     => "/var/log/${log_service_name}.log",
+        'service_name' => 'log_collector',
+        'config'       => '/etc/log_collector',
+        'log_file'     => '/var/log/log_collector.log',
         'user'         => $heka_user,
       },
       operations       => {
@@ -269,17 +262,17 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
     }
 
     if $is_rabbitmq {
-      pcmk_colocation { "${log_service_name}-with-rabbitmq":
+      pcmk_colocation { 'log_collector-with-rabbitmq':
         ensure  => present,
-        alias   => $log_service_name,
+        alias   => 'log_collector',
         first   => $rabbitmq_resource,
-        second  => "clone_${log_service_name}",
+        second  => 'clone_log_collector',
         score   => 0,
-        require => Pacemaker::Service[$log_service_name],
+        require => Pacemaker::Service['log_collector'],
       }
     }
 
-    pacemaker::service { $metric_service_name:
+    pacemaker::service { 'metric_collector':
       ensure           => present,
       prefix           => false,
       primitive_class  => 'ocf',
@@ -293,9 +286,9 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
         'failure-timeout'     => '120',
       },
       parameters       => {
-        'service_name' => $metric_service_name,
-        'config'       => $metric_config_dir,
-        'log_file'     => "/var/log/${metric_service_name}.log",
+        'service_name' => 'metric_collector',
+        'config'       => '/etc/metric_collector',
+        'log_file'     => '/var/log/metric_collector.log',
         'user'         => $heka_user,
       },
       operations       => {
