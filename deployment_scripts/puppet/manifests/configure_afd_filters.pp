@@ -14,8 +14,6 @@
 
 notice('fuel-plugin-lma-collector: configure_afd_filters.pp')
 
-include lma_collector::params
-
 $lma           = hiera_hash('lma_collector', {})
 $roles         = node_roles(hiera('nodes'), hiera('uid'))
 $is_controller = member($roles, 'controller') or member($roles, 'primary-controller')
@@ -28,11 +26,10 @@ if $alarms_definitions == undef {
 if $is_controller {
   # On controllers make sure the Log and Metric collector services are
   # configured with the "pacemaker" provider
-  include lma_collector::params
-  Service<| title == $lma_collector::params::log_service_name |> {
+  Service<| title == 'log_collector' |> {
     provider => 'pacemaker'
   }
-  Service<| title == $lma_collector::params::metric_service_name |> {
+  Service<| title == 'metric_collector' |> {
     provider => 'pacemaker'
   }
 }
@@ -68,8 +65,10 @@ if $alerting_mode == 'remote' {
     }
     $nagios_user = $lma_infra_alerting['nagios_user']
     $nagios_password = $lma_infra_alerting['nagios_password']
-    $http_port = $lma_collector::params::nagios_http_port
-    $http_path = $lma_collector::params::nagios_http_path
+    # Important: $http_port and $http_path must match the
+    # lma_infra_monitoring configuration.
+    $http_port = 8001
+    $http_path = 'cgi-bin/cmd.cgi'
     $nagios_url = "http://${nagios_server}:${http_port}/${http_path}"
   } else {
     if ! $lma_infra_alerting {

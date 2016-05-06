@@ -19,8 +19,6 @@ $messaging_address = get_network_role_property('mgmt/messaging', 'ipaddr')
 $memcache_address  = get_network_role_property('mgmt/memcache', 'ipaddr')
 $network_metadata = hiera_hash('network_metadata')
 
-include lma_collector::params
-
 $ceilometer      = hiera_hash('ceilometer', {})
 $lma_collector   = hiera_hash('lma_collector')
 $rabbit          = hiera_hash('rabbit')
@@ -46,11 +44,10 @@ else {
 
 # Make sure the Log and Metric collector services are configured with the
 # "pacemaker" provider
-include lma_collector::params
-Service<| title == $lma_collector::params::log_service_name |> {
+Service<| title == 'log_collector' |> {
   provider => 'pacemaker'
 }
-Service<| title == $lma_collector::params::metric_service_name |> {
+Service<| title == 'metric_collector' |> {
   provider => 'pacemaker'
 }
 
@@ -452,7 +449,7 @@ if $influxdb_mode != 'disabled' {
   }
 
   if $use_local_influxdb or $use_remote_influxdb {
-    $influxdb_url = "http://${influxdb_server}:${lma_collector::params::influxdb_port}/ping"
+    $influxdb_url = "http://${influxdb_server}:8086/ping"
   }
 
   $vip_urls = {
@@ -495,13 +492,13 @@ if $alerting_mode == 'remote' {
 
     # Important: $http_port and $http_path must match the
     # lma_infra_monitoring configuration.
-    $http_port = $lma_collector::params::nagios_http_port
-    $http_path = $lma_collector::params::nagios_http_path
+    $http_port = 8001
+    $http_path = 'cgi-bin/cmd.cgi'
     $nagios_url = "http://${nagios_server}:${http_port}/${http_path}"
   }
 } elsif $alerting_mode == 'standalone' {
   $use_nagios = false
-  $subject = "${lma_collector::params::smtp_subject} environment ${deployment_id}"
+  $subject = "LMA Alert Notification - environment ${deployment_id}"
   class { 'lma_collector::smtp_alert':
     send_from => $lma_collector['alerting_send_from'],
     send_to   => [$lma_collector['alerting_send_to']],
@@ -522,7 +519,8 @@ if $use_nagios {
     user                      => $nagios_user,
     password                  => $nagios_password,
     message_type              => $lma_collector['gse_cluster_global']['output_message_type'],
-    virtual_hostname          => $lma_collector::params::nagios_hostname_for_cluster_global,
+    # Following parameter must match the lma_infrastructure_alerting::params::nagios_global_vhostname_prefix
+    virtual_hostname          => '00-global-clusters',
   }
 
   lma_collector::gse_nagios { 'node_clusters':
@@ -531,6 +529,7 @@ if $use_nagios {
     user                      => $nagios_user,
     password                  => $nagios_password,
     message_type              => $lma_collector['gse_cluster_node']['output_message_type'],
-    virtual_hostname          => $lma_collector::params::nagios_hostname_for_cluster_nodes,
+    # Following parameter must match the lma_infrastructure_alerting::params::nagios_node_vhostname_prefix
+    virtual_hostname          => '00-node-clusters',
   }
 }
