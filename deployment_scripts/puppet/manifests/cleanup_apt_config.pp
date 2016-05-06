@@ -14,11 +14,9 @@
 
 notice('fuel-plugin-lma-collector: cleanup_apt_config.pp')
 
-include lma_collector::params
-
 case $::osfamily {
     'Debian': {
-        file { $::lma_collector::params::apt_config_file:
+        file { '/etc/apt/apt.conf.d/99norecommends':
             ensure  => absent,
         }
     }
