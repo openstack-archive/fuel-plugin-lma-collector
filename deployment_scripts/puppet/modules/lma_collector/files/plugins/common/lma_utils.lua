@@ -21,6 +21,7 @@ local inject_message = inject_message
 local inject_payload = inject_payload
 local read_message = read_message
 local pcall = pcall
+local type = type
 
 local M = {}
 setfenv(1, M) -- Remove external access to contain everything in the module
