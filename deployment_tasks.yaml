@@ -120,14 +120,11 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
 
-# The influxdb-configuration task is declared by the influxdb-grafana plugin.
-# The elasticsearch-kibana-configuration task is declared by the
-# elasticsearch-kibana plugin.
 - id: lma-backends
   type: puppet
   version: 2.0.0
-  requires: [lma-base, influxdb-configuration, elasticsearch-kibana-configuration]
-  required_for: [lma-cleanup-apt-config]
+  requires: [lma-base]
+  required_for: [lma-cleanup-apt-config, lma_aggregator]
   role:
     - primary-elasticsearch_kibana
     - elasticsearch_kibana
