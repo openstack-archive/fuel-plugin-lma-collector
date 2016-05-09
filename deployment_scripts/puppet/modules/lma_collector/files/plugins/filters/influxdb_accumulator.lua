@@ -25,6 +25,8 @@ local flush_interval = read_config('flush_interval') or 5
 local default_tenant_id = read_config("default_tenant_id")
 local default_user_id = read_config("default_user_id")
 local time_precision = read_config("time_precision")
+local payload_name = read_config("payload_name") or "influxdb"
+local bulk_metric_type_matcher = read_config("bulk_metric_type_matcher") or "bulk_metric$"
 
 -- the tag_fields parameter is a list of tags separated by spaces
 local tag_grammar = l.Ct((l.C((l.P(1) - l.P" ")^1) * l.P" "^0)^0)
@@ -47,7 +49,7 @@ function flush ()
     local now = os.time()
     if #datapoints > 0 and (#datapoints > flush_count or now - last_flush > flush_interval) then
         datapoints[#datapoints+1] = ''
-        utils.safe_inject_payload("txt", "influxdb", table.concat(datapoints, "\n"))
+        utils.safe_inject_payload("txt", payload_name, table.concat(datapoints, "\n"))
 
         datapoints = {}
         last_flush = now
@@ -117,13 +119,14 @@ function process_bulk_metric()
     -- The payload contains a list of datapoints, each point being formatted
     -- either like this: {name='foo',value=1,tags={k1=v1,...}}
     -- or for multi_values: {name='bar',values={k1=v1, ..},tags={k1=v1,...}
+    -- datapoints can also contain a 'timestamp' in millisecond.
     local datapoints = decode_json_payload()
     if not datapoints then
         return 'Invalid payload value'
     end
 
     for _, point in ipairs(datapoints) do
-        encode_datapoint(point.name, point.value or point.values, point.tags or {})
+        encode_datapoint(point.name, point.value or point.values, point.tags or {}, point.timestamp)
     end
 end
 
@@ -161,16 +164,23 @@ end
 -- name:  the measurement's name
 -- value: a scalar value or a list of key-value pairs
 -- tags:  a table of tags
+-- timestamp: an optional timestamp in nanosecond
 --
--- Timestamp is taken from the Heka message
-function encode_datapoint(name, value, tags)
+-- Timestamp is taken from the Heka message if not provided as parameter.
+function encode_datapoint(name, value, tags, timestamp)
     if type(name) ~= 'string' or value == nil or type(tags) ~= 'table' then
         -- fail silently if any input parameter is invalid
         return
     end
 
     local ts
-    if time_precision  and time_precision ~= 'ns' then
+    if timestamp ~= nil then
+        if time_precision and time_precision == 'ms' then
+            ts = math.floor(timestamp / 1e6)
+        else
+            ts = timestamp
+        end
+    elseif time_precision and time_precision ~= 'ns' then
         ts = field_util.message_timestamp(time_precision)
     else
         ts = read_message('Timestamp')
@@ -211,7 +221,7 @@ end
 function process_message()
     local err_msg
     local msg_type = read_message("Type")
-    if msg_type:match('bulk_metric$') then
+    if msg_type:match(bulk_metric_type_matcher) then
         err_msg = process_bulk_metric()
     else
         err_msg = process_single_metric()
