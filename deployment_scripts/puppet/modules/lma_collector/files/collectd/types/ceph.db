@@ -43,4 +43,4 @@ osd_count     up:GAUGE:0:U down:GAUGE:0:U in:GAUGE:0:U out:GAUGE:0:U
 # amount of used and total space in bytes, type_instance is the OSD identifier
 osd_space     used:GAUGE:0:U total:GAUGE:0:U
 # apply and commit latencies in milliseconds, type_instance is the OSD identifier
-osd_latency   appply:GAUGE:0:U commit:GAUGE:0:U
+osd_latency   apply:GAUGE:0:U commit:GAUGE:0:U
