@@ -245,4 +245,27 @@ function truncate(str, max_length, delimiter)
     return string.sub(str, 1, pos)
 end
 
+-- Convert a nanosecond timestamp to a lower precision timestamp.
+-- Arguments:
+--   timestamp_precision: one of 'ms', 's', 'm' or 'h'.
+--   timestamp: a timestamp in nanosecond, if not provided the message Timestamp is used.
+function message_timestamp(timestamp_precision, timestamp)
+    -- Default is to divide ns to ms
+    local timestamp_divisor = 1e6
+    -- Divide ns to s
+    if timestamp_precision == "s" then
+        timestamp_divisor = 1e9
+    -- Divide ns to m
+    elseif timestamp_precision == "m" then
+        timestamp_divisor = 1e9 * 60
+    -- Divide ns to h
+    elseif timestamp_precision == "h" then
+        timestamp_divisor = 1e9 * 60 * 60
+    end
+    if timestamp == nil then
+        timestamp = read_message("Timestamp")
+    end
+    return math.floor(timestamp / timestamp_divisor)
+end
+
 return M
