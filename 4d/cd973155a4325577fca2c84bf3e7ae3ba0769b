@@ -1,0 +1,12 @@
+Verified+1: Plugins CI <plugins.ci@mirantis.com>
+Code-Review-1: Swann Croiset <scroiset@mirantis.com>
+Code-Review+2: Simon Pasquier <spasquier@mirantis.com>
+Code-Review+2: Eric Lemoine <elemoine@mirantis.com>
+Code-Review+1: venkatamahesh <venkatamaheshkotha@gmail.com>
+Workflow+1: Eric Lemoine <elemoine@mirantis.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 09 May 2016 09:00:41 +0000
+Reviewed-on: https://review.openstack.org/312003
+Project: openstack/fuel-plugin-lma-collector
+Branch: refs/heads/master
