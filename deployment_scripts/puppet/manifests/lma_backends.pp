@@ -48,18 +48,21 @@ if $lma_collector_hash['influxdb_mode'] != 'disabled' {
     class { 'lma_collector::collectd::influxdb':
         username => 'root',
         password => $influxdb_grafana['influxdb_rootpass'],
-        address  => $mgmt_address,
+        address  => hiera('lma::influxdb::listen_address', $mgmt_address),
+        port     => hiera('lma::influxdb::influxdb_port', 8086)
     }
   }
 
   if $is_elasticsearch_node {
     class { 'lma_collector::collectd::elasticsearch':
       address => hiera('lma::elasticsearch::vip', $mgmt_address),
+      port    => hiera('lma::elasticsearch::rest_port', 9200)
     }
   }
 
   if $network_metadata['vips']['influxdb'] or $network_metadata['vips']['es_vip_mgmt'] {
-    # Only when used with the version 0.9 (and higher) of the Elasticsearch-Kibana and InfluxDB-Grafana plugins
+    # Only when used with the version 0.9 (and higher) of the
+    # Elasticsearch-Kibana and InfluxDB-Grafana plugins
     class { 'lma_collector::collectd::haproxy':
       socket => '/var/lib/haproxy/stats',
     }
