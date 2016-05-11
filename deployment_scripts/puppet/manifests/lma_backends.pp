@@ -22,10 +22,9 @@ $influxdb_grafana = hiera('influxdb_grafana')
 
 if $lma_collector_hash['influxdb_mode'] != 'disabled' {
   $network_metadata = hiera('network_metadata')
-  $current_roles    = hiera('roles')
 
-  $is_elasticsearch_node = member($current_roles, 'elasticsearch_kibana') or member($current_roles, 'primary-elasticsearch_kibana')
-  $is_influxdb_node = member($current_roles, 'influxdb_grafana') or member($current_roles, 'primary-influxdb_grafana')
+  $is_elasticsearch_node = roles_include(['elasticsearch_kibana', 'primary-elasticsearch_kibana'])
+  $is_influxdb_node = roles_include(['influxdb_grafana', 'primary-influxdb_grafana'])
 
   if $is_elasticsearch_node {
     $process_matches = [{name => 'elasticsearch', regex => 'java'}]

@@ -17,8 +17,7 @@ notice('fuel-plugin-lma-collector: configure_afd_filters.pp')
 include lma_collector::params
 
 $lma           = hiera_hash('lma_collector', {})
-$roles         = node_roles(hiera('nodes'), hiera('uid'))
-$is_controller = member($roles, 'controller') or member($roles, 'primary-controller')
+$is_controller = roles_include(['controller', 'primary-controller'])
 $is_rabbitmq   = roles_include(['standalone-rabbitmq', 'primary-standalone-rabbitmq'])
 $is_mysql_server = roles_include(['standalone-database', 'primary-standalone-database'])
 
