@@ -21,8 +21,6 @@ class lma_collector::params {
   # Lua plugins are shared across log and metric collectors
   $plugins_dir = '/usr/share/lma_collector'
 
-  $apt_config_file = '/etc/apt/apt.conf.d/99norecommends'
-
   $pacemaker_managed = false
 
   # Address and port of the Heka dashboard for health reports.
@@ -174,18 +172,11 @@ class lma_collector::params {
   # Nagios parameters
   #
   $nagios_server = 'localhost'
-  $nagios_http_port = 8001
-  $nagios_http_path = 'cgi-bin/cmd.cgi'
   $nagios_user = 'nagiosadmin'
   $nagios_password = ''
   $nagios_timeout = 2
 
-  # Following parameter must match the lma_infrastructure_alerting::params::nagios_openstack_dummy_hostname
-  $nagios_hostname_for_cluster_global = '00-global-clusters'
-  $nagios_hostname_for_cluster_nodes = '00-node-clusters'
-
   # Parameters for SMTP alert of service status
   $smtp_from = 'lma-alert@localhost.localdomain'
-  $smtp_subject = 'LMA Alert Notification'
   $smtp_send_interval = 0
 }
