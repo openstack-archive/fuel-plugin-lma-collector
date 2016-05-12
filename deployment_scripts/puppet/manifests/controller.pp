@@ -195,8 +195,8 @@ if $alerting_mode != 'disabled' {
 
     # Important: $http_port and $http_path must match the
     # lma_infra_monitoring configuration.
-    $http_port = $lma_collector::params::nagios_http_port
-    $http_path = $lma_collector::params::nagios_http_path
+    $http_port = 8001
+    $http_path = 'status'
     $nagios_url = "http://${nagios_server}:${http_port}/${http_path}"
   } elsif $alerting_mode == 'standalone' {
     $use_nagios = false

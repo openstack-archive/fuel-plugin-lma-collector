@@ -44,8 +44,8 @@ if $alerting_mode == 'remote' {
   $nagios_server = $nagios_nodes[0]['internal_address']
   $nagios_user = $lma_infra_alerting['nagios_user']
   $nagios_password = $lma_infra_alerting['nagios_password']
-  $http_port = $lma_collector::params::nagios_http_port
-  $http_path = $lma_collector::params::nagios_http_path
+  $http_port = '8001'
+  $http_path = 'status'
   $nagios_url = "http://${nagios_server}:${http_port}/${http_path}"
 } else {
   $nagios_enabled = false
