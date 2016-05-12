@@ -25,7 +25,10 @@
 - id: lma-configure-apt
   type: puppet
   version: 2.0.0
-  requires: [post_deployment_start]
+  # We use update_hosts as an anchor to order the post-deployment tasks executed
+  # by this plugin and the InfluxDB & Elasticsearch plugins. The dependency chain is:
+  # Other plugins tasks -> update_hosts -> (LMA collector tasks)
+  requires: [post_deployment_start, update_hosts]
   required_for: [post_deployment_end]
   role: '*'
   parameters:
@@ -120,13 +123,10 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
 
-# The influxdb-configuration task is declared by the influxdb-grafana plugin.
-# The elasticsearch-kibana-configuration task is declared by the
-# elasticsearch-kibana plugin.
 - id: lma-backends
   type: puppet
   version: 2.0.0
-  requires: [lma-base, influxdb-configuration, elasticsearch-kibana-configuration]
+  requires: [lma-base]
   required_for: [lma-cleanup-apt-config]
   role:
     - primary-elasticsearch_kibana
