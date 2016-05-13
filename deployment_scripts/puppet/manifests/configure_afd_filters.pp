@@ -69,7 +69,7 @@ if $alerting_mode == 'remote' {
     # Important: $http_port and $http_path must match the
     # lma_infra_monitoring configuration.
     $http_port = 8001
-    $http_path = 'cgi-bin/cmd.cgi'
+    $http_path = 'status'
     $nagios_url = "http://${nagios_server}:${http_port}/${http_path}"
   } else {
     if ! $lma_infra_alerting {
