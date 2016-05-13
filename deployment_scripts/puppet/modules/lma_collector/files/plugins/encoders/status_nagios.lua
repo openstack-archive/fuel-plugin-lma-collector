@@ -71,9 +71,11 @@ function process_message()
             details[#details+1] = alarm
         end
     end
-    -- Nagios cannot accept 'plugin_output' parameter greater than 1024 bytes
+    -- Nagios CGI cannot accept 'plugin_output' parameter greater than 1024 bytes
     -- See bug #1517917 for details
-    data['plugin_output'] = lma.truncate(table.concat(details, nagios_break_line), 1024, nagios_break_line)
+    -- With the 'cmd.cgi' re-implementation for the command PROCESS_SERVICE_CHECK_RESULT,
+    -- this limit can be increased to 3KB. See blueprint scalable-nagios-api.
+    data['plugin_output'] = lma.truncate(table.concat(details, nagios_break_line), 3072, nagios_break_line)
 
     local params = {}
     for k, v in pairs(data) do
