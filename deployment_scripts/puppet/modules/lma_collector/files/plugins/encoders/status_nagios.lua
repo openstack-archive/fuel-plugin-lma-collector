@@ -21,6 +21,11 @@ local interp = require "msg_interpolate"
 
 local host = read_config('nagios_host')
 local service_template = read_config('service_template') or error('service_template is required!')
+-- Nagios CGI cannot accept 'plugin_output' parameter greater than 1024 bytes
+-- See bug #1517917 for details.
+-- With the 'cmd.cgi' re-implementation for the command PROCESS_SERVICE_CHECK_RESULT,
+-- this limit can be increased to 3KB. See blueprint scalable-nagios-api.
+local truncate_size = (read_config('truncate_size') + 0) or 3072
 local data = {
    cmd_typ = '30',
    cmd_mod = '2',
@@ -71,9 +76,7 @@ function process_message()
             details[#details+1] = alarm
         end
     end
-    -- Nagios cannot accept 'plugin_output' parameter greater than 1024 bytes
-    -- See bug #1517917 for details
-    data['plugin_output'] = lma.truncate(table.concat(details, nagios_break_line), 1024, nagios_break_line)
+    data['plugin_output'] = lma.truncate(table.concat(details, nagios_break_line), truncate_size, nagios_break_line)
 
     local params = {}
     for k, v in pairs(data) do
