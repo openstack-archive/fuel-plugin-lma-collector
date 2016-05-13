@@ -25,10 +25,10 @@
 - id: lma-configure-apt
   type: puppet
   version: 2.0.0
-  # We use update_hosts as an anchor to order the post-deployment tasks executed
+  # We use upload_nodes_info as an anchor to order the post-deployment tasks executed
   # by this plugin and the InfluxDB & Elasticsearch plugins. The dependency chain is:
-  # Other plugins tasks -> update_hosts -> (LMA collector tasks)
-  requires: [post_deployment_start, update_hosts]
+  # Other plugins tasks -> upload_nodes_info -> (LMA collector tasks)
+  requires: [post_deployment_start, upload_nodes_info]
   required_for: [post_deployment_end]
   role: '*'
   parameters:
