@@ -25,7 +25,7 @@ local service_template = read_config('service_template') or error('service_templ
 -- See bug #1517917 for details.
 -- With the 'cmd.cgi' re-implementation for the command PROCESS_SERVICE_CHECK_RESULT,
 -- this limit can be increased to 3KB. See blueprint scalable-nagios-api.
-local truncate_size = (read_config('truncate_size') + 0) or 3072
+local truncate_size = (read_config('truncate_size') or 3072) + 0
 local data = {
    cmd_typ = '30',
    cmd_mod = '2',
