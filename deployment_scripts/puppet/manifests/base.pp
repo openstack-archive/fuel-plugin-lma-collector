@@ -434,3 +434,5 @@ if $is_rabbitmq {
     }
   }
 }
+
+class { 'fuel_lma_collector::tools': }
