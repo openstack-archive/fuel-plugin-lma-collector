@@ -142,7 +142,9 @@
 - id: lma-cleanup-apt-config
   type: puppet
   version: 2.0.0
-  required_for: [post_deployment_end]
+  # We use update_hosts as an anchor to order the post-deployment tasks
+  # executed by the LMA infrastructure plugin.
+  required_for: [post_deployment_end, update_hosts]
   role: '*'
   parameters:
     puppet_manifest: puppet/manifests/cleanup_apt_config.pp
