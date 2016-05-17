@@ -126,8 +126,14 @@
 - id: lma-backends
   type: puppet
   version: 2.0.0
-  requires: [lma-base]
-  required_for: [lma-cleanup-apt-config]
+  # upload_nodes_info is used as an anchor to ensure that LMA backends are
+  # deployed before executing this task. LMA backends plugin must configured
+  # their backends before this anchor. The dependency chain is:
+  # (Plugin's backends deployment) -> upload_nodes_info -> lma-backends
+  # We use update_hosts as an anchor to order the post-deployment tasks
+  # executed by the LMA infrastructure plugin.
+  requires: [lma-base, upload_nodes_info]
+  required_for: [lma-cleanup-apt-config, update_hosts]
   role:
     - primary-elasticsearch_kibana
     - elasticsearch_kibana
