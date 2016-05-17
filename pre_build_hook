@@ -42,7 +42,8 @@ download_packages \
     http://mirrors.kernel.org/ubuntu/pool/main/libd/libdbi/libdbi1_0.9.0-1_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/r/rrdtool/librrd4_1.4.7-2ubuntu5_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/universe/c/collectd/collectd_5.4.0-3ubuntu2_amd64.deb \
-    http://mirrors.kernel.org/ubuntu/pool/main/libd/libdbi-drivers/libdbd-mysql_0.9.0-2ubuntu2_amd64.deb
+    http://mirrors.kernel.org/ubuntu/pool/main/libd/libdbi-drivers/libdbd-mysql_0.9.0-2ubuntu2_amd64.deb \
+    http://mirrors.kernel.org/ubuntu/pool/main/s/sysstat/sysstat_10.2.0-1_amd64.deb
 
 download_puppet_module "collectd" "${COLLECTD_TARBALL_URL}"
 download_puppet_module "apache" "${APACHE_TARBALL_URL}"
