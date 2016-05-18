@@ -261,14 +261,12 @@ if ! $storage_options['objects_ceph'] {
   }
 }
 
-# Logs
-if $lma_collector['elasticsearch_mode'] != 'disabled' {
+if hiera('lma::collector::elasticsearch::server', false) {
   class { 'lma_collector::logs::pacemaker': }
 }
 
 # Metrics
-$influxdb_mode = $lma_collector['influxdb_mode']
-if $influxdb_mode != 'disabled' {
+if hiera('lma::collector::influxdb::server', false) {
 
   $nova           = hiera_hash('nova', {})
   $neutron        = hiera_hash('quantum_settings', {})
@@ -414,29 +412,10 @@ if $influxdb_mode != 'disabled' {
   class { 'lma_collector::afd::workers': }
 
   # VIP checks
-  if $influxdb_mode == 'remote' {
-    $use_local_influxdb = false
-    $use_remote_influxdb = true
-    $influxdb_server = $lma_collector['influxdb_address']
-  } elsif $influxdb_mode == 'local'{
-    $use_local_influxdb = true
-    $use_remote_influxdb = false
-    $influxdb_vip_name = 'influxdb'
-    if $network_metadata['vips'][$influxdb_vip_name] {
-      $influxdb_server = $network_metadata['vips'][$influxdb_vip_name]['ipaddr']
-    } else {
-      # compatibility with the InfluxDB-Grafana plugin 0.8
-      $influxdb_grafana = hiera_hash('influxdb_grafana', {})
-      $influxdb_nodes = get_nodes_hash_by_roles($network_metadata, ['influxdb_grafana'])
-      $influxdb_server = $influxdb_nodes[0]['internal_address']
-    }
-  } else {
-    $use_local_influxdb = false
-    $use_remote_influxdb = false
-  }
-
-  if $use_local_influxdb or $use_remote_influxdb {
-    $influxdb_url = "http://${influxdb_server}:8086/ping"
+  if hiera('lma::collector::influxdb::server', false) {
+    $influxdb_server = hiera('lma::collector::influxdb::server')
+    $influxdb_port = hiera('lma::collector::influxdb::port')
+    $influxdb_url = "http://${influxdb_server}:${influxdb_port}/ping"
   }
 
   $vip_urls = {
