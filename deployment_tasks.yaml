@@ -10,17 +10,8 @@
     puppet_manifest: puppet/manifests/hiera_override.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
-
-- id: lma-check-configuration
-  type: puppet
-  version: 2.0.0
-  requires: [post_deployment_start]
-  required_for: [post_deployment_end]
-  role: [primary-controller]
-  parameters:
-    puppet_manifest: puppet/manifests/check_environment_configuration.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 300
+  reexecute_on:
+    - deploy_changes
 
 - id: lma-configure-apt
   type: puppet
@@ -35,6 +26,8 @@
     puppet_manifest: puppet/manifests/configure_apt.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
+  reexecute_on:
+    - deploy_changes
 
 - id: lma-base
   type: puppet
@@ -46,6 +39,8 @@
     puppet_manifest: puppet/manifests/base.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
+  reexecute_on:
+    - deploy_changes
 
 # All tasks lma-main-* must be executed before lma-aggregator. So we don't
 # need to add a requirement to post_deployment_end because it is implied
@@ -60,6 +55,8 @@
     puppet_manifest: puppet/manifests/controller.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
+  reexecute_on:
+    - deploy_changes
 
 - id: lma-main-compute
   type: puppet
@@ -71,6 +68,8 @@
     puppet_manifest: puppet/manifests/compute.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
+  reexecute_on:
+    - deploy_changes
 
 - id: lma-main-cinder
   type: puppet
@@ -82,6 +81,8 @@
     puppet_manifest: puppet/manifests/cinder.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
+  reexecute_on:
+    - deploy_changes
 
 - id: lma-main-ceph-osd
   type: puppet
@@ -93,6 +94,8 @@
     puppet_manifest: puppet/manifests/ceph_osd.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
+  reexecute_on:
+    - deploy_changes
 
 - id: lma-aggregator
   type: puppet
@@ -104,6 +107,8 @@
     puppet_manifest: puppet/manifests/aggregator.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
+  reexecute_on:
+    - deploy_changes
 
 - id: lma-configure-afd-filters
   type: puppet
@@ -122,6 +127,8 @@
     puppet_manifest: puppet/manifests/configure_afd_filters.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
+  reexecute_on:
+    - deploy_changes
 
 - id: lma-backends
   type: puppet
@@ -137,6 +144,8 @@
     puppet_manifest: puppet/manifests/lma_backends.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
+  reexecute_on:
+    - deploy_changes
 
 # This task must be executed at the very end of the deployment.
 - id: lma-cleanup-apt-config
@@ -151,4 +160,6 @@
     puppet_manifest: puppet/manifests/cleanup_apt_config.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
+  reexecute_on:
+    - deploy_changes
 
