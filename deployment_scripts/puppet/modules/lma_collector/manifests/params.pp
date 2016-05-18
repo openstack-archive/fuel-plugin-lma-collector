@@ -165,7 +165,6 @@ class lma_collector::params {
 
   $apache_status_host = '127.0.0.1'
   $apache_status_port = '80'
-  $apache_allow_from  = ['127.0.0.1','::1']
 
   $gse_policies_module = 'gse_policies'
 

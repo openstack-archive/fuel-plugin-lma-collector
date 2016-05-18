@@ -12,14 +12,14 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-# Class: lma_collector::mod_status
+# Class: fuel_lma_collector::mod_status
 #
 # We don't use apache::mod_status because it requires to include the apache
-# base class. And by doing this we overwrite horizon configuration.
+# base class. And by doing this we would overwrite the Horizon configuration.
 
-class lma_collector::mod_status (
-  $allow_from = $lma_collector::params::apache_allow_from,
-) inherits lma_collector::params {
+class fuel_lma_collector::mod_status (
+  $allow_from = $fuel_lma_collector::params::apache_allow_from,
+) inherits fuel_lma_collector::params {
 
   include apache::params
   include apache::service
@@ -48,17 +48,17 @@ class lma_collector::mod_status (
     }
   }
 
-  # Template uses $allow_from, $lib_path
+  # This template uses $allow_from and $lib_path
   file { $status_conf:
     ensure  => file,
-    content => template('lma_collector/apache/status.conf.erb'),
+    content => template('fuel_lma_collector/apache/status.conf.erb'),
     require => File[$status_load],
     notify  => Class['apache::service'],
   }
 
   file { $status_load:
     ensure  => file,
-    content => template('lma_collector/apache/status.load.erb'),
+    content => template('fuel_lma_collector/apache/status.load.erb'),
   }
 
 }
