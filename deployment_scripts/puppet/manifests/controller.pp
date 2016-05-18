@@ -399,8 +399,8 @@ if hiera('lma::collector::influxdb::server', false) {
   # Notification are always collected, lets extract metrics from there
   class { 'lma_collector::notifications::metrics': }
 
-  # Enable Apache status module
-  class { 'lma_collector::mod_status': }
+  # Enable the Apache status module
+  class { 'fuel_lma_collector::mod_status': }
 
   # Enable service heartbeat metrics
   class { 'lma_collector::metrics::service_heartbeat':
