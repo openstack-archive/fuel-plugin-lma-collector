@@ -14,16 +14,15 @@
 
 notice('fuel-plugin-lma-collector: compute.pp')
 
-$ceilometer    = hiera_hash('ceilometer', {})
-$lma_collector = hiera_hash('lma_collector')
+$ceilometer = hiera_hash('ceilometer', {})
 
-if $lma_collector['elasticsearch_mode'] != 'disabled' {
+if hiera('lma::collector::elasticsearch::server', false) {
   lma_collector::logs::openstack { 'nova': }
   lma_collector::logs::openstack { 'neutron': }
   class { 'lma_collector::logs::libvirt': }
 }
 
-if $lma_collector['influxdb_mode'] != 'disabled' {
+if hiera('lma::collector::influxdb::server', false) {
   class { 'lma_collector::logs::counter':
     hostname => $::hostname,
   }
