@@ -14,11 +14,14 @@
 
 notice('fuel-plugin-lma-collector: cinder.pp')
 
+prepare_network_config(hiera('network_scheme', {}))
+
 $ceilometer      = hiera_hash('ceilometer', {})
 $lma_collector   = hiera_hash('lma_collector')
 $is_controller   = roles_include(['controller', 'primary-controller'])
 $is_rabbitmq     = roles_include(['standalone-rabbitmq', 'primary-standalone-rabbitmq'])
 $is_mysql_server = roles_include(['standalone-database', 'primary-standalone-database'])
+$network_metadata = hiera_hash('network_metadata')
 
 if $is_controller or $is_rabbitmq or $is_mysql_server {
   # On nodes where pacemaker is deployed, make sure Log and Metric collector services
@@ -31,13 +34,15 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
   }
 }
 
-if $lma_collector['influxdb_mode'] != 'disabled' {
+$influxdb_nodes = get_nodes_hash_by_roles($network_metadata, ['influxdb_grafana', 'primary-influxdb_grafana'])
+if size(count($influxdb_nodes)) > 0 or $lma_collector['influxdb_mode'] == 'remote' {
   class { 'lma_collector::logs::counter':
     hostname => $::hostname,
   }
 }
 
-if $lma_collector['elasticsearch_mode'] != 'disabled' {
+$es_nodes = get_nodes_hash_by_roles($network_metadata, ['elasticsearch_kibana', 'primary-elasticsearch_kibana'])
+if size(count($es_nodes)) > 0 or $lma_collector['elasticsearch_mode'] == 'remote' {
   lma_collector::logs::openstack { 'cinder': }
 }
 

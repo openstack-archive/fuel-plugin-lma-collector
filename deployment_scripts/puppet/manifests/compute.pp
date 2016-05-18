@@ -14,16 +14,20 @@
 
 notice('fuel-plugin-lma-collector: compute.pp')
 
+prepare_network_config(hiera('network_scheme', {}))
 $ceilometer    = hiera_hash('ceilometer', {})
 $lma_collector = hiera_hash('lma_collector')
 
-if $lma_collector['elasticsearch_mode'] != 'disabled' {
+$influxdb_nodes = get_nodes_hash_by_roles($network_metadata, ['influxdb_grafana', 'primary-influxdb_grafana'])
+$es_nodes = get_nodes_hash_by_roles($network_metadata, ['elasticsearch_kibana', 'primary-elasticsearch_kibana'])
+
+if size(count($es_nodes)) > 0 or $lma_collector['elasticsearch_mode'] == 'remote' {
   lma_collector::logs::openstack { 'nova': }
   lma_collector::logs::openstack { 'neutron': }
   class { 'lma_collector::logs::libvirt': }
 }
 
-if $lma_collector['influxdb_mode'] != 'disabled' {
+if size(count($influxdb_nodes)) > 0 or $lma_collector['influxdb_mode'] == 'remote' {
   class { 'lma_collector::logs::counter':
     hostname => $::hostname,
   }

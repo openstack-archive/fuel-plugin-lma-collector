@@ -17,10 +17,11 @@ notice('fuel-plugin-lma-collector: lma_backends.pp')
 prepare_network_config(hiera('network_scheme', {}))
 $mgmt_address = get_network_role_property('management', 'ipaddr')
 
-$lma_collector_hash = hiera_hash('lma_collector')
+$lma_collector = hiera_hash('lma_collector')
 $influxdb_grafana = hiera('influxdb_grafana')
+$influxdb_nodes = get_nodes_hash_by_roles($network_metadata, ['influxdb_grafana', 'primary-influxdb_grafana'])
 
-if $lma_collector_hash['influxdb_mode'] != 'disabled' {
+if size(count($influxdb_nodes)) > 0 or $lma_collector['influxdb_mode'] == 'remote' {
   $network_metadata = hiera('network_metadata')
 
   $is_elasticsearch_node = roles_include(['elasticsearch_kibana', 'primary-elasticsearch_kibana'])

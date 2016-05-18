@@ -11,17 +11,6 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
 
-- id: lma-check-configuration
-  type: puppet
-  version: 2.0.0
-  requires: [post_deployment_start]
-  required_for: [post_deployment_end]
-  role: [primary-controller]
-  parameters:
-    puppet_manifest: puppet/manifests/check_environment_configuration.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 300
-
 - id: lma-configure-apt
   type: puppet
   version: 2.0.0

@@ -261,14 +261,12 @@ if ! $storage_options['objects_ceph'] {
   }
 }
 
-# Logs
-if $lma_collector['elasticsearch_mode'] != 'disabled' {
-  class { 'lma_collector::logs::pacemaker': }
-}
+class { 'lma_collector::logs::pacemaker': }
 
 # Metrics
 $influxdb_mode = $lma_collector['influxdb_mode']
-if $influxdb_mode != 'disabled' {
+$influxdb_nodes = get_nodes_hash_by_roles($network_metadata, ['influxdb_grafana', 'primary-influxdb_grafana'])
+if size(keys($influxdb_nodes)) > 0 or $influxdb_mode == 'remote' {
 
   $nova           = hiera_hash('nova', {})
   $neutron        = hiera_hash('quantum_settings', {})
@@ -426,8 +424,6 @@ if $influxdb_mode != 'disabled' {
       $influxdb_server = $network_metadata['vips'][$influxdb_vip_name]['ipaddr']
     } else {
       # compatibility with the InfluxDB-Grafana plugin 0.8
-      $influxdb_grafana = hiera_hash('influxdb_grafana', {})
-      $influxdb_nodes = get_nodes_hash_by_roles($network_metadata, ['influxdb_grafana'])
       $influxdb_server = $influxdb_nodes[0]['internal_address']
     }
   } else {

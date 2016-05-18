@@ -34,6 +34,8 @@ class lma_collector (
   $tags = {},
 ) {
   include lma_collector::params
+  include lma_collector::service::log
+  include lma_collector::service::metric
 
   validate_hash($tags)
 

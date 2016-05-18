@@ -14,9 +14,12 @@
 
 notice('fuel-plugin-lma-collector: ceph_osd.pp')
 
-$lma_collector_hash = hiera_hash('lma_collector')
+prepare_network_config(hiera('network_scheme', {}))
+$lma_collector = hiera_hash('lma_collector')
+$network_metadata = hiera_hash('network_metadata')
+$influxdb_nodes = get_nodes_hash_by_roles($network_metadata, ['influxdb_grafana', 'primary-influxdb_grafana'])
 
-if $lma_collector_hash['influxdb_mode'] != 'disabled' {
+if size(count($influxdb_nodes)) > 0 or $lma_collector['influxdb_mode'] == 'remote' {
   # Only install this python collectd plugin if ceph-osd is not deployed on a
   # controller node. This is due to a limitation of the python plugin puppet
   # module which can be run only by one manifest otherwise the collectd configuration is

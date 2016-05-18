@@ -65,21 +65,27 @@ if $is_controller {
 
 $elasticsearch_mode = $lma_collector['elasticsearch_mode']
 
+
 case $elasticsearch_mode {
   'remote': {
     $es_server = $lma_collector['elasticsearch_address']
+    $configure_elasticsearch = true
   }
   'local': {
     $vip_name = 'es_vip_mgmt'
     if $network_metadata['vips'][$vip_name] {
       $es_server = $network_metadata['vips'][$vip_name]['ipaddr']
+      $configure_elasticsearch = true
     }else{
-      # compatibility with elasticsearch-kibana version 0.8
-      $es_server = $es_nodes[0]['internal_address']
+      if count($es_nodes) == 1 {
+        # compatibility with elasticsearch-kibana version 0.8
+        $es_server = $es_nodes[0]['internal_address']
+        $configure_elasticsearch = true
+      } else {
+        # There is not Elasticsearch node available and the plugin is disabled
+        $configure_elasticsearch = false
+      }
     }
-  }
-  'disabled': {
-    # Nothing to do
   }
   default: {
     fail("'${elasticsearch_mode}' mode not supported for Elasticsearch")
@@ -307,8 +313,7 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
   }
 }
 
-$influxdb_mode = $lma_collector['influxdb_mode']
-if $elasticsearch_mode != 'disabled' {
+if $configure_elasticsearch {
   class { 'lma_collector::logs::system':
     require => Class['lma_collector'],
   }
@@ -338,6 +343,7 @@ if $elasticsearch_mode != 'disabled' {
   }
 }
 
+$influxdb_mode = $lma_collector['influxdb_mode']
 case $influxdb_mode {
   'remote','local': {
     if $influxdb_mode == 'remote' {
@@ -345,6 +351,7 @@ case $influxdb_mode {
       $influxdb_database = $lma_collector['influxdb_database']
       $influxdb_user = $lma_collector['influxdb_user']
       $influxdb_password = $lma_collector['influxdb_password']
+      $configure_influxdb = true
     }
     else {
       # Note: we don't validate data inputs because another manifest
@@ -352,53 +359,59 @@ case $influxdb_mode {
       $influxdb_vip_name = 'influxdb'
       if $network_metadata['vips'][$influxdb_vip_name] {
         $influxdb_server = $network_metadata['vips'][$influxdb_vip_name]['ipaddr']
+        $configure_influxdb = true
       } else {
-        $influxdb_server = $influxdb_nodes[0]['internal_address']
+        if count($influxdb_nodes) == 0 {
+          $influxdb_server = $influxdb_nodes[0]['internal_address']
+          $configure_influxdb = true
+        } else {
+          # There is not InfluxDB node available and the plugin is disabled
+          $configure_influxdb = false
+        }
       }
       $influxdb_database = $influxdb_grafana['influxdb_dbname']
       $influxdb_user = $influxdb_grafana['influxdb_username']
       $influxdb_password = $influxdb_grafana['influxdb_userpass']
     }
 
-    # TODO(all): this class is also applied by other role-specific manifests.
-    # This is sub-optimal and error prone. It needs to be fixed by having all
-    # collectd resources managed by a single manifest.
-    class { 'lma_collector::collectd::base':
-      processes => ['hekad', 'collectd'],
-      # Purge the default configuration shipped with the collectd package
-      purge     => true,
-      require   => Class['lma_collector'],
-    }
-
-    if $is_mysql_server {
-      $nova = hiera_hash('nova', {})
-
-      class { 'lma_collector::collectd::mysql':
-        username => 'nova',
-        password => $nova['db_password'],
-        require  => Class['lma_collector::collectd::base'],
+    if $configure_influxdb {
+      # TODO(all): this class is also applied by other role-specific manifests.
+      # This is sub-optimal and error prone. It needs to be fixed by having all
+      # collectd resources managed by a single manifest.
+      class { 'lma_collector::collectd::base':
+        processes => ['hekad', 'collectd'],
+        # Purge the default configuration shipped with the collectd package
+        purge     => true,
+        require   => Class['lma_collector'],
       }
 
-      lma_collector::collectd::dbi_mysql_status { 'mysql_status':
-        username => 'nova',
-        dbname   => 'nova',
-        password => $nova['db_password'],
-        require  => Class['lma_collector::collectd::base'],
+      if $is_mysql_server {
+        $nova = hiera_hash('nova', {})
+
+        class { 'lma_collector::collectd::mysql':
+          username => 'nova',
+          password => $nova['db_password'],
+          require  => Class['lma_collector::collectd::base'],
+        }
+
+        lma_collector::collectd::dbi_mysql_status { 'mysql_status':
+          username => 'nova',
+          dbname   => 'nova',
+          password => $nova['db_password'],
+          require  => Class['lma_collector::collectd::base'],
+        }
+      }
+
+      class { 'lma_collector::influxdb':
+        server     => $influxdb_server,
+        database   => $influxdb_database,
+        user       => $influxdb_user,
+        password   => $influxdb_password,
+        tag_fields => ['deployment_id', 'environment_label', 'tenant_id', 'user_id'],
+        require    => Class['lma_collector'],
       }
     }
 
-    class { 'lma_collector::influxdb':
-      server     => $influxdb_server,
-      database   => $influxdb_database,
-      user       => $influxdb_user,
-      password   => $influxdb_password,
-      tag_fields => ['deployment_id', 'environment_label', 'tenant_id', 'user_id'],
-      require    => Class['lma_collector'],
-    }
-
-  }
-  'disabled': {
-    # Nothing to do
   }
   default: {
     fail("'${influxdb_mode}' mode not supported for InfluxDB")
@@ -420,7 +433,7 @@ if $is_rabbitmq {
   }
 
 
-  if ($influxdb_mode != 'disabled') {
+  if $configure_influxdb {
     class { 'lma_collector::notifications::metrics': }
 
     # If the node has the controller role, the collectd Python plugins will be
