@@ -436,34 +436,8 @@ if hiera('lma::collector::influxdb::server', false) {
 
 $alerting_mode = $lma_collector['alerting_mode']
 $deployment_id = hiera('deployment_id')
-if $alerting_mode == 'remote' {
-  $use_nagios = true
-  $nagios_url = $lma_collector['nagios_url']
-  $nagios_user = $lma_collector['nagios_user']
-  $nagios_password = $lma_collector['nagios_password']
-} elsif $alerting_mode == 'local' {
-  $infra_alerting_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting', 'primary-infrastructure_alerting'])
-  if size(keys($infra_alerting_nodes)) > 0 {
-    $use_nagios = true
-    $lma_infra_alerting = hiera_hash('lma_infrastructure_alerting', false)
-    if $network_metadata['vips']['infrastructure_alerting_mgmt_vip'] {
-      $nagios_server = $network_metadata['vips']['infrastructure_alerting_mgmt_vip']['ipaddr']
-    } else {
-      # compatibility with the LMA Infrastructure Alerting plugin 0.8
-      $nagios_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting'])
-      $nagios_server = $nagios_nodes[0]['internal_address']
-    }
-    $nagios_user = $lma_infra_alerting['nagios_user']
-    $nagios_password = $lma_infra_alerting['nagios_password']
 
-    # Important: $http_port and $http_path must match the
-    # lma_infra_monitoring configuration.
-    $http_port = 8001
-    $http_path = 'status'
-    $nagios_url = "http://${nagios_server}:${http_port}/${http_path}"
-  }
-} elsif $alerting_mode == 'standalone' {
-  $use_nagios = false
+if $alerting_mode == 'standalone' {
   $subject = "LMA Alert Notification - environment ${deployment_id}"
   class { 'lma_collector::smtp_alert':
     send_from => $lma_collector['alerting_send_from'],
@@ -474,16 +448,14 @@ if $alerting_mode == 'remote' {
     user      => $lma_collector['alerting_smtp_user'],
     password  => $lma_collector['alerting_smtp_password'],
   }
-} else {
-  fail("'${alerting_mode}' mode not supported for the infrastructure alerting service")
 }
 
-if $use_nagios {
+if hiera('lma::infrastructure_alerting::url', false) {
   lma_collector::gse_nagios { 'global_clusters':
     openstack_deployment_name => $deployment_id,
-    url                       => $nagios_url,
-    user                      => $nagios_user,
-    password                  => $nagios_password,
+    url                       => hiera('lma::infrastructure_alerting::url'),
+    user                      => hiera('lma::infrastructure_alerting::user'),
+    password                  => hiera('lma::infrastructure_alerting::password'),
     message_type              => $lma_collector['gse_cluster_global']['output_message_type'],
     # Following parameter must match the lma_infrastructure_alerting::params::nagios_global_vhostname_prefix
     virtual_hostname          => '00-global-clusters',
@@ -491,9 +463,9 @@ if $use_nagios {
 
   lma_collector::gse_nagios { 'node_clusters':
     openstack_deployment_name => $deployment_id,
-    url                       => $nagios_url,
-    user                      => $nagios_user,
-    password                  => $nagios_password,
+    url                       => hiera('lma::infrastructure_alerting::url'),
+    user                      => hiera('lma::infrastructure_alerting::user'),
+    password                  => hiera('lma::infrastructure_alerting::password'),
     message_type              => $lma_collector['gse_cluster_node']['output_message_type'],
     # Following parameter must match the lma_infrastructure_alerting::params::nagios_node_vhostname_prefix
     virtual_hostname          => '00-node-clusters',

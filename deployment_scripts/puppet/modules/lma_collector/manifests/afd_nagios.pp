@@ -13,11 +13,11 @@
 #    under the License.
 #
 define lma_collector::afd_nagios(
+  $url,
+  $user,
+  $password,
   $ensure = present,
   $hostname = $::hostname,
-  $url       = undef,
-  $user      = $lma_collector::params::nagios_user,
-  $password  = $lma_collector::params::nagios_password,
   $service_template  = '%{node_role}.%{source}',
   $message_type = 'afd_node_metric',
 ){
@@ -25,10 +25,6 @@ define lma_collector::afd_nagios(
   include lma_collector::service::metric
 
   $lua_modules_dir = $lma_collector::params::lua_modules_dir
-
-  if $url == undef {
-    fail('url parameter is undef!')
-  }
 
   $config = {'nagios_host' => $hostname, 'service_template' => $service_template}
   heka::encoder::sandbox { "nagios_afd_${title}":
