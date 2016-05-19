@@ -19,8 +19,8 @@ local utils = require 'lma_utils'
 local l = require 'lpeg'
 l.locale(l)
 
-local flush_count = read_config('flush_count') or 100
-local flush_interval = read_config('flush_interval') or 5
+local flush_count = (read_config('flush_count') or 100) + 0
+local flush_interval = (read_config('flush_interval') or 5) + 0
 local default_tenant_id = read_config("default_tenant_id")
 local default_user_id = read_config("default_user_id")
 local time_precision = read_config("time_precision")

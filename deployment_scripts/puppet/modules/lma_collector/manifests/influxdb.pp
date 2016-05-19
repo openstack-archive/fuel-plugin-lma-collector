@@ -20,16 +20,16 @@ class lma_collector::influxdb (
   $port           = $lma_collector::params::influxdb_port,
   $tag_fields     = $lma_collector::params::influxdb_tag_fields,
   $time_precision = $lma_collector::params::influxdb_time_precision,
+  $flush_count    = $lma_collector::params::influxdb_flush_count,
+  $flush_interval = $lma_collector::params::influxdb_flush_interval,
 ) inherits lma_collector::params {
   include lma_collector::service::metric
 
   $lua_modules_dir = $lma_collector::params::lua_modules_dir
 
-  validate_string($database)
-  validate_string($user)
-  validate_string($password)
-  validate_string($server)
+  validate_string($database, $user, $password, $server, $time_precision)
   validate_array($tag_fields)
+  validate_integer([$flush_count, $flush_interval])
 
   heka::filter::sandbox { 'influxdb_accumulator':
     config_dir       => $lma_collector::params::metric_config_dir,
@@ -37,8 +37,8 @@ class lma_collector::influxdb (
     message_matcher  => $lma_collector::params::influxdb_message_matcher,
     ticker_interval  => 1,
     config           => {
-      flush_interval => $lma_collector::params::influxdb_flush_interval,
-      flush_count    => $lma_collector::params::influxdb_flush_count,
+      flush_interval => $flush_interval,
+      flush_count    => $flush_count,
       tag_fields     => join(sort(concat(['hostname'], $tag_fields)), ' '),
       time_precision => $time_precision,
       # FIXME(pasquier-s): provide the default_tenant_id & default_user_id
