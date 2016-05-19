@@ -21,6 +21,8 @@ describe 'lma_collector::afd_nagios' do
     end
     let(:params) do
         {:url => 'http://nagios.org',
+         :user => 'foo',
+         :password => 'secret',
          :message_type => 'foo_type'
         }
     end
