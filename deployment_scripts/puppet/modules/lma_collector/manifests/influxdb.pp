@@ -20,6 +20,8 @@ class lma_collector::influxdb (
   $port,
   $tag_fields     = $lma_collector::params::influxdb_tag_fields,
   $time_precision = $lma_collector::params::influxdb_time_precision,
+  $flush_count    = $lma_collector::params::influxdb_flush_count,
+  $flush_interval = $lma_collector::params::influxdb_flush_interval,
 ) inherits lma_collector::params {
   include lma_collector::service::metric
 
@@ -27,7 +29,9 @@ class lma_collector::influxdb (
 
   $lua_modules_dir = $lma_collector::params::lua_modules_dir
 
+  validate_string($database, $user, $password, $server, $time_precision)
   validate_array($tag_fields)
+  validate_integer([$flush_count, $flush_interval])
 
   heka::filter::sandbox { 'influxdb_accumulator':
     config_dir       => $lma_collector::params::metric_config_dir,

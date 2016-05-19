@@ -39,4 +39,18 @@ describe 'lma_collector::influxdb' do
             "flush_count"=> :undef, "time_precision" => "ms"}) }
         it { is_expected.to contain_heka__filter__sandbox('influxdb_annotation') }
     end
+
+    describe 'with flush and precision parameters' do
+        let(:params) {{ :server => 'localhost', :user => 'lma', :password => 'lma',
+                        :database => 'lma', :flush_count => 1, :flush_interval => 2,
+                        :time_precision => 's'
+        }}
+        it { is_expected.to contain_heka__output__http('influxdb') }
+        it { is_expected.to contain_heka__encoder__payload('influxdb') }
+        it { is_expected.to contain_heka__filter__sandbox('influxdb_accumulator').with_config({
+            "flush_interval"=> "2", "flush_count"=> "1", "time_precision" => "s",
+            "tag_fields" => "hostname"
+        }) }
+        it { is_expected.to contain_heka__filter__sandbox('influxdb_annotation') }
+    end
 end
