@@ -45,52 +45,12 @@ class { 'fuel_lma_collector::afds':
 }
 
 # Forward AFD status to Nagios if deployed
-$network_metadata = hiera_hash('network_metadata')
-$alerting_mode = $lma['alerting_mode']
-if $alerting_mode == 'remote' {
-  $nagios_enabled = true
-  $nagios_url = $lma['nagios_url']
-  $nagios_user = $lma['nagios_user']
-  $nagios_password = $lma['nagios_password']
-} elsif $alerting_mode == 'local' {
-  $lma_infra_alerting = hiera_hash('lma_infrastructure_alerting', false)
-  $infra_alerting_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting', 'primary-infrastructure_alerting'])
-  if size(keys($infra_alerting_nodes)) > 0 {
-    $nagios_enabled = true
-    if $network_metadata['vips']['infrastructure_alerting_mgmt_vip'] {
-      $nagios_server = $network_metadata['vips']['infrastructure_alerting_mgmt_vip']['ipaddr']
-    } else {
-      # compatibility with the LMA Infrastructure Alerting plugin 0.8
-      $nagios_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting'])
-      $nagios_server = $nagios_nodes[0]['internal_address']
-    }
-    $nagios_user = $lma_infra_alerting['nagios_user']
-    $nagios_password = $lma_infra_alerting['nagios_password']
-    # Important: $http_port and $http_path must match the
-    # lma_infra_monitoring configuration.
-    $http_port = 8001
-    $http_path = 'status'
-    $nagios_url = "http://${nagios_server}:${http_port}/${http_path}"
-  } else {
-    if ! $lma_infra_alerting {
-      notice('Could not get the LMA Infrastructure Alerting parameters. The LMA-Infrastructure-Alerting plugin is probably not installed.')
-    } elsif ! $lma_infra_alerting['metadata']['enabled'] {
-      notice(join(['Could not get the LMA Infrastructure Alerting parameters. ',
-        'The LMA-Infrastructure-Alerting plugin is probably not enabled for this environment.'], ''))
-    } else {
-      notice('The LMA-Infrastructure-Alerting plugin is enabled but no alerting node for this environment.')
-    }
-  }
-} else {
-  $nagios_enabled = false
-}
-
-if $nagios_enabled {
+if hiera('lma::infrastructure_alerting::is_deployed', false) {
   lma_collector::afd_nagios { 'nodes':
     ensure   => present,
     hostname => $::hostname,
-    url      => $nagios_url,
-    user     => $nagios_user,
-    password => $nagios_password,
+    url      => hiera('lma::infrastructure_alerting::url'),
+    user     => hiera('lma::infrastructure_alerting::user'),
+    password => hiera('lma::infrastructure_alerting::password'),
   }
 }

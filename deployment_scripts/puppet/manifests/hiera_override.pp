@@ -93,6 +93,48 @@ if ($plugin_data) {
     $influxdb_is_deployed = false
   }
 
+  # Infrastructure Alerting
+  $alerting_mode = $plugin_data['alerting_mode']
+  $lma_infra_alerting = hiera('lma_infrastructure_alerting', {})
+  $infra_alerting_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting', 'primary-infrastructure_alerting'])
+  $infra_alerting_nodes_count = count($infra_alerting_nodes)
+
+  case $alerting_mode {
+    'remote': {
+      $nagios_url = $lma['nagios_url']
+      $nagios_user = $lma['nagios_user']
+      $nagios_password = $lma['nagios_password']
+    }
+    'local': {
+      $infra_vip_name = 'infrastructure_alerting_mgmt_vip'
+      if $network_metadata['vips'][$infra_vip_name] {
+        $nagios_server = $network_metadata['vips'][$infra_vip_name]['ipaddr']
+      } elsif $es_nodes_count > 0 {
+        $nagios_server = $es_nodes[0]['internal_address']
+      } else {
+        $nagios_server = undef
+      }
+      $nagios_user = $lma_infra_alerting['nagios_user']
+      $nagios_password = $lma_infra_alerting['nagios_password']
+      if $nagios_server {
+        # Important: $http_port and $http_path must match the
+        # lma_infra_monitoring configuration.
+        $nagios_http_port = 8001
+        $nagios_http_path = 'status'
+        $nagios_url = "http://${nagios_server}:${nagios_http_port}/${nagios_http_path}"
+      }
+    }
+    default: {
+      fail("'${alerting_mode}' mode not supported for Elasticsearch")
+    }
+  }
+
+  if $infra_alerting_nodes_count > 0 or $nagios_url {
+    $nagios_is_deployed = true
+  } else {
+    $nagios_is_deployed = false
+  }
+
   $hiera_file = '/etc/hiera/plugins/lma_collector.yaml'
 
   $calculated_content = inline_template('
@@ -106,6 +148,10 @@ lma::influxdb::port: 8086
 lma::influxdb::database: <%= @influxdb_database %>
 lma::influxdb::user: <%= @influxdb_user %>
 lma::influxdb::password: <%= @influxdb_password %>
+lma::infrastructure_alerting::is_deployed: <%= @nagios_is_deployed %>
+lma::infrastructure_alerting::url: <%= @nagios_url %>
+lma::infrastructure_alerting::user: <%= @nagios_user %>
+lma::infrastructure_alerting::password: <%= @nagios_password %>
   ')
 
   file { $hiera_file:
