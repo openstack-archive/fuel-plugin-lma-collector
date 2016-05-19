@@ -815,6 +815,10 @@ InfluxDB.
   options: an array. Default: `[]`.
 * `time_precision`: *Optional*. Time precision. Valid options: a string.
   Default: `ms`.
+* `flush_count`: *Optional*. Maximum number of datapoints to send in a single
+  write request. Valid values: an integer. Default: `5000`.
+* `flush_interval`: *Optional*. Maximum number of seconds to wait before
+  writing data to InfluxDB. Valid values: an integer. Default: `5`.
 
 #### Class: `lma_collector::notifications::input`
 

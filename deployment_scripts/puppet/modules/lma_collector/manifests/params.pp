@@ -157,6 +157,11 @@ class lma_collector::params {
   $elasticsearch_fields = ['Timestamp', 'Type', 'Logger', 'Severity', 'Payload', 'Pid', 'Hostname', 'DynamicFields']
 
   $influxdb_timeout = 5
+  $influxdb_flush_interval = 5
+  # InfluxDB recommends a batch size of 5,000 points but we are limited to 500
+  # due to the hekad_max_message_size. The limit is reached when the influxdb
+  # accumulator inject data points.
+  $influxdb_flush_count = 500
   $influxdb_tag_fields = []
   $influxdb_time_precision = 'ms'
   $influxdb_message_matcher = join([
