@@ -20,7 +20,11 @@ describe 'lma_collector::gse_nagios' do
          :osfamily => 'Debian'}
     end
     let(:params) do
-        {:url => 'http://nagios.org',
+        {:server  => 'nagios.org',
+         :http_port => 9999,
+         :http_path => 'status',
+         :user => 'foo',
+         :password => 'secret',
          :message_type => 'foo_type',
          :virtual_hostname => 'foo_vhost'}
     end

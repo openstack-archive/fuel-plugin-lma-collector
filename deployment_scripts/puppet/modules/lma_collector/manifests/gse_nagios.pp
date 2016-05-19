@@ -13,30 +13,25 @@
 #    under the License.
 #
 define lma_collector::gse_nagios (
+  $server,
+  $http_port,
+  $http_path,
+  $user,
+  $password,
+  $message_type,
+  $virtual_hostname,
   $ensure = present,
+  $http_scheme = 'http',
   $openstack_deployment_name = '',
-  $url       = undef,
-  $user      = $lma_collector::params::nagios_user,
-  $password  = $lma_collector::params::nagios_password,
   $service_template  = '%{cluster_name}',
-  $message_type = undef,
-  $virtual_hostname = undef,
 ) {
   include lma_collector::params
   include lma_collector::service::metric
 
-  $lua_modules_dir = $lma_collector::params::lua_modules_dir
+  validate_integer($http_port)
 
-  if $url == undef {
-    fail('url parameter is undef!')
-  }
-  if ! $message_type {
-    fail('message_type is undef!')
-  }
-  if ! $virtual_hostname {
-    fail('virtual_hostname is required!')
-  }
-  validate_string($url)
+  $lua_modules_dir = $lma_collector::params::lua_modules_dir
+  $url = "${http_scheme}://${server}:${http_port}/${http_path}"
 
   # This must be identical logic than in lma-infra-alerting-plugin
   $_nagios_host = "${virtual_hostname}-env${openstack_deployment_name}"

@@ -93,6 +93,35 @@ if ($plugin_data) {
     $influxdb_is_deployed = false
   }
 
+  # Infrastructure Alerting
+  $alerting_mode = $plugin_data['alerting_mode']
+  $lma_infra_alerting = hiera('lma_infrastructure_alerting', {})
+  $infra_alerting_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting', 'primary-infrastructure_alerting'])
+  $infra_alerting_nodes_count = count($infra_alerting_nodes)
+
+  case $alerting_mode {
+    'local': {
+      $infra_vip_name = 'infrastructure_alerting_mgmt_vip'
+      if $network_metadata['vips'][$infra_vip_name] {
+        $nagios_server = $network_metadata['vips'][$infra_vip_name]['ipaddr']
+      } elsif $infra_alerting_nodes_count > 0 {
+        $nagios_server = $infra_alerting_nodes[0]['internal_address']
+      } else {
+        $nagios_server = undef
+      }
+      $nagios_password = $lma_infra_alerting['nagios_password']
+    }
+    default: {
+      fail("'${alerting_mode}' mode not supported for Nagios")
+    }
+  }
+
+  if $infra_alerting_nodes_count > 0 or $nagios_server {
+    $nagios_is_deployed = true
+  } else {
+    $nagios_is_deployed = false
+  }
+
   $hiera_file = '/etc/hiera/plugins/lma_collector.yaml'
 
   $calculated_content = inline_template('
@@ -107,6 +136,13 @@ lma::collector::influxdb::port: 8086
 lma::collector::influxdb::database: <%= @influxdb_database %>
 lma::collector::influxdb::user: <%= @influxdb_user %>
 lma::collector::influxdb::password: <%= @influxdb_password %>
+<% end -%>
+<% if @nagios_is_deployed -%>
+lma::collector::infrastructure_alerting::server: <%= @nagios_server %>
+lma::collector::infrastructure_alerting::http_port: 8001
+lma::collector::infrastructure_alerting::http_path: status
+lma::collector::infrastructure_alerting::user: nagiosadmin
+lma::collector::infrastructure_alerting::password: <%= @nagios_password %>
 <% end -%>
   ')
 
