@@ -20,8 +20,8 @@ describe 'lma_collector::influxdb' do
     end
 
     describe 'with mandatory parameters' do
-        let(:params) {{ :server => 'localhost', :user => 'lma', :password =>
-                        'lma', :database => 'lma' }}
+        let(:params) {{ :server => 'localhost', :user => 'lma', :password => 'lma',
+                        :database => 'lma' }}
         it { is_expected.to contain_heka__output__http('influxdb') }
         it { is_expected.to contain_heka__encoder__payload('influxdb') }
         it { is_expected.to contain_heka__filter__sandbox('influxdb_accumulator') }
@@ -29,13 +29,27 @@ describe 'lma_collector::influxdb' do
     end
 
     describe 'with tag_fields parameter' do
-        let(:params) {{ :server => 'localhost', :user => 'lma', :password =>
-                        'lma', :database => 'lma', :tag_fields => ['foo', 'zzz'] }}
+        let(:params) {{ :server => 'localhost', :user => 'lma', :password => 'lma',
+                        :database => 'lma', :tag_fields => ['foo', 'zzz'] }}
         it { is_expected.to contain_heka__output__http('influxdb') }
         it { is_expected.to contain_heka__encoder__payload('influxdb') }
         it { is_expected.to contain_heka__filter__sandbox('influxdb_accumulator').with_config({
-            "tag_fields" => "foo hostname zzz", "flush_interval"=> :undef,
-            "flush_count"=> :undef, "time_precision" => "ms"}) }
+            "tag_fields" => "foo hostname zzz", "flush_interval"=> "5",
+            "flush_count"=> "5000", "time_precision" => "ms"}) }
+        it { is_expected.to contain_heka__filter__sandbox('influxdb_annotation') }
+    end
+
+    describe 'with flush and precision parameters' do
+        let(:params) {{ :server => 'localhost', :user => 'lma', :password => 'lma',
+                        :database => 'lma', :flush_count => 1, :flush_interval => 2,
+                        :time_precision => 's'
+        }}
+        it { is_expected.to contain_heka__output__http('influxdb') }
+        it { is_expected.to contain_heka__encoder__payload('influxdb') }
+        it { is_expected.to contain_heka__filter__sandbox('influxdb_accumulator').with_config({
+            "flush_interval"=> "2", "flush_count"=> "1", "time_precision" => "s",
+            "tag_fields" => "hostname"
+        }) }
         it { is_expected.to contain_heka__filter__sandbox('influxdb_annotation') }
     end
 end
