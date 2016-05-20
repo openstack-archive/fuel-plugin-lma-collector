@@ -102,7 +102,7 @@ The *AFD metrics* and *GSE metrics* are new types of metrics introduced
 in LMA v 0.8. They contain detailed information about the entities
 being monitored.
 Please refer to the `Metrics section of the Developer Guide
-<http://fuel-plugin-lma-collector.readthedocs.org/en/latest/appendix_b.html>`_
+<http://fuel-plugin-lma-collector.readthedocs.io/en/latest/appendix_b.html>`_
 for further information about the structure of those messages.
 
 Any backend system that has a *Persister* plugged

@@ -66,7 +66,7 @@ Steps
 
 #. Once the deployment has finished, connect to each node of the environment using ssh and run the following checks:
 
-    a. Check that hekad and collectd processes are up and running on all the nodes as described in the `LMA Collector documentation <http://fuel-plugin-lma-collector.readthedocs.org/en/stable/user/configuration.html#plugin-verification>`_.
+    a. Check that hekad and collectd processes are up and running on all the nodes as described in the `LMA Collector documentation <http://fuel-plugin-lma-collector.readthedocs.io/en/stable/user/configuration.html#plugin-verification>`_.
 
     #. Look for errors in /var/log/lma_collector.log
 

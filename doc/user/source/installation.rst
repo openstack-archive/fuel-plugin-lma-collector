@@ -14,9 +14,9 @@ There are two options:
 
 1. Install these backend services automatically using the Fuel Plugins listed below.
 
-  * `Elasticsearch-Kibana Fuel Plugin Installation Guide <http://fuel-plugin-elasticsearch-kibana.readthedocs.org/en/latest/installation.html#installation-guide>`_.
-  * `InfluxDB-Grafana Fuel Plugin Installation Guide <http://fuel-plugin-influxdb-grafana.readthedocs.org/en/latest/installation.html#installation-guide>`_.
-  * `Infrastructure Alerting Fuel Plugin Installation Guide <http://fuel-plugin-lma-infrastructure-alerting.readthedocs.org/en/latest/installation.html#installation-guide>`_.
+  * `Elasticsearch-Kibana Fuel Plugin Installation Guide <http://fuel-plugin-elasticsearch-kibana.readthedocs.io/en/latest/installation.html#installation-guide>`_.
+  * `InfluxDB-Grafana Fuel Plugin Installation Guide <http://fuel-plugin-influxdb-grafana.readthedocs.io/en/latest/installation.html#installation-guide>`_.
+  * `Infrastructure Alerting Fuel Plugin Installation Guide <http://fuel-plugin-lma-infrastructure-alerting.readthedocs.io/en/latest/installation.html#installation-guide>`_.
 
 2. Install these backend services manually outside of your OpenStack environment.
    This installation must comply with the LMA Collector Plugin's :ref:`requirements <plugin_requirements>`.

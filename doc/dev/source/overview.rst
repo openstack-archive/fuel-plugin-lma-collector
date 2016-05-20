@@ -28,7 +28,7 @@ Its core components are :
 
 The primary function of the Collector is to transform the acquired raw
 operational data into an internal message representation that is based on the
-`Heka message structure <http://hekad.readthedocs.org/en/latest/message/index.html>`_.
+`Heka message structure <http://hekad.readthedocs.io/en/latest/message/index.html>`_.
 that can be further exploited to, for example, detect anomalies or create
 new metric messages.
 
@@ -54,13 +54,13 @@ Furthermore, the LMA Toolchain has been designed with the dual objective to be b
 It is, for example, quite possible (without any code change) to integrate the Collector
 with an external monitoring application like Nagios. This could simply be done through enabling
 the Nagios output plugin of Heka for a subset of messages matching the
-`message matcher <https://hekad.readthedocs.org/en/latest/message_matcher.html#message-matcher>`_
+`message matcher <https://hekad.readthedocs.io/en/latest/message_matcher.html#message-matcher>`_
 syntax of the output plugin. You should probably not modify the configuration of the LMA
 Collector manually but apply any configuration change to the Puppet manifests that are shipped
 with the LMA Collector plugin for Fuel. Many other integration combinations are possible thanks
 to the extreme flexibility of Heka.
 
-We recommend you to read the Heka `documentation <https://hekad.readthedocs.org/en/latest/index.html>`_
+We recommend you to read the Heka `documentation <https://hekad.readthedocs.io/en/latest/index.html>`_
 to become more familiar with that technology.
 
 The rest of this document is organised in several chapters that will take you through a

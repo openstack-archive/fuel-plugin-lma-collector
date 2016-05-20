@@ -28,7 +28,7 @@ log files, collectd and RabbitMQ for the OpenStack notifications.
 
 A primary function of the Collector is to sanitise and transform the ingested
 raw operational data into internal messages using the
-`Heka message structure <https://hekad.readthedocs.org/en/stable/message/index.html>`_.
+`Heka message structure <https://hekad.readthedocs.io/en/stable/message/index.html>`_.
 This message structure is used within the Collector's framework to match, filter
 and route messages to plugins written in
 `Lua <http://www.lua.org/>`_ which perform various

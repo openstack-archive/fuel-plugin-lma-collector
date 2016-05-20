@@ -50,4 +50,4 @@ Attributes in **bold** are always present in the messages while attributes in
 .. note:: All date/time fields represented as string are formatted according
    to the `RFC3339 <http://tools.ietf.org/html/rfc3339>`_ document.
 
-.. [#] `Heka message structure <http://hekad.readthedocs.org/en/latest/message/index.html>`_
+.. [#] `Heka message structure <http://hekad.readthedocs.io/en/latest/message/index.html>`_

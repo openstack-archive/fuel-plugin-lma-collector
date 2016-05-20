@@ -76,4 +76,4 @@ Attributes in **bold** are always present in the messages while attributes in
 Metric messages may include additional fields to specify the scope of the
 measurement. Refer to the `User Documentation`_ for more details.
 
-.. _User Documentation: http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/appendix_b.html
+.. _User Documentation: http://fuel-plugin-lma-collector.readthedocs.io/en/latest/user/appendix_b.html
