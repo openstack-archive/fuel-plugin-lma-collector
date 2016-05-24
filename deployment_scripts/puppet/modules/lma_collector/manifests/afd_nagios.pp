@@ -13,9 +13,12 @@
 #    under the License.
 #
 define lma_collector::afd_nagios(
-  $url,
+  $server,
+  $http_port,
+  $http_path,
   $user,
   $password,
+  $http_scheme = 'http',
   $ensure = present,
   $hostname = $::hostname,
   $service_template  = '%{node_role}.%{source}',
@@ -24,7 +27,10 @@ define lma_collector::afd_nagios(
   include lma_collector::params
   include lma_collector::service::metric
 
+  validate_integer($http_port)
+
   $lua_modules_dir = $lma_collector::params::lua_modules_dir
+  $url = "${http_scheme}://${server}:${http_port}/${http_path}"
 
   $config = {'nagios_host' => $hostname, 'service_template' => $service_template}
   heka::encoder::sandbox { "nagios_afd_${title}":

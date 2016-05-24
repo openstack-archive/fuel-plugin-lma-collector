@@ -450,10 +450,12 @@ if $alerting_mode == 'standalone' {
   }
 }
 
-if hiera('lma::collector::infrastructure_alerting::url', false) {
+if hiera('lma::collector::infrastructure_alerting::server', false) {
   lma_collector::gse_nagios { 'global_clusters':
     openstack_deployment_name => $deployment_id,
-    url                       => hiera('lma::collector::infrastructure_alerting::url'),
+    server                    => hiera('lma::collector::infrastructure_alerting::server'),
+    http_port                 => hiera('lma::collector::infrastructure_alerting::http_port'),
+    http_path                 => hiera('lma::collector::infrastructure_alerting::http_path'),
     user                      => hiera('lma::collector::infrastructure_alerting::user'),
     password                  => hiera('lma::collector::infrastructure_alerting::password'),
     message_type              => $lma_collector['gse_cluster_global']['output_message_type'],
@@ -463,7 +465,9 @@ if hiera('lma::collector::infrastructure_alerting::url', false) {
 
   lma_collector::gse_nagios { 'node_clusters':
     openstack_deployment_name => $deployment_id,
-    url                       => hiera('lma::collector::infrastructure_alerting::url'),
+    server                    => hiera('lma::collector::infrastructure_alerting::server'),
+    http_port                 => hiera('lma::collector::infrastructure_alerting::http_port'),
+    http_path                 => hiera('lma::collector::infrastructure_alerting::http_path'),
     user                      => hiera('lma::collector::infrastructure_alerting::user'),
     password                  => hiera('lma::collector::infrastructure_alerting::password'),
     message_type              => $lma_collector['gse_cluster_node']['output_message_type'],

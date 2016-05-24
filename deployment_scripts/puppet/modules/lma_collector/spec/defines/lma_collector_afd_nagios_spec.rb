@@ -20,7 +20,9 @@ describe 'lma_collector::afd_nagios' do
          :osfamily => 'Debian'}
     end
     let(:params) do
-        {:url => 'http://nagios.org',
+        {:server => 'nagios.org',
+         :http_port => 9999,
+         :http_path => 'status',
          :user => 'foo',
          :password => 'secret',
          :message_type => 'foo_type'
