@@ -214,6 +214,7 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
       },
       operations      => {
         'monitor' => {
+          'interval' => '20',
           'timeout'  => '10',
         },
         'start'   => {
@@ -293,6 +294,7 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
       },
       operations       => {
         'monitor' => {
+          'interval' => '20',
           'timeout'  => '10',
         },
         'start'   => {
