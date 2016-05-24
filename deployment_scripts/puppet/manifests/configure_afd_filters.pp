@@ -45,11 +45,13 @@ class { 'fuel_lma_collector::afds':
 }
 
 # Forward AFD status to Nagios if deployed
-if hiera('lma::infrastructure_alerting::url', false) {
+if hiera('lma::infrastructure_alerting::server', false) {
   lma_collector::afd_nagios { 'nodes':
-    ensure   => present,
-    hostname => $::hostname,
-    url      => hiera('lma::infrastructure_alerting::url'),
-    password => hiera('lma::infrastructure_alerting::password'),
+    ensure    => present,
+    hostname  => $::hostname,
+    server    => hiera('lma::infrastructure_alerting::server'),
+    http_port => hiera('lma::infrastructure_alerting::http_port'),
+    http_path => hiera('lma::infrastructure_alerting::http_path'),
+    password  => hiera('lma::infrastructure_alerting::password'),
   }
 }
