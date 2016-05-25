@@ -174,9 +174,6 @@ class lma_collector::params {
 
   # Nagios parameters
   #
-  $nagios_server = 'localhost'
-  $nagios_user = 'nagiosadmin'
-  $nagios_password = ''
   $nagios_timeout = 2
 
   # Parameters for SMTP alert of service status
