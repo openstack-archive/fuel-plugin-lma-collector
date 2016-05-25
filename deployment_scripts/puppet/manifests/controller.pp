@@ -14,7 +14,7 @@
 
 notice('fuel-plugin-lma-collector: controller.pp')
 
-prepare_network_config(hiera('network_scheme', {}))
+prepare_network_config(hiera_hash('network_scheme', {}))
 $messaging_address = get_network_role_property('mgmt/messaging', 'ipaddr')
 $memcache_address  = get_network_role_property('mgmt/memcache', 'ipaddr')
 $network_metadata = hiera_hash('network_metadata')

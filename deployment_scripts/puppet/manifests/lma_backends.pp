@@ -14,13 +14,13 @@
 
 notice('fuel-plugin-lma-collector: lma_backends.pp')
 
-prepare_network_config(hiera('network_scheme', {}))
+prepare_network_config(hiera_hash('network_scheme', {}))
 $mgmt_address = get_network_role_property('management', 'ipaddr')
 
 $influxdb_grafana = hiera('influxdb_grafana')
 
 if hiera('lma::collector::influxdb::server', false) {
-  $network_metadata = hiera('network_metadata')
+  $network_metadata = hiera_hash('network_metadata')
 
   $is_elasticsearch_node = roles_include(['elasticsearch_kibana', 'primary-elasticsearch_kibana'])
   $is_influxdb_node = roles_include(['influxdb_grafana', 'primary-influxdb_grafana'])
