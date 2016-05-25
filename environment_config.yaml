@@ -98,8 +98,6 @@ attributes:
         label: "Alerts sent to a local cluster running the LMA Infrastructure Alerting plugin (if deployed)"
       - data: "standalone"
         label: "Alerts sent by email (requires a SMTP server)"
-      - data: "remote"
-        label: "Alerts sent to a remote Nagios server"
 
   alerting_send_to:
     value: ''
@@ -165,34 +163,3 @@ attributes:
     weight: 97
     type: "password"
     restrictions: *not_standalone_and_no_auth
-
-  nagios_url:
-    value: ''
-    label: 'Nagios URL'
-    description: 'ie: http://<server>/nagios3/cgi-bin/cmd.cgi'
-    weight: 100
-    type: "text"
-    regex: &node_url_regex
-      source: '^(http(s?):\/\/)?([a-zA-Z\d]+[a-zA-Z\d_\-.]*)(:[0-9]+)?(\/[a-zA-Z0-9_\-\s.\/\?%#&=]*)?$'
-      error: "Invalid URL"
-    restrictions: &not_remote
-        - condition: "settings:lma_collector.alerting_mode.value != 'remote'"
-          action: "disable"
-
-  nagios_user:
-    value: 'nagiosadmin'
-    label: 'Nagios user'
-    description: ''
-    weight: 105
-    type: "text"
-    regex: *not_empty_parameter
-    restrictions: *not_remote
-
-  nagios_password:
-    value: ''
-    label: 'Nagios password'
-    description: ''
-    weight: 110
-    type: "password"
-    regex: *not_empty_parameter
-    restrictions: *not_remote

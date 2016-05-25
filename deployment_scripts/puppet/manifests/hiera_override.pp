@@ -100,11 +100,6 @@ if ($plugin_data) {
   $infra_alerting_nodes_count = count($infra_alerting_nodes)
 
   case $alerting_mode {
-    'remote': {
-      $nagios_url = $plugin_data['nagios_url']
-      $nagios_user = $plugin_data['nagios_user']
-      $nagios_password = $lma['nagios_password']
-    }
     'local': {
       $infra_vip_name = 'infrastructure_alerting_mgmt_vip'
       if $network_metadata['vips'][$infra_vip_name] {
@@ -114,22 +109,14 @@ if ($plugin_data) {
       } else {
         $nagios_server = undef
       }
-      $nagios_user = 'nagiosadmin'
       $nagios_password = $lma_infra_alerting['nagios_password']
-      if $nagios_server {
-        # Important: $http_port and $http_path must match the
-        # lma_infra_monitoring configuration.
-        $nagios_http_port = 8001
-        $nagios_http_path = 'status'
-        $nagios_url = "http://${nagios_server}:${nagios_http_port}/${nagios_http_path}"
-      }
     }
     default: {
       fail("'${alerting_mode}' mode not supported for Nagios")
     }
   }
 
-  if $infra_alerting_nodes_count > 0 or $nagios_url {
+  if $infra_alerting_nodes_count > 0 or $nagios_server {
     $nagios_is_deployed = true
   } else {
     $nagios_is_deployed = false
@@ -151,8 +138,10 @@ lma::collector::influxdb::user: <%= @influxdb_user %>
 lma::collector::influxdb::password: <%= @influxdb_password %>
 <% end -%>
 <% if @nagios_is_deployed -%>
-lma::collector::infrastructure_alerting::url: <%= @nagios_url %>
-lma::collector::infrastructure_alerting::user: <%= @nagios_user %>
+lma::collector::infrastructure_alerting::server: <%= @nagios_server %>
+lma::collector::infrastructure_alerting::http_port: 8001
+lma::collector::infrastructure_alerting::http_path: status
+lma::collector::infrastructure_alerting::user: nagiosadmin
 lma::collector::infrastructure_alerting::password: <%= @nagios_password %>
 <% end -%>
   ')
