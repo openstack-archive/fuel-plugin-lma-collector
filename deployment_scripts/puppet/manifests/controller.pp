@@ -396,9 +396,6 @@ if hiera('lma::collector::influxdb::server', false) {
 
   class { 'lma_collector::logs::aggregated_http_metrics': }
 
-  # Notification are always collected, lets extract metrics from there
-  class { 'lma_collector::notifications::metrics': }
-
   # Enable the Apache status module
   class { 'fuel_lma_collector::mod_status': }
 
