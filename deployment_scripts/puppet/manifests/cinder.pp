@@ -15,7 +15,6 @@
 notice('fuel-plugin-lma-collector: cinder.pp')
 
 $ceilometer      = hiera_hash('ceilometer', {})
-$lma_collector   = hiera_hash('lma_collector')
 $is_controller   = roles_include(['controller', 'primary-controller'])
 $is_rabbitmq     = roles_include(['standalone-rabbitmq', 'primary-standalone-rabbitmq'])
 $is_mysql_server = roles_include(['standalone-database', 'primary-standalone-database'])
@@ -31,13 +30,13 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
   }
 }
 
-if $lma_collector['influxdb_mode'] != 'disabled' {
+if hiera('lma::collector::influxdb::server', false) {
   class { 'lma_collector::logs::counter':
     hostname => $::hostname,
   }
 }
 
-if $lma_collector['elasticsearch_mode'] != 'disabled' {
+if hiera('lma::collector::elasticsearch::server', false) {
   lma_collector::logs::openstack { 'cinder': }
 }
 

@@ -17,16 +17,10 @@ attributes:
     value: "local"
     label: "Events analytics (logs and notifications)"
     values:
-      - data: "disabled"
-        label: "Disabled"
       - data: "local"
-        label: "Local node"
+        label: "Local node (if deployed)"
       - data: "remote"
         label: "Remote server"
-    restrictions: &all_disabled_msg
-      - condition: "settings:lma_collector.elasticsearch_mode.value == 'disabled' and settings:lma_collector.influxdb_mode.value == 'disabled'"
-        action: "none"
-        message: "Please enable Events or Metrics analytics or both"
 
   elasticsearch_address:
     value: ''
@@ -47,13 +41,10 @@ attributes:
     value: "local"
     label: "Metrics analytics"
     values:
-      - data: "disabled"
-        label: "Disabled"
       - data: "local"
-        label: "Local node"
+        label: "Local node (if deployed)"
       - data: "remote"
         label: "Remote server"
-    restrictions: *all_disabled_msg
 
   influxdb_address:
     value: ''
@@ -109,7 +100,6 @@ attributes:
         label: "Alerts sent by email (requires a SMTP server)"
       - data: "remote"
         label: "Alerts sent to a remote Nagios server"
-    restrictions: *all_disabled_msg
 
   alerting_send_to:
     value: ''
