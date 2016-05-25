@@ -355,7 +355,7 @@ if hiera('lma::collector::influxdb::server', false) {
   }
 }
 
-if $is_rabbitmq {
+if $is_rabbitmq && (hiera('lma::collector::elasticsearch::server', false) or hiera('lma::collector::influxdb::server', false)){
   # OpenStack notifications are always useful for indexation and metrics
   # collection
   $messaging_address = get_network_role_property('mgmt/messaging', 'ipaddr')
