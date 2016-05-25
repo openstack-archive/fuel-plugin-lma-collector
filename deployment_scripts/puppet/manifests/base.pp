@@ -15,7 +15,7 @@
 notice('fuel-plugin-lma-collector: base.pp')
 
 # TODO(spasquier): fail if Neutron isn't used
-prepare_network_config(hiera('network_scheme', {}))
+prepare_network_config(hiera_hash('network_scheme', {}))
 $fuel_version      = 0 + hiera('fuel_version')
 $lma_collector     = hiera_hash('lma_collector')
 $is_controller     = roles_include(['controller', 'primary-controller'])

@@ -14,7 +14,7 @@
 
 notice('fuel-plugin-lma-collector: aggregator.pp')
 
-prepare_network_config(hiera('network_scheme', {}))
+prepare_network_config(hiera_hash('network_scheme', {}))
 $mgmt_address    = get_network_role_property('management', 'ipaddr')
 $lma_collector   = hiera_hash('lma_collector')
 $is_controller   = roles_include(['controller', 'primary-controller'])

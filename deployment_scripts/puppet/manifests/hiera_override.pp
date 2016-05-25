@@ -14,7 +14,7 @@
 
 notice('fuel-plugin-lma-collector: hiera_override.pp')
 
-prepare_network_config(hiera('network_scheme', {}))
+prepare_network_config(hiera_hash('network_scheme', {}))
 $plugin_data = hiera_hash('lma_collector', undef)
 
 if ($plugin_data) {
