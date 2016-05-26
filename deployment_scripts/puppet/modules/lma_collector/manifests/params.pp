@@ -156,9 +156,6 @@ class lma_collector::params {
 
   $influxdb_port = '8086'
   $influxdb_timeout = 5
-  $influxdb_flush_interval = 5
-  # InfluxDB recommends a batch size of 5,000 points
-  $influxdb_flush_count = 5000
   $influxdb_tag_fields = []
   $influxdb_time_precision = 'ms'
   $influxdb_message_matcher = join([
