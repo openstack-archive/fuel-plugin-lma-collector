@@ -383,3 +383,5 @@ if $is_rabbitmq and (hiera('lma::collector::elasticsearch::server', false) or hi
     }
   }
 }
+
+class { 'fuel_lma_collector::tools': }
