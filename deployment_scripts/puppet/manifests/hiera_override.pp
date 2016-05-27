@@ -62,9 +62,9 @@ if ($plugin_data) {
   case $influxdb_mode {
     'remote': {
       $influxdb_server = $plugin_data['influxdb_address']
-      $influxdb_database = $lma_collector['influxdb_database']
-      $influxdb_user = $lma_collector['influxdb_user']
-      $influxdb_password = $lma_collector['influxdb_password']
+      $influxdb_database = $plugin_data['influxdb_database']
+      $influxdb_user = $plugin_data['influxdb_user']
+      $influxdb_password = $plugin_data['influxdb_password']
       $monitor_influxdb = false
     }
     'local': {
