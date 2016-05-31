@@ -17,7 +17,7 @@ class lma_collector::influxdb (
   $user,
   $password,
   $server,
-  $port           = $lma_collector::params::influxdb_port,
+  $port,
   $tag_fields     = $lma_collector::params::influxdb_tag_fields,
   $time_precision = $lma_collector::params::influxdb_time_precision,
 ) inherits lma_collector::params {

@@ -150,11 +150,8 @@ class lma_collector::params {
   $worker_report_interval = 60
   $worker_downtime_factor = 2
 
-  $elasticsearch_server = false
-  $elasticsearch_port = '9200'
   $elasticsearch_fields = ['Timestamp', 'Type', 'Logger', 'Severity', 'Payload', 'Pid', 'Hostname', 'DynamicFields']
 
-  $influxdb_port = '8086'
   $influxdb_timeout = 5
   $influxdb_tag_fields = []
   $influxdb_time_precision = 'ms'

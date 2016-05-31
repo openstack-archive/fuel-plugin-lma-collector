@@ -20,7 +20,7 @@ describe 'lma_collector::elasticsearch' do
     end
 
     describe 'with localhost server' do
-        let(:params) {{ :server => 'localhost' }}
+        let(:params) {{ :server => 'localhost', :port => 9200 }}
         it { is_expected.to contain_heka__output__elasticsearch('elasticsearch') }
         it { is_expected.to contain_heka__encoder__es_json('elasticsearch') }
     end
