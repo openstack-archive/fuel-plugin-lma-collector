@@ -82,6 +82,7 @@ if ($plugin_data) {
       $influxdb_database = $influxdb_grafana['influxdb_dbname']
       $influxdb_user = $influxdb_grafana['influxdb_username']
       $influxdb_password = $influxdb_grafana['influxdb_userpass']
+      $influxdb_root_password = $influxdb_grafana['influxdb_rootpass']
     }
     default: {
       fail("'${influxdb_mode}' mode not supported for InfluxDB")
@@ -136,6 +137,7 @@ lma::collector::influxdb::port: 8086
 lma::collector::influxdb::database: <%= @influxdb_database %>
 lma::collector::influxdb::user: <%= @influxdb_user %>
 lma::collector::influxdb::password: <%= @influxdb_password %>
+lma::collector::influxdb::root_password: <%= @influxdb_root_password %>
 <% end -%>
 <% if @nagios_is_deployed -%>
 lma::collector::infrastructure_alerting::server: <%= @nagios_server %>
