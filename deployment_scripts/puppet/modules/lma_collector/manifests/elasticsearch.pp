@@ -13,8 +13,8 @@
 #    under the License.
 #
 class lma_collector::elasticsearch (
-  $server = $lma_collector::params::elasticsearch_server,
-  $port = $lma_collector::params::elasticsearch_port,
+  $server,
+  $port,
 ) inherits lma_collector::params {
   include lma_collector::service::log
 
