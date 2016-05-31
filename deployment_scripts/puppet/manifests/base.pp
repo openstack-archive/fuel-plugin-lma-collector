@@ -36,12 +36,6 @@ if $detach_rabbitmq['metadata'] and $detach_rabbitmq['metadata']['enabled'] {
   $is_rabbitmq = $is_controller
 }
 
-$elasticsearch_kibana = hiera_hash('elasticsearch_kibana', {})
-$es_nodes = get_nodes_hash_by_roles($network_metadata, ['elasticsearch_kibana'])
-
-$influxdb_grafana = hiera_hash('influxdb_grafana', {})
-$influxdb_nodes = get_nodes_hash_by_roles($network_metadata, ['influxdb_grafana'])
-
 if $lma_collector['environment_label'] != '' {
   $environment_label = $lma_collector['environment_label']
 } else {
@@ -347,6 +341,7 @@ if hiera('lma::collector::influxdb::server', false) {
 
   class { 'lma_collector::influxdb':
     server     => hiera('lma::collector::influxdb::server'),
+    port       => hiera('lma::collector::influxdb::port'),
     database   => hiera('lma::collector::influxdb::database'),
     user       => hiera('lma::collector::influxdb::user'),
     password   => hiera('lma::collector::influxdb::password'),
