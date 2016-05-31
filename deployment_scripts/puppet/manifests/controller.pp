@@ -354,8 +354,9 @@ if hiera('lma::collector::influxdb::server', false) {
 
   class { 'lma_collector::collectd::haproxy':
     socket       => $haproxy_socket,
-    # Ignore internal stats ('Stats' for 6.1, 'stats' for 7.0) and lma proxies
-    proxy_ignore => ['Stats', 'stats', 'lma'],
+    # Ignore internal stats ('Stats' for 6.1, 'stats' for 7.0), lma proxies and
+    # Nova EC2
+    proxy_ignore => ['Stats', 'stats', 'lma', 'nova-api-1'],
     proxy_names  => {
       'ceilometer'          => 'ceilometer-api',
       'cinder-api'          => 'cinder-api',
@@ -371,7 +372,9 @@ if hiera('lma::collector::influxdb::server', false) {
       'murano'              => 'murano-api',
       'mysqld'              => 'mysqld-tcp',
       'neutron'             => 'neutron-api',
-      'nova-api-1'          => 'nova-ec2-api',
+      # starting with Mitaka (and later)
+      'nova-api'            => 'nova-api',
+      # before Mitaka
       'nova-api-2'          => 'nova-api',
       'nova-novncproxy'     => 'nova-novncproxy-websocket',
       'nova-metadata-api'   => 'nova-metadata-api',
