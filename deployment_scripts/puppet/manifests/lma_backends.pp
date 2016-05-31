@@ -17,7 +17,6 @@ notice('fuel-plugin-lma-collector: lma_backends.pp')
 prepare_network_config(hiera_hash('network_scheme', {}))
 $mgmt_address = get_network_role_property('management', 'ipaddr')
 
-$influxdb_grafana = hiera('influxdb_grafana')
 
 if hiera('lma::collector::influxdb::server', false) {
   $network_metadata = hiera_hash('network_metadata')
@@ -45,7 +44,7 @@ if hiera('lma::collector::influxdb::server', false) {
   if $is_influxdb_node {
     class { 'lma_collector::collectd::influxdb':
         username => 'root',
-        password => $influxdb_grafana['influxdb_rootpass'],
+        password => hiera('lma::collector::influxdb::root_password'),
         address  => hiera('lma::collector::influxdb::listen_address', $mgmt_address),
         port     => hiera('lma::collector::influxdb::influxdb_port', 8086)
     }
