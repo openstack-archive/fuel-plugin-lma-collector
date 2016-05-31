@@ -13,12 +13,13 @@
 #    under the License.
 #
 class lma_collector::elasticsearch (
-  $server = $lma_collector::params::elasticsearch_server,
-  $port = $lma_collector::params::elasticsearch_port,
+  $server,
+  $port,
 ) inherits lma_collector::params {
   include lma_collector::service::log
 
   validate_string($server)
+  validate_integer($port)
 
   heka::encoder::es_json { 'elasticsearch':
     config_dir              => $lma_collector::params::log_config_dir,

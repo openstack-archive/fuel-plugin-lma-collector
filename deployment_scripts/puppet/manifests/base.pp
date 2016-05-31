@@ -341,6 +341,7 @@ if hiera('lma::collector::influxdb::server', false) {
 
   class { 'lma_collector::influxdb':
     server     => hiera('lma::collector::influxdb::server'),
+    port       => hiera('lma::collector::influxdb::port'),
     database   => hiera('lma::collector::influxdb::database'),
     user       => hiera('lma::collector::influxdb::user'),
     password   => hiera('lma::collector::influxdb::password'),

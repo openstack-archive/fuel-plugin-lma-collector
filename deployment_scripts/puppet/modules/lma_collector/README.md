@@ -487,7 +487,7 @@ Elasticsearch for indexing.
 ##### Parameters
 
 * `server`: *Required*. Elasticsearch server name. Valid options: a string.
-* `port`: *Optional*. Elasticsearch service port. Valid options: a string. Default: "9200".
+* `port`: *Required*. Elasticsearch service port. Valid options: an integer.
 
 #### Class: `lma_collector::logs::keystone_wsgi`
 
@@ -801,8 +801,7 @@ InfluxDB.
 * `user`: *Required*. InfluxDB username. Valid options: a string.
 * `password`: *Required*. InfluxDB password. Valid options: a string.
 * `server`: *Required*. InfluxDB server name. Valid options: a string.
-* `port`: *Optional*. InfluxDB service port. Valid options: a string. Default:
-  `8086`.
+* `port`: *Required*. InfluxDB service port. Valid options: an integer.
 * `tag_fields`: *Optional*. List of message fields to be stored as tags. Valid
   options: an array. Default: `[]`.
 * `time_precision`: *Optional*. Time precision. Valid options: a string.

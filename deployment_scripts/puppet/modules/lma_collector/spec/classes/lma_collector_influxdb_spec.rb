@@ -20,8 +20,8 @@ describe 'lma_collector::influxdb' do
     end
 
     describe 'with mandatory parameters' do
-        let(:params) {{ :server => 'localhost', :user => 'lma', :password =>
-                        'lma', :database => 'lma' }}
+        let(:params) {{ :server => 'localhost', :port => 8086, :user => 'lma',
+                        :password => 'lma', :database => 'lma' }}
         it { is_expected.to contain_heka__output__http('influxdb') }
         it { is_expected.to contain_heka__encoder__payload('influxdb') }
         it { is_expected.to contain_heka__filter__sandbox('influxdb_accumulator') }
@@ -29,8 +29,9 @@ describe 'lma_collector::influxdb' do
     end
 
     describe 'with tag_fields parameter' do
-        let(:params) {{ :server => 'localhost', :user => 'lma', :password =>
-                        'lma', :database => 'lma', :tag_fields => ['foo', 'zzz'] }}
+        let(:params) {{ :server => 'localhost', :port => 8086, :user => 'lma',
+                        :password => 'lma', :database => 'lma',
+                        :tag_fields => ['foo', 'zzz'] }}
         it { is_expected.to contain_heka__output__http('influxdb') }
         it { is_expected.to contain_heka__encoder__payload('influxdb') }
         it { is_expected.to contain_heka__filter__sandbox('influxdb_accumulator').with_config({

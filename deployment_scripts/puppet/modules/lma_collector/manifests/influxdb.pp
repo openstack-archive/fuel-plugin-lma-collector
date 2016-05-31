@@ -17,11 +17,14 @@ class lma_collector::influxdb (
   $user,
   $password,
   $server,
-  $port           = $lma_collector::params::influxdb_port,
+  $port,
   $tag_fields     = $lma_collector::params::influxdb_tag_fields,
   $time_precision = $lma_collector::params::influxdb_time_precision,
 ) inherits lma_collector::params {
   include lma_collector::service::metric
+
+  validate_string($server, $user, $password)
+  validate_integer($port)
 
   $lua_modules_dir = $lma_collector::params::lua_modules_dir
 
