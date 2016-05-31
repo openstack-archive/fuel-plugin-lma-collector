@@ -185,11 +185,6 @@ lma_collector:
           - backends
           - endpoint
           - http_errors
-      nova-ec2-api:
-        policy: highest_severity
-        group_by: member
-        members:
-          - backends
       nova-novncproxy-websocket:
         policy: highest_severity
         group_by: member
@@ -502,7 +497,6 @@ lma_collector:
         members:
           - nova-logs
           - nova-api
-          - nova-ec2-api
           - nova-metadata-api
           - nova-scheduler
           - nova-compute

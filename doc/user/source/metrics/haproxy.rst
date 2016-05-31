@@ -16,7 +16,6 @@
 * murano-api
 * neutron-api
 * nova-api
-* nova-ec2-api
 * nova-metadata-api
 * nova-novncproxy-websocket
 * sahara-api
