@@ -35,6 +35,7 @@ define lma_collector::heka (
   $heka_monitoring = true,
   $poolsize = 100,
   $install_init_script = true,
+  $version = 'latest',
 ) {
 
   include lma_collector::params
@@ -98,6 +99,7 @@ define lma_collector::heka (
     max_timer_inject    => $lma_collector::params::hekad_max_timer_inject,
     poolsize            => $poolsize,
     install_init_script => $install_init_script,
+    version             => $version,
   }
 
   # Heka self-monitoring

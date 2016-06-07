@@ -941,6 +941,7 @@ The title must be either `log_collector` or `metric_collector`.
 * `install_init_script`: *Optional*. Whether or not install the init script (Upstart or Systemd).
   This is typically used when the service is managed by Pacemaker for example.
   (default: true, valid option: boolean).
+* `version`: *Optional*. The Heka version to install. (default: 'latest').
 
 #### Define: `lma_collector::logs::openstack`
 
