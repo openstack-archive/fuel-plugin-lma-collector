@@ -383,6 +383,20 @@ function diag_system {
 
   tail_file /var/log/puppet.log
   run_cmd 'grep -E "MODULAR|fuel-plugin-" /var/log/puppet.log' $diag_output/puppet_tasks.list
+
+  # Network informations
+  run_cmd "ip route" $diag_output/ip_route
+  run_cmd "ip link" $diag_output/ip_link
+  run_cmd "ip address" $diag_output/ip_address
+  run_cmd "ip netns" $diag_output/ip_netns
+  for netns in $(ip netns 2>/dev/null); do
+    run_cmd "ip netns exec $netns ip route" "$diag_output/netns_${netns}_ip_route"
+    run_cmd "ip netns exec $netns ip link" "$diag_output/netns_${netns}_ip_link"
+    run_cmd "ip netns exec $netns ip address" "$diag_output/netns_${netns}_ip_address"
+  done
+  if which "brctl" >/dev/null; then
+      run_cmd "brctl show" $diag_output/brctl_show
+  fi
 }
 
 if has_collector; then
