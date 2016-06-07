@@ -54,6 +54,9 @@
 #   used when the service is managed by Pacemaker for example.
 #   (default: true).
 #
+# [*version*]
+#   The package version to install. (default: 'latest').
+#
 # === Examples
 #
 #  class { 'heka':
@@ -81,6 +84,7 @@ define heka (
   $pre_script = undef,
   $internal_statistics = undef,
   $install_init_script = true,
+  $version = 'latest',
 ) {
 
   include heka::params
@@ -146,7 +150,7 @@ define heka (
 
   if ! defined(Package[$heka::params::package_name]) {
     package { $heka::params::package_name:
-      ensure => latest,
+      ensure => $version,
       alias  => 'heka',
     }
 
