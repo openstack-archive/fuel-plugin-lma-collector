@@ -27,12 +27,14 @@
 #
 class lma_collector::collectd::libvirt (
   $connection = $lma_collector::params::libvirt_connection,
+  $refresh_interval = 10,
 ) inherits lma_collector::params {
 
   validate_string($connection)
 
   class { 'collectd::plugin::libvirt':
-    connection      => $connection,
-    hostname_format => 'uuid',
+    connection       => $connection,
+    hostname_format  => 'uuid',
+    refresh_interval => $refresh_interval,
   }
 }
