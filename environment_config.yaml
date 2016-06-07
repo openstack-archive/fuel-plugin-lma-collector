@@ -11,6 +11,83 @@ attributes:
     weight: 10
     type: "text"
 
+  enable_tls:
+    value: true
+    label: "Enable TLS termination on HAProxy"
+    description: ""
+    weight: 11
+    type: "checkbox"
+
+  grafana_hostname:
+    value: "grafana.fuel.local"
+    label: "DNS hostname for Grafana"
+    description: "Your DNS entries should point to this name. Self-signed certificates also will use this hostname"
+    weight: 12
+    type: "text"
+    restrictions:
+      - condition: "settings:lma_collector.enable_tls.value == false"
+        action: "disable"
+
+  grafana_ssl_cert:
+    value: ""
+    label: "Certificate for Grafana"
+    description: ""
+    weight: 13
+    type: "file"
+    restrictions:
+      - condition: "settings:lma_collector.enable_tls.value == false"
+        action: "disable"
+
+  kibana_hostname:
+    value: "kibana.fuel.local"
+    label: "DNS hostname for Kibana"
+    description: "Your DNS entries should point to this name. Self-signed certificates also will use this hostname"
+    weight: 14
+    type: "text"
+    restrictions:
+      - condition: "settings:lma_collector.enable_tls.value == false"
+        action: "disable"
+
+  kibana_ssl_cert:
+    value: ""
+    label: "Certificate for Kibana"
+    description: ""
+    weight: 15
+    type: "file"
+    restrictions:
+      - condition: "settings:lma_collector.enable_tls.value == false"
+        action: "disable"
+
+  nagios_hostname:
+    value: "nagios.fuel.local"
+    label: "DNS hostname for Nagios"
+    description: "Your DNS entries should point to this name. Self-signed certificates also will use this hostname"
+    weight: 16
+    type: "text"
+    restrictions:
+      - condition: "settings:lma_collector.enable_tls.value == false"
+        action: "disable"
+
+  nagios_ssl_cert:
+    value: ""
+    label: "Certificate for Nagios"
+    description: ""
+    weight: 17
+    type: "file"
+    restrictions:
+      - condition: "settings:lma_collector.enable_tls.value == false"
+        action: "disable"
+
+  ssl_private_key:
+    value: ""
+    label: "Private key"
+    description: ""
+    weight: 18
+    type: "file"
+    restrictions:
+      - condition: "settings:lma_collector.enable_tls.value == false"
+        action: "disable"
+
   elasticsearch_mode:
     type: "radio"
     weight: 20
