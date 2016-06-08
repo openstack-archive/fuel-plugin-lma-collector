@@ -3,39 +3,42 @@
 Installation
 ============
 
-Prior to installing the LMA Collector Plugin, you may want to install the backend
-services the Collector depends on. These backend services include:
+Prior to installing the StackLight Collector Plugin,
+you may want to install the backend services the Collector uses
+to store the data. These backend services include:
 
 * Elasticsearch
 * InfluxDB
 * Nagios
 
-There are two options:
+There are two installation options:
 
-1. Install these backend services automatically using the Fuel Plugins listed below.
+1. Install the backend services automatically within a Fuel environment using the Fuel Plugins listed below.
 
-  * `Elasticsearch-Kibana Fuel Plugin Installation Guide <http://fuel-plugin-elasticsearch-kibana.readthedocs.io/en/latest/installation.html#installation-guide>`_.
-  * `InfluxDB-Grafana Fuel Plugin Installation Guide <http://fuel-plugin-influxdb-grafana.readthedocs.io/en/latest/installation.html#installation-guide>`_.
-  * `Infrastructure Alerting Fuel Plugin Installation Guide <http://fuel-plugin-lma-infrastructure-alerting.readthedocs.io/en/latest/installation.html#installation-guide>`_.
+  * `StackLight Elasticsearch-Kibana Fuel Plugin Installation Guide <http://fuel-plugin-elasticsearch-kibana.readthedocs.io/en/latest/installation.html#installation-guide>`_.
+  * `StackLight InfluxDB-Grafana Fuel Plugin Installation Guide <http://fuel-plugin-influxdb-grafana.readthedocs.io/en/latest/installation.html#installation-guide>`_.
+  * `StackLight Infrastructure Alerting Fuel Plugin Installation Guide <http://fuel-plugin-lma-infrastructure-alerting.readthedocs.io/en/latest/installation.html#installation-guide>`_.
 
-2. Install these backend services manually outside of your OpenStack environment.
-   This installation must comply with the LMA Collector Plugin's :ref:`requirements <plugin_requirements>`.
+2. Install the backend services on your own outside of a Fuel environment.
+   Note that in this case, the installation must comply with the StackLight Collector
+   Plugin's :ref:`requirements <plugin_requirements>`.
 
 
-LMA Collector Fuel Plugin installation using the RPM file of the Fuel Plugins Catalog
--------------------------------------------------------------------------------------
+StackLight Collector Fuel Plugin installation using the RPM file of the Fuel Plugins Catalog
+--------------------------------------------------------------------------------------------
 
-To install the LMA Collector Fuel Plugin using the RPM file of the Fuel Plugins
+To install the StackLight Collector Fuel Plugin using the RPM file of the Fuel Plugins
 Catalog, follow these steps:
 
-1. Download the RPM file from the `Fuel Plugins Catalog <https://software.mirantis.com/download-mirantis-openstack-fuel-plug-ins/>`_.
+1. Select, using the _MONITORING_ category and Mirantis OpenStack version you are using, the RPM file
+   you want to download from the `Fuel Plugins Catalog <https://www.mirantis.com/validated-solution-integrations/fuel-plugins/>`_
 
 2. Copy the RPM file to the Fuel Master node::
 
     [root@home ~]# scp lma_collector-0.10-0.10.0-1.noarch.rpm \
     root@<Fuel Master node IP address>:
 
-3. Install the plugin using the `Fuel CLI <http://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#using-fuel-cli>`_::
+3. Install the plugin using the `Fuel Plugins CLI <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide/cli/cli_plugins.html>`_::
 
     [root@fuel ~]# fuel plugins --install lma_collector-0.10-0.10.0-1.noarch.rpm
 
@@ -47,15 +50,17 @@ Catalog, follow these steps:
     1  | lma_collector        | 0.10.0   | 4.0.0
 
 
-LMA Collector Fuel Plugin installation from source
---------------------------------------------------
+StackLight Collector Fuel Plugin installation from source
+---------------------------------------------------------
 
 Alternatively, you may want to build the RPM file of the plugin from source
-if, for example, you want to test the latest features, modify some built-in
-configuration or implement your own customization.
-But note that running a Fuel plugin that you have built yourself is at your own risk.
+if, for example, you wanted to test the latest features of the master branch
+or modify some built-in configuration or implement customization.
 
-To install LMA Collector Plugin from source, you first need to prepare an
+But note, however, that running a Fuel plugin that you have built yourself
+is at your own risk and not supported.
+
+To install StackLight Collector Plugin from source, you first need to prepare an
 environement to build the RPM file.
 The recommended approach is to build the RPM file directly onto the Fuel Master
 node so that you won't have to copy that file later on.
