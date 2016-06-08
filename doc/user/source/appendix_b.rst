@@ -3,8 +3,8 @@
 Appendix B: List of metrics
 ===========================
 
-This is the list of metrics that are emitted by the LMA collector service. They
-are listed by category then by metric name.
+Here is a list of metrics that are emitted by the StackLight Collector.
+They are listed by category then by metric name.
 
 System
 ------
@@ -63,8 +63,8 @@ Clusters
 
 .. include:: metrics/clusters.rst
 
-LMA self-monitoring
--------------------
+Self Monitoring
+---------------
 
 .. include:: metrics/lma.rst
 
