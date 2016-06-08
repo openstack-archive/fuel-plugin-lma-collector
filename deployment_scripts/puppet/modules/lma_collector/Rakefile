@@ -44,6 +44,7 @@ task :lua_tests => [:lua_libraries, :lib_cbuf] do |t|
     LUA_TESTS.each do |f|
         sh "lua5.1", f
     end
+    Rake::Task[:remove_cbuf_library].invoke
 end
 
 # Need to pull date_time.lua from the lua_sandbox repository because some tests
@@ -121,8 +122,4 @@ task :remove_cbuf_library do |t|
     verbose(false) do
         sh 'rm -f ./circular_buffer.so'
     end
-end
-
-Kernel.trap("EXIT") do
-      Rake::Task[:remove_cbuf_library].invoke
 end
