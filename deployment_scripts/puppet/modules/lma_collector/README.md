@@ -937,10 +937,11 @@ The title must be either `log_collector` or `metric_collector`.
 * `groups`: *Optional*. Additional groups to add to the user running the Heka service. Ignored if the Heka service is run as "root". Valid options: an array of strings. Default: `['syslog', 'adm']`.
 * `poolsize`: *Optional*. The pool size of maximum messages that can exist (default: 100).
 * `heka_monitoring`: *Optional*. Enable the hekad plugins monitoring by configuring
-  the Heka dashboard and a filter plugin. (default: true, valid option: boolean).
+  the Heka dashboard and a filter plugin. Valid options: boolean. Default: true.
 * `install_init_script`: *Optional*. Whether or not install the init script (Upstart or Systemd).
   This is typically used when the service is managed by Pacemaker for example.
-  (default: true, valid option: boolean).
+  Valid options: boolean. Default: true.
+* `version`: *Optional*. The Heka version to install. Default: 'latest'.
 
 #### Define: `lma_collector::logs::openstack`
 

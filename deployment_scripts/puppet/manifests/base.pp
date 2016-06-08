@@ -14,6 +14,8 @@
 
 notice('fuel-plugin-lma-collector: base.pp')
 
+$heka_version = '0.10.0'
+
 # TODO(spasquier): fail if Neutron isn't used
 prepare_network_config(hiera_hash('network_scheme', {}))
 $fuel_version      = 0 + hiera('fuel_version')
@@ -85,6 +87,7 @@ lma_collector::heka { 'log_collector':
   user                => $heka_user,
   groups              => $additional_groups,
   install_init_script => $install_heka_init_script,
+  version             => $heka_version,
   require             => Class['lma_collector'],
 }
 
@@ -92,6 +95,7 @@ lma_collector::heka { 'metric_collector':
   user                => $heka_user,
   groups              => $additional_groups,
   install_init_script => $install_heka_init_script,
+  version             => $heka_version,
   require             => Class['lma_collector'],
 }
 
