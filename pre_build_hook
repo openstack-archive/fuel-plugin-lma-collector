@@ -19,7 +19,7 @@ SAHARA_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/openstack-sahara-7.
 OPENSTACKLIB_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/openstack-openstacklib-7.0.0.tar.gz"
 
 download_packages \
-    https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka_${HEKA_VERSION}_amd64.deb \
+    https://github.com/elemoine/heka/releases/download/ratelimit-1/heka_${HEKA_VERSION}_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fonts-dejavu/fonts-dejavu-core_2.34-1ubuntu1_all.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fontconfig/fontconfig-config_2.11.0-0ubuntu4.1_all.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fontconfig/libfontconfig1_2.11.0-0ubuntu4.1_amd64.deb \
@@ -43,6 +43,8 @@ download_packages \
     http://mirrors.kernel.org/ubuntu/pool/main/r/rrdtool/librrd4_1.4.7-2ubuntu5_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/universe/c/collectd/collectd_5.4.0-3ubuntu2_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/libd/libdbi-drivers/libdbd-mysql_0.9.0-2ubuntu2_amd64.deb
+
+check_md5sum heka_${HEKA_VERSION}_amd64.deb 69514d94173181a8d1dcab769062fdac
 
 download_puppet_module "collectd" "${COLLECTD_TARBALL_URL}"
 download_puppet_module "apache" "${APACHE_TARBALL_URL}"

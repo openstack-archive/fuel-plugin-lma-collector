@@ -20,19 +20,22 @@ MODULES_DIR="${ROOT}"/deployment_scripts/puppet/modules
 RPM_REPO="${ROOT}"/repositories/centos/
 DEB_REPO="${ROOT}"/repositories/ubuntu/
 
+function get_package_path {
+    FILE=$(basename "$1")
+    if [[ "$1" == *.deb ]]; then
+        echo "$DEB_REPO"/"$FILE"
+    elif [[ "$1" == *.rpm ]]; then
+        echo "$RPM_REPO"/"$FILE"
+    else
+        echo "Invalid URL for $1"
+        exit 1
+    fi
+}
+
 # Download RPM or DEB packages and store them in the local repository directory
 function download_packages {
     while [ $# -gt 0 ]; do
-        if [[ "$1" == *.deb ]]; then
-            REPO=$DEB_REPO
-        elif [[ "$1" == *.rpm ]]; then
-            REPO=$RPM_REPO
-        else
-            echo "Invalid URL for download_package(): $1"
-        fi
-
-        FILE=$(basename "$1")
-        wget -qO - "$1" > "$REPO"/"$FILE"
+        wget -qO - "$1" > "$(get_package_path "$1")"
         shift
     done
 }
@@ -44,3 +47,7 @@ function download_puppet_module {
     wget -qO- "$2" | tar -C "${MODULES_DIR}/$1" --strip-components=1 -xz
 }
 
+function check_md5sum {
+    FILE="$(get_package_path "$1")"
+    echo "$2 $FILE" | md5sum --check --strict
+}
