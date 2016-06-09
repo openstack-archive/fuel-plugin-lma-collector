@@ -17,9 +17,11 @@ notice('fuel-plugin-lma-collector: aggregator.pp')
 prepare_network_config(hiera_hash('network_scheme', {}))
 $mgmt_address    = get_network_role_property('management', 'ipaddr')
 $lma_collector   = hiera_hash('lma_collector')
-$is_controller   = roles_include(['controller', 'primary-controller'])
-$is_rabbitmq     = roles_include(['standalone-rabbitmq', 'primary-standalone-rabbitmq'])
-$is_mysql_server = roles_include(['standalone-database', 'primary-standalone-database'])
+
+$node_profiles   = hiera_hash('lma::collector::node_profiles')
+$is_controller   = $node_profiles['controller']
+$is_mysql_server = $node_profiles['mysql']
+$is_rabbitmq     = $node_profiles['rabbitmq']
 
 $network_metadata = hiera_hash('network_metadata')
 $controllers      = get_nodes_hash_by_roles($network_metadata, ['primary-controller', 'controller'])
