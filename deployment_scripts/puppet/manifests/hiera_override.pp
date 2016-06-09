@@ -37,6 +37,8 @@ if ($plugin_data) {
     $is_rabbitmq_node = $is_controller_node
   }
 
+  $has_controller = count(get_nodes_hash_by_roles($network_metadata, ['primary-controller'])) > 0
+
   # Elasticsearch
   $is_elasticsearch_node = roles_include(['elasticsearch_kibana', 'primary-elasticsearch_kibana'])
   $elasticsearch_mode = $plugin_data['elasticsearch_mode']
@@ -152,6 +154,7 @@ lma::collector::is_elasticsearch_node: <%= @is_elasticsearch_node %>
 lma::collector::is_rabbitmq_node: <%= @is_rabbitmq_node %>
 lma::collector::is_mysql_node: <%= @is_mysql_node %>
 lma::collector::is_base_os_node: <%= @is_base_os_node %>
+lma::collector::has_controller: <%= @has_controller %>
 <% if @es_is_deployed -%>
 lma::collector::elasticsearch::server: <%= @es_server %>
 lma::collector::elasticsearch::rest_port: 9200
