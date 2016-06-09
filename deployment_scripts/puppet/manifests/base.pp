@@ -327,19 +327,34 @@ if hiera('lma::collector::influxdb::server', false) {
   }
 
   if $is_mysql_server {
-    $nova = hiera_hash('nova', {})
-
-    class { 'lma_collector::collectd::mysql':
-      username => 'nova',
-      password => $nova['db_password'],
-      require  => Class['lma_collector::collectd::base'],
+    if hiera('lma::collector::has_controller', false) {
+      $nova = hiera_hash('nova', {})
+      $mysql_username = 'nova'
+      $mysql_password = $nova['db_password']
+      $mysql_db = 'nova'
+    } elsif hiera('lma::collector::is_influxdb_node') {
+      $influxdb_plugin = hiera_hash('influxdb_grafana', {})
+      if $influxdb_plugin['mysql_mode'] == 'locale' {
+        # Dedicated environement with InfluxDB deployed with local Mysql (detach database plugin)
+        $mysql_username = $influxdb_plugin['mysql_username']
+        $mysql_password = $influxdb_plugin['mysql_password']
+        $mysql_db = $influxdb_plugin['mysql_db']
+      }
     }
 
-    lma_collector::collectd::dbi_mysql_status { 'mysql_status':
-      username => 'nova',
-      dbname   => 'nova',
-      password => $nova['db_password'],
-      require  => Class['lma_collector::collectd::base'],
+    if $mysql_username {
+      class { 'lma_collector::collectd::mysql':
+        username => $mysql_username,
+        password => $mysql_password,
+        require  => Class['lma_collector::collectd::base'],
+      }
+
+      lma_collector::collectd::dbi_mysql_status { 'mysql_status':
+        username => $mysql_username,
+        dbname   => $mysql_db,
+        password => $mysql_password,
+        require  => Class['lma_collector::collectd::base'],
+      }
     }
   }
 
