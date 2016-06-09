@@ -1,6 +1,6 @@
-==============================================================
-Welcome to the Mirantis OpenStack LMA Collector Documentation!
-==============================================================
+==================================================
+Welcome to the StackLight Collector Documentation!
+==================================================
 
 .. toctree::
    :maxdepth: 2
