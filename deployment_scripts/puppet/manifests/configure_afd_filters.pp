@@ -15,9 +15,9 @@
 notice('fuel-plugin-lma-collector: configure_afd_filters.pp')
 
 $lma           = hiera_hash('lma_collector', {})
-$is_controller = roles_include(['controller', 'primary-controller'])
-$is_rabbitmq   = roles_include(['standalone-rabbitmq', 'primary-standalone-rabbitmq'])
-$is_mysql_server = roles_include(['standalone-database', 'primary-standalone-database'])
+$is_controller = hiera('lma::collector::is_controller_node')
+$is_rabbitmq   = hiera('lma::collector::is_rabbitmq_node')
+$is_mysql_server = hiera('lma::collector::is_mysql_node')
 
 $alarms_definitions = $lma['alarms']
 if $alarms_definitions == undef {

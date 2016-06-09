@@ -20,7 +20,7 @@ if hiera('lma::collector::influxdb::server', false) {
   # module which can be run only by one manifest otherwise the collectd configuration is
   # overwritten by the next run. Currently only controller nodes have python
   # plugins installed so it's safe to install on all other roles .. for now.
-  if ! roles_include(['controller', 'primary-controller']) {
+  if ! hiera('lma::collector::is_controller_node') {
     class { 'lma_collector::collectd::base':
       processes    => ['hekad', 'collectd'],
     }
