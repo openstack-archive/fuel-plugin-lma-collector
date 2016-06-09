@@ -21,8 +21,8 @@ $mgmt_address = get_network_role_property('management', 'ipaddr')
 if hiera('lma::collector::influxdb::server', false) {
   $network_metadata = hiera_hash('network_metadata')
 
-  $is_elasticsearch_node = roles_include(['elasticsearch_kibana', 'primary-elasticsearch_kibana'])
-  $is_influxdb_node = roles_include(['influxdb_grafana', 'primary-influxdb_grafana'])
+  $is_elasticsearch_node = hiera('lma::collector::is_elasticsearch_node')
+  $is_influxdb_node = hiera('lma::collector::is_influxdb_node')
 
   if $is_elasticsearch_node {
     $process_matches = [{name => 'elasticsearch', regex => 'java'}]
