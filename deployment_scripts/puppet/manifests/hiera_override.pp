@@ -19,8 +19,23 @@ $plugin_data = hiera_hash('lma_collector', undef)
 
 if ($plugin_data) {
   $network_metadata = hiera_hash('network_metadata')
+  $is_controller_node = roles_include(['controller', 'primary-controller'])
+  $is_base_os_node = roles_include('base-os')
+
+  if roles_include(['standalone-database', 'primary-standalone-database']) {
+    $is_mysql_node = true
+  } else {
+    $is_mysql_node = $is_controller_node
+  }
+
+  if roles_include(['standalone-rabbitmq', 'primary-standalone-rabbitmq']) {
+    $is_rabbitmq_node = true
+  } else {
+    $is_rabbitmq_node = $is_controller_node
+  }
 
   # Elasticsearch
+  $is_elasticsearch_node = roles_include(['elasticsearch_kibana', 'primary-elasticsearch_kibana'])
   $elasticsearch_mode = $plugin_data['elasticsearch_mode']
   $es_nodes = get_nodes_hash_by_roles($network_metadata, ['elasticsearch_kibana', 'primary-elasticsearch_kibana'])
   $es_nodes_count = count($es_nodes)
@@ -54,6 +69,7 @@ if ($plugin_data) {
   }
 
   # InfluxDB
+  $is_influxdb_node = roles_include(['influxdb_grafana', 'primary-influxdb_grafana'])
   $influxdb_mode = $plugin_data['influxdb_mode']
   $influxdb_nodes = get_nodes_hash_by_roles($network_metadata, ['influxdb_grafana', 'primary-influxdb_grafana'])
   $influxdb_nodes_count = count($influxdb_nodes)
@@ -127,6 +143,14 @@ if ($plugin_data) {
 
   $calculated_content = inline_template('
 ---
+lma::collector::node_profiles:
+  controller: <%= @is_controller_node %>
+  influxdb: <%= @is_influxdb_node %>
+  elasticsearch: <%= @is_elasticsearch_node %>
+  rabbitmq: <%= @is_rabbitmq_node %>
+  mysql: <%= @is_mysql_node %>
+  base_os: <%= @is_base_os_node %>
+
 <% if @es_is_deployed -%>
 lma::collector::elasticsearch::server: <%= @es_server %>
 lma::collector::elasticsearch::rest_port: 9200

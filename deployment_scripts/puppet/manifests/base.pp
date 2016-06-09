@@ -18,25 +18,15 @@ $heka_version = '0.10.0'
 
 # TODO(spasquier): fail if Neutron isn't used
 prepare_network_config(hiera_hash('network_scheme', {}))
-$fuel_version      = 0 + hiera('fuel_version')
-$lma_collector     = hiera_hash('lma_collector')
-$is_controller     = roles_include(['controller', 'primary-controller'])
-$is_base_os        = roles_include('base-os')
-$network_metadata  = hiera_hash('network_metadata')
-$detach_rabbitmq   = hiera('detach-rabbitmq', {})
-$detach_database   = hiera('detach-database', {})
+$fuel_version    = 0 + hiera('fuel_version')
+$lma_collector   = hiera_hash('lma_collector')
 
-if $detach_database['metadata'] and $detach_database['metadata']['enabled'] {
-  $is_mysql_server = roles_include(['standalone-database', 'primary-standalone-database'])
-} else {
-  $is_mysql_server = $is_controller
-}
+$node_profiles   = hiera_hash('lma::collector::node_profiles')
+$is_controller   = $node_profiles['controller']
+$is_base_os      = $node_profiles['base_os']
+$is_mysql_server = $node_profiles['mysql']
+$is_rabbitmq     = $node_profiles['rabbitmq']
 
-if $detach_rabbitmq['metadata'] and $detach_rabbitmq['metadata']['enabled'] {
-  $is_rabbitmq = roles_include(['standalone-rabbitmq', 'primary-standalone-rabbitmq'])
-} else {
-  $is_rabbitmq = $is_controller
-}
 
 if $lma_collector['environment_label'] != '' {
   $environment_label = $lma_collector['environment_label']
