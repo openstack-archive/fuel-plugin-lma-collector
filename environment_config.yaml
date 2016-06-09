@@ -95,7 +95,7 @@ attributes:
     label: "Alerting"
     values:
       - data: "local"
-        label: "Alerts sent to a local cluster running the LMA Infrastructure Alerting plugin (if deployed)"
+        label: "Alerts sent to the StackLight Infrastructure Alerting plugin (Nagios) if deployed."
       - data: "standalone"
         label: "Alerts sent by email (requires a SMTP server)"
 
