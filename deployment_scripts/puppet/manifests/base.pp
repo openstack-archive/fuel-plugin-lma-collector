@@ -27,7 +27,6 @@ $is_base_os      = $node_profiles['base_os']
 $is_mysql_server = $node_profiles['mysql']
 $is_rabbitmq     = $node_profiles['rabbitmq']
 
-
 if $lma_collector['environment_label'] != '' {
   $environment_label = $lma_collector['environment_label']
 } else {
@@ -317,18 +316,16 @@ if hiera('lma::collector::influxdb::server', false) {
   }
 
   if $is_mysql_server {
-    $nova = hiera_hash('nova', {})
-
     class { 'lma_collector::collectd::mysql':
-      username => 'nova',
-      password => $nova['db_password'],
+      username => hiera('lma::collector::monitor::mysql_username'),
+      password => hiera('lma::collector::monitor::mysql_password'),
       require  => Class['lma_collector::collectd::base'],
     }
 
     lma_collector::collectd::dbi_mysql_status { 'mysql_status':
-      username => 'nova',
-      dbname   => 'nova',
-      password => $nova['db_password'],
+      username => hiera('lma::collector::monitor::mysql_username'),
+      dbname   => hiera('lma::collector::monitor::mysql_db'),
+      password => hiera('lma::collector::monitor::mysql_password'),
       require  => Class['lma_collector::collectd::base'],
     }
   }
