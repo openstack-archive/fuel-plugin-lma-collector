@@ -34,6 +34,8 @@ if ($plugin_data) {
     $is_rabbitmq_node = $is_controller_node
   }
 
+  $has_controller = count(get_nodes_hash_by_roles($network_metadata, ['primary-controller'])) > 0
+
   # Elasticsearch
   $is_elasticsearch_node = roles_include(['elasticsearch_kibana', 'primary-elasticsearch_kibana'])
   $elasticsearch_mode = $plugin_data['elasticsearch_mode']
@@ -109,6 +111,20 @@ if ($plugin_data) {
   } else {
     $influxdb_is_deployed = false
   }
+  if $has_controller {
+    $nova = hiera_hash('nova', {})
+    $mysql_username = 'nova'
+    $mysql_password = $nova['db_password']
+    $mysql_db = 'nova'
+  } elsif $is_influxdb_node {
+      $influxdb_plugin = hiera_hash('influxdb_grafana', {})
+      if $influxdb_plugin['mysql_mode'] == 'locale' {
+        # Dedicated environement with InfluxDB deployed with local Mysql (detach database plugin)
+        $mysql_username = $influxdb_plugin['mysql_username']
+        $mysql_password = $influxdb_plugin['mysql_password']
+        $mysql_db = $influxdb_plugin['mysql_db']
+      }
+  }
 
   # Infrastructure Alerting
   $alerting_mode = $plugin_data['alerting_mode']
@@ -150,6 +166,10 @@ lma::collector::node_profiles:
   rabbitmq: <%= @is_rabbitmq_node %>
   mysql: <%= @is_mysql_node %>
   base_os: <%= @is_base_os_node %>
+
+lma::collector::monitor::mysql_db: <%= @mysql_db %>
+lma::collector::monitor::mysql_username: <%= @mysql_username %>
+lma::collector::monitor::mysql_password: <%= @mysql_password %>
 
 <% if @es_is_deployed -%>
 lma::collector::elasticsearch::server: <%= @es_server %>
