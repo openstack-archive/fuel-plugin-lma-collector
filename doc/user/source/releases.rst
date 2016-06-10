@@ -6,6 +6,48 @@ Release Notes
 Version 0.10.0
 --------------
 
+* Changes
+
+  * Separate processing pipeline for logs and metrics
+
+    Prior to StackLight version 0.10.0, there was one instance of the *hekad*
+    process running to process both the logs and the metrics. Starting with StackLight
+    version 0.10.0, the processing of logs and notifications is separated
+    from the processing of metrics into two different *hekad* instances.
+    This allows for better performance and flow control mechanisms when the
+    maximum buffer size on disk has reached a limit. With the *hekad* instance
+    processing the metrics, the buffering policy mandates to drop the metrics
+    when the maximum buffer size is reached. With the *hekad* instance
+    processing the logs, the buffering policy mandates to block the
+    entire processing pipeline. This way, one can avoid
+    loosing logs (and notifications) in cases when the Elasticsearch
+    server has been inaccessible for a long period of time.
+    As a result, the StackLight collector has now two services running
+    on a node:
+
+    * The **log_collector** service
+    * The **metric_collector** service
+
+  * Metrics derived from logs are now aggregated
+
+    To avoid flooding the *metric_collector* with bursts of metrics derived
+    from logs, the *log_collector* service sends aggregated metrics
+    by bulk to the *metric_collector* service.
+    An example of aggregated metric derived from logs is the
+    `openstack_<service>_http_response_time_stats
+    <http://fuel-plugin-lma-collector.readthedocs.io/en/latest/appendix_b.html#api-response-times>`_.
+
+  * Diagnostic tool
+
+    A diagnostic tool is now available to help diagnose problems.
+    The diagnostic tool checks that the toolchain is properly installed
+    and configured across the entire StackLight LMA toolchain. Please check the
+    the `Troubleshooting Chapter
+    <http://fuel-plugin-lma-collector.readthedocs.io/en/latest/configuration.html#troubleshooting>`_
+    of the User Guide for more information.
+
+* Bug fixes
+
 Version 0.9.0
 -------------
 
