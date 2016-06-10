@@ -22,7 +22,8 @@ check_fuel_nodes_file "${FUEL_NODES_FILE}"
 # collectd processes could be wedged, stop or kill them
 # see https://bugs.launchpad.net/lma-toolchain/+bug/1560946
 echo "** Stopping collectd"
-for n in $(grep True $FUEL_NODES_FILE | grep ready | awk -F '|' '{print $5}'); do
+node_list=$(get_online_nodes "$(cat $FUEL_NODES_FILE)")
+for n in $node_list; do
     echo "$n";
     ssh "$n" '/etc/init.d/collectd  stop; pkill -9 collectd'
 done
@@ -30,7 +31,8 @@ done
 # Several hekad processes may run on these nodes, stop or kill them
 # see https://bugs.launchpad.net/lma-toolchain/+bug/1561109
 echo "** Stopping hekad"
-for n in $(grep -v controller $FUEL_NODES_FILE | grep True | grep ready | awk -F '|' '{print $5}'); do
+node_list=$(get_online_nodes "$(grep -v controller $FUEL_NODES_FILE)")
+for n in $node_list; do
     echo "$n";
     ssh "$n" 'service lma_collector stop; pkill -TERM hekad; sleep 5; pkill -9 hekad;'
 done
@@ -38,7 +40,8 @@ done
 # Stop hekad on controllers during the upgrade to avoid losing logs and notification
 # (because elasticsearch will be stopped and hekad doesn't buffer data with 0.8.0)
 echo "** Stopping Heka on controller(s)"
-for n in $(grep controller $FUEL_NODES_FILE | grep True | grep ready | awk -F '|' '{print $5}'|tail -n 1); do
+node_list=$(get_online_nodes "$(grep controller $FUEL_NODES_FILE)")
+for n in $node_list; do
     echo "$n";
     ssh "$n" 'crm resource stop lma_collector'
 done

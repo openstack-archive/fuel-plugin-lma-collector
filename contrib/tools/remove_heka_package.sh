@@ -19,10 +19,12 @@ FUEL_NODES_FILE=/tmp/nodes
 
 check_fuel_nodes_file "${FUEL_NODES_FILE}"
 
+node_list=$(get_online_nodes "$(cat $FUEL_NODES_FILE)")
+
 # Remove Heka due to the issue with heka package versionning
 # https://github.com/mozilla-services/heka/issues/1892
 echo "** Remove Heka package"
-for n in $(grep True $FUEL_NODES_FILE | grep ready |awk -F '|' '{print $5}'); do
+for n in $node_list; do
     echo "$n";
     ssh "$n" 'apt-get remove -y heka'
 done
