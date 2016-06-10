@@ -6,6 +6,46 @@ Release Notes
 Version 0.10.0
 --------------
 
+* Changes
+
+  * Separate processing pipeline for logs and metrics
+
+    Prior to StackLight version 0.10.0 there was only one instance of *hekad*
+    to process both the logs and the metrics. Starting with StackLight
+    version 0.10.0, the processing of logs and notifications is separated
+    from the processing of metrics into two different *hekad* instances.
+    This allows for better performance and flow control when the
+    maximum buffer size on disk has reached a limit. With the *hekad* instance
+    processing the metrics, the buffering policy mandates to drop metrics when
+    the maximum buffer size has been reached. With the *hekad* instance
+    processing the logs, the buffering policy mandates to block the
+    entire stream processing pipeline. This way, the *log_collector* avoids
+    loosing logs and notifications when the Elasticsearch server has been
+    inaccessible for a long period of time. As a result, there is now
+    two *collector* services running on the nodes:
+      * The **log_collector** service
+      * The **metric_collector** service
+
+  * Metrics derived from logs are aggregated
+
+    To avoid flooding the *metric_collector* with metrics derived
+    from logs, the *log_collector* sends aggregated metrics by bulk
+    to the *metric_collector*.
+    An example of aggregated metric derived from logs is the
+    `openstack_<service>_http_response_time_stats
+    <http://fuel-plugin-lma-collector.readthedocs.io/en/latest/appendix_b.html#api-response-times>`_.
+
+  * Diagnostic tool
+
+    A diagnostic tool is now avaialble that you can use to check across
+    the entire cluster that the StackLight LMA Toolchain
+    is properly installed, configured and running. Please check the
+    the `Troubleshooting Chapter
+    <http://fuel-plugin-lma-collector.readthedocs.io/en/latest/configuration.html#troubleshooting>`_
+    of the User Guide for more information.
+
+* Bug fixes
+
 Version 0.9.0
 -------------
 
