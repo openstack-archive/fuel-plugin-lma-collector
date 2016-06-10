@@ -21,4 +21,8 @@ function check_fuel_nodes_file {
     fi
 }
 
-
+# Get IPs list of online nodes from 'fuel command' output.
+function get_online_nodes {
+   # "fuel nodes" command output differs form Fuel 8 and 9 for online nodes: True/False and 0/1
+   fuel nodes | grep ready | awk -F '|' -vOFS=':' '{print $5,$9 }'|tr -d ' '|grep -E ':1|:True'|awk -F ':' '{print $1}'
+}
