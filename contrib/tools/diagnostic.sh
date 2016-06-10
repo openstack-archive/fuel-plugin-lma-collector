@@ -16,17 +16,22 @@
 set -e
 
 FUEL_NODES_FILE=/tmp/nodes
-
-. "$(dirname "$(readlink -f "$0")")"/common.sh
-
 DIAG_DIR=/var/lma_diagnostics
+
+fuel nodes > $FUEL_NODES_FILE
+
+# "fuel nodes" command output differs form Fuel 8 and 9 for online nodes: True/False and 0/1
+node_list=$(cat $FUEL_NODES_FILE | grep ready | awk -F '|' -vOFS=':' '{print $5,$9 }'|tr -d ' '|grep -E ':1|:True'|awk -F ':' '{print $1}')
+
 rm -rf "$DIAG_DIR"
 mkdir $DIAG_DIR
 
-mco rpc --verbose --display all --agent execute_shell_command --action execute --argument cmd="/usr/local/bin/lma_diagnostics" > "$DIAG_DIR/outputs.log" 2>&1
+echo "Running lma_diagnostic tool on all available nodes (this can take several minutes)"
+mco rpc --timeout 300 --verbose --display all --agent execute_shell_command --action execute --argument cmd="/usr/local/bin/lma_diagnostics" > "$DIAG_DIR/outputs.log" 2>&1
 
-node_list=$(grep True $FUEL_NODES_FILE | grep ready | awk -F '|' '{print $5}')
+node_list=$(cat $FUEL_NODES_FILE | grep ready | awk -F '|' '{print $5}')
 for n in $node_list; do
+    echo "Downloading diagnostic for node $n"
     rsync -arz "$n:$DIAG_DIR" "$DIAG_DIR/$n/" || echo "Fail to retrieve diagnostic from $n"
 done
 
