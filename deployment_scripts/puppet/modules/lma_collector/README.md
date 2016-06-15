@@ -1029,7 +1029,7 @@ The resource title should be set to the service name (e.g. `'nova'`).
 #### Define `lma_collector::afd_filter`
 
 Declare this define to configure an [Anomaly and Fault Detection
-filter](http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/alarms.html)
+filter](http://fuel-plugin-lma-collector.readthedocs.org/en/latest/alarms.html)
 in Heka.
 
 ##### Parameters
@@ -1051,7 +1051,7 @@ in Heka.
 #### Define `lma_collector::afd_nagios`
 
 Declare this define to send [Anomaly and Fault Detection messages](
-http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/alarms.html)
+http://fuel-plugin-lma-collector.readthedocs.org/en/latest/alarms.html)
 to Nagios as [passive check
 results](https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/3/en/passivechecks.html).
 
@@ -1074,7 +1074,7 @@ results](https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/3/en/pas
 #### Define `lma_collector::gse_cluster_filter`
 
 Declare this define to configure an [Global Status Evaluation filter](
-http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/alarms.html)
+http://fuel-plugin-lma-collector.readthedocs.org/en/latest/alarms.html)
 in Heka.
 
 ##### Parameters
@@ -1095,7 +1095,7 @@ in Heka.
   filter to associate the AFD/GSE metrics to the clusters. Valid options: a
   string. Default: undef.
 * `clusters`: *Optional*. List of clusters that the plugin manages. See the [GSE
-  configuration](http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/alarms.html)
+  configuration](http://fuel-plugin-lma-collector.readthedocs.org/en/latest/alarms.html)
   documentation for details. Valid options: a hash. Default: {}.
 * `warm_up_period`: *Optional*. Number of seconds after a (re)start that the
   GSE plugin will wait before emitting its metric messages. Valid options: an
@@ -1104,7 +1104,7 @@ in Heka.
 #### Define `lma_collector::gse_nagios`
 
 Declare this define to send [Global Status Evaluation messages](
-http://fuel-plugin-lma-collector.readthedocs.org/en/latest/user/alarms.html)
+http://fuel-plugin-lma-collector.readthedocs.org/en/latest/alarms.html)
 to Nagios as [passive check
 results](https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/3/en/passivechecks.html).
 
