@@ -192,26 +192,26 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
     }
   } else {
     pacemaker::service { 'log_collector':
-      ensure           => present,
-      prefix           => false,
-      primitive_class  => 'ocf',
-      primitive_type   => 'ocf-log_collector',
-      use_handler      => false,
-      complex_type     => 'clone',
-      complex_metadata => {
+      ensure          => present,
+      prefix          => false,
+      primitive_class => 'ocf',
+      primitive_type  => 'ocf-log_collector',
+      use_handler     => false,
+      complex_type    => 'clone',
+      metadata        => {
         # the resource should start as soon as the dependent resources
         # (eg RabbitMQ) are running *locally*
         'interleave'          => true,
         'migration-threshold' => '3',
         'failure-timeout'     => '120',
       },
-      parameters       => {
+      parameters      => {
         'service_name' => 'log_collector',
         'config'       => '/etc/log_collector',
         'log_file'     => '/var/log/log_collector.log',
         'user'         => $heka_user,
       },
-      operations       => {
+      operations      => {
         'monitor' => {
           'interval' => '20',
           'timeout'  => '10',
@@ -223,7 +223,7 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
           'timeout' => '30',
         },
       },
-      ocf_script_file  => 'lma_collector/ocf-lma_collector',
+      ocf_script_file => 'lma_collector/ocf-lma_collector',
     }
 
     if $is_rabbitmq {
@@ -238,25 +238,25 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
     }
 
     pacemaker::service { 'metric_collector':
-      ensure           => present,
-      prefix           => false,
-      primitive_class  => 'ocf',
-      primitive_type   => 'ocf-metric_collector',
-      use_handler      => false,
-      complex_type     => 'clone',
-      complex_metadata => {
+      ensure          => present,
+      prefix          => false,
+      primitive_class => 'ocf',
+      primitive_type  => 'ocf-metric_collector',
+      use_handler     => false,
+      complex_type    => 'clone',
+      metadata        => {
         # The resource can start at any time
         'interleave'          => false,
         'migration-threshold' => '3',
         'failure-timeout'     => '120',
       },
-      parameters       => {
+      parameters      => {
         'service_name' => 'metric_collector',
         'config'       => '/etc/metric_collector',
         'log_file'     => '/var/log/metric_collector.log',
         'user'         => $heka_user,
       },
-      operations       => {
+      operations      => {
         'monitor' => {
           'interval' => '20',
           'timeout'  => '10',
@@ -268,7 +268,7 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
           'timeout' => '30',
         },
       },
-      ocf_script_file  => 'lma_collector/ocf-lma_collector',
+      ocf_script_file => 'lma_collector/ocf-lma_collector',
     }
   }
 }
