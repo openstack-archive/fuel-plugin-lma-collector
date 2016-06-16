@@ -107,7 +107,9 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
       ms_metadata     => {
         # the resource should start as soon as the dependent resources (eg RabbitMQ)
         # are running *locally*
-        'interleave'          => true,
+        'interleave' => true,
+      },
+      metadata        => {
         'migration-threshold' => '3',
         'failure-timeout'     => '120',
       },
@@ -166,7 +168,9 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
       use_handler     => false,
       ms_metadata     => {
         # The resource can start at any time
-        'interleave'          => false,
+        'interleave' => false,
+      },
+      metadata        => {
         'migration-threshold' => '3',
         'failure-timeout'     => '120',
       },
@@ -201,7 +205,9 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
       complex_metadata => {
         # the resource should start as soon as the dependent resources
         # (eg RabbitMQ) are running *locally*
-        'interleave'          => true,
+        'interleave' => true,
+      },
+      metadata         => {
         'migration-threshold' => '3',
         'failure-timeout'     => '120',
       },
@@ -224,6 +230,7 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
         },
       },
       ocf_script_file  => 'lma_collector/ocf-lma_collector',
+      require          => Lma_collector::Heka['log_collector'],
     }
 
     if $is_rabbitmq {
@@ -246,7 +253,9 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
       complex_type     => 'clone',
       complex_metadata => {
         # The resource can start at any time
-        'interleave'          => false,
+        'interleave' => false,
+      },
+      metadata         => {
         'migration-threshold' => '3',
         'failure-timeout'     => '120',
       },
@@ -269,6 +278,7 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
         },
       },
       ocf_script_file  => 'lma_collector/ocf-lma_collector',
+      require          => Lma_collector::Heka['metric_collector'],
     }
   }
 }
