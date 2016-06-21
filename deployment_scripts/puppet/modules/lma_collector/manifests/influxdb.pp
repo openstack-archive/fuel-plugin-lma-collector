@@ -23,15 +23,10 @@ class lma_collector::influxdb (
 ) inherits lma_collector::params {
   include lma_collector::service::metric
 
-  validate_string($server, $user, $password)
   validate_integer($port)
 
   $lua_modules_dir = $lma_collector::params::lua_modules_dir
 
-  validate_string($database)
-  validate_string($user)
-  validate_string($password)
-  validate_string($server)
   validate_array($tag_fields)
 
   heka::filter::sandbox { 'influxdb_accumulator':
