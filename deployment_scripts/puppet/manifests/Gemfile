@@ -18,6 +18,6 @@ group :development, :test do
   gem "puppet", ENV['PUPPET_VERSION'] || '~> 3.4.0'
   gem 'puppetlabs_spec_helper'
   # Need to use master branch of puppet-lint because of
-  # https://github.com/rodjek/puppet-lint/issues/355
+  # https://github.com/rodjek/puppet-lint/issues/472
   gem 'puppet-lint', :git => 'https://github.com/rodjek/puppet-lint.git'
 end

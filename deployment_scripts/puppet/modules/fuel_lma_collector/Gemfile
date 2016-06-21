@@ -22,6 +22,6 @@ group :development, :test do
   gem 'puppetlabs_spec_helper'
   gem 'metadata-json-lint'
   # Need to use master branch of puppet-lint because of
-  # https://github.com/rodjek/puppet-lint/issues/355
+  # https://github.com/rodjek/puppet-lint/issues/472
   gem 'puppet-lint', :git => 'https://github.com/rodjek/puppet-lint.git'
 end
