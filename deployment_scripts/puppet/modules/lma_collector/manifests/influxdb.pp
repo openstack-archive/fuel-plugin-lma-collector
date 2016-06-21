@@ -23,7 +23,7 @@ class lma_collector::influxdb (
 ) inherits lma_collector::params {
   include lma_collector::service::metric
 
-  validate_string($server, $user, $password)
+  validate_string($server, $user)
   validate_integer($port)
 
   $lua_modules_dir = $lma_collector::params::lua_modules_dir
