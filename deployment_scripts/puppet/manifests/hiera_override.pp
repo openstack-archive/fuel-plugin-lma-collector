@@ -123,7 +123,7 @@ if ($plugin_data) {
         # same environment but without controller (eg dedicated environment scenario)
         $mysql_username = $influxdb_plugin['mysql_username']
         $mysql_password = $influxdb_plugin['mysql_password']
-        $mysql_db = $influxdb_plugin['mysql_db']
+        $mysql_db = $influxdb_plugin['mysql_dbname']
       }
   }
 
