@@ -20,7 +20,6 @@ $memcache_address  = get_network_role_property('mgmt/memcache', 'ipaddr')
 $network_metadata = hiera_hash('network_metadata')
 
 $ceilometer      = hiera_hash('ceilometer', {})
-$lma_collector   = hiera_hash('lma_collector')
 $rabbit          = hiera_hash('rabbit')
 $management_vip  = hiera('management_vip')
 $storage_options = hiera_hash('storage', {})
@@ -434,19 +433,19 @@ if hiera('lma::collector::influxdb::server', false) {
   }
 }
 
-$alerting_mode = $lma_collector['alerting_mode']
+$alerting_mode = hiera('lma::collector::infrastructure_alerting::mode')
 $deployment_id = hiera('deployment_id')
 
 if $alerting_mode == 'standalone' {
   $subject = "LMA Alert Notification - environment ${deployment_id}"
   class { 'lma_collector::smtp_alert':
-    send_from => $lma_collector['alerting_send_from'],
-    send_to   => [$lma_collector['alerting_send_to']],
+    send_from => hiera('lma::collector::infrastructure_alerting::send_from'),
+    send_to   => [hiera('lma::collector::infrastructure_alerting::send_to')],
     subject   => $subject,
-    host      => $lma_collector['alerting_smtp_host'],
-    auth      => $lma_collector['alerting_smtp_auth'],
-    user      => $lma_collector['alerting_smtp_user'],
-    password  => $lma_collector['alerting_smtp_password'],
+    host      => hiera('lma::collector::infrastructure_alerting::smtp_host'),
+    auth      => hiera('lma::collector::infrastructure_alerting::smtp_auth'),
+    user      => hiera('lma::collector::infrastructure_alerting::smtp_user'),
+    password  => hiera('lma::collector::infrastructure_alerting::smtp_password'),
   }
 }
 
@@ -458,7 +457,7 @@ if hiera('lma::collector::infrastructure_alerting::server', false) {
     http_path                 => hiera('lma::collector::infrastructure_alerting::http_path'),
     user                      => hiera('lma::collector::infrastructure_alerting::user'),
     password                  => hiera('lma::collector::infrastructure_alerting::password'),
-    message_type              => $lma_collector['gse_cluster_global']['output_message_type'],
+    message_type              => hiera('lma::collector::infrastrucutre_alerting::message_type'),
     # Following parameter must match the lma_infrastructure_alerting::params::nagios_global_vhostname_prefix
     virtual_hostname          => '00-global-clusters',
   }
@@ -470,7 +469,7 @@ if hiera('lma::collector::infrastructure_alerting::server', false) {
     http_path                 => hiera('lma::collector::infrastructure_alerting::http_path'),
     user                      => hiera('lma::collector::infrastructure_alerting::user'),
     password                  => hiera('lma::collector::infrastructure_alerting::password'),
-    message_type              => $lma_collector['gse_cluster_node']['output_message_type'],
+    message_type              => hiera('lma::collector::infrastrucutre_alerting::message_type'),
     # Following parameter must match the lma_infrastructure_alerting::params::nagios_node_vhostname_prefix
     virtual_hostname          => '00-node-clusters',
   }

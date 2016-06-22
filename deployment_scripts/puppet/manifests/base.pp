@@ -19,7 +19,6 @@ $heka_version = '0.10.0'
 # TODO(spasquier): fail if Neutron isn't used
 prepare_network_config(hiera_hash('network_scheme', {}))
 $fuel_version    = 0 + hiera('fuel_version')
-$lma_collector   = hiera_hash('lma_collector')
 
 $node_profiles   = hiera_hash('lma::collector::node_profiles')
 $is_controller   = $node_profiles['controller']
@@ -27,17 +26,12 @@ $is_base_os      = $node_profiles['base_os']
 $is_mysql_server = $node_profiles['mysql']
 $is_rabbitmq     = $node_profiles['rabbitmq']
 
-if $lma_collector['environment_label'] != '' {
-  $environment_label = $lma_collector['environment_label']
-} else {
-  $environment_label = join(['env-', hiera('deployment_id')], '')
-}
 $tags = {
   deployment_id     => hiera('deployment_id'),
   openstack_region  => 'RegionOne',
   openstack_release => hiera('openstack_version'),
   openstack_roles   => join(hiera('roles'), ','),
-  environment_label => $environment_label,
+  environment_label => hiera('lma::collector::environment_label')
 }
 
 if $is_controller {

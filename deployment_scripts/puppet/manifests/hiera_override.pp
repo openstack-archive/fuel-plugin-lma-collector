@@ -22,6 +22,12 @@ if ($plugin_data) {
   $is_controller_node = roles_include(['controller', 'primary-controller'])
   $is_base_os_node = roles_include('base-os')
 
+  if $plugin_data['environment_label'] != '' {
+    $environment_label = $plugin_data['environment_label']
+  } else {
+    $environment_label = join(['env-', hiera('deployment_id')], '')
+  }
+
   if roles_include(['standalone-database', 'primary-standalone-database']) {
     $is_mysql_node = true
   } else {
@@ -127,6 +133,21 @@ if ($plugin_data) {
       }
   }
 
+  # GSE
+  $gse_service = $plugin_data['gse_cluster_service']
+  $gse_node = $plugin_data['gse_cluster_node']
+  $gse_global = $plugin_data['gse_cluster_global']
+  $gse_policies =  $plugin_data['gse_policies']
+
+  # cluster
+  $node_cluster_roles = $plugin_data['node_cluster_roles']
+  $service_cluster_roles = $plugin_data['service_cluster_roles']
+  $node_cluster_alarms = $plugin_data['node_cluster_alarms']
+  $service_cluster_alarms = $plugin_data['service_cluster_alarms']
+
+  # Alarms
+  $alarms = $plugin_data['alarms']
+
   # Infrastructure Alerting
   $alerting_mode = $plugin_data['alerting_mode']
   $lma_infra_alerting = hiera('lma_infrastructure_alerting', {})
@@ -144,6 +165,15 @@ if ($plugin_data) {
         $nagios_server = undef
       }
       $nagios_password = $lma_infra_alerting['nagios_password']
+      $message_type = $plugin_data['gse_cluster_global']['output_message_type']
+    }
+    'standalone': {
+      $send_from = $plugin_data['alerting_send_from']
+      $send_to   = $plugin_data['alerting_send_to']
+      $smtp_host = $plugin_data['alerting_smtp_host']
+      $smtp_auth = $plugin_data['alerting_smtp_auth']
+      $smtp_user = $plugin_data['alerting_smtp_user']
+      $smtp_password = $plugin_data['alerting_smtp_password']
     }
     default: {
       fail("'${alerting_mode}' mode not supported for Nagios")
@@ -160,6 +190,7 @@ if ($plugin_data) {
 
   $calculated_content = inline_template('
 ---
+lma::collector::environment_label: <%= @environment_label %>
 lma::collector::node_profiles:
   controller: <%= @is_controller_node %>
   influxdb: <%= @is_influxdb_node %>
@@ -184,12 +215,36 @@ lma::collector::influxdb::user: <%= @influxdb_user %>
 lma::collector::influxdb::password: <%= @influxdb_password %>
 lma::collector::influxdb::root_password: <%= @influxdb_root_password %>
 <% end -%>
+
+lma::collector::gse::service: <%= @gse_service %>
+lma::collector::gse::node: <%= @gse_node %>
+lma::collector::gse::global: <%= @gse_global %>
+lma::collector::gse::policies: <%= @gse_policies %>
+
+lma::collector::cluster::node_roles: <%= @node_cluster_roles %>
+lma::collector::cluster::service_roles: <%= @service_cluster_roles %>
+lma::collector::cluster::node_alarms: <%= @node_cluster_alarms %>
+lma::collector::cluster::service_alarms: <%= @service_cluster_alarms %>
+
+lma::collector::alarms: <%= @alarms %>
+
+lma::collector::infrastrucutre_alerting::mode: <%= @alerting_mode %>
 <% if @nagios_is_deployed -%>
 lma::collector::infrastructure_alerting::server: <%= @nagios_server %>
 lma::collector::infrastructure_alerting::http_port: 8001
 lma::collector::infrastructure_alerting::http_path: status
 lma::collector::infrastructure_alerting::user: nagiosadmin
 lma::collector::infrastructure_alerting::password: <%= @nagios_password %>
+lma::collector::infrastructure_alerting::message_type: <%= @message_type %>
+
+<% end -%>
+<% if @alerting_mode == "standalone" -%>
+lma::collector::infrastructure_alerting::send_from: <%= @send_from %>
+lma::collector::infrastructure_alerting::send_to: <%= @send_to %
+lma::collector::infrastructure_alerting::smtp_host: <%= @smtp_host %>
+lma::collector::infrastructure_alerting::smtp_auth: <%= @smtp_auth %>
+lma::collector::infrastructure_alerting::smtp_user: <%= @smtp_user %>
+lma::collector::infrastructure_alerting::smtp_password: <%= @smtp_password %>
 <% end -%>
   ')
 

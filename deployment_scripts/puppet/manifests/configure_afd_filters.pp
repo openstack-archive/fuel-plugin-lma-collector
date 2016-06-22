@@ -14,13 +14,12 @@
 
 notice('fuel-plugin-lma-collector: configure_afd_filters.pp')
 
-$lma             = hiera_hash('lma_collector', {})
 $node_profiles   = hiera_hash('lma::collector::node_profiles')
 $is_controller   = $node_profiles['controller']
 $is_mysql_server = $node_profiles['mysql']
 $is_rabbitmq     = $node_profiles['rabbitmq']
 
-$alarms_definitions = $lma['alarms']
+$alarms_definitions = hiera('lma::collector::alarms')
 if $alarms_definitions == undef {
     fail('Alarms definitions not found. Check files in /etc/hiera/override.')
 }
@@ -38,10 +37,10 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
 
 class { 'fuel_lma_collector::afds':
     roles                  => hiera('roles'),
-    node_cluster_roles     => $lma['node_cluster_roles'],
-    service_cluster_roles  => $lma['service_cluster_roles'],
-    node_cluster_alarms    => $lma['node_cluster_alarms'],
-    service_cluster_alarms => $lma['service_cluster_alarms'],
+    node_cluster_roles     => hiera('lma::collector::cluster::node_roles'),
+    service_cluster_roles  => hiera('lma::collector::cluster::service_roles'),
+    node_cluster_alarms    => hiera('lma::collector::cluster::node_alarms'),
+    service_cluster_alarms => hiera('lma::collector::cluster::service_alarms'),
     alarms                 => $alarms_definitions,
 }
 

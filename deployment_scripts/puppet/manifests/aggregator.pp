@@ -16,7 +16,6 @@ notice('fuel-plugin-lma-collector: aggregator.pp')
 
 prepare_network_config(hiera_hash('network_scheme', {}))
 $mgmt_address    = get_network_role_property('management', 'ipaddr')
-$lma_collector   = hiera_hash('lma_collector')
 
 $node_profiles   = hiera_hash('lma::collector::node_profiles')
 $is_controller   = $node_profiles['controller']
@@ -96,14 +95,14 @@ if $is_controller {
   # - node clusters
   # - global clusters
   create_resources(lma_collector::gse_cluster_filter, {
-    'service' => $lma_collector['gse_cluster_service'],
-    'node'    => $lma_collector['gse_cluster_node'],
-    'global'  => $lma_collector['gse_cluster_global'],
+    'service' => hiera('lma::collector::gse::service'),
+    'node'    => hiera('lma::collector::gse::node'),
+    'global'  => hiera('lma::collector::gse::global'),
   }, {
     require => Class['lma_collector::gse_policies']
   })
 
   class { 'lma_collector::gse_policies':
-    policies => $lma_collector['gse_policies']
+    policies => hiera('lma::collector::gse::policies')
   }
 }
