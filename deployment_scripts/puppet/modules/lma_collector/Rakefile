@@ -74,7 +74,7 @@ end
 
 file 'tests/lua/mocks/date_time.lua' do |t|
     verbose(false) do
-        sh "curl", "-s", "-o", t.name, "https://raw.githubusercontent.com/mozilla-services/lua_sandbox/master/modules/date_time.lua" do |ok, res|
+        sh "curl", "-s", "-o", t.name, "https://raw.githubusercontent.com/mozilla-services/lua_sandbox/master/modules/lpeg/date_time.lua" do |ok, res|
             if ! ok then
                 raise "Fail to download date_time.lua from lua_sandbox repository!"
             end
