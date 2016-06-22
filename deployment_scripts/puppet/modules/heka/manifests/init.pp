@@ -22,7 +22,9 @@
 #   The directory where to store the configuration (default: '/etc/hekad').
 #
 # [*user*]
-#   The user to run the Heka service as (default: 'heka'). You may have to use 'root' on some systems for the Heka service to be able to access log files, run additional commands, ...
+#   The user to run the Heka service as (default: 'heka'). You may have to use
+#   'root' on some systems for the Heka service to be able to access log files,
+#   run additional commands, ...
 #
 # [*additional_groups*]
 #   Additional groups to which the heka user should be added.
@@ -37,10 +39,13 @@
 #   The maxium Heka message size in bytes (default: undef to use default Heka value).
 #
 # [*max_process_inject*]
-#   The maximum number of messages that a sandbox filter's ProcessMessage function can inject in a single call (default: undef to use default Heka value).
+#   The maximum number of messages that a sandbox filter's ProcessMessage
+#   function can inject in a single call (default: undef to use default Heka
+#   value).
 #
 # [*max_timer_inject*]
-#   The maximum number of messages that a sandbox filter's TimerEvent function can inject in a single call (default: undef to use default Heka value).
+#   The maximum number of messages that a sandbox filter's TimerEvent function
+#   can inject in a single call (default: undef to use default Heka value).
 #
 # [*poolsize*]
 #   The pool size of maximum messages that can exist (default: 100).
