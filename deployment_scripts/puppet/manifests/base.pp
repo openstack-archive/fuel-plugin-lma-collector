@@ -109,6 +109,11 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
         # are running *locally*
         'interleave' => true,
       },
+      metadata        => {
+        # Make sure that Pacemaker tries to restart the resource if it fails
+        # too many times
+        'failure-timeout' => '120'
+      },
       parameters      => {
         'service_name' => 'log_collector',
         'config'       => '/etc/log_collector',
@@ -166,6 +171,11 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
         # The resource can start at any time
         'interleave' => false,
       },
+      metadata        => {
+        # Make sure that Pacemaker tries to restart the resource if it fails
+        # too many times
+        'failure-timeout' => '120'
+      },
       parameters      => {
         'service_name' => 'metric_collector',
         'config'       => '/etc/metric_collector',
@@ -198,6 +208,11 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
         # the resource should start as soon as the dependent resources
         # (eg RabbitMQ) are running *locally*
         'interleave' => true,
+      },
+      metadata         => {
+        # Make sure that Pacemaker tries to restart the resource if it fails
+        # too many times
+        'failure-timeout' => '120'
       },
       parameters       => {
         'service_name' => 'log_collector',
@@ -242,6 +257,11 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
       complex_metadata => {
         # The resource can start at any time
         'interleave' => false,
+      },
+      metadata         => {
+        # Make sure that Pacemaker tries to restart the resource if it fails
+        # too many times
+        'failure-timeout' => '120'
       },
       parameters       => {
         'service_name' => 'metric_collector',
