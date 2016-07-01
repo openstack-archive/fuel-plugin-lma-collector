@@ -112,7 +112,9 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
       metadata        => {
         # Make sure that Pacemaker tries to restart the resource if it fails
         # too many times
-        'failure-timeout' => '120'
+        'failure-timeout'     => '120s',
+        'migration-threshold' => 'INFINITY',
+        'resource-stickiness' => '1',
       },
       parameters      => {
         'service_name' => 'log_collector',
@@ -174,7 +176,9 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
       metadata        => {
         # Make sure that Pacemaker tries to restart the resource if it fails
         # too many times
-        'failure-timeout' => '120'
+        'failure-timeout'     => '120s',
+        'migration-threshold' => 'INFINITY',
+        'resource-stickiness' => '1',
       },
       parameters      => {
         'service_name' => 'metric_collector',
@@ -212,7 +216,9 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
       metadata         => {
         # Make sure that Pacemaker tries to restart the resource if it fails
         # too many times
-        'failure-timeout' => '120'
+        'failure-timeout'     => '120s',
+        'migration-threshold' => 'INFINITY',
+        'resource-stickiness' => '1',
       },
       parameters       => {
         'service_name' => 'log_collector',
@@ -261,7 +267,9 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
       metadata         => {
         # Make sure that Pacemaker tries to restart the resource if it fails
         # too many times
-        'failure-timeout' => '120'
+        'failure-timeout'     => '120s',
+        'migration-threshold' => 'INFINITY',
+        'resource-stickiness' => '1',
       },
       parameters       => {
         'service_name' => 'metric_collector',
