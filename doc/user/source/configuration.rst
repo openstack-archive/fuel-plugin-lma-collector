@@ -57,8 +57,6 @@ To configure your plugin, you need to follow these steps:
    for StackLight but instead create a dedicated network when configuring your environement.
    This will improve the performance of both OpenStack and StackLight overall and facilitate
    the access to the Kibana and Grafana analytics.
-   Please refer to the `StackLight Planning Guide <>`_ for further information about
-   that subject.
 
 6. Deploy your environment following the `instructions
    <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide/deploy-environment.html>`__
