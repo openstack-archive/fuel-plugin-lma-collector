@@ -186,7 +186,7 @@ lma::collector::influxdb::root_password: <%= @influxdb_root_password %>
 <% end -%>
 <% if @nagios_is_deployed -%>
 lma::collector::infrastructure_alerting::server: <%= @nagios_server %>
-lma::collector::infrastructure_alerting::http_port: 8001
+lma::collector::infrastructure_alerting::http_port: 80
 lma::collector::infrastructure_alerting::http_path: status
 lma::collector::infrastructure_alerting::user: nagiosadmin
 lma::collector::infrastructure_alerting::password: <%= @nagios_password %>
