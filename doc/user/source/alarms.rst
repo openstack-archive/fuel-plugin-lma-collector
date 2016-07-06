@@ -8,123 +8,131 @@ Alarms Configuration Guide
 Overview
 --------
 
-The process of running alarms in LMA is not centralized
-(as it is often the case in conventional monitoring systems)
-but distributed across all the Collectors.
+The process of running alarms in StackLight is not centralized
+(as it is often the case in more conventional monitoring systems)
+but distributed across all the StackLight Collectors.
 
 Each Collector is individually responsible for monitoring the
 resources and the services that are deployed on the node and for reporting
-any anomaly or fault it may have detected to the *Aggregator*.
+any anomaly or fault it has detected to the Aggregator.
 
-The anomaly and fault detection logic in LMA is designed
-more like an "Expert System" in that the Collector and the Aggregator use *facts*
-and *rules* that are executed within the Heka's stream processing pipeline.
+The anomaly and fault detection logic in StackLight is designed
+more like an *expert system* in that the Collector and the Aggregator
+use artifacts we could refer to as *facts* and *rules*.
 
-The *facts* are the messages ingested by the Collector
-into the Heka pipeline.
-The rules are either threshold monitoring alarms or aggregation
-and correlation rules. Both are declaratively defined in YAML(tm) files
-that can be modified.
-Those rules are executed by a collection of Heka filter plugins written in Lua
-organised according to a configurable processing workflow.
+The *facts* are the operational data ingested in the StackLight's
+stream processing pipeline.
+The *rules* are either alarm rules or aggregation rules.
+They are declaratively defined in YAML files that can be modified.
+Those rules are turned into a collection of Lua plugins
+that are executed by the Collector and the Aggregator.
+They are generated dynamically using the Puppet modules of the StackLight
+Collector Plugin.
 
-These plugins are called *AFD plugins* for Anomaly and Fault Detection plugins
-and *GSE plugins* for Global Status Evaluation plugins.
+There are two types of Lua plugins related to the processing
+of alarms.
 
-Both the AFD and GSE plugins create metrics called respectively the *AFD metrics*
-and the *GSE metrics*.
+* The **AFD plugin** for Anomaly and Fault Detection plugin.
+* The **GSE plugin** for Global Status Evaluation plugin.
 
+These plugins create a special type of metric called respectively
+the **AFD metric** and the **GSE metric**.
+
+* The AFD metric contains information about the health status
+  of a node or service in the OpenStack environment.
+  The AFD metrics are sent on a regular basis to the Aggregator
+  where they are further processed by the GSE plugins.
+* The GSE metric contains information about the health status
+  of a cluster in the OpenStack environment. A cluster is a
+  logical grouping of nodes or services. We call
+  them node clusters and service clusters hereafter.
+  A service cluster can be anything like a cluster of API endpoints
+  or a cluster of workers. A cluster of nodes is a grouping of
+  nodes that have the same role. For example 'compute' or 'storage'.
+
+.. note:: The AFD and GSE metrics are new types of metrics introduced
+   in StackLight version 0.8.
+   They contain detailed information about the fault and anomalies
+   detected by StackLight. Please refer to the
+   `Metrics section of the Developer Guide
+   <http://lma-developer-guide.readthedocs.io/en/latest/metrics.html>`_
+   for more information about the message structure of these metrics.
+
+The StackLight stream processing pipeline workflow is shown in the figure below:
 
 .. figure:: ../../images/AFD_and_GSE_message_flow.*
    :width: 800
    :alt: Message flow for the AFD and GSE metrics
    :align: center
 
-   Message flow for the AFD and GSE metrics
+The AFD and GSE Plugins
+-----------------------
 
-The *AFD metrics* contain information about the health status of a
-resource such as a device, a system component like a filesystem, or service
-like an API endpoint, at the node level.
-Then, those *AFD metrics* are sent on a regular basis by each Collector
-to the Aggregator where they can be aggregated and correlated hence the
-name 'aggregator'.
+In the current version of StackLight, there are three types of GSE plugins:
 
-The *GSE metrics* contain information about the health status
-of a service cluster, such as the Nova API endpoints cluster, or the RabbitMQ
-cluster as well as the clusters of nodes, like the Compute cluster or
-Controller cluster.
-The health status of a cluster is inferred by the GSE plugins using
-aggregation and correlation rules and facts contained in the
-*AFD metrics* it received from the Collectors.
+* The **Service Cluster GSE Plugin** which receives AFD metrics for services
+  from the AFD plugins.
+* The **Node Cluster GSE Plugin** which receives AFD metrics for nodes
+  from the AFD plugins.
+* The **Global Cluster GSE Plugin** which receives GSE metrics from the
+  GSE plugins above. It aggregates and correlates the GSE metrics to issue a global
+  health status for the top-level clusters like Nova, MySQL and so forth.
 
-In the current version of the LMA Toolchain, there are three :ref:`GSE plugins <gse_plugins>`:
+The health status exposed in the GSE metrics is as follow:
 
-* The Service Cluster GSE which receives metrics from the AFD plugins monitoring
-  the services and emits health status for the clusters of services (nova-api, nova-scheduler and so forth).
-* The Node Cluster GSE which receives metrics from the AFD plugins monitoring
-  the system and emits health status for the clusters of nodes (controllers, computes and so forth).
-* The Global Cluster GSE which receives metrics from the two other GSE plugins
-  and emits health status for the top-level clusters (Nova, MySQL and so forth).
-
-The meaning for each health status is as follow:
-
-* **Down**: One or several primary functions of a cluster has failed or is failing.
+* *Down*: One or several primary functions of a cluster has failed or is failing.
   For example, the API service for Nova or Cinder isn't accessible.
-* **Critical**: One or several primary functions of a
+* *Critical*: One or several primary functions of a
   cluster are severely degraded. The quality
-  of service delivered to the end-user should be severely
-  impacted.
-* **Warning**: One or several primary functions of the
+  of service delivered to the end-user is severely impacted.
+* *Warning*: One or several primary functions of the
   cluster are slightly degraded. The quality
-  of service delivered to the end-user should be slightly
+  of service delivered to the end-user is slightly
   impacted.
-* **Unknown**: There is not enough data to infer the actual
-  health state of the cluster.
-* **Okay**: None of the above was found to be true.
+* *Unknown*: There is not enough data to infer the actual
+  health status of the cluster.
+* *Okay*: None of the above was found to be true.
 
-The *AFD and GSE metrics* are also consumed by other groups
-of Heka plugins called the *Persisters*.
+The AFD and GSE Persisters
+--------------------------
 
-* A *Persister* for InfluxDB turns the *GSE metric*
-  messages into InfluxDB data-points and Grafana annotations. They
-  are displayed in Grafana dashboards to represent the
-  health status of the OpenStack services and clusters.
-* A *Persister* for Elasticsearch turns the *AFD metrics*
-  messages into AFD events which are indexed in Elasticsearch to
-  be able to search and display the faults and anomalies that occured
-  in the OpenStack environment.
-* A *Persister* for Nagios turns the *GSE metrics*
-  messages into passive checks that are sent to Nagios which in turn
-  will send alert notifications when there is a change of state for
-  the services and clusters being monitored.
+The AFD and GSE metrics are also consumed by other types
+of Lua plugins called the **persisters**.
 
-The *AFD metrics* and *GSE metrics* are new types of metrics introduced
-in LMA v 0.8. They contain detailed information about the entities
-being monitored.
-Please refer to the `Metrics section of the Developer Guide
-<http://fuel-plugin-lma-collector.readthedocs.io/en/latest/appendix_b.html>`_
-for further information about the structure of those messages.
+* The **InfluxDB persister** transforms the GSE metrics
+  into InfluxDB data-points and Grafana annotations. They
+  are used in Grafana to graph the health status of
+  the OpenStack clusters.
+* The **Elasticsearch persister** transforms the AFD metrics
+  into events that are indexed in Elasticsearch. Using Kibana,
+  these events can be searched to display a fault or an anomaly
+  that occured in the environment (not implemented yet).
+* The **Nagios persister** transforms the GSE and AFD metrics
+  into passive checks that are sent to Nagios for alerting and
+  escalation.
 
-Any backend system that has a *Persister* plugged
-into the Heka pipeline of the Aggregator can consume those metrics.
-The idea is to feed those systems with rich operational
-insights about how OpenStack is operating at scale.
+New persisters could be created easely to feed other
+systems with the operational insight contained in the
+AFD and GSE metrics.
 
 .. _alarm_configuration:
 
-Alarm Configuration
--------------------
+Alarms Configuration
+--------------------
 
-The LMA Toolchain comes out-of-the-box with predefined alarm and correlation
-rules. We have tried to make the alarm rules comprehensive and relevant enough
-to cover the most common use cases, but it is possible that your mileage varies
-depending on the specifics of your environment and monitoring requirements.
-It is obviously possible to modify the alarm rules or even create new ones.
-In this case, you will be required to modify the alarm rules configuration
-file and reapply the Puppet module that will turn the alarm rules into Lua code
-on each of the nodes you want the change to take effect. This procedure is
-explained below but first you need to know how the alarm rule structure is
-defined.
+StackLight comes with a predefined set of alarm rules.
+We have tried to make these rules as comprehensive and relevant
+as possible, but your mileage may vary depending on the specifics of
+your OpenStack environment and monitoring requirements.
+Therefore, it is possible to modify those predefined rules
+and create new ones.
+To do so, you will be required to modify the
+``/etc/hiera/override/alarming.yaml`` file
+and apply the :ref:`Puppet manifest <puppet_apply>`
+that will dynamically generate Lua plugins known as
+the AFD Plugins which are the actuators of the alarm rules.
+But before you proceed, you need to understand the structure
+of that file.
 
 .. _alarm_structure:
 
@@ -261,13 +269,12 @@ as shown in the example below::
 |       And apply the following formula:
 |
 |            abs(avg(CW) - avg(PW)) > std(HW) * 1.5 ? true : false
-
 |     mww:
 |       returns the result (true, false) of the Mann-Whitney-Wilcoxon test function
-|       of Heka that can be used only with normal distributions (not implemented yet)
+        of Heka that can be used only with normal distributions (not implemented yet)
 |     mww-nonparametric:
 |       returns the result (true, false) of the Mann-Whitney-Wilcoxon
-|       test function of Heka that can be used with non-normal distributions (not implemented yet)
+        test function of Heka that can be used with non-normal distributions (not implemented yet)
 |     diff:
 |       returns the difference between the last value and the first value of all the values
 
@@ -276,67 +283,27 @@ as shown in the example below::
 |   The threshold of the alarm rule
 
 
-How to modify an alarm?
-~~~~~~~~~~~~~~~~~~~~~~~
+How to modify or create an alarm?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To modify an alarm, you need to edit the */etc/hiera/override/alarming.yaml*
-file. This file has three different sections:
+To modify (or create) an alarm, you need to edit the
+``/etc/hiera/override/alarming.yaml`` file.
+This file has four sections:
 
-* The first section contains a list of alarms.
-* The second section defines the mapping between the internal definition of
-  a cluster and one or several Fuel roles.
-  The definition of a cluster is abstrat. It can be mapped to any Fuel role(s).
-  In the example below, we define three clusters for:
+1. The *alarms* section contains a global list of alarms that
+   are executed by the Collectors. These alarms are global to
+   the LMA toolchain and should be kept identical
+   on all nodes of the OpenStack environment.
+   Here is another example of the definition of an alarm::
 
-    * controller,
-    * compute,
-    * and storage
-
-* The third section defines how the alarms are assigned to clusters.
-  In the example below, the *controller* cluster is assigned to four alarms:
-
-    * Two alarms ['cpu-critical-controller', 'cpu-warning-controller'] grouped as *system* alarms.
-    * Two alarms ['fs-critical', 'fs-warning'] grouped as *fs* (file system) alarms.
-
-Note:
-  The alarm groups is a mere implementaton artifact (although
-  it has some practicall usefulness) that is used to divide the workload
-  across several Lua plugins. Since the Lua plugins
-  runtime is sandboxed within Heka, it is preferable to run
-  smaller sets of alarms in different plugins rather than a large set
-  of alarms in a single plugin. This is to avoid having plugins shut down
-  by Heka because they use too much CPU or memory.
-  Furthermore, the alarm groups are used to identify what we
-  call a *source*. A *source* is defined by a tuple which includes the name of
-  the cluster and the name of the alarm group.
-  For example the tuple ['controller', 'system'] identifies a *source*.
-  The tuple ['controller', 'fs'] identifies another *source*.
-  The interesting thing about the *source* is that it is used by the
-  *GSE Plugins* to find out whether it has received enough data
-  (from its 'known' *sources*) to issue a health status or not.
-  If it doesn't, then the *GSE Plugin* will issue a *GSE Metric* with an
-  *Unknown* health status when it has reached the end of the
-  *ticker interval* period.
-  By default, the *ticker interval* for the GSE Plugins is set to
-  10 seconds. This practically means that every 10 seconds, a GSE Plugin
-  is compelled to send a *GSE Metric* regardless of the metrics
-  it has received from the upstream *GSE Plugins* and/or *AFD Plugins*.
-
-Here is an example of the definition of an alarm and how
-that alarm is assigned to a cluster::
-
-    lma_collector:
-        #
-        # The alarms list
-        #
-      alarms:
-        - name: 'cpu-critical-controller'
-          description: 'CPU critical on controller'
-          severity: 'critical'
-          enabled: 'true'
-          trigger:
-            logical_operator: 'or'
-            rules:
+     alarms:
+       - name: 'cpu-critical-controller'
+         description: 'CPU critical on controller'
+         severity: 'critical'
+         enabled: 'true'
+         trigger:
+           logical_operator: 'or'
+           rules:
               - metric: cpu_idle
                 relational_operator: '<='
                 threshold: 5
@@ -350,216 +317,185 @@ that alarm is assigned to a cluster::
                 periods: 0
                 function: avg
 
-        [Skip....]
+   This alarm is called 'cpu-critical-controller'.
+   It says that CPU activity is critical (severity: 'critical')
+   if any of the rules in the alarm definition evaluates to true.
 
-        #
-        # Cluster name to roles mapping section
-        #
-      node_cluster_roles:
-        controller: ['primary-controller', 'controller']
-        compute: ['compute']
-        storage: ['cinder', 'ceph-osd']
+   The rule says that the alarm
+   will evaluate to 'true' if the value of the metric *cpu_idle*
+   has been in average (function: avg) below or equal
+   (relational_operator: <=) to 5 for the last 5 minutes (window: 120).
 
-        #
-        # Cluster name to alarms assignement section
-        #
-      node_cluster_alarms:
+   OR (logical_operator: 'or')
+
+   If the value of the metric **cpu_wait** has been in average
+   (function: avg) superior or equal (relational_operator: >=) to 35
+   for the last 5 minutes (window: 120)
+
+   Note that these metrics are expressed in percentage.
+
+   What alarms are executed on which node depends on
+   the mapping between the alarm definition and the
+   definition of a cluster as described in the following sections.
+
+2. The *node_cluster_roles* section defines the mapping between
+   the internal definition of a cluster of nodes and one or
+   several Fuel roles. For example::
+
+    node_cluster_roles:
+      controller: ['primary-controller', 'controller']
+      compute: ['compute']
+      storage: ['cinder', 'ceph-osd']
+      [ ... ]
+
+   Creates a mapping between the 'primary-controller'
+   and 'controller' Fuel roles and the internal defintion of a cluster
+   of nodes called 'controller'.
+   Likewise, the internal definition of a cluster of nodes called
+   'storage' is mapped to the 'cinder' and 'ceph-osd' Fuel roles.
+   The internal definition of a cluster of nodes is used to assign
+   the alarms to the relevant category of nodes.
+   This mapping is also used to configure the **passive checks**
+   in Nagios. This is the reason why, it is criticaly important
+   to keep the exact same copy of ``/etc/hiera/override/alarming.yaml``
+   across all the nodes of the OpenStack environment including the
+   node(s) where Nagios is installed.
+
+3. The *service_cluster_roles* section defines the mapping between
+   the internal definition of a cluster of services and one or
+   several Fuel roles. For example::
+
+     service_cluster_roles:
+       rabbitmq: ['primary-controller', 'controller']
+       nova-api: ['primary-controller', 'controller']
+       elasticsearch: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
+       [ ... ]
+
+   Creates a mapping between the 'primary-controller'
+   and 'controller' Fuel roles and the internal defintion of a cluster
+   of services called 'rabbitmq'.
+   Likewise, the internal definition of a cluster of services called
+   'elasticsearch' is mapped to the 'primary-elasticsearch_kibana'
+   and 'elasticsearch_kibana' Fuel roles.
+   As for the clusters of nodes, the internal definition of a cluster
+   of services is used to assign the alarns to the relevant category of services.
+
+4. The *node_cluster_alarms* section defines the mapping between
+   the internal definition of a cluster of nodes and the alarms that
+   are assigned to that category of nodes. For example::
+
+     node_cluster_alarms:
         controller:
-          system: ['cpu-critical-controller', 'cpu-warning-controller']
-          fs: ['fs-critical', 'fs-warning']
+         cpu: ['cpu-critical-controller', 'cpu-warning-controller']
+         root-fs: ['root-fs-critical', 'root-fs-warning']
+         log-fs: ['log-fs-critical', 'log-fs-warning']
 
-In this example, you can see that the alarm *cpu-critical-controller* is
-assigned to the *controller* cluster (or in other words) to the nodes assigned
-to the *primary-controller* or *controller* roles.
+   Creates three alarm groups for the cluster of nodes called
+   'controller'.
 
-This alarm tells the system that any node associated with the *controller*
-cluster is claimed to be critical (severity: 'critical') if any of the rules in
-the alarm evaluates to true.
+   * The *cpu* alarm group is mapped to two alarms defined in the
+     *alarms* section known as the 'cpu-critical-controller' and
+     'cpu-warning-controller' alarms. Those alarms monitor the
+     CPU on the controller nodes. Note that the order matters
+     here since the first alarm which evaluates to 'true' stops
+     the evaluation. Hence, it is important to start the list
+     with the most critical alarms.
+   * The *root-fs* alarm group is mapped to two alarms defined
+     in the *alarms* section known as the 'root-fs-critical'
+     and 'root-fs-warning' alarms. Those alarms monitor the
+     root file system on the controller nodes.
+   * The *log-fs* alarm group is mapped to two alarms defined
+     in the *alarms* section known as the 'log-fs-critical' and
+     'log-fs-warning' alarms. Those alarms monitor the file
+     system where the logs are created on the controller
+     nodes.
 
-The first rule says that the alarm evaluates to true if
-the metric *cpu_idle* has been in average (function: avg) below or equal
-(relational_operator: <=) to 5 (this metric is expressed in percentage) for the
-last 5 minutes (window: 120)
+   .. note:: An *alarm group* is a mere implementaton artifact
+      (although it has several functional usefulness) that is
+      primarily used to distribute the alarms evaluation workload
+      across several Lua plugins. Since the Lua plugins
+      runtime is sandboxed within Heka, it is preferable to run
+      smaller sets of alarms in different plugins rather than a
+      large set of alarms in a single plugin. This is to avoid
+      having alarms evaluation plugins shutdown by Heka.
+      Furthermore, the alarm groups are used to identify what is
+      called a *source*. A *source* is a tuple in which we associate
+      a cluster with an alarm group. For example the tuple ['controller', 'cpu']
+      is a *source*. It associates a 'controller' cluster with the 'cpu'
+      alarm group. The tuple ['controller', 'root-fs'] is another *source*
+      example. The *source* is used by the GSE Plugins to remember the
+      AFD metrics it has received. If a GSE Plugin stops receiving
+      AFD metrics it used to get, then the GSE Plugin will
+      infer that the health status for the cluster associated
+      with the source is *Unknown*.
 
-Or (logical_operator: 'or')
+      This is evaluated every *ticker-interval*. By default,
+      the *ticker interval* for the GSE Plugins is set to
+      10 seconds.
 
-if the metric *cpu_wait* has been in average (function: avg) superior or equal
-(relational_operator: >=) to 35 (this metric is expressed in percentage) for the
-last 5 minutes (window: 120)
+.. _aggreg_correl_config:
 
-Once you have edited and saved the */etc/hiera/override/alarming.yaml* file, you
-need to re-apply the Puppet module::
+Aggregation and Correlation Configuration
+-----------------------------------------
 
-    # puppet apply --modulepath=/etc/fuel/plugins/lma_collector-0.10/puppet/modules/ \
-    /etc/fuel/plugins/lma_collector-0.10/puppet/manifests/configure_afd_filters.pp
+StackLight comes with a predefined set of aggregation rules and
+correlation policies. As for the alarms, it is possible to
+create new aggregation rules and correlation policies or modify
+existing ones. To do so, you will be required to modify the
+``/etc/hiera/override/gse_filters.yaml`` file
+and apply the :ref:`Puppet manifest <puppet_apply>`
+that will generate Lua plugins known as
+the GSE Plugins which are the actuators of these aggregation
+rules and correlation policies.
+But before you proceed, you need to undestand the structure
+of that file.
 
-This will restart the LMA Collector with your change.
+.. note:: As for ``/etc/hiera/override/alarming.yaml``,
+   it is criticaly important to keep the exact same copy of
+   ``/etc/hiera/override/gse_filters.yaml``
+   across all the nodes of the OpenStack environment including the
+   node(s) where Nagios is installed.
+   
+The aggregation rules and correlation policies are defined
+in the ``/etc/hiera/override/gse_filters.yaml`` configuration file.
 
-.. _gse_plugins:
+This file has four sections:
 
-GSE configuration
------------------
+1. The *gse_policies* section contains the :ref:`health status
+   correlation policies <gse_policies>` that apply to the node
+   clusters and service clusters.
+2. The *gse_cluster_service* section contains the :ref:`aggregation rules
+   <gse_cluster_service>` for the service clusters. These
+   aggregation rules are actuated by the Service Cluster GSE
+   Plugin which runs on the Aggregator.
+3. The *gse_cluster_node* section contains the :ref:`aggreagion rules
+   <gse_cluster_node>` for the node clusters. These aggregation rules
+   are actuated by the Node Cluster GSE Plugin which runs on the
+   Aggregator.
+4. The *gse_cluster_global* section contains the :ref:`aggregation
+   rules <gse_cluster_global>` for the so-called top-level clusters.
+   A global cluster is a kind of logical construct of node clusters
+   and service clusters. These aggregation rules are actuated by
+   the Global Cluster GSE Plugin which runs on the Aggregator.
 
-The LMA toolchain comes with a predefined configuration for the GSE plugins. As
-for the alarms, it is possible to modify this configuration.
+.. _gse_policies:
 
-The GSE plugins are defined declaratively in the
-*/etc/hiera/override/gse_filters.yaml* file. By default, that file specifies
-three kinds of GSE plugins:
-
-* *gse_cluster_service* for the Service Cluster GSE which evaluates the status
-  of the service clusters.
-
-* *gse_cluster_node* for the Node Cluster GSE which evaluates the status of the
-  node clusters.
-
-* *gse_cluster_global* for the Global Cluster GSE  which evaluates the status
-  of the global clusters.
-
-The structure of a GSE plugin declarative definition is described below::
-
-  gse_cluster_service:
-    input_message_types:
-      - afd_service_metric
-    aggregator_flag: true
-    cluster_field: service
-    member_field: source
-    output_message_type: gse_service_cluster_metric
-    output_metric_name: cluster_service_status
-    interval: 10
-    warm_up_period: 20
-    clusters:
-      nova-api:
-        policy: highest_severity
-        group_by: member
-        members:
-          - backends
-          - endpoint
-          - http_errors
-      [...]
-
-Where
-
-| input_message_types
-|   Type: list
-|   The type(s) of AFD metric messages consumed by the GSE plugin.
-
-| aggregator_flag
-|   Type: boolean
-|   Whether or not the input messages are received from the upstream collectors.
-    This is true for the Service and Node Cluster plugins and false for the
-    Global Cluster plugin.
-
-| cluster_field
-|   Type: unicode
-|   The field in the input message used by the GSE plugin to associate the
-    AFD/GSE metrics to the clusters.
-
-| member_field
-|   Type: unicode
-|   The field in the input message used by the GSE plugin to identify the
-    cluster members.
-
-| output_message_type
-|   Type: unicode
-|   The type of metric messages emitted by the GSE plugin.
-
-| output_metric_name
-|   Type: unicode
-|   The Fields[name] value of the metric messages that the GSE plugin emits.
-
-| interval
-|   Type: integer
-|   The interval (in seconds) at which the GSE plugin emits its metric messages.
-
-| warm_up_period
-|   Type: integer
-|   The number of seconds after a (re)start that the GSE plugin will wait
-    before emitting its metric messages.
-
-| clusters
-|   Type: list
-|   The list of clusters that the plugin manages. See
-    :ref:`cluster_definitions` for details.
-
-.. _cluster_definitions:
-
-Cluster definition
-~~~~~~~~~~~~~~~~~~
-
-The GSE clusters are defined as shown in the example below::
-
-  gse_cluster_service:
-    [...]
-
-    clusters:
-      nova-api:
-        members:
-          - backends
-          - endpoint
-          - http_errors
-        group_by: member
-        policy: highest_severity
-
-    [...]
-
-Where
-
-| members
-|   Type: list
-|   The list of cluster members.
-    The AFD/GSE messages are associated to the cluster when the *cluster_field*
-    value is equal to the cluster name and the *member_field* value is in this
-    list.
-
-| group_by
-|   Type: Enum(member, hostname)
-|   This parameter defines how the incoming AFD metrics are aggregated.
-|
-|     member:
-|       aggregation by member, irrespective of the host that emitted the AFD metric.
-|       This setting is typically used for AFD metrics that are not host-centric.
-|
-|     hostname:
-|       aggregation by hostname then by member.
-|       This setting is typically used for AFD metrics that are host-centric such as
-|       those working on filesystem or CPU usage metrics.
-
-| policy:
-|   Type: unicode
-|   The policy to use for computing the cluster status. See :ref:`cluster_policies`
-    for details.
-
-If we look more closely at the example above, it defines that the Service
-Cluster GSE plugin will emit a *gse_service_cluster_metric* message every 10
-seconds that will report the current status of the *nova-api* cluster. This
-status is computed using the  *afd_service_metric* metrics for which
-Fields[service] is 'nova-api' and Fields[source] is one of 'backends',
-'endpoint' or 'http_errors'. The 'nova-api' cluster's status is computed using
-the 'highest_severity' policy which means that it will be equal to the 'worst'
-status across all members.
-
-.. _cluster_policies:
-
-Cluster policies
-~~~~~~~~~~~~~~~~
+Health status policies
+~~~~~~~~~~~~~~~~~~~~~~
 
 The correlation logic implemented by the GSE plugins is policy-based.
-The cluster policies define how the GSE plugins infer the health status of a
+The policies define how the GSE plugins infer the health status of a
 cluster.
 
 By default, two policies are defined:
 
-* *highest_severity*, it defines that the cluster's status depends on the
+* The **highest_severity** policy defines that the cluster's status depends on the
   member with the highest severity, typically used for a cluster of services.
-* *majority_of_members*, it defines that the cluster is healthy as long as
+* The **majority_of_members** policy defines that the cluster is healthy as long as
   (N+1)/2 members of the cluster are healthy. This is typically used for
   clusters managed by Pacemaker.
 
-The GSE policies are defined declaratively in the */etc/hiera/override/gse_filters.yaml*
-file at the *gse_policies* entry.
-
-A policy consists of a list of rules which are evaluated against the
+A policy consists of a list of rules that are evaluated against the
 current status of the cluster's members. When one of the rules matches, the
 cluster's status gets the value associated with the rule and the evaluation
 stops here. The last rule of the list is usually a catch-all rule that
@@ -612,7 +548,7 @@ Where
 |   Type: float
 |   The threshold value
 
-Lets now take a more detailed look at the policy called *highest_severity*::
+Lets take a closer look at the policy called *highest_severity*::
 
   gse_policies:
 
@@ -662,3 +598,433 @@ The policy definition reads as:
 * Otherwise the status of the cluster is *Okay* if the status of at least one cluster's entity is *Okay*.
 
 * Otherwise the status of the cluster is *Unknown*.
+
+.. _gse_cluster_service:
+
+Service cluster aggregation rules
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The service cluster aggregation rules are used to designate
+the members of a service cluster along with
+the AFD metrics that must be taken into account to derive an
+health status for the service cluster.
+Here is an example of the service cluster aggregation rules::
+
+  gse_cluster_service:
+    input_message_types:
+      - afd_service_metric
+    aggregator_flag: true
+    cluster_field: service
+    member_field: source
+    output_message_type: gse_service_cluster_metric
+    output_metric_name: cluster_service_status
+    interval: 10
+    warm_up_period: 20
+    clusters:
+      nova-api:
+        policy: highest_severity
+        group_by: member
+        members:
+          - backends
+          - endpoint
+          - http_errors
+
+Where
+
+| input_message_types
+|   Type: list
+|   The type(s) of AFD metric messages consumed by the GSE plugin.
+
+| aggregator_flag
+|   Type: boolean
+|   Whether or not the input messages are received from the upstream collectors.
+    This is true for the Service and Node Cluster plugins and false for the
+    Global Cluster plugin.
+
+| cluster_field
+|   Type: unicode
+|   The field in the input message used by the GSE plugin to associate the
+    AFD metrics to the clusters.
+
+| member_field
+|   Type: unicode
+|   The field in the input message used by the GSE plugin to identify the
+    cluster members.
+
+| output_message_type
+|   Type: unicode
+|   The type of metric messages emitted by the GSE plugin.
+
+| output_metric_name
+|   Type: unicode
+|   The Fields[name] value of the metric messages that the GSE plugin emits.
+
+| interval
+|   Type: integer
+|   The interval (in seconds) at which the GSE plugin emits its metric messages.
+
+| warm_up_period
+|   Type: integer
+|   The number of seconds after a (re)start that the GSE plugin will wait
+    before emitting its metric messages.
+
+| clusters
+|   Type: list
+|   The list of service clusters that the plugin handles. See
+    :ref:`service_cluster` for details.
+
+.. _service_cluster:
+
+Service cluster definition
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The service clusters are defined as shown in the example below::
+
+  gse_cluster_service:
+    [...]
+    clusters:
+      nova-api:
+        members:
+          - backends
+          - endpoint
+          - http_errors
+        group_by: member
+        policy: highest_severity
+
+Where
+
+| members
+|   Type: list
+|   The list of cluster members.
+    The AFD messages that are associated to the cluster when the *cluster_field*
+    value is equal to the cluster name and the *member_field* value is in this
+    list.
+
+| group_by
+|   Type: Enum(member, hostname)
+|   This parameter defines how the incoming AFD metrics are aggregated.
+|
+|     member:
+|       aggregation by member, irrespective of the host that emitted the AFD metric.
+|       This setting is typically used for AFD metrics that are not host-centric.
+|
+|     hostname:
+|       aggregation by hostname then by member.
+|       This setting is typically used for AFD metrics that are host-centric such as
+|       those working on filesystem or CPU usage metrics.
+
+| policy:
+|   Type: unicode
+|   The policy to use for computing the service cluster status. See :ref:`gse_policies`
+    for details.
+
+If we look more closely into the example above, it defines that the Service
+Cluster GSE plugin resulting from those rules will emit a
+*gse_service_cluster_metric* message every 10
+seconds to report the current status of the *nova-api* cluster. This
+status is computed using the *afd_service_metric* metric for which
+Fields[service] is 'nova-api' and Fields[source] is one of 'backends',
+'endpoint' or 'http_errors'. The 'nova-api' cluster's status is computed using
+the 'highest_severity' policy which means that it will be equal to the 'worst'
+status across all members.
+
+.. _gse_cluster_node:
+
+Node cluster aggregation rules
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The node cluster aggregation rules are used to designate
+the members of a node cluster along with
+the AFD metrics that must be taken into account to derive
+an health status for the node cluster.
+Here is an example of the node cluster aggregation rules::
+
+  gse_cluster_node:
+    input_message_types:
+      - afd_node_metric
+    aggregator_flag: true
+    # the field in the input messages to identify the cluster
+    cluster_field: node_role
+    # the field in the input messages to identify the cluster's member
+    member_field: source
+    output_message_type: gse_node_cluster_metric
+    output_metric_name: cluster_node_status
+    interval: 10
+    warm_up_period: 80
+    clusters:
+      controller:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - cpu
+          - root-fs
+          - log-fs
+
+Where
+
+| input_message_types
+|   Type: list
+|   The type(s) of AFD metric messages consumed by the GSE plugin.
+
+| aggregator_flag
+|   Type: boolean
+|   Whether or not the input messages are received from the upstream collectors.
+    This is true for the Service and Node Cluster plugins and false for the
+    Global Cluster plugin.
+
+| cluster_field
+|   Type: unicode
+|   The field in the input message used by the GSE plugin to associate the
+    AFD metrics to the clusters.
+
+| member_field
+|   Type: unicode
+|   The field in the input message used by the GSE plugin to identify the
+    cluster members.
+
+| output_message_type
+|   Type: unicode
+|   The type of metric messages emitted by the GSE plugin.
+
+| output_metric_name
+|   Type: unicode
+|   The Fields[name] value of the metric messages that the GSE plugin emits.
+
+| interval
+|   Type: integer
+|   The interval (in seconds) at which the GSE plugin emits its metric messages.
+
+| warm_up_period
+|   Type: integer
+|   The number of seconds after a (re)start that the GSE plugin will wait
+    before emitting its metric messages.
+
+| clusters
+|   Type: list
+|   The list of node clusters that the plugin handles. See
+    :ref:`node_cluster` for details.
+
+.. _node_cluster:
+
+Node cluster definition
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The node clusters are defined as shown in the example below::
+
+  gse_cluster_node:
+    [...]
+    clusters:
+      controller:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - cpu
+          - root-fs
+          - log-fs
+
+Where
+
+| members
+|   Type: list
+|   The list of cluster members.
+    The AFD messages are associated to the cluster when the *cluster_field*
+    value is equal to the cluster name and the *member_field* value is in this
+    list.
+
+| group_by
+|   Type: Enum(member, hostname)
+|   This parameter defines how the incoming AFD metrics are aggregated.
+|
+|     member:
+|       aggregation by member, irrespective of the host that emitted the AFD metric.
+|       This setting is typically used for AFD metrics that are not host-centric.
+|
+|     hostname:
+|       aggregation by hostname then by member.
+|       This setting is typically used for AFD metrics that are host-centric such as
+|       those working on filesystem or CPU usage metrics.
+
+| policy:
+|   Type: unicode
+|   The policy to use for computing the node cluster status. See :ref:`gse_policies`
+    for details.
+
+If we look more closely into the example above, it defines that the Node
+Cluster GSE plugin resulting from those rules will emit a
+*gse_node_cluster_metric* message every 10
+seconds to report the current status of the *controller* cluster. This
+status is computed using the *afd_node_metric* metric for which
+Fields[node_role] is 'controller' and Fields[source] is one of 'cpu',
+'root-fs' or 'log-fs'. The 'controller' cluster's status is computed using
+the 'majority_of_members' policy which means that it will be equal to the 'majority'
+status across all members.
+
+.. _gse_cluster_global:
+
+Top-level cluster aggregation rules
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The top-level agggregation rules aggregate GSE metrics from the
+Service Cluster GSE Plugin and the Node Cluster GSE Plugin.
+This is the last aggregation stage that issues health status
+for the top-level clusters. A top-level cluster is a logical
+contruct of service and node clustering. By default, we define
+that the health status of Nova, as a top-level cluster,
+depends on the health status of several service clusters
+related to Nova and the health status of the 'controller' and
+'compute' node clusters. But it can be anything. For example, you
+could define a 'control-plane' top-level cluster that would
+exclude the health status of the 'compute' node cluster if
+you wanted to... In summary, the top-level cluster aggregation
+rules are used to designate the node clusters and service
+clusters members of a top-level cluster along with
+the GSE metrics that must be taken into account to derive
+an health status for the top-level cluster.
+Here is an example of a top-level cluster aggregation rules::
+
+  gse_cluster_global:
+    input_message_types:
+      - gse_service_cluster_metric
+      - gse_node_cluster_metric
+    aggregator_flag: false
+    # the field in the input messages to identify the cluster's member
+    member_field: cluster_name
+    output_message_type: gse_cluster_metric
+    output_metric_name: cluster_status
+    interval: 10
+    warm_up_period: 30
+    clusters:
+      nova:
+        policy: highest_severity
+        group_by: member
+        members:
+          - nova-logs
+          - nova-api
+          - nova-metadata-api
+          - nova-scheduler
+          - nova-compute
+          - nova-conductor
+          - nova-cert
+          - nova-consoleauth
+          - nova-novncproxy-websocket
+          - controller
+          - compute
+        hints:
+          - cinder
+          - glance
+          - keystone
+          - neutron
+          - mysql
+          - rabbitmq
+
+Where
+
+| input_message_types
+|   Type: list
+|   The type(s) of GSE  metric messages consumed by the GSE plugin.
+
+| aggregator_flag
+|   Type: boolean
+    This is always false for the Global Cluster plugin.
+
+| member_field
+|   Type: unicode
+|   The field in the input message used by the GSE plugin to identify the
+    cluster members.
+
+| output_message_type
+|   Type: unicode
+|   The type of metric messages emitted by the GSE plugin.
+
+| output_metric_name
+|   Type: unicode
+|   The Fields[name] value of the metric messages that the GSE plugin emits.
+
+| interval
+|   Type: integer
+|   The interval (in seconds) at which the GSE plugin emits its metric messages.
+
+| warm_up_period
+|   Type: integer
+|   The number of seconds after a (re)start that the GSE plugin will wait
+    before emitting its metric messages.
+
+| clusters
+|   Type: list
+|   The list of node clusters and service clusters that the plugin handles. See
+    :ref:`global_cluster` for details.
+
+.. _global_cluster:
+
+Top-level cluster definition
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The top-level clusters are defined as shown in the example below::
+
+  gse_cluster_global:
+    [...]
+    clusters:
+      nova:
+        policy: highest_severity
+        group_by: member
+        members:
+          - nova-logs
+          - nova-api
+          - nova-metadata-api
+          - nova-scheduler
+          - nova-compute
+          - nova-conductor
+          - nova-cert
+          - nova-consoleauth
+          - nova-novncproxy-websocket
+          - controller
+          - compute
+        hints:
+          - cinder
+          - glance
+          - keystone
+          - neutron
+          - mysql
+          - rabbitmq
+
+Where
+
+| members
+|   Type: list
+|   The list of cluster members.
+|   The GSE messages are associated to the cluster when the *member_field* value
+|   (i.e *cluster_name*) is in this list.
+
+| hints
+|   Type: list
+|   The list of clusters that are indirectly associated with the top-level cluster.
+|   The GSE messages are indirectly associated to the cluster when the *member_field* value
+|   (i.e *cluster_name*) is in this list. This means that they are not used to derive
+|   the health status of the top-level cluster but as 'hints' for root cause analysis.
+
+| group_by
+|   Type: Enum(member, hostname)
+|   This parameter defines how the incoming GSE metrics are aggregated.
+|   In the case of the top-level cluster definition, it is always by member.
+
+| policy:
+|   Type: unicode
+|   The policy to use for computing the top-level cluster status. See :ref:`gse_policies`
+    for details.
+
+.. _puppet_apply:
+
+Apply your Configuration Changes
+--------------------------------
+
+Once you have edited and saved your changes in
+``/etc/hiera/override/alarmaing.yaml`` and / or
+``/etc/hiera/override/gse_filters.yaml``,
+you need to apply the following Puppet manifest on
+all the nodes of your OpenStack
+environment (**including the node(s) where Nagios is installed**)
+for the changes to take effect::
+
+  # puppet apply --modulepath=/etc/fuel/plugins/lma_collector-<version>/puppet/modules:\
+      /etc/puppet/modules \
+      /etc/fuel/plugins/lma_collector-<version>/puppet/manifests/configure_afd_filters.pp

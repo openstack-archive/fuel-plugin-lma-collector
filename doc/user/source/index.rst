@@ -13,6 +13,7 @@ Welcome to the StackLight Collector Documentation!
    licenses
    appendix_a
    appendix_b
+   appendix_c
 
 Indices and Tables
 ==================
