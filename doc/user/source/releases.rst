@@ -12,27 +12,27 @@ Version 0.10.0
 
     Prior to StackLight version 0.10.0, there was one instance of the *hekad*
     process running to process both the logs and the metrics. Starting with StackLight
-    version 0.10.0, the processing of logs and notifications is separated
-    from the processing of metrics into two different *hekad* instances.
-    This allows for better performance and flow control mechanisms when the
+    version 0.10.0, the processing of the logs and notifications is separated
+    from the processing of the metrics in two different *hekad* instances.
+    This allows for better performance and control of the flow when the
     maximum buffer size on disk has reached a limit. With the *hekad* instance
     processing the metrics, the buffering policy mandates to drop the metrics
     when the maximum buffer size is reached. With the *hekad* instance
     processing the logs, the buffering policy mandates to block the
-    entire processing pipeline. This way, one can avoid
-    losing logs (and notifications) in cases when the Elasticsearch
-    server has been inaccessible for a long period of time.
-    As a result, the StackLight collector has now two services running
-    on a node:
+    entire processing pipeline. This way, we can avoid
+    losing logs (and notifications) when the Elasticsearch
+    server is inaccessible for a long period of time.
+    As a result, the StackLight collector has now two processes running
+    on the node:
 
-    * The **log_collector** service
-    * The **metric_collector** service
+    * One for the *log_collector* service
+    * One for the *metric_collector* service
 
-  * Metrics derived from logs are now aggregated
+  * Metrics derived from logs are aggregated by the *log_collector* service.
 
     To avoid flooding the *metric_collector* with bursts of metrics derived
-    from logs, the *log_collector* service sends aggregated metrics
-    by bulk to the *metric_collector* service.
+    from logs, the *log_collector* service sends metrics by bulk to the
+    *metric_collector* service.
     An example of aggregated metric derived from logs is the
     `openstack_<service>_http_response_time_stats
     <http://fuel-plugin-lma-collector.readthedocs.io/en/latest/appendix_b.html#api-response-times>`_.
@@ -41,10 +41,10 @@ Version 0.10.0
 
     A diagnostic tool is now available to help diagnose problems.
     The diagnostic tool checks that the toolchain is properly installed
-    and configured across the entire StackLight LMA toolchain. Please check the
-    the `Troubleshooting Chapter
-    <http://fuel-plugin-lma-collector.readthedocs.io/en/latest/configuration.html#troubleshooting>`_
-    of the User Guide for more information.
+    and configured across the entire LMA toolchain. Please check the
+    `Diagnostic Tool
+    <http://fuel-plugin-lma-collector.readthedocs.io/en/latest/configuration.html#diagnostic>`_
+    section of the User Guide for more information.
 
 * Bug fixes
 

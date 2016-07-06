@@ -3,76 +3,84 @@
 Overview
 ========
 
-The LMA Collector is the advanced monitoring agent of the
-so called Logging, Monitoring and Alerting (LMA) Toolchain of Mirantis OpenStack,
-which is now officially called the **StackLight Collector** (or just the *collector*).
+The **StackLight Collector Plugin** is used to install and configure
+several software components that are used to collect and process all the
+data that we think is relevant to provide deep operational insights about
+your OpenStack environment. These finely integrated components are
+collectively referred to as the **StackLight Collector** (or just **the Collector**).
 
-The StackLight Collector should be installed on each of the OpenStack nodes you
-want to monitor. It is a key component of the
-`LMA Toolchain of Mirantis OpenStack <https://launchpad.net/lma-toolchain>`_
-as shown in the figure below:
+.. note:: The Collector has evolved over time and so the term
+   'collector' is a little bit of a misnomer since it is
+   more of a **smart monitoring agent** than a mere data 'collector'.
+
+The Collecor is a key component of the so-called
+`Logging, Monitoring and Alerting toolchain of Mirantis OpenStack
+<https://launchpad.net/lma-toolchain>`_ (a.k.a StackLight).
 
 .. image:: ../../images/toolchain_map.png
    :align: center
 
-Each *collector* is individually responsible for supporting the sensing,
-measurement, collection, analysis and alarm functions for the node
-it is running on.
+The Collector is installed on every node of your OpenStack
+environment. Each Collector is individually responsible for supporting
+all the monitoring functions of your OpenStack environment for both
+the operating system and the services running on the node.
+Note also that the Collector running on the *primary controller*
+(the controller which owns the management VIP) is called the
+**Aggregator** since it performs additional aggregation and correlation
+functions. The Aggregator is the central point of convergence for
+all the faults and anomalies detected at the node level. The
+fundamental role of the Aggregator is to issue an opinion about the
+health status of your OpenStack environment at the cluster
+level. As such, the Collector may be viewed as a monitoring
+agent for cloud infrastructure clusters.
 
-A wealth of operational data is collected from a variety of sources including
-log files, collectd and RabbitMQ for the OpenStack notifications.
+The main building blocks of the Collector are:
 
-.. note:: The *collector* which runs on the active controller of the control
-   plane cluster, is called the *aggregator* because it performs additional
-   aggregation and multivariate correlation functions to compute service
-   healthiness metrics at the cluster level.
+* **collectd** which comes bundled with a collection of monitoring plugins.
+  Some of them are standard collectd plugins while others are purpose-built
+  plugins written in python to perform various OpenStack services checks.
+* **Heka**, `a golang data processing swiss army knife by Mozilla
+  <https://github.com/mozilla-services/heka>`_.
+  Heka supports a number of standard input and output plugins
+  that allows to ingest data from a variety of sources
+  including collectd, log files and RabbitMQ,
+  as well as to persist the operational data to external backend servers like
+  Elasticsearch, InfluxDB and Nagios for search and further processing.
+* **A collection of Heka plugins** written in Lua which does
+  the actual data processing such as running metrics transformations
+  and running alarms.
 
-A primary function of the *collector* is to sanitise and transform the ingested
-raw operational data into internal message representations using the
-`Heka message structure <https://hekad.readthedocs.io/en/stable/message/index.html>`_.
-This message structure is used within the *collector's* plugin framework to match,
-filter and route messages to plugins written in `Lua <http://www.lua.org/>`_
-that perform various data analysis and computation functions.
+.. note:: An important function of the Collector is to normalize
+   the operational data into an internal `Heka message structure
+   <https://hekad.readthedocs.io/en/stable/message/index.html>`_
+   representation that can be ingested into the Heka's stream processing
+   pipeline. The stream processing pipeline uses matching policies to
+   route the Heka messages to the `Lua <http://www.lua.org/>`_ plugins that
+   will perform the actual data computation functions.
 
-As such, the *collector* may also be described as a pluggable framework
-for operational data stream processing and routing.
+There are three types of Lua plugins that were developed for the Collector:
 
-Its main building blocks are:
+* The **decoder plugins** to sanitize and normalize the ingested data.
+* The **filter plugins** to process the data.
+* The **encoder plugins** to serialize the data that is
+  sent to the backend servers.
 
-* `collectd <https://collectd.org/>`_ which is bundled with a collection of
-  monitoring plugins. Many of them are purpose-built for OpenStack.
-* `Heka <https://github.com/mozilla-services/heka>`_ (a golang data processing
-  *swiss army knife* by Mozilla) which is the cornerstone technology of the Collector.
-  Heka supports out-of-the-box a number of input and output plugins that allows
-  the Collector to integrate with a number of external systems' native
-  protocol like Elasticsearch, InfluxDB, Nagios, SMTP, Whisper, Kafka, AMQP and
-  Carbon to name a few.
-* A collection of Heka plugins written in Lua to decode, process and encode the
-  operational data.
+There are five types of data sent by the Collector (and the Aggregator)
+to the backend servers:
 
-There are three types of Lua plugins running in the *collector*:
+* The logs and the notifications, which are referred to as events,
+  sent to Elasticsearch for indexing.
+* The metric's time-series sent to InfluxDB.
+* The annotation sent to InfluxDB.
+* The OpenStack environment clusters health status
+  sent as *passive checks* to Nagios
 
-* The input plugins which collect, sanitize and transform the raw
-  data into an internal message representation which is injected into the
-  Heka pipeline for further processing.
-* The filter plugins which execute the analysis and correlation functions.
-* The output plugins which encode and transmit the messages to external
-  systems like Elasticsearch, InfluxDB or Nagios where the data can
-  be further processed and persisted.
-
-The output of the *collector* and *aggregator* is of four kinds:
-
-* The logs and notifications which are sent to Elasticsearch for indexing.
-  Elasticsearch combined with Kibana provides insightful log analytics.
-* The metrics which are sent to InfluxDB.
-  InfluxDB combined with Grafana provides insightful time-series analytics.
-* The health status metrics for the OpenStack clusters which are sent to Nagios
-  (or via SMTP) for alerting and escalation purposes.
-* The annotation messages which are sent to InfluxDB. The annotation messages contain
-  information about what caused a service cluster or node cluster to change state.
-  The annotation messages provide root cause analysis hints whenever possible.
-  The annotation messages are also used to construct the alert notifications that are
-  sent via SMTP or to Nagios.
+.. note:: The annotations are like notification messages
+   which are exposed in Grafana. They contain information about the
+   anomalies and faults that have been detected by the Collector.
+   They are also used to construct the *passive checks* sent to Nagios.
+   They may additionally contain 'hints' about what the Collector think
+   could be the root cause of a problem.
 
 .. _plugin_requirements:
 
@@ -94,10 +102,10 @@ Requirements
 Limitations
 -----------
 
-* The plugin is not compatible with an OpenStack environment deployed with Nova-Network.
+* The plugin is not compatible with an OpenStack environment deployed with nova-network.
 
-* The Elasticsearch output plugin of the *collector* is configured to use the **drop** policy
-  which implies that the *collector* will start dropping the logs and the OpenStack
+* The Elasticsearch output plugin of the Collector is configured to use the **drop** policy
+  which implies that the Collector will start dropping the logs and the OpenStack
   notifications when the output plugin has reached a buffering limit that is currently
   set to 1GB by default. This situation can typically happen when the Elasticsearch server
   has been inaccessible for a long period of time.

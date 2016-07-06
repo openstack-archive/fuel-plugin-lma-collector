@@ -126,3 +126,65 @@ use the instructions below to troubleshoot the problem:
 5. Check if the nodes are able to connect to the Elasticsearch server on port 9200.
 
 6. Check if the nodes are able to connect to the InfluxDB server on port 8086.
+
+
+.. _diagnostic:
+
+Diagnostic Tool
+---------------
+
+A **global diagnostic tool** is installed on the Fuel Master node
+by the StackLight Collector Plugin. The global diagnostic tool checks
+that StackLight is configured and running properly across the entire
+LMA toolchain for all the nodes of your OpenStack environment::
+
+  [root@nailgun ~]# /var/www/nailgun/plugins/lma_collector-<version>/contrib/tools/diagnostic.sh
+  Running lma_diagnostic tool on all available nodes (this can take several minutes)
+  The diagnostic archive is here: /var/lma_diagnostics.2016-06-10_11-23-1465557820.tgz
+
+Note that a global diagnostic can take several minutes.
+
+All the results are consolidated in an archive file with the 
+name ``/var/lma_diagnostics.[date +%Y-%m-%d_%H-%M-%s].tgz``.
+
+Instead of running a global diagnostic, you may want to run the diagnostic
+on individual nodes. The tool will figure out what checks should be executed
+based on the role of the node as shown below::
+
+  root@node-3:~# hiera roles
+  ["controller"]
+
+  root@node-3:~# lma_diagnostics
+
+  2016-06-10-11-08-04 INFO node-3.test.domain.local role ["controller"]
+  2016-06-10-11-08-04 INFO ** LMA Collector
+  2016-06-10-11-08-04 INFO 2 process(es) 'hekad -config' found
+  2016-06-10-11-08-04 INFO 1 process(es) hekad is/are listening on port 4352
+  2016-06-10-11-08-04 INFO 1 process(es) hekad is/are listening on port 8325
+  2016-06-10-11-08-05 INFO 1 process(es) hekad is/are listening on port 5567
+  2016-06-10-11-08-05 INFO 1 process(es) hekad is/are listening on port 4353
+  [...]
+
+In the example above, the diagnostic tool reports that two *hekad*
+processes are runing on *node-3* which is the expected outcome.
+In the case where one *hekad* process is not be running, the
+diagnostic tool would report an error as shown below::
+
+  root@node-3:~# lma_diagnostics 
+  2016-06-10-11-11-48 INFO node-3.test.domain.local role ["controller"]
+  2016-06-10-11-11-48 INFO ** LMA Collector
+  2016-06-10-11-11-48 **ERROR 1 'hekad -config' processes found, 2 expected!**
+  2016-06-10-11-11-48 **ERROR 'hekad' process does not LISTEN on port: 4352**
+  [...]
+
+Here, two errors are reported:
+
+  1. There is only one *hekad* process running instead of two.
+  2. No *hekad* process is listening on port 4352.
+
+This is one example of the type of checks performed by the
+diagnostic tool but there are many others.
+On the OpenStack nodes, the diagnostic's results are stored 
+in ``/var/lma_diagnostics/diagnostics.log``.
+
+**A successful LMA toolchain diagnostic should be free of errors**.
