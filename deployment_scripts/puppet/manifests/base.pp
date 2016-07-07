@@ -133,7 +133,6 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
           'timeout' => '30',
         },
       },
-      ocf_script_file => 'lma_collector/ocf-lma_collector',
     }
 
     if $is_rabbitmq {
@@ -196,7 +195,6 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
           'timeout' => '30',
         },
       },
-      ocf_script_file => 'lma_collector/ocf-lma_collector',
     }
   } else {
     pacemaker::service { 'log_collector':
@@ -235,7 +233,6 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
           'timeout' => '30',
         },
       },
-      ocf_script_file  => 'lma_collector/ocf-lma_collector',
       require          => Lma_collector::Heka['log_collector'],
     }
 
@@ -285,7 +282,6 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
           'timeout' => '30',
         },
       },
-      ocf_script_file  => 'lma_collector/ocf-lma_collector',
       require          => Lma_collector::Heka['metric_collector'],
     }
   }
