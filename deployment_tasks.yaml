@@ -35,6 +35,13 @@
   requires: [lma-hiera-override, lma-configure-apt]
   required_for: [post_deployment_end]
   role: '*'
+  # lma-configure-apt ships the OCF script so the task should wait for the
+  # script to be available on all the necessary nodes otherwise Pacemaker may
+  # fail to start the resource and keep it in failed state forever.
+  # See https://bugs.launchpad.net/lma-toolchain/+bug/1593137 for details
+  cross-depends:
+    - name: lma-configure-apt
+      role: /.*/
   parameters:
     puppet_manifest: puppet/manifests/base.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
