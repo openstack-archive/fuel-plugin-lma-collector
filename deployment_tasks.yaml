@@ -163,3 +163,18 @@
   reexecute_on:
     - deploy_changes
 
+# This task must be executed at the very end of the deployment.
+- id: lma-cleanup-collectors
+  type: puppet
+  version: 2.0.0
+  requires: [lma-base]
+  required_for: [post_deployment_end]
+  role:
+    - primary-controller
+  cross-depends:
+    - name: lma-base
+      role: [primary-controller, controller]
+  parameters:
+    puppet_manifest: puppet/manifests/cleanup_collectors.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 300
