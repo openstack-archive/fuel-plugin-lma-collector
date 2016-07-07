@@ -29,3 +29,18 @@ case $::osfamily {
         # Currently only Debian like distributions need specific configuration.
     }
 }
+
+$node_profiles   = hiera_hash('lma::collector::node_profiles')
+if $node_profiles['controller'] or $node_profiles['rabbitmq'] or $node_profiles['mysql'] {
+  # The OCF script should exist before any node tries to configure the
+  # collector services with Pacemaker. This is why it is shipped by this
+  # manifest.
+  file { 'ocf-lma_collector':
+    ensure => present,
+    source => 'puppet:///modules/lma_collector/ocf-lma_collector',
+    path   => '/usr/lib/ocf/resource.d/fuel/ocf-lma_collector',
+    mode   => '0755',
+    owner  => 'root',
+    group  => 'root',
+  }
+}

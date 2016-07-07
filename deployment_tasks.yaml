@@ -19,7 +19,7 @@
   # We use upload_nodes_info as an anchor to order the post-deployment tasks executed
   # by this plugin and the InfluxDB & Elasticsearch plugins. The dependency chain is:
   # Other plugins tasks -> upload_nodes_info -> (LMA collector tasks)
-  requires: [post_deployment_start, upload_nodes_info]
+  requires: [post_deployment_start, upload_nodes_info, lma-hiera-override]
   required_for: [post_deployment_end]
   role: '*'
   parameters:
@@ -32,9 +32,16 @@
 - id: lma-base
   type: puppet
   version: 2.0.0
-  requires: [lma-hiera-override, lma-configure-apt]
+  requires: [lma-configure-apt]
   required_for: [post_deployment_end]
   role: '*'
+  # lma-configure-apt ships the OCF script so the task should wait for the
+  # script to be available on all the necessary nodes otherwise Pacemaker may
+  # fail to start the resource and keep it in failed state forever.
+  # See https://bugs.launchpad.net/lma-toolchain/+bug/1593137 for details
+  cross-depends:
+    - name: lma-configure-apt
+      role: /.*/
   parameters:
     puppet_manifest: puppet/manifests/base.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
@@ -162,19 +169,3 @@
     timeout: 600
   reexecute_on:
     - deploy_changes
-
-# This task must be executed at the very end of the deployment.
-- id: lma-cleanup-collectors
-  type: puppet
-  version: 2.0.0
-  requires: [lma-base]
-  required_for: [post_deployment_end]
-  role:
-    - primary-controller
-  cross-depends:
-    - name: lma-base
-      role: [primary-controller, controller]
-  parameters:
-    puppet_manifest: puppet/manifests/cleanup_collectors.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 300
