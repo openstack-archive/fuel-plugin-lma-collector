@@ -1,62 +1,64 @@
-The Logging, Monitoring and Alerting (LMA) Collector Plugin for Fuel
-====================================================================
+The StackLight Collector Plugin for Fuel
+========================================
 
-The LMA Collector Plugin for Fuel is used to install and configure
-the LMA Collector in OpenStack environments deployed by [Fuel](
-https://wiki.openstack.org/wiki/Fuel).
+The StackLight Collector Plugin is used to install and
+configure several software components that are used to
+collect and process all the data that we think is relevant
+to provide deep operational insights about your OpenStack environment.
+These finely integrated components are collectively referred to as
+the StackLight Collector (or just the Collector).
 
-The LMA Collector is an advanced monitoring agent solution that should
-be installed on each of the OpenStack nodes you want to monitor.
+The Collecor is a key component of the so-called Logging,
+Monitoring and Alerting (LMA) toolchain of Mirantis OpenStack.
 
-Please check the [LMA Collector Plugin Overview](
+Please start with the [StackLight Collector Plugin Overview](
 http://fuel-plugin-lma-collector.readthedocs.org/en/latest/overview.html)
-section of the plugin's documentation for additional details.
+to getting started.
 
 Release Notes
 -------------
 
-The release notes of the LMA Collector Plugin are provided in the
-[Release Notes](
+A summary description of the features are provided in the [Release Notes](
 http://fuel-plugin-lma-collector.readthedocs.org/en/latest/releases.html)
-section of the plugin documentation.
+section of the plugin's documentation.
 
 Requirements
 ------------
 
-The LMA Collector Plugin requirements are defined in the [Requirements](
+The requirements are provided in the [Requirements](
 http://fuel-plugin-lma-collector.readthedocs.org/en/latest/overview.html#requirements)
-section of the plugin documentation.
+section of the plugin's documentation.
 
 Known issues
 ------------
 
-The LMA Toolchain's related issues are listed on [Launchpad](
+All known issues are listed on [Launchpad](
 https://bugs.launchpad.net/lma-toolchain).
 
 Limitations
 -----------
 
-The LMA Collector Plugin limitations are described in the [Limitations](
+All known limitations are described in the [Limitations](
 http://fuel-plugin-lma-collector.readthedocs.org/en/latest/overview.html#limitations)
-section of the plugin documentation.
+section of the plugin's documentation.
 
 Installation
 ------------
 
-The installation instructions of the LMA Collector Plugin are provided
+The installation instructions of the StackLight Collector are provided
 in the [Installation](
 http://fuel-plugin-lma-collector.readthedocs.org/en/latest/installation.html#installation)
-section of the plugin documentation.
+section of the plugin's documentation.
 
 User Guide
 ----------
 
-Instructions for how to configure the plugin and the alarms
+Instructions for how to configure the StackLight Collector
 are provided in the [Configuration Guide](
 http://fuel-plugin-lma-collector.readthedocs.org/en/latest/configuration.html)
 and [Alarms Configuration Guide](
 http://fuel-plugin-lma-collector.readthedocs.org/en/latest/alarms.html)
-of the plugin documentation.
+sections of the plugin's documentation.
 
 Communication
 -------------
@@ -69,7 +71,7 @@ prefixed by `[fuel][plugins][lma]`.
 Reporting Bugs
 --------------
 
-Bugs should be filed against the [LMA Toolchain project](
+Bugs should be filed against the [LMA toolchain project](
 https://launchpad.net/lma-toolchain) on Launchpad (not Github!).
 
 Contributing
