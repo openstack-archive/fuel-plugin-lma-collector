@@ -17,8 +17,6 @@ DIAG_DIR=/var/lma_diagnostics
 rm -rf "$DIAG_DIR"
 mkdir -p "$DIAG_DIR" || exit 1
 
-GRAFANA_PORT=8000
-NAGIOS_PORT=8001
 ES_PORT=9200
 INFLUXDB_PORT=8086
 NUM_COLLECTORS=1
@@ -182,6 +180,13 @@ function diag_collectd {
 
 function diag_influxdb {
   log_info "** InfluxDB"
+  GRAFANA_PORT=8000
+  if grep lma::grafana::tls::enabled /etc/hiera/plugins/influxdb_grafana.yaml|grep false 2>&1 >/dev/null; then
+    FRONTEND_GRAFANA_PORT=80
+  else
+    FRONTEND_GRAFANA_PORT=443
+  fi
+
   copy_file /etc/influxdb
   tail_file /var/log/influxdb/influxd.log
 
@@ -200,10 +205,9 @@ function diag_influxdb {
 
   address=$(hiera lma::influxdb::vip)
   if [ "$address" != "nil" ]; then
-    address=$address:$INFLUXDB_PORT
-    run_cmd "curl -S -i ${address}/ping" "${diag_output}/test_ping.vip" 5
+    run_cmd "curl -S -i ${address}:${INFLUXDB_PORT}/ping" "${diag_output}/test_ping.vip" 5
     if [ $? -ne 0 ]; then
-      log_err "Fail to reach Influxdb ($address)"
+      log_err "Fail to reach Influxdb (${address}:${INFLUXDB_PORT})"
     fi
   fi
 
@@ -215,9 +219,13 @@ function diag_influxdb {
   check_process grafana-server "${diag_output}/processes"
   check_net_listen grafana "${diag_output}/netstat" 1 $GRAFANA_PORT
 
-  run_cmd "curl -S -i ${address}/login" "${diag_output}/vip_test" 5
+  if [ $FRONTEND_GRAFANA_PORT == "443" ]; then
+    run_cmd "curl -S -k -i https://${address}:${FRONTEND_GRAFANA_PORT}/login" "${diag_output}/vip_test" 5
+  else
+    run_cmd "curl -S -i http://${address}:${FRONTEND_GRAFANA_PORT}/login" "${diag_output}/vip_test" 5
+  fi
   if [ $? -ne 0 ]; then
-    log_err "Fail to reach Grafana ($address:$GRAFANA_PORT)"
+    log_err "Fail to reach Grafana ($address:$FRONTEND_GRAFANA_PORT)"
   fi
 }
 
@@ -258,6 +266,13 @@ function diag_elasticsearch {
       log_err "Fail to reach Elasticsearch through the VIP ($address)"
     fi
   fi
+
+  log_info "** Kibana"
+  KIBANA_PORT=5601
+  copy_file /opt/kibana/config
+  diag_output="${DIAG_DIR}/diag.kibana"
+  mkdir -p "$diag_output"
+  check_net_listen node "${diag_output}/netstat.${KIBANA_PORT}" 1 $KIBANA_PORT
 }
 
 function diag_collector {
@@ -317,29 +332,53 @@ function diag_nagios {
   log_info "** Nagios"
   diag_output="${DIAG_DIR}/diag.nagios"
   mkdir -p "$diag_output"
+
+  if grep tls_enabled /etc/hiera/plugins/lma_infrastructure_alerting.yaml|grep false 2>&1 >/dev/null; then
+    NAGIOS_PORT=80
+  else
+    NAGIOS_PORT=443
+  fi
+
   copy_file /etc/nagios3/
+  copy_file /etc/apache2-nagios/
 
   run_cmd "nagios3 -v /etc/nagios3/nagios.cfg" "$diag_output/configuration_validation"
   if [ $? -ne 0 ]; then
     log_err "Nagios configuration error"
   fi
 
-  check_process "nagios3 -d" "$diag_output/processes.nagios3"
-  check_process "apache2 -k" "$diag_output/processes.apache2" any
+  # Nagios/Apache2 are running only on one node at a time
+  if crm resource status nagios3 2>&1 |grep $(hostname)|grep "is running" >/dev/null; then
+    log_info "Nagios is running on this node"
+    check_process "nagios3 -d" "$diag_output/processes.nagios3"
+    check_process "apache2 -k" "$diag_output/processes.apache2" any
+  else
+    log_info "Nagios is running elsewhere"
+  fi
 
   tail_file /var/nagios/nagios.log
   tail_file /var/log/apache2/nagios_error.log
   tail_file /var/log/apache2/nagios_access.log
+  tail_file /var/log/apache2/nagios_wsgi_error.log
+  tail_file /var/log/apache2/nagios_wsgi_access.log
 
-  # lma_infrastructure_alerting >= v0.9
-  address=$(hiera lma::infrastructure_alerting::vip)
-  if [ "$address" == "nil" ]; then
-    # lma_infrastructure_alerting v0.8
-    address="127.0.0.1"
-  fi
-  run_cmd "curl -S -i $address:$NAGIOS_PORT" "${diag_output}/nagios_ui_test"
+  wsgi_address=$(hiera lma::infrastructure_alerting::vip)
+  run_cmd "curl -S -i $wsgi_address:80/status" "${diag_output}/nagios_wsgi_test"
   if [ $? -ne 0 ]; then
-    log_err "Fail to reach Apache/Nagios ($address:$NAGIOS_PORT)"
+    log_err "Fail to reach Apache/Nagios ($wsgi_address:80)"
+  fi
+
+  # NOTE: It is easier to get UI address from Apache configuration than
+  # from hiera, because hiera key lma::infrastructure_alerting::nagios_ui is a
+  # hash which was a bad idea.
+  ui_address=$(grep -v $wsgi_address /etc/apache2-nagios/port.confs|grep ':'|grep -v -E '^#'|awk '{print $2}')
+  if [ $NAGIOS_PORT == "443" ]; then
+    run_cmd "curl -S -k -i https://${ui_address}" "${diag_output}/nagios_ui_test"
+  else
+    run_cmd "curl -S -i http://${ui_address}" "${diag_output}/nagios_ui_test"
+  fi
+  if [ $? -ne 0 ]; then
+    log_err "Fail to reach Nagios UI ($ui_address)"
   fi
 }
 
@@ -415,6 +454,10 @@ if has_elasticsearch; then
 fi
 if has_nagios; then
   diag_nagios
+fi
+
+if [ -d /etc/haproxy ]; then
+  copy_file /etc/haproxy
 fi
 
 diag_system
