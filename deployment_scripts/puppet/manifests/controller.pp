@@ -297,7 +297,9 @@ if hiera('lma::collector::influxdb::server', false) {
   # controller.
   unless $detach_rabbitmq_enabled {
     class { 'lma_collector::collectd::rabbitmq':
-      queue => ['/^(\\w*notifications\\.(error|info|warn)|[a-z]+|(metering|event)\.sample)$/'],
+      username => 'nova',
+      password => $rabbit['password'],
+      require  => Class['lma_collector::collectd::base'],
     }
   }
 
