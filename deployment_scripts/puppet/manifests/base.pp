@@ -381,8 +381,9 @@ if $is_rabbitmq and (hiera('lma::collector::elasticsearch::server', false) or hi
     # collectd Puppet module.
     unless $is_controller {
       class { 'lma_collector::collectd::rabbitmq':
-        queue   => ['/^(\\w*notifications\\.(error|info|warn)|[a-z]+|(metering|event)\.sample)$/'],
-        require => Class['lma_collector::collectd::base'],
+        username => 'nova',
+        password => $rabbit['password'],
+        require  => Class['lma_collector::collectd::base'],
       }
     }
   }
