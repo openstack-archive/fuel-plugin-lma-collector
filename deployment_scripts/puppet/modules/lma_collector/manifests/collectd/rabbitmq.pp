@@ -14,23 +14,35 @@
 #
 
 class lma_collector::collectd::rabbitmq (
-  $queue = [],
+  $username,
+  $password,
+  $host = undef,
+  $port = undef,
 ) {
 
-  validate_array($queue)
-
-  # Add quotes around the array values
-  $real_queue = suffix(prefix($queue, '"'), '"')
-
-  if $queue {
-    $config = {
-      'Queue' => $real_queue,
+  if $host {
+    $host_config = {
+      'Host' => "\"${host}\"",
     }
   } else {
-    $config = {}
+    $host_config = {}
+  }
+
+  if $port {
+    validate_integer($port)
+    $port_config = {
+      'Port' => "\"${port}\"",
+    }
+  } else {
+    $port_config = {}
+  }
+
+  $config = {
+    'Username' => "\"${username}\"",
+    'Password' => "\"${password}\"",
   }
 
   lma_collector::collectd::python { 'rabbitmq_info':
-    config => $config,
+    config => merge($config, $host_config, $port_config)
   }
 }
