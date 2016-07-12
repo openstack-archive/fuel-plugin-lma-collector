@@ -1,21 +1,50 @@
-==================================================
-Welcome to the StackLight Collector Documentation!
-==================================================
+==========================================
+Fuel Plugin for StackLight Collector Guide
+==========================================
+
+Overview
+~~~~~~~~
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   overview
-   releases
-   installation
-   configuration
-   alarms
+   intro
+   requirements
+   prerequisites
+   limitations
+   release_notes
    licenses
-   appendix_a
-   appendix_b
-   appendix_c
+   references
 
-Indices and Tables
-==================
+Installing StackLight Collector plugin for Fuel
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* :ref:`search`
+.. toctree::
+   :maxdepth: 1
+
+   install
+
+Configuring StackLight Collector plugin for Fuel
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. toctree::
+   :maxdepth: 1
+   
+   configure_plugin
+
+Configuring alarms
+~~~~~~~~~~~~~~~~~~
+
+.. toctree::
+   :maxdepth: 1
+
+   configure_alarms
+
+Appendix
+~~~~~~~~
+
+.. toctree::
+   :maxdepth: 1
+   
+   appendix_metrics
+   appendix_alarms

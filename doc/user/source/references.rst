@@ -1,7 +1,11 @@
 .. _references:
 
-Appendix A: References
-======================
+.. raw:: latex
+
+   \pagebreak
+
+References
+----------
 
 * The `StackLight Collector plugin <https://github.com/openstack/fuel-plugin-lma-collector>`_ project at GitHub.
 * The `StackLight Elasticsearch-Kibana plugin <https://github.com/openstack/fuel-plugin-elasticsearch-kibana>`_ project at GitHub.
