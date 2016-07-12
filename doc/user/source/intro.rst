@@ -1,7 +1,7 @@
-.. _user_overview:
+.. _user_intro:
 
-Overview
-========
+Introduction
+------------
 
 The **StackLight Collector Plugin** is used to install and configure
 several software components that are used to collect and process all the
@@ -19,6 +19,7 @@ The Collecor is a key component of the so-called
 
 .. image:: ../../images/toolchain_map.png
    :align: center
+   :width: 90%
 
 The Collector is installed on every node of your OpenStack
 environment. Each Collector is individually responsible for supporting
@@ -81,30 +82,3 @@ to the backend servers:
    They basicaly contain the same information as the *passive checks*
    sent to Nagios. In addition, they may contain 'hints' about what
    the Collector think could be the root cause of a problem.
-
-.. _plugin_requirements:
-
-Requirements
-------------
-
-+-------------------------------------------------------+-------------------------------------------------------------------+
-| Requirement                                           | Version/Comment                                                   |
-+=======================================================+===================================================================+
-| Mirantis OpenStack                                    | 8.0 or 9.0                                                        |
-+-------------------------------------------------------+-------------------------------------------------------------------+
-| A running Elasticsearch server (for log analytics)    | 1.7.4 or higher, the RESTful API must be enabled over port 9200   |
-+-------------------------------------------------------+-------------------------------------------------------------------+
-| A running InfluxDB server (for metric analytics)      | 0.10.0 or higher, the RESTful API must be enabled over port 8086  |
-+-------------------------------------------------------+-------------------------------------------------------------------+
-| A running Nagios server (for infrastructure alerting) | 3.5 or higher, the command CGI must be enabled                    |
-+-------------------------------------------------------+-------------------------------------------------------------------+
-
-Limitations
------------
-
-* The plugin is not compatible with an OpenStack environment deployed with nova-network.
-
-* When you re-execute tasks on deployed nodes using the Fuel CLI, the *hekad* and
-  *collectd* processes will be restarted on these nodes during the post-deployment
-  phase. See `bug #1570850
-  <https://bugs.launchpad.net/lma-toolchain/+bug/1570850>`_ for details.
