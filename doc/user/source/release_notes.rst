@@ -1,10 +1,10 @@
-.. _releases:
+.. _release_notes:
 
-Release Notes
-=============
+Release notes
+-------------
 
 Version 0.10.0
---------------
+++++++++++++++
 
 * Changes
 
@@ -49,7 +49,7 @@ Version 0.10.0
 * Bug fixes
 
 Version 0.9.0
--------------
++++++++++++++
 
 * Changes
 
@@ -94,7 +94,7 @@ Version 0.9.0
     <https://bugs.launchpad.net/lma-toolchain/+bug/1561603>`_).
 
 Version 0.8.0
--------------
++++++++++++++
 
 * Support for alerting in two different modes:
 
@@ -114,6 +114,6 @@ Version 0.8.0
 
 
 Version 0.7.0
--------------
++++++++++++++
 
 * Initial release of the plugin. This is a beta version.

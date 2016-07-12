@@ -1,7 +1,7 @@
-.. _alarm_list:
+.. _alarms:
 
-Appendix C: List of built-in alarms
-===================================
+List of built-in alarms
+-----------------------
 
 Here is a list of all the alarms that are built-in in StackLight::
 
