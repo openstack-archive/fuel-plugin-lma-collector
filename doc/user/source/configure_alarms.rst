@@ -1,9 +1,4 @@
-.. _alarm_guide:
-
-Alarms Configuration Guide
-============================
-
-.. _alarm_overview:
+.. _configure_alarms:
 
 Overview
 --------
@@ -65,7 +60,7 @@ The StackLight stream processing pipeline workflow is shown in the figure below:
    :alt: Message flow for the AFD and GSE metrics
    :align: center
 
-The AFD and GSE Plugins
+The AFD and GSE plugins
 -----------------------
 
 In the current version of StackLight, there are three types of GSE plugins:
@@ -93,7 +88,7 @@ The health status exposed in the GSE metrics is as follow:
   health status of the cluster.
 * *Okay*: None of the above was found to be true.
 
-The AFD and GSE Persisters
+The AFD and GSE persisters
 --------------------------
 
 The AFD and GSE metrics are also consumed by other types
@@ -117,7 +112,7 @@ AFD and GSE metrics.
 
 .. _alarm_configuration:
 
-Alarms Configuration
+Alarms configuration
 --------------------
 
 StackLight comes with a predefined set of alarm rules.
@@ -136,8 +131,8 @@ of that file.
 
 .. _alarm_structure:
 
-Alarm Structure
-~~~~~~~~~~~~~~~
+Alarm structure
++++++++++++++++
 
 An alarm rule is defined declaratively using the YAML syntax
 as shown in the example below::
@@ -283,8 +278,8 @@ as shown in the example below::
 |   The threshold of the alarm rule
 
 
-How to modify or create an alarm?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Modify or create an alarm
++++++++++++++++++++++++++
 
 To modify (or create) an alarm, you need to edit the
 ``/etc/hiera/override/alarming.yaml`` file.
@@ -435,7 +430,7 @@ This file has four sections:
 
 .. _aggreg_correl_config:
 
-Aggregation and Correlation Configuration
+Aggregation and correlation configuration
 -----------------------------------------
 
 StackLight comes with a predefined set of aggregation rules and
@@ -481,7 +476,7 @@ This file has four sections:
 .. _gse_policies:
 
 Health status policies
-~~~~~~~~~~~~~~~~~~~~~~
+++++++++++++++++++++++
 
 The correlation logic implemented by the GSE plugins is policy-based.
 The policies define how the GSE plugins infer the health status of a
@@ -602,7 +597,7 @@ The policy definition reads as:
 .. _gse_cluster_service:
 
 Service cluster aggregation rules
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++++++++++++++++++++++++++++++++++
 
 The service cluster aggregation rules are used to designate
 the members of a service cluster along with
@@ -676,7 +671,7 @@ Where
 .. _service_cluster:
 
 Service cluster definition
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+++++++++++++++++++++++++++
 
 The service clusters are defined as shown in the example below::
 
@@ -731,7 +726,7 @@ status across all members.
 .. _gse_cluster_node:
 
 Node cluster aggregation rules
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+++++++++++++++++++++++++++++++
 
 The node cluster aggregation rules are used to designate
 the members of a node cluster along with
@@ -807,7 +802,7 @@ Where
 .. _node_cluster:
 
 Node cluster definition
-~~~~~~~~~~~~~~~~~~~~~~~
++++++++++++++++++++++++
 
 The node clusters are defined as shown in the example below::
 
@@ -862,7 +857,7 @@ status across all members.
 .. _gse_cluster_global:
 
 Top-level cluster aggregation rules
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++++++++++++++++++++++++++++++++++++
 
 The top-level agggregation rules aggregate GSE metrics from the
 Service Cluster GSE Plugin and the Node Cluster GSE Plugin.
@@ -957,7 +952,7 @@ Where
 .. _global_cluster:
 
 Top-level cluster definition
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+++++++++++++++++++++++++++++
 
 The top-level clusters are defined as shown in the example below::
 
@@ -1014,7 +1009,7 @@ Where
 
 .. _puppet_apply:
 
-Apply your Configuration Changes
+Apply your configuration changes
 --------------------------------
 
 Once you have edited and saved your changes in
