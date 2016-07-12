@@ -1,8 +1,3 @@
-.. _config_guide:
-
-Configuration Guide
-===================
-
 .. _plugin_configuration:
 
 Plugin configuration
@@ -22,7 +17,6 @@ To configure your plugin, you need to follow these steps:
 .. image:: ../../images/collector_settings.png
    :width: 350pt
    :alt: The StackLight Collector Plugin settings
-   :align: center
 
 4. Tick the StackLight Collector Plugin box and
    fill-in the required fields as indicated below.
@@ -130,7 +124,7 @@ use the instructions below to troubleshoot the problem:
 
 .. _diagnostic:
 
-Diagnostic Tool
+Diagnostic tool
 ---------------
 
 A **global diagnostic tool** is installed on the Fuel Master node
