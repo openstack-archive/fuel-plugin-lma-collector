@@ -1,6 +1,7 @@
 .. _cluster_metrics:
 
-The cluster metrics are emitted by the GSE plugins (See the :ref:`alarm_guide` for details).
+The cluster metrics are emitted by the GSE plugins. For details, see
+:ref:`Configuring alarms <configure_alarms>`.
 
 * ``cluster_node_status``, the status of the node cluster.
   The metric contains a ``cluster_name`` field that identifies the node cluster.

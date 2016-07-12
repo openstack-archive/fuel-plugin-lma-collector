@@ -1,8 +1,3 @@
-.. _config_guide:
-
-Configuration Guide
-===================
-
 .. _plugin_configuration:
 
 Plugin configuration
@@ -19,32 +14,31 @@ To configure your plugin, you need to follow these steps:
 3. Scroll down through the settings until you find the StackLight Collector
    Plugin section. You should see a page like this.
 
-.. image:: ../../images/collector_settings.png
-   :width: 350pt
-   :alt: The StackLight Collector Plugin settings
-   :align: center
+   .. image:: ../../images/collector_settings.png
+      :width: 350pt
+      :alt: The StackLight Collector Plugin settings
 
 4. Tick the StackLight Collector Plugin box and
    fill-in the required fields as indicated below.
 
-  a. Provide an *Environment Label* of your choice to tag your data (optional).
-  b. For the *Events Analytics* destination, select *Local node* if you plan to use the
-     Elasticsearch-Kibana Plugin in the  environment. Otherwise, select *Remote server*
-     and specify the fully qualified name or IP address of an external Elasticsearch server.
-  c. For the *Metrics Analytics* destination, select *Local node* if you plan to use the
-     InfluxDB-Grafana Plugin in the environment. Otherwise, select *Remote server* and specify
-     the fully qualified name or IP address of an external InfluxDB server. Then, specify the
-     InfluxDB database name you want to use, a username and password that have read and write
-     access permissions.
-  d. For *Alerting*, select *Alerts sent by email* if you want to receive alerts sent by email
-     from the Collector. Otherwise, select *Alerts sent to a local cluster* if you plan to
-     use the Infrastructure Alerting Plugin (Nagios) in the environment.
-     Alternatively, you can select *Alerts sent to a remote Nagios server*.
-  e. For *Alerts sent by email*, you can specify the SMTP authentication method you want to use. Then,
-     specify the SMTP server fully qualified name or IP address, the SMTP username and password who
-     have the permissions to send emails.
-  f. Finally, specify the Nagios server URL, username and password if you have chosen to send
-     alerts to an external Nagios server.
+   a. Provide an *Environment Label* of your choice to tag your data (optional).
+   b. For the *Events Analytics* destination, select *Local node* if you plan to use the
+      Elasticsearch-Kibana Plugin in the  environment. Otherwise, select *Remote server*
+      and specify the fully qualified name or IP address of an external Elasticsearch server.
+   c. For the *Metrics Analytics* destination, select *Local node* if you plan to use the
+      InfluxDB-Grafana Plugin in the environment. Otherwise, select *Remote server* and specify
+      the fully qualified name or IP address of an external InfluxDB server. Then, specify the
+      InfluxDB database name you want to use, a username and password that have read and write
+      access permissions.
+   d. For *Alerting*, select *Alerts sent by email* if you want to receive alerts sent by email
+      from the Collector. Otherwise, select *Alerts sent to a local cluster* if you plan to
+      use the Infrastructure Alerting Plugin (Nagios) in the environment.
+      Alternatively, you can select *Alerts sent to a remote Nagios server*.
+   e. For *Alerts sent by email*, you can specify the SMTP authentication method you want to use. Then,
+      specify the SMTP server fully qualified name or IP address, the SMTP username and password who
+      have the permissions to send emails.
+   f. Finally, specify the Nagios server URL, username and password if you have chosen to send
+      alerts to an external Nagios server.
 
 5. Configure your environment following the `instructions
    <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide/configure-environment.html>`__
@@ -130,7 +124,7 @@ use the instructions below to troubleshoot the problem:
 
 .. _diagnostic:
 
-Diagnostic Tool
+Diagnostic tool
 ---------------
 
 A **global diagnostic tool** is installed on the Fuel Master node
