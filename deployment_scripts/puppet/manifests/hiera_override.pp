@@ -21,20 +21,21 @@ if ($plugin_data) {
   $network_metadata = hiera_hash('network_metadata')
   $is_controller_node = roles_include(['controller', 'primary-controller'])
   $is_base_os_node = roles_include('base-os')
+  $has_controller = count(get_nodes_hash_by_roles($network_metadata, ['primary-controller'])) > 0
+  $has_detached_rabbitmq = count(get_nodes_hash_by_roles($network_metadata, ['primary-standalone-rabbitmq'])) > 0
+  $has_detached_database = count(get_nodes_hash_by_roles($network_metadata, ['primary-standalone-database'])) > 0
 
   if roles_include(['standalone-database', 'primary-standalone-database']) {
     $is_mysql_node = true
   } else {
-    $is_mysql_node = $is_controller_node
+    $is_mysql_node = $is_controller_node and ! $has_detached_database
   }
 
   if roles_include(['standalone-rabbitmq', 'primary-standalone-rabbitmq']) {
     $is_rabbitmq_node = true
   } else {
-    $is_rabbitmq_node = $is_controller_node
+    $is_rabbitmq_node = $is_controller_node and ! $has_detached_rabbitmq
   }
-
-  $has_controller = count(get_nodes_hash_by_roles($network_metadata, ['primary-controller'])) > 0
 
   # Elasticsearch
   $is_elasticsearch_node = roles_include(['elasticsearch_kibana', 'primary-elasticsearch_kibana'])
