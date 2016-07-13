@@ -19,16 +19,23 @@ describe 'lma_collector::collectd::rabbitmq' do
          :osfamily => 'Debian', :concat_basedir => '/foo'}
     end
 
-    describe 'with defaults' do
-        it { is_expected.to contain_lma_collector__collectd__python('rabbitmq_info') }
-    end
-
-    describe 'with queue parameter' do
+    describe 'with minimal parameters' do
         let(:params) do
-            {:queue => ['/^(foo|bar)\\w+$/', 'notif']}
+            {:username => 'foouser', :password => 'foopass' }
         end
         it { is_expected.to contain_lma_collector__collectd__python('rabbitmq_info') \
-             .with_config({'Queue' => ['"/^(foo|bar)\\w+$/"', '"notif"']})
+             .with_config({'Username' => '"foouser"', 'Password' => '"foopass"'})
+        }
+    end
+    describe 'with host and port parameters' do
+        let(:params) do
+            {:username => 'foouser', :password => 'foopass', :host => 'foohost',
+             :port => 123,
+            }
+        end
+        it { is_expected.to contain_lma_collector__collectd__python('rabbitmq_info') \
+             .with_config({'Username' => '"foouser"', 'Password' => '"foopass"',
+                           'Port' => '"123"', 'Host' => '"foohost"'})
         }
     end
 end
