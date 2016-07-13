@@ -101,7 +101,7 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
       ensure          => present,
       prefix          => false,
       primitive_class => 'ocf',
-      primitive_type  => 'ocf-log_collector',
+      primitive_type  => 'ocf-lma_collector',
       complex_type    => 'clone',
       use_handler     => false,
       ms_metadata     => {
@@ -133,7 +133,6 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
           'timeout' => '30',
         },
       },
-      ocf_script_file => 'lma_collector/ocf-lma_collector',
     }
 
     if $is_rabbitmq {
@@ -165,7 +164,7 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
       ensure          => present,
       prefix          => false,
       primitive_class => 'ocf',
-      primitive_type  => 'ocf-metric_collector',
+      primitive_type  => 'ocf-lma_collector',
       complex_type    => 'clone',
       use_handler     => false,
       ms_metadata     => {
@@ -196,14 +195,13 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
           'timeout' => '30',
         },
       },
-      ocf_script_file => 'lma_collector/ocf-lma_collector',
     }
   } else {
     pacemaker::service { 'log_collector':
       ensure           => present,
       prefix           => false,
       primitive_class  => 'ocf',
-      primitive_type   => 'ocf-log_collector',
+      primitive_type   => 'ocf-lma_collector',
       use_handler      => false,
       complex_type     => 'clone',
       complex_metadata => {
@@ -235,7 +233,6 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
           'timeout' => '30',
         },
       },
-      ocf_script_file  => 'lma_collector/ocf-lma_collector',
       require          => Lma_collector::Heka['log_collector'],
     }
 
@@ -254,7 +251,7 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
       ensure           => present,
       prefix           => false,
       primitive_class  => 'ocf',
-      primitive_type   => 'ocf-metric_collector',
+      primitive_type   => 'ocf-lma_collector',
       use_handler      => false,
       complex_type     => 'clone',
       complex_metadata => {
@@ -285,7 +282,6 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
           'timeout' => '30',
         },
       },
-      ocf_script_file  => 'lma_collector/ocf-lma_collector',
       require          => Lma_collector::Heka['metric_collector'],
     }
   }
