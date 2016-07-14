@@ -3,9 +3,9 @@
 Prerequisites
 -------------
 
-Prior to installing the StackLight Collector Plugin,
-you may want to install the backend services the *collector* uses
-to store the data. These backend services include:
+Prior to installing the StackLight Collector plugin for Fuel, you may want to
+install the back-end services the *collector* uses to store the data. These
+back-end services include the following:
 
 * Elasticsearch
 * InfluxDB
@@ -13,12 +13,14 @@ to store the data. These backend services include:
 
 There are two installation options:
 
-1. Install the backend services automatically within a Fuel environment using the Fuel Plugins listed below.
+#. Install the back-end services automatically within a Fuel environment using
+   the following Fuel plugins:
 
-  * `StackLight Elasticsearch-Kibana Fuel Plugin Installation Guide <http://fuel-plugin-elasticsearch-kibana.readthedocs.io/en/latest/installation.html#installation-guide>`_.
-  * `StackLight InfluxDB-Grafana Fuel Plugin Installation Guide <http://fuel-plugin-influxdb-grafana.readthedocs.io/en/latest/installation.html#installation-guide>`_.
-  * `StackLight Infrastructure Alerting Fuel Plugin Installation Guide <http://fuel-plugin-lma-infrastructure-alerting.readthedocs.io/en/latest/installation.html#installation-guide>`_.
+   * `StackLight Elasticsearch-Kibana Fuel Plugin Installation Guide <http://fuel-plugin-elasticsearch-kibana.readthedocs.io/en/latest/installation.html#installation-guide>`_
+   * `StackLight InfluxDB-Grafana Fuel Plugin Installation Guide <http://fuel-plugin-influxdb-grafana.readthedocs.io/en/latest/installation.html#installation-guide>`_
+   * `StackLight Infrastructure Alerting Fuel Plugin Installation Guide <http://fuel-plugin-lma-infrastructure-alerting.readthedocs.io/en/latest/installation.html#installation-guide>`_
 
-2. Install the backend services on your own outside of a Fuel environment.
-   Note that in this case, the installation must comply with the StackLight Collector
-   Plugin's :ref:`requirements <plugin_requirements>`.
+#. Install the back-end services manually outside of a Fuel environment.
+   In this case, the installation must comply with the
+   :ref:`requirements <plugin_requirements>` of the StackLight Collector
+   plugin.
