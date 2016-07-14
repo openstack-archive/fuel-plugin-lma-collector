@@ -1,7 +1,13 @@
 .. _plugin_requirements:
 
+.. raw:: latex
+
+   \pagebreak
+
 Requirements
 ------------
+
+The StackLight Collector plugin 0.10.0 has the following requirements:
 
 +-------------------------------------------------------+-------------------------------------------------------------------+
 | Requirement                                           | Version/Comment                                                   |
