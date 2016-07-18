@@ -1,0 +1,8 @@
+Code-Review+2: Patrick Petit <ppetit@mirantis.com>
+Workflow+1: Patrick Petit <ppetit@mirantis.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 18 Jul 2016 17:17:27 +0000
+Reviewed-on: https://review.openstack.org/342918
+Project: openstack/fuel-plugin-lma-collector
+Branch: refs/heads/master
