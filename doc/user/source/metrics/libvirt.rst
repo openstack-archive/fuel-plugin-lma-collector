@@ -1,6 +1,6 @@
 .. _libvirt-metrics:
 
-Every metric contains an ``instance_id`` field which is the UUID of the
+Every metric contains an ``instance_id`` field, which is the UUID of the
 instance for the Nova service.
 
 CPU
@@ -17,7 +17,7 @@ Disk
 ^^^^
 
 Metrics have a ``device`` field that contains the virtual disk device to which
-the metric applies (eg 'vda', 'vdb' and so on).
+the metric applies. For example, 'vda', 'vdb', and others.
 
 * ``virt_disk_octets_read``, the number of octets (bytes) read per second.
 
@@ -37,7 +37,7 @@ Network
 ^^^^^^^
 
 Metrics have an ``interface`` field that contains the interface name to which
-the metric applies (eg 'tap0dc043a6-dd', 'tap769b123a-2e' and so on).
+the metric applies. For example, 'tap0dc043a6-dd', 'tap769b123a-2e', and others.
 
 * ``virt_if_dropped_rx``, the number of dropped packets per second when
   receiving from the interface.

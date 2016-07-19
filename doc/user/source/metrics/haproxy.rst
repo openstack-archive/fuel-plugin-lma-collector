@@ -1,6 +1,6 @@
 .. _haproxy_metrics:
 
-``frontend`` and ``backend`` field values can be:
+The ``frontend`` and ``backend`` field values can be as follows:
 
 * cinder-api
 * glance-api
@@ -35,7 +35,8 @@ Server
 Frontends
 ^^^^^^^^^
 
-The following metrics have a ``frontend`` field that contains the name of the frontend server.
+The following metrics have a ``frontend`` field that contains the name of the
+front-end server:
 
 * ``haproxy_frontend_bytes_in``, the number of bytes received by the frontend.
 * ``haproxy_frontend_bytes_out``, the number of bytes transmitted by the frontend.
@@ -55,25 +56,33 @@ Backends
 ^^^^^^^^
 .. _haproxy_backend_metric:
 
-The following metrics have a ``backend`` field that contains the name of the backend server.
+The following metrics have a ``backend`` field that contains the name of the
+back-end server:
 
-* ``haproxy_backend_bytes_in``, the number of bytes received by the backend.
-* ``haproxy_backend_bytes_out``, the number of bytes transmitted by the backend.
+* ``haproxy_backend_bytes_in``, the number of bytes received by the back end.
+* ``haproxy_backend_bytes_out``, the number of bytes transmitted by the back end.
 * ``haproxy_backend_denied_requests``, the number of denied requests.
 * ``haproxy_backend_denied_responses``, the number of denied responses.
-* ``haproxy_backend_downtime``, the total downtime in second.
+* ``haproxy_backend_downtime``, the total downtime in seconds.
 * ``haproxy_backend_error_connection``, the number of error connections.
 * ``haproxy_backend_error_responses``, the number of error responses.
 * ``haproxy_backend_queue_current``, the number of requests in queue.
-* ``haproxy_backend_redistributed``, the number of times a request was redispatched to another server.
+* ``haproxy_backend_redistributed``, the number of times a request was
+  redispatched to another server.
 * ``haproxy_backend_response_1xx``, the number of HTTP responses with 1xx code.
 * ``haproxy_backend_response_2xx``, the number of HTTP responses with 2xx code.
 * ``haproxy_backend_response_3xx``, the number of HTTP responses with 3xx code.
 * ``haproxy_backend_response_4xx``, the number of HTTP responses with 4xx code.
 * ``haproxy_backend_response_5xx``, the number of HTTP responses with 5xx code.
-* ``haproxy_backend_response_other``, the number of HTTP responses with other code.
-* ``haproxy_backend_retries``, the number of times a connection to a server was retried.
-* ``haproxy_backend_servers``, the count of servers grouped by state. This metric has an additional ``state`` field that contains the state of the backends (either 'down' or 'up').
+* ``haproxy_backend_response_other``, the number of HTTP responses with other
+  code.
+* ``haproxy_backend_retries``, the number of times a connection to a server
+  was retried.
+* ``haproxy_backend_servers``, the count of servers grouped by state. This
+  metric has an additional ``state`` field that contains the state of the
+  back ends (either 'down' or 'up').
 * ``haproxy_backend_session_current``, the number of current sessions.
 * ``haproxy_backend_session_total``, the cumulative number of sessions.
-* ``haproxy_backend_status``, the global backend status where values ``0`` and ``1`` represent respectively ``DOWN`` (all backends are down) and ``UP`` (at least one backend is up).
+* ``haproxy_backend_status``, the global back-end status where values ``0``
+  and ``1`` represent, respectively, ``DOWN`` (all back ends are down) and ``UP``
+  (at least one back end is up).

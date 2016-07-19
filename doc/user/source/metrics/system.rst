@@ -3,36 +3,45 @@
 CPU
 ^^^
 
-Metrics have a ``cpu_number`` field that contains the CPU number to which the metric applies.
+Metrics have a ``cpu_number`` field that contains the CPU number to which the
+metric applies.
 
-* ``cpu_idle``, percentage of CPU time spent in the idle task.
-* ``cpu_interrupt``, percentage of CPU time spent servicing interrupts.
-* ``cpu_nice``, percentage of CPU time spent in user mode with low priority (nice).
-* ``cpu_softirq``, percentage of CPU time spent servicing soft interrupts.
-* ``cpu_steal``, percentage of CPU time spent in other operating systems.
-* ``cpu_system``, percentage of CPU time spent in system mode.
-* ``cpu_user``, percentage of CPU time spent in user mode.
-* ``cpu_wait``, percentage of CPU time spent waiting for I/O operations to complete.
+* ``cpu_idle``, the percentage of CPU time spent in the idle task.
+* ``cpu_interrupt``, the percentage of CPU time spent servicing interrupts.
+* ``cpu_nice``, the percentage of CPU time spent in user mode with low
+  priority (nice).
+* ``cpu_softirq``, the percentage of CPU time spent servicing soft interrupts.
+* ``cpu_steal``, the percentage of CPU time spent in other operating systems.
+* ``cpu_system``, the percentage of CPU time spent in system mode.
+* ``cpu_user``, the percentage of CPU time spent in user mode.
+* ``cpu_wait``, the percentage of CPU time spent waiting for I/O operations to
+  complete.
 
 
 Disk
 ^^^^
 
-Metrics have a ``device`` field that contains the disk device number the metric applies to (eg 'sda', 'sdb' and so on).
+Metrics have a ``device`` field that contains the disk device number the metric
+applies to. For example, 'sda', 'sdb', and others.
 
-* ``disk_merged_read``, the number of read operations per second that could be merged with already queued operations.
-* ``disk_merged_write``, the number of write operations per second that could be merged with already queued operations.
+* ``disk_merged_read``, the number of read operations per second that could be
+  merged with already queued operations.
+* ``disk_merged_write``, the number of write operations per second that could
+  be merged with already queued operations.
 * ``disk_octets_read``, the number of octets (bytes) read per second.
 * ``disk_octets_write``, the number of octets (bytes) written per second.
 * ``disk_ops_read``, the number of read operations per second.
 * ``disk_ops_write``, the number of write operations per second.
-* ``disk_time_read``, the average time for a read operation to complete in the last interval.
-* ``disk_time_write``, the average time for a write operation to complete in the last interval.
+* ``disk_time_read``, the average time for a read operation to complete in the
+  last interval.
+* ``disk_time_write``, the average time for a write operation to complete in
+  the last interval.
 
 File system
 ^^^^^^^^^^^
 
-Metrics have a ``fs`` field that contains the partition's mount point to which the metric applies (eg '/', '/var/lib' and so on).
+Metrics have a ``fs`` field that contains the partition's mount point to which
+the metric applies. For example, '/', '/var/lib', and others.
 
 * ``fs_inodes_free``, the number of free inodes on the file system.
 * ``fs_inodes_percent_free``, the percentage of free inodes on the file system.
@@ -52,46 +61,53 @@ System load
 
 * ``load_longterm``, the system load average over the last 15 minutes.
 * ``load_midterm``, the system load average over the last 5 minutes.
-* ``load_shortterm``, the system load averge over the last minute.
+* ``load_shortterm``, the system load average over the last minute.
 
 Memory
 ^^^^^^
 
-* ``memory_buffered``, the amount of memory (in bytes) which is buffered.
-* ``memory_cached``, the amount of memory (in bytes) which is cached.
-* ``memory_free``, the amount of memory (in bytes) which is free.
-* ``memory_used``, the amount of memory (in bytes) which is used.
+* ``memory_buffered``, the amount of buffered memory in bytes.
+* ``memory_cached``, the amount of cached memory in bytes.
+* ``memory_free``, the amount of free memory in bytes.
+* ``memory_used``, the amount of used memory in bytes.
 
 Network
 ^^^^^^^
 
-Metrics have a ``interface`` field that contains the interface name the metric applies to (eg 'eth0', 'eth1' and so on).
+Metrics have an ``interface`` field that contains the interface name the
+metric applies to. For example, 'eth0', 'eth1', and others.
 
-* ``if_errors_rx``, the number of errors per second detected when receiving from the interface.
-* ``if_errors_tx``, the number of errors per second detected when transmitting from the interface.
-* ``if_octets_rx``, the number of octets (bytes) received per second by the interface.
-* ``if_octets_tx``, the number of octets (bytes) transmitted per second by the interface.
-* ``if_packets_rx``, the number of packets received per second by the interface.
-* ``if_packets_tx``, the number of packets transmitted per second by the interface.
+* ``if_errors_rx``, the number of errors per second detected when receiving
+  from the interface.
+* ``if_errors_tx``, the number of errors per second detected when transmitting
+  from the interface.
+* ``if_octets_rx``, the number of octets (bytes) received per second by the
+  interface.
+* ``if_octets_tx``, the number of octets (bytes) transmitted per second by the
+  interface.
+* ``if_packets_rx``, the number of packets received per second by the
+  interface.
+* ``if_packets_tx``, the number of packets transmitted per second by the
+  interface.
 
 Processes
 ^^^^^^^^^
 
 * ``processes_count``, the number of processes in a given state. The metric has
-  a ``state`` field (one of 'blocked', 'paging', 'running', 'sleeping', 'stopped'
-  or 'zombies').
+  a ``state`` field (one of 'blocked', 'paging', 'running', 'sleeping',
+  'stopped' or 'zombies').
 * ``processes_fork_rate``, the number of processes forked per second.
 
 Swap
 ^^^^
 
-* ``swap_cached``, the amount of cached memory (in bytes) which is in the swap.
-* ``swap_free``, the amount of free memory (in bytes) which is in the swap.
+* ``swap_cached``, the amount of cached memory (in bytes) that is in the swap.
+* ``swap_free``, the amount of free memory (in bytes) that is in the swap.
 * ``swap_io_in``, the number of swap pages written per second.
 * ``swap_io_out``, the number of swap pages read per second.
-* ``swap_used``, the amount of used memory (in bytes) which is in the swap.
+* ``swap_used``, the amount of used memory (in bytes) that is in the swap.
 
 Users
 ^^^^^
 
-* ``logged_users``, the number of users currently logged-in.
+* ``logged_users``, the number of users currently logged in.
