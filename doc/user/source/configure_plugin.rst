@@ -77,6 +77,10 @@ Plugin configuration
 
 .. _plugin_verification:
 
+.. raw:: latex
+
+   \pagebreak
+
 Plugin verification
 -------------------
 
