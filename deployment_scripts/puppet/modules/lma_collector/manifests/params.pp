@@ -86,8 +86,12 @@ class lma_collector::params {
   $buffering_max_buffer_size_for_aggregator = 256 * 1024 * 1024
   $queue_full_action_for_aggregator  = 'drop'
 
-  $buffering_max_file_size_for_log = 64 * 1024 * 1024
-  $buffering_max_buffer_size_for_log = 256 * 1024 * 1024
+  # The log collector should have enough room to deal with transient spikes of
+  # data otherwise it may fill up the local buffer which in turn blocks the
+  # Heka pipeline. Once the pipeline is stuck, it will have a hard time to
+  # recover from that situation. In most cases, 1Gb should be enough.
+  $buffering_max_file_size_for_log = 128 * 1024 * 1024
+  $buffering_max_buffer_size_for_log = 1024 * 1024 * 1024
   $queue_full_action_for_log = 'block'
 
   $buffering_max_file_log_metric_size = 64 * 1024 * 1024
