@@ -47,11 +47,11 @@ Plugin configuration
    #. Specify the Nagios server URL, username, and password if you have chosen
       to send alerts to an external Nagios server.
 
-#. Configure your environment as described in `Configure your Environment
+#. Configure your environment as described in `Configure your environment
    <http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide/configure-environment.html>`__.
 
    .. note:: By default, StackLight is configured to use the *management
-      network*, of the so-called *default node network group* created by Fuel.
+      network* of the so-called *default node network group* created by Fuel.
       While this default setup may be appropriate for small deployments or
       evaluation purposes, it is recommended that you not use the default
       *management network* for StackLight. Instead, create a dedicated network
@@ -65,10 +65,9 @@ Plugin configuration
    .. note:: The StackLight Collector Plugin is a *hot-pluggable* plugin.
       Therefore, it is possible to install and deploy the *collector* in an
       environment that is already deployed. After the installation of the
-      StackLight Collector Plugin, you will need to define the settings of the
-      plugin and then run the command shown below from the *Fuel master node*
-      for every node of your deployment. You need to start with
-      *the controller node(s)*:
+      StackLight Collector Plugin, define the settings of the plugin and
+      run the command shown below from the *Fuel master node* for every
+      node of your deployment starting with *the controller node(s)*:
 
       .. code-block:: console
 
@@ -207,75 +206,71 @@ On the OpenStack nodes, the diagnostic results are stored in ``/var/lma_diagnost
 
 .. _advanced_configuration:
 
-Advanced Configuration
+Advanced configuration
 ----------------------
 
-Reconfiguring the StackLight Collector after you have removed a node
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Due to a current limitation in Fuel, when a node is removed from an OpenStack
+environment through the Fuel web UI or CLI, the services that were running on
+that node are not automatically removed from the database. Therefore,
+StackLight reports these services as failed. To resolve this issue, remove
+these services manually.
 
-There is currently a limitation in Fuel in that when a
-node is removed from an OpenStack environment (via the Fuel Web UI
-or CLI), the services that were running on that node are not
-automatically removed from the database and as such, are reported
-failed by StackLight. To remedy to this problem, you need to remove
-those services manually.
+**To reconfigure the StackLight Collector after removing a node:**
 
-#. From a controller node, list the services that are reported failed.
-   In the example below 'node-7'.
+#. From a controller node, list the services that are reported failed. In the
+   example below, it is ``node-7``.
 
    .. code-block:: console
 
       root@node-6:~# source ./openrc
       root@node-6:~# neutron agent-list
-      +--------------------------------------+--------------------+-------------------+-------------------+-------+-----+
-      | id                                   | agent_type         | host              | availability_zone | alive | ... |
-      +--------------------------------------+--------------------+-------------------+-------------------+-------+-----+
-      | 08a69bad-cc5d-4e85-a9d0-50467d480259 | Metadata agent     | node-8.domain.tld |                   | :-)   | ... |
-      | 11b6dca6-ab86-47bf-ae38-2ec2de07a90d | Metadata agent     | node-7.domain.tld |                   | xxx   | ... |
-      | 22ea82e3-dbbc-4e57-9d41-3dbf1720b708 | DHCP agent         | node-6.domain.tld | nova              | :-)   | ... |
-      | 2d82849e-7ddd-4d1a-857e-0ad255c58eb0 | L3 agent           | node-6.domain.tld | nova              | :-)   | ... |
-      | 3221ec18-2b65-4696-8ae1-49856023767a | Open vSwitch agent | node-6.domain.tld |                   | :-)   | ... |
-      | 84bfd240-379f-40f3-a1fa-eaa266debe0d | Open vSwitch agent | node-7.domain.tld |                   | xxx   | ... |
-      | 9452e8f0-8d53-40bb-b0ae-fe9932c00963 | Open vSwitch agent | node-9.domain.tld |                   | :-)   | ... |
-      | 97136b09-96a4-4887-89ed-e5ad5bae24f4 | Open vSwitch agent | node-8.domain.tld |                   | :-)   | ... |
-      | c198bc94-38a6-427d-ab04-fbad26affb9e | DHCP agent         | node-7.domain.tld | nova              | xxx   | ... |
-      | c76c4ed4-75e7-426b-9a04-823b00caadc4 | L3 agent           | node-7.domain.tld | nova              | xxx   | ... |
-      | d0fd8bb5-5f6f-4286-a959-7eb70f0f836a | L3 agent           | node-8.domain.tld | nova              | :-)   | ... |
-      | d21f9cea-2719-49a4-adee-9810d51f431b | DHCP agent         | node-8.domain.tld | nova              | :-)   | ... |
-      | f6f871b7-67ad-4b70-88cc-66e51c2a7b1d | Metadata agent     | node-6.domain.tld |                   | :-)   | ... |
-      +--------------------------------------+--------------------+-------------------+-------------------+-------+-----+
-
+      +--------------+-------------------+-------------------+-------------------+-------+
+      | id           | agent_type        | host              | availability_zone | alive |
+      +--------------+-------------------+-------------------+-------------------+-------+
+      | 08a69bad-... | Metadata agent    | node-8.domain.tld |                   | :-)   |
+      | 11b6dca6-... | Metadata agent    | node-7.domain.tld |                   | xxx   |
+      | 22ea82e3-... | DHCP agent        | node-6.domain.tld | nova              | :-)   |
+      | 2d82849e-... | L3 agent          | node-6.domain.tld | nova              | :-)   |
+      | 3221ec18-... | Open vSwitch agent| node-6.domain.tld |                   | :-)   |
+      | 84bfd240-... | Open vSwitch agent| node-7.domain.tld |                   | xxx   |
+      | 9452e8f0-... | Open vSwitch agent| node-9.domain.tld |                   | :-)   |
+      | 97136b09-... | Open vSwitch agent| node-8.domain.tld |                   | :-)   |
+      | c198bc94-... | DHCP agent        | node-7.domain.tld | nova              | xxx   |
+      | c76c4ed4-... | L3 agent          | node-7.domain.tld | nova              | xxx   |
+      | d0fd8bb5-... | L3 agent          | node-8.domain.tld | nova              | :-)   |
+      | d21f9cea-... | DHCP agent        | node-8.domain.tld | nova              | :-)   |
+      | f6f871b7-... | Metadata agent    | node-6.domain.tld |                   | :-)   |
+      +--------------+-------------------+-------------------+-------------------+-------+
       root@node-6:~# nova service-list
-      +----+------------------+-------------------+----------+---------+-------+----------------------------+-----+
-      | Id | Binary           | Host              | Zone     | Status  | State | Updated_at                 | ... |
-      +----+------------------+-------------------+----------+---------+-------+----------------------------+-----+
-      | 1  | nova-consoleauth | node-6.domain.tld | internal | enabled | up    | 2016-07-19T11:43:07.000000 | ... |
-      | 4  | nova-scheduler   | node-6.domain.tld | internal | enabled | up    | 2016-07-19T11:43:21.000000 | ... |
-      | 7  | nova-cert        | node-6.domain.tld | internal | enabled | up    | 2016-07-19T11:43:07.000000 | ... |
-      | 10 | nova-conductor   | node-6.domain.tld | internal | enabled | up    | 2016-07-19T11:42:52.000000 | ... |
-      | 22 | nova-cert        | node-7.domain.tld | internal | enabled | down  | 2016-07-19T11:43:04.000000 | ... |
-      | 25 | nova-consoleauth | node-7.domain.tld | internal | enabled | down  | 2016-07-19T11:43:04.000000 | ... |
-      | 28 | nova-scheduler   | node-7.domain.tld | internal | enabled | down  | 2016-07-19T11:43:36.000000 | ... |
-      | 31 | nova-cert        | node-8.domain.tld | internal | enabled | up    | 2016-07-19T11:43:04.000000 | ... |
-      | 34 | nova-consoleauth | node-8.domain.tld | internal | enabled | up    | 2016-07-19T11:43:04.000000 | ... |
-      | 37 | nova-conductor   | node-7.domain.tld | internal | enabled | down  | 2016-07-19T11:42:51.000000 | ... |
-      | 43 | nova-scheduler   | node-8.domain.tld | internal | enabled | up    | 2016-07-19T11:43:35.000000 | ... |
-      | 49 | nova-conductor   | node-8.domain.tld | internal | enabled | up    | 2016-07-19T11:42:48.000000 | ... |
-      | 64 | nova-compute     | node-9.domain.tld | nova     | enabled | up    | 2016-07-19T11:42:47.000000 | ... |
-      +----+------------------+-------------------+----------+---------+-------+----------------------------+-----+
-
+      +----+------------------+-------------------+----------+---------+-------+-----------------+
+      | Id | Binary           | Host              | Zone     | Status  | State |   Updated_at    |
+      +----+------------------+-------------------+----------+---------+-------+-----------------+
+      | 1  | nova-consoleauth | node-6.domain.tld | internal | enabled | up    | 2016-07-19T11:43|
+      | 4  | nova-scheduler   | node-6.domain.tld | internal | enabled | up    | 2016-07-19T11:43|
+      | 7  | nova-cert        | node-6.domain.tld | internal | enabled | up    | 2016-07-19T11:43|
+      | 10 | nova-conductor   | node-6.domain.tld | internal | enabled | up    | 2016-07-19T11:42|
+      | 22 | nova-cert        | node-7.domain.tld | internal | enabled | down  | 2016-07-19T11:43|
+      | 25 | nova-consoleauth | node-7.domain.tld | internal | enabled | down  | 2016-07-19T11:43|
+      | 28 | nova-scheduler   | node-7.domain.tld | internal | enabled | down  | 2016-07-19T11:43|
+      | 31 | nova-cert        | node-8.domain.tld | internal | enabled | up    | 2016-07-19T11:43|
+      | 34 | nova-consoleauth | node-8.domain.tld | internal | enabled | up    | 2016-07-19T11:43|
+      | 37 | nova-conductor   | node-7.domain.tld | internal | enabled | down  | 2016-07-19T11:42|
+      | 43 | nova-scheduler   | node-8.domain.tld | internal | enabled | up    | 2016-07-19T11:43|
+      | 49 | nova-conductor   | node-8.domain.tld | internal | enabled | up    | 2016-07-19T11:42|
+      | 64 | nova-compute     | node-9.domain.tld | nova     | enabled | up    | 2016-07-19T11:42|
+      +----+------------------+-------------------+----------+---------+-------+-----------------+
       root@node-6:~# cinder service-list
-      +------------------+-------------------------------+------+---------+-------+----------------------------+-----+
-      |      Binary      |              Host             | Zone |  Status | State |         Updated_at         | ... |
-      +------------------+-------------------------------+------+---------+-------+----------------------------+-----+
-      |  cinder-backup   |       node-9.domain.tld       | nova | enabled | up    | 2016-07-19T11:44:01.000000 | ... |
-      | cinder-scheduler |       node-6.domain.tld       | nova | enabled | up    | 2016-07-19T11:43:56.000000 | ... |
-      | cinder-scheduler |       node-7.domain.tld       | nova | enabled | down  | 2016-07-19T11:43:59.000000 | ... |
-      | cinder-scheduler |       node-8.domain.tld       | nova | enabled | up    | 2016-07-19T11:44:00.000000 | ... |
-      |  cinder-volume   | node-9.domain.tld@LVM-backend | nova | enabled | up    | 2016-07-19T11:44:00.000000 | ... |
-      +------------------+-------------------------------+------+---------+-------+----------------------------+-----+
+      +------------------+-------------------------------+------+---------+-------+-----------------+
+      |      Binary      |              Host             | Zone |  Status | State |   Updated_at    |
+      +------------------+-------------------------------+------+---------+-------+-----------------+
+      |  cinder-backup   |       node-9.domain.tld       | nova | enabled | up    | 2016-07-19T11:44|
+      | cinder-scheduler |       node-6.domain.tld       | nova | enabled | up    | 2016-07-19T11:43|
+      | cinder-scheduler |       node-7.domain.tld       | nova | enabled | down  | 2016-07-19T11:43|
+      | cinder-scheduler |       node-8.domain.tld       | nova | enabled | up    | 2016-07-19T11:44|
+      |  cinder-volume   | node-9.domain.tld@LVM-backend | nova | enabled | up    | 2016-07-19T11:44|
+      +------------------+-------------------------------+------+---------+-------+-----------------+
 
-#. Remove the services and / or agents that are reported failed on that node.
+#. Remove the services and/or agents that are reported failed on that node:
 
    .. code-block:: console
 
@@ -283,7 +278,7 @@ those services manually.
       root@node-6:~# cinder service-disable <hostname> <binary>
       root@node-6:~# neutron agent-delete <id of agent to delete>
 
-#. Then, restart the Collector on all the controller nodes.
+#. Restart the Collector on all the controller nodes:
 
    .. code-block:: console
 
