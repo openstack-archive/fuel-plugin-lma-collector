@@ -1,9 +1,13 @@
 .. _alarms:
 
+.. raw:: latex
+
+   \pagebreak
+
 List of built-in alarms
 -----------------------
 
-Here is a list of all the alarms that are built-in in StackLight::
+The following is a list of StackLight built-in alarms::
 
   alarms:
     - name: 'cpu-critical-controller'
@@ -733,4 +737,3 @@ Here is a list of all the alarms that are built-in in StackLight::
             window: 60
             periods: 0
             function: min
-

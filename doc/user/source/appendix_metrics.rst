@@ -3,8 +3,8 @@
 List of metrics
 ---------------
 
-Here is a list of metrics that are emitted by the StackLight Collector.
-They are listed by category then by metric name.
+The following is a list of metrics that are emitted by the StackLight Collector.
+The metrics are listed by category, then by metric name.
 
 System
 ++++++
@@ -63,7 +63,7 @@ Clusters
 
 .. include:: metrics/clusters.rst
 
-Self Monitoring
+Self-monitoring
 +++++++++++++++
 
 .. include:: metrics/lma.rst
