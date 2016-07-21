@@ -245,6 +245,19 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
         score   => 0,
         require => Pacemaker::Service['log_collector'],
       }
+
+      pcmk_order { 'log_collector-after-rabbitmq':
+        ensure  => present,
+        first   => $rabbitmq_resource,
+        second  => 'clone_log_collector',
+        # Heka cannot start if RabbitMQ isn't ready to accept connections. But
+        # once it is initialized, it can recover from a RabbitMQ outage. This is
+        # why we set score to 0 (interleave) meaning that the collector should
+        # start once RabbitMQ is active but a restart of RabbitMQ
+        # won't trigger a restart of the LMA collector.
+        score   => 0,
+        require => Pcmk_colocation['log_collector'],
+      }
     }
 
     pacemaker::service { 'metric_collector':
