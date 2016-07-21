@@ -14,8 +14,8 @@ as the **StackLight Collector**, or just **the Collector**.
    than a mere data *collector*.
 
 The Collector is the key component of the so-called
-`Logging, Monitoring and Alerting toolchain of Mirantis OpenStack
-<https://launchpad.net/lma-toolchain>`_ also known as StackLight.
+`Logging, Monitoring, and Alerting toolchain of Mirantis OpenStack
+<https://launchpad.net/lma-toolchain>`_, also known as StackLight.
 
 .. image:: ../../images/toolchain_map.png
    :align: center

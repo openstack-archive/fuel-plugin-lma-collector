@@ -73,9 +73,8 @@ node so that you will not have to copy that file later on.
    .. note:: You may also need to build the Fuel Plugin Builder if the package
       version of the plugin is higher than the package version supported by the
       Fuel Plugin Builder you get from ``pypi``. For instructions on how to
-      build the Fuel Plugin Builder, see the *Preparing an environment for
-      plugin development* section of the
-      `Fuel plugins Wiki <https://wiki.openstack.org/wiki/Fuel/Plugins>`_.
+      build the Fuel Plugin Builder, see the *Install Fuel Plugin Builder*
+      section of the `Fuel Plugin SDK Guide <http://docs.openstack.org/developer/fuel-docs/plugindocs/fuel-plugin-sdk-guide/create-plugin/install-plugin-builder.html>`_.
 
 #. Clone the plugin repository:
 

@@ -45,10 +45,8 @@ contains the following updates:
 
   A diagnostic tool is now available to help diagnose issues. The diagnostic
   tool checks that the toolchain is properly installed and configured across
-  the entire LMA toolchain. For more information, see the
-  `Diagnostic Tool
-  <http://fuel-plugin-lma-collector.readthedocs.io/en/latest/configuration.html#diagnostic>`_
-  section of the User Guide.
+  the entire LMA toolchain. For more information, see
+  :ref:`Diagnostic Tool <diagnostic>`.
 
 Version 0.9.0
 +++++++++++++
