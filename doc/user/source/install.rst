@@ -45,10 +45,10 @@ customize the plugin.
 .. note:: Running a Fuel plugin that you built yourself is at your own risk
    and will not be supported.
 
-To install the StackLight Collector Plugin from source, first prepare
-an environement to build the RPM file. The recommended approach is to
-build the RPM file directly onto the Fuel Master node so that you
-will not have to copy that file later on.
+To install the StackLight Collector Plugin from source, first prepare an
+environment to build the RPM file. The recommended approach is to build the
+RPM file directly onto the Fuel Master node so that you will not have to copy
+that file later on.
 
 **To prepare an environment and build the plugin:**
 
