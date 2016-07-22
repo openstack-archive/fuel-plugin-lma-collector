@@ -19,7 +19,7 @@ The Collector is the key component of the so-called
 
 .. image:: ../../images/toolchain_map.png
    :align: center
-   :width: 80%
+   :width: 440pt
 
 The Collector is installed on every node of your OpenStack environment. Each
 Collector is individually responsible for supporting all the monitoring
@@ -39,7 +39,7 @@ The main building blocks of the Collector are as follows:
   plugins. Some of them are standard collectd plugins while others are
   purpose-built plugins written in Python to perform various OpenStack
   services checks.
-* **Heka**, `a golang data-processing multifunctional tool by Mozilla
+* **Heka**, `a Golang data-processing multifunctional tool by Mozilla
   <https://github.com/mozilla-services/heka>`_. Heka supports a number of
   standard input and output plugins that allows to ingest data from a variety
   of sources including collectd, log files, and RabbitMQ, as well as to
