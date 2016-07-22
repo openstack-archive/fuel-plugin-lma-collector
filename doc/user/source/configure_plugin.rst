@@ -106,25 +106,37 @@ Troubleshooting
 If you see no data in the Kibana and/or Grafana dashboards, follow the
 instructions below to troubleshoot the issue:
 
-#. Verify that the *collector* services are up and running::
+#. Verify that the *collector* services are up and running:
 
-    # On the controller node(s)
-    [root@node-1 ~]# crm resource status metric_collector
-    [root@node-1 ~]# crm resource status log_collector
+   * On the controller nodes:
 
-    # On non controller nodes
-    [root@node-2 ~]# status log_collector
-    [root@node-2 ~]# status metric_collector
+     .. code-block:: console
 
-#. If a *collector* is down, restart it::
+        [root@node-1 ~]# crm resource status metric_collector
+        [root@node-1 ~]# crm resource status log_collector
 
-    # On the controller node(s)
-    [root@node-1 ~]# crm resource start log_collector
-    [root@node-1 ~]# crm resource start metric_collector
+   * On non-controller nodes:
 
-    # On non controller nodes
-    [root@node-2 ~]# start log_collector
-    [root@node-2 ~]# start metric_collector
+     .. code-block:: console
+   
+        [root@node-2 ~]# status log_collector
+        [root@node-2 ~]# status metric_collector
+
+#. If a *collector* is down, restart it:
+
+   * On the controller nodes:
+
+     .. code-block:: console
+
+        [root@node-1 ~]# crm resource start log_collector
+        [root@node-1 ~]# crm resource start metric_collector
+
+   * On non-controller nodes:
+
+     .. code-block:: console
+
+        [root@node-2 ~]# start log_collector
+        [root@node-2 ~]# start metric_collector
 
 #. Look for errors in the log file of the *collectors* located at
    ``/var/log/log_collector.log`` and ``/var/log/metric_collector.log``.
@@ -222,53 +234,53 @@ these services manually.
 
    .. code-block:: console
 
-      root@node-6:~# source ./openrc
-      root@node-6:~# neutron agent-list
-      +--------------+-------------------+-------------------+-------------------+-------+
-      | id           | agent_type        | host              | availability_zone | alive |
-      +--------------+-------------------+-------------------+-------------------+-------+
-      | 08a69bad-... | Metadata agent    | node-8.domain.tld |                   | :-)   |
-      | 11b6dca6-... | Metadata agent    | node-7.domain.tld |                   | xxx   |
-      | 22ea82e3-... | DHCP agent        | node-6.domain.tld | nova              | :-)   |
-      | 2d82849e-... | L3 agent          | node-6.domain.tld | nova              | :-)   |
-      | 3221ec18-... | Open vSwitch agent| node-6.domain.tld |                   | :-)   |
-      | 84bfd240-... | Open vSwitch agent| node-7.domain.tld |                   | xxx   |
-      | 9452e8f0-... | Open vSwitch agent| node-9.domain.tld |                   | :-)   |
-      | 97136b09-... | Open vSwitch agent| node-8.domain.tld |                   | :-)   |
-      | c198bc94-... | DHCP agent        | node-7.domain.tld | nova              | xxx   |
-      | c76c4ed4-... | L3 agent          | node-7.domain.tld | nova              | xxx   |
-      | d0fd8bb5-... | L3 agent          | node-8.domain.tld | nova              | :-)   |
-      | d21f9cea-... | DHCP agent        | node-8.domain.tld | nova              | :-)   |
-      | f6f871b7-... | Metadata agent    | node-6.domain.tld |                   | :-)   |
-      +--------------+-------------------+-------------------+-------------------+-------+
-      root@node-6:~# nova service-list
-      +----+------------------+-------------------+----------+---------+-------+-----------------+
-      | Id | Binary           | Host              | Zone     | Status  | State |   Updated_at    |
-      +----+------------------+-------------------+----------+---------+-------+-----------------+
-      | 1  | nova-consoleauth | node-6.domain.tld | internal | enabled | up    | 2016-07-19T11:43|
-      | 4  | nova-scheduler   | node-6.domain.tld | internal | enabled | up    | 2016-07-19T11:43|
-      | 7  | nova-cert        | node-6.domain.tld | internal | enabled | up    | 2016-07-19T11:43|
-      | 10 | nova-conductor   | node-6.domain.tld | internal | enabled | up    | 2016-07-19T11:42|
-      | 22 | nova-cert        | node-7.domain.tld | internal | enabled | down  | 2016-07-19T11:43|
-      | 25 | nova-consoleauth | node-7.domain.tld | internal | enabled | down  | 2016-07-19T11:43|
-      | 28 | nova-scheduler   | node-7.domain.tld | internal | enabled | down  | 2016-07-19T11:43|
-      | 31 | nova-cert        | node-8.domain.tld | internal | enabled | up    | 2016-07-19T11:43|
-      | 34 | nova-consoleauth | node-8.domain.tld | internal | enabled | up    | 2016-07-19T11:43|
-      | 37 | nova-conductor   | node-7.domain.tld | internal | enabled | down  | 2016-07-19T11:42|
-      | 43 | nova-scheduler   | node-8.domain.tld | internal | enabled | up    | 2016-07-19T11:43|
-      | 49 | nova-conductor   | node-8.domain.tld | internal | enabled | up    | 2016-07-19T11:42|
-      | 64 | nova-compute     | node-9.domain.tld | nova     | enabled | up    | 2016-07-19T11:42|
-      +----+------------------+-------------------+----------+---------+-------+-----------------+
-      root@node-6:~# cinder service-list
-      +------------------+-------------------------------+------+---------+-------+-----------------+
-      |      Binary      |              Host             | Zone |  Status | State |   Updated_at    |
-      +------------------+-------------------------------+------+---------+-------+-----------------+
-      |  cinder-backup   |       node-9.domain.tld       | nova | enabled | up    | 2016-07-19T11:44|
-      | cinder-scheduler |       node-6.domain.tld       | nova | enabled | up    | 2016-07-19T11:43|
-      | cinder-scheduler |       node-7.domain.tld       | nova | enabled | down  | 2016-07-19T11:43|
-      | cinder-scheduler |       node-8.domain.tld       | nova | enabled | up    | 2016-07-19T11:44|
-      |  cinder-volume   | node-9.domain.tld@LVM-backend | nova | enabled | up    | 2016-07-19T11:44|
-      +------------------+-------------------------------+------+---------+-------+-----------------+
+    root@node-6:~# source ./openrc
+    root@node-6:~# neutron agent-list
+    +--------------+-------------------+-------------------+-------------------+-------+
+    | id           | agent_type        | host              | availability_zone | alive |
+    +--------------+-------------------+-------------------+-------------------+-------+
+    | 08a69bad-... | Metadata agent    | node-8.domain.tld |                   | :-)   |
+    | 11b6dca6-... | Metadata agent    | node-7.domain.tld |                   | xxx   |
+    | 22ea82e3-... | DHCP agent        | node-6.domain.tld | nova              | :-)   |
+    | 2d82849e-... | L3 agent          | node-6.domain.tld | nova              | :-)   |
+    | 3221ec18-... | Open vSwitch agent| node-6.domain.tld |                   | :-)   |
+    | 84bfd240-... | Open vSwitch agent| node-7.domain.tld |                   | xxx   |
+    | 9452e8f0-... | Open vSwitch agent| node-9.domain.tld |                   | :-)   |
+    | 97136b09-... | Open vSwitch agent| node-8.domain.tld |                   | :-)   |
+    | c198bc94-... | DHCP agent        | node-7.domain.tld | nova              | xxx   |
+    | c76c4ed4-... | L3 agent          | node-7.domain.tld | nova              | xxx   |
+    | d0fd8bb5-... | L3 agent          | node-8.domain.tld | nova              | :-)   |
+    | d21f9cea-... | DHCP agent        | node-8.domain.tld | nova              | :-)   |
+    | f6f871b7-... | Metadata agent    | node-6.domain.tld |                   | :-)   |
+    +--------------+-------------------+-------------------+-------------------+-------+
+    root@node-6:~# nova service-list
+    +--+----------------+-----------------+---------+--------+-------+-----------------+
+    |Id|Binary          |Host             | Zone    | Status | State |   Updated_at    |
+    +--+----------------+-----------------+---------+--------+-------+-----------------+
+    |1 |nova-consoleauth|node-6.domain.tld| internal| enabled| up    | 2016-07-19T11:43|
+    |4 |nova-scheduler  |node-6.domain.tld| internal| enabled| up    | 2016-07-19T11:43|
+    |7 |nova-cert       |node-6.domain.tld| internal| enabled| up    | 2016-07-19T11:43|
+    |10|nova-conductor  |node-6.domain.tld| internal| enabled| up    | 2016-07-19T11:42|
+    |22|nova-cert       |node-7.domain.tld| internal| enabled| down  | 2016-07-19T11:43|
+    |25|nova-consoleauth|node-7.domain.tld| internal| enabled| down  | 2016-07-19T11:43|
+    |28|nova-scheduler  |node-7.domain.tld| internal| enabled| down  | 2016-07-19T11:43|
+    |31|nova-cert       |node-8.domain.tld| internal| enabled| up    | 2016-07-19T11:43|
+    |34|nova-consoleauth|node-8.domain.tld| internal| enabled| up    | 2016-07-19T11:43|
+    |37|nova-conductor  |node-7.domain.tld| internal| enabled| down  | 2016-07-19T11:42|
+    |43|nova-scheduler  |node-8.domain.tld| internal| enabled| up    | 2016-07-19T11:43|
+    |49|nova-conductor  |node-8.domain.tld| internal| enabled| up    | 2016-07-19T11:42|
+    |64|nova-compute    |node-9.domain.tld| nova    | enabled| up    | 2016-07-19T11:42|
+    +--+----------------+-----------------+---------+--------+-------+-----------------+
+    root@node-6:~# cinder service-list
+    +----------------+-----------------------------+----+-------+-----+----------------+
+    |    Binary      |            Host             |Zone| Status|State|   Updated_at   |
+    +----------------+-----------------------------+----+-------+-----+----------------+
+    |cinder-backup   |       node-9.domain.tld     |nova|enabled|up   |2016-07-19T11:44|
+    |cinder-scheduler|       node-6.domain.tld     |nova|enabled|up   |2016-07-19T11:43|
+    |cinder-scheduler|       node-7.domain.tld     |nova|enabled|down |2016-07-19T11:43|
+    |cinder-scheduler|       node-8.domain.tld     |nova|enabled|up   |2016-07-19T11:44|
+    |cinder-volume   |node-9.domain.tld@LVM-backend|nova|enabled|up   |2016-07-19T11:44|
+    +----------------+-----------------------------+----+-------+-----+----------------+
 
 #. Remove the services and/or agents that are reported failed on that node:
 
