@@ -433,7 +433,7 @@ This file has the following sections:
 #. The ``gse_policies`` section contains the :ref:`health status correlation
    policies <gse_policies>` that apply to the node clusters and service
    clusters.
-#. The ``gse_cluster_service` section contains the :ref:`aggregation rules
+#. The ``gse_cluster_service`` section contains the :ref:`aggregation rules
    <gse_cluster_service>` for the service clusters. These aggregation rules
    are actuated by the Service Cluster GSE Plugin that runs on the Aggregator.
 #. The ``gse_cluster_node`` section contains the :ref:`aggregation rules
