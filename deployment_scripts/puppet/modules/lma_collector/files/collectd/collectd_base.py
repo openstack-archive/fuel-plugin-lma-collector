@@ -169,9 +169,8 @@ class Base(object):
             self.logger.error("Command '%s' failed (return code %d): %s" %
                               (cmd, returncode, stderr))
             return None
-        elapsedtime = time.time() - start_time
-
         if self.debug:
+            elapsedtime = time.time() - start_time
             self.logger.info("Command '%s' returned %s in %0.3fs" %
                              (cmd, returncode, elapsedtime))
 
@@ -186,12 +185,15 @@ class Base(object):
         See execute().
 
         Returns:
-            A Python object or None if the execution of the program failed.
+            A Python object or
+            None if the execution of the program or JSON decoding fails.
         """
         outputs = self.execute(*args, **kwargs)
         if outputs:
-            return json.loads(outputs[0])
-        return
+            try:
+                return json.loads(outputs[0])
+            except ValueError as e:
+                self.logger.error("{}: document: '{}'".format(e, outputs[0]))
 
     @staticmethod
     def restore_sigchld():
