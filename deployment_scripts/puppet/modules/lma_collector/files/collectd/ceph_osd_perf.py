@@ -69,6 +69,9 @@ class CephOSDPerfPlugin(base.CephBase):
             osd_id = m.group(1)
             perf_dump = self.execute_to_json('ceph --admin-daemon %s perf dump'
                                              % socket_name)
+            if not perf_dump:
+                continue
+
             for prefix, stats in perf_dump.iteritems():
                 if prefix not in self.PREFIXES or not stats:
                     continue
