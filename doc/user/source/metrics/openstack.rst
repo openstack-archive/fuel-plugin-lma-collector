@@ -73,8 +73,6 @@ The following metrics are retrieved from the Nova API:
   'error', 'paused', 'resumed', 'rescued', 'resized', 'shelved_offloaded' or
   'suspended'.
 
-The following metrics are retrieved from the Nova database:
-
 .. _compute-service-state-metrics:
 
 * ``openstack_nova_service``, the Nova service state (either ``0`` for 'up',
@@ -125,8 +123,6 @@ The following metrics are retrieved from the Cinder API:
 'backing-up', 'restoring-backup', 'error', 'error_deleting', 'error_restoring',
 'error_extending'.
 
-The following metrics are retrieved from the Cinder database:
-
 .. _volume-service-state-metrics:
 
 * ``openstack_cinder_service``, the Cinder service state (either ``0`` for
@@ -175,8 +171,6 @@ The following metrics are retrieved from the Neutron API:
 
 ``<owner>`` is one of 'compute', 'dhcp', 'floatingip', 'floatingip_agent_gateway', 'router_interface', 'router_gateway', 'router_ha_interface',
 'router_interface_distributed', or 'router_centralized_snat'.
-
-The following metrics are retrieved from the Neutron database:
 
 .. _network-agent-state-metrics:
 
