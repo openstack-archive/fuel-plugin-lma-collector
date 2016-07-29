@@ -48,8 +48,10 @@ class PacemakerResourcePlugin(base.Base):
                                      '--quiet', '--resource', resource],
                                     shell=False)
             if not out:
-                self.logger.error("%s: Failed to get the status for '%s'" %
-                                  (self.plugin, resource))
+                msg = "{}: Failed to get the status for '%s'".format(
+                    self.plugin, resource)
+                self.logger.error(msg)
+                raise base.HeartbeatException(msg)
 
             else:
                 value = 0
