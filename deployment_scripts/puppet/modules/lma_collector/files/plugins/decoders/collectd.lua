@@ -181,7 +181,15 @@ function process_message ()
                     msg['Fields']['name'] = msg['Fields']['name'] .. sample['type_instance']
                 end
             elseif metric_source == 'rabbitmq_info' then
-                msg['Fields']['name'] = 'rabbitmq' .. sep .. sample['type_instance']
+                if sample['meta'] and sample['meta']['heartbeat'] then
+                    msg['Fields']['name'] = 'rabbitmq' .. sep .. 'heartbeat'
+                    if sample['meta']['failure'] then
+                        msg['Fields']['details'] = sample['meta']['failure']
+                    end
+                else
+                    msg['Fields']['name'] = 'rabbitmq' .. sep .. sample['type_instance']
+                end
+
                 if sample['meta'] and sample['meta']['queue'] then
                     msg['Fields']['queue'] = sample['meta']['queue']
                     msg['Fields']['tag_fields'] = { 'queue' }
@@ -256,56 +264,84 @@ function process_message ()
             elseif metric_source == 'memcached' then
                 msg['Fields']['name'] = 'memcached' .. sep .. string.gsub(metric_name, 'memcached_', '')
             elseif metric_source == 'haproxy' then
-                msg['Fields']['name'] = 'haproxy' .. sep .. sample['type_instance']
-                if sample['meta'] then
-                    if sample['meta']['backend'] then
-                        msg['Fields']['tag_fields'] = { 'backend' }
-                        msg['Fields']['backend'] = sample['meta']['backend']
-                        if sample['meta']['state'] then
-                            msg['Fields']['tag_fields'][2] = 'state'
-                            msg['Fields']['state'] = sample['meta']['state']
+                if sample['meta'] and sample['meta']['heartbeat'] then
+                    msg['Fields']['name'] = 'haproxy' .. sep .. 'heartbeat'
+                    if sample['meta']['failure'] then
+                        msg['Fields']['details'] = sample['meta']['failure']
+                    end
+                else
+                    msg['Fields']['name'] = 'haproxy' .. sep .. sample['type_instance']
+                    if sample['meta'] then
+                        if sample['meta']['backend'] then
+                            msg['Fields']['tag_fields'] = { 'backend' }
+                            msg['Fields']['backend'] = sample['meta']['backend']
+                            if sample['meta']['state'] then
+                                msg['Fields']['tag_fields'][2] = 'state'
+                                msg['Fields']['state'] = sample['meta']['state']
+                            end
+                        elseif sample['meta']['frontend'] then
+                            msg['Fields']['tag_fields'] = { 'frontend' }
+                            msg['Fields']['frontend'] = sample['meta']['frontend']
                         end
-                    elseif sample['meta']['frontend'] then
-                        msg['Fields']['tag_fields'] = { 'frontend' }
-                        msg['Fields']['frontend'] = sample['meta']['frontend']
                     end
                 end
             elseif metric_source == 'apache' then
                 metric_name = string.gsub(metric_name, 'apache_', '')
                 msg['Fields']['name'] = 'apache' .. sep .. string.gsub(metric_name, 'scoreboard', 'workers')
             elseif metric_source == 'ceph_osd_perf' then
-                msg['Fields']['name'] = 'ceph_perf' .. sep .. sample['type']
-
-                msg['Fields']['tag_fields'] = { 'cluster', 'osd' }
-                msg['Fields']['cluster'] = sample['plugin_instance']
-                msg['Fields']['osd'] = sample['type_instance']
-            elseif metric_source:match('^ceph') then
-                msg['Fields']['name'] = 'ceph' .. sep .. sample['type']
-                if sample['dsnames'][i] ~= 'value' then
-                    msg['Fields']['name'] = msg['Fields']['name'] .. sep .. sample['dsnames'][i]
-                end
-
-                msg['Fields']['tag_fields'] = { 'cluster' }
-                msg['Fields']['cluster'] = sample['plugin_instance']
-
-                if sample['type_instance'] ~= '' then
-                    local additional_tag
-                    if string.match(sample['type'], '^pool_') then
-                        additional_tag = 'pool'
-                    elseif string.match(sample['type'], '^pg_state') then
-                        additional_tag = 'state'
-                    elseif string.match(sample['type'], '^osd_') then
-                        additional_tag = 'osd'
+                if sample['meta'] and sample['meta']['heartbeat'] then
+                    msg['Fields']['name'] = 'ceph_perf' .. sep .. 'heartbeat'
+                    if sample['meta']['failure'] then
+                        msg['Fields']['details'] = sample['meta']['failure']
                     end
-                    if additional_tag then
-                        msg['Fields']['tag_fields'][2] = additional_tag
-                        msg['Fields'][additional_tag] = sample['type_instance']
+                else
+                    msg['Fields']['name'] = 'ceph_perf' .. sep .. sample['type']
+
+                    msg['Fields']['tag_fields'] = { 'cluster', 'osd' }
+                    msg['Fields']['cluster'] = sample['plugin_instance']
+                    msg['Fields']['osd'] = sample['type_instance']
+                end
+            elseif metric_source:match('^ceph') then
+                if sample['meta'] and sample['meta']['heartbeat'] then
+                    msg['Fields']['name'] = 'ceph' .. sep .. 'heartbeat'
+                    if sample['meta']['failure'] then
+                        msg['Fields']['details'] = sample['meta']['failure']
+                    end
+                else
+                    msg['Fields']['name'] = 'ceph' .. sep .. sample['type']
+                    if sample['dsnames'][i] ~= 'value' then
+                        msg['Fields']['name'] = msg['Fields']['name'] .. sep .. sample['dsnames'][i]
+                    end
+
+                    msg['Fields']['tag_fields'] = { 'cluster' }
+                    msg['Fields']['cluster'] = sample['plugin_instance']
+
+                    if sample['type_instance'] ~= '' then
+                        local additional_tag
+                        if string.match(sample['type'], '^pool_') then
+                            additional_tag = 'pool'
+                        elseif string.match(sample['type'], '^pg_state') then
+                            additional_tag = 'state'
+                        elseif string.match(sample['type'], '^osd_') then
+                            additional_tag = 'osd'
+                        end
+                        if additional_tag then
+                            msg['Fields']['tag_fields'][2] = additional_tag
+                            msg['Fields'][additional_tag] = sample['type_instance']
+                        end
                     end
                 end
             elseif metric_source == 'pacemaker_resource' then
-                msg['Fields']['name'] = 'pacemaker_local_resource_active'
-                msg['Fields']['tag_fields'] = { 'resource' }
-                msg['Fields']['resource'] = sample['type_instance']
+                if sample['meta'] and sample['meta']['heartbeat'] then
+                    msg['Fields']['name'] = 'pacemaker' .. sep .. 'heartbeat'
+                    if sample['meta']['failure'] then
+                        msg['Fields']['details'] = sample['meta']['failure']
+                    end
+                else
+                    msg['Fields']['name'] = 'pacemaker_local_resource_active'
+                    msg['Fields']['tag_fields'] = { 'resource' }
+                    msg['Fields']['resource'] = sample['type_instance']
+                end
             elseif metric_source ==  'users' then
                 -- 'users' is a reserved name for InfluxDB v0.9
                 msg['Fields']['name'] = 'logged_users'
@@ -333,7 +369,14 @@ function process_message ()
                     msg['Fields']['name'] = 'virt' .. sep .. metric_name
                 end
             elseif metric_source == 'elasticsearch_cluster' or metric_source == 'influxdb' then
-                msg['Fields']['name'] = metric_source .. sep .. sample['type_instance']
+                if sample['meta'] and sample['meta']['heartbeat'] then
+                    msg['Fields']['name'] = metric_source .. sep .. 'heartbeat'
+                    if sample['meta']['failure'] then
+                        msg['Fields']['details'] = sample['meta']['failure']
+                    end
+                else
+                    msg['Fields']['name'] = metric_source .. sep .. sample['type_instance']
+                end
             elseif metric_source == 'http_check' then
                 msg['Fields']['name'] = metric_source
                 msg['Fields']['service'] = sample['type_instance']
