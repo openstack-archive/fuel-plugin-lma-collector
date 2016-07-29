@@ -86,13 +86,14 @@ class Base(object):
         """Iterate over the collected metrics
 
         This class must be implemented by the subclass and should yield dict
-        objects that represent the collected values. Each dict has 3 keys:
+        objects that represent the collected values. Each dict has 6 keys:
             - 'values', a scalar number or a list of numbers if the type
             defines several datasources.
             - 'type_instance' (optional)
             - 'plugin_instance' (optional)
             - 'type' (optional, default='gauge')
             - 'meta' (optional)
+            - 'hostname' (optional)
 
         For example:
 
@@ -118,6 +119,7 @@ class Base(object):
 
         v = self.collectd.Values(
             plugin=self.plugin,
+            host=metric.get('hostname', ''),
             type=metric.get('type', 'gauge'),
             plugin_instance=self.plugin_instance,
             type_instance=type_instance,

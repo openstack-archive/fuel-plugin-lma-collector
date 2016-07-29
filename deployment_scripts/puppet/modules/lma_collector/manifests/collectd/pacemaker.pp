@@ -15,71 +15,29 @@
 
 class lma_collector::collectd::pacemaker (
   $resources,
-  $master_resource = undef,
+  $notify_resource = undef,
   $hostname = undef,
 ) {
 
-  validate_array($resources)
+  validate_hash($resources)
 
-  # Add quotes around the array values
-  $real_resources = suffix(prefix($resources, '"'), '"')
+  # Add quotes around the hash keys and values
+  $resources_keys = suffix(prefix(keys($resources), '"'), '"')
+  $resources_values = suffix(prefix(values($resources), '"'), '"')
+  $real_resources = hash(flatten(zip($resources_keys, $resources_values)))
 
   if $hostname {
-    $config = {
-      'Resource' => $real_resources,
-      'Hostname' => "\"${hostname}\"",
-    }
+    $_hostname = {'Hostname' => "\"${hostname}\""}
   } else {
-    $config = {
-      'Resource' => $real_resources,
-    }
+    $_hostname = {}
+  }
+  if $notify_resource {
+    $_notify_resource = {'NotifyResource' => "\"${notify_resource}\""}
+  } else {
+    $_notify_resource = {}
   }
 
-  lma_collector::collectd::python { 'pacemaker_resource':
-    config => $config
+  lma_collector::collectd::python { 'collectd_pacemaker':
+    config => merge({'Resource' => $real_resources}, $_hostname, $_notify_resource)
   }
-
-  if $master_resource {
-
-    if ! member($resources, $master_resource) {
-      fail("${master_resource} not a member of ${resources}")
-    }
-
-    # Configure a PostCache chain to create a collectd notification each time
-    # the pacemaker_resource plugin generates a metric whose "type instance"
-    # matches the resource specified by the $master_resource parameter.
-    #
-    # The notifications are caught by other plugins to know the state of that
-    # Pacemaker resource.
-
-    collectd::plugin { 'target_notification': }
-    collectd::plugin { 'match_regex': }
-
-    class { 'collectd::plugin::chain':
-      chainname     => 'PostCache',
-      defaulttarget => 'write',
-      rules         => [
-        {
-          'match'   => {
-            'type'    => 'regex',
-            'matches' => {
-              'Plugin'       => '^pacemaker_resource$',
-              'TypeInstance' => "^${master_resource}$",
-            },
-          },
-          'targets' => [
-            {
-              'type'       => 'notification',
-              'attributes' => {
-                'Message'  => '{\"resource\":\"%{type_instance}\",\"value\":%{ds:value}}',
-                'Severity' => 'OKAY',
-              },
-            },
-          ],
-        },
-      ],
-    }
-
-  }
-
 }
