@@ -406,7 +406,7 @@ if hiera('lma::collector::influxdb::server', false) {
 
   # Enable service heartbeat metrics
   class { 'lma_collector::metrics::service_heartbeat':
-    services => ['haproxy', 'memcached']
+    services => ['memcached']
   }
 
   # AFD filters
