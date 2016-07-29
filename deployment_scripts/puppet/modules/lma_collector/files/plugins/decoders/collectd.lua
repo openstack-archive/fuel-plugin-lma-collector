@@ -306,10 +306,20 @@ function process_message ()
                         msg['Fields'][additional_tag] = sample['type_instance']
                     end
                 end
-            elseif metric_source == 'pacemaker_resource' then
-                msg['Fields']['name'] = 'pacemaker_local_resource_active'
-                msg['Fields']['tag_fields'] = { 'resource' }
-                msg['Fields']['resource'] = sample['type_instance']
+            elseif metric_source == 'pacemaker' then
+                msg['Fields']['name'] = metric_source .. sep .. sample['type_instance']
+
+                -- add dimension fields
+                local t = {}
+                for _, v in ipairs({'status', 'resource'}) do
+                    if sample['meta'] and sample['meta'][v] then
+                        t[#t+1] = v
+                        msg['Fields'][v] = sample['meta'][v]
+                    end
+                end
+                if #t > 0 then
+                    msg['Fields']['tag_fields'] = t
+                end
             elseif metric_source ==  'users' then
                 -- 'users' is a reserved name for InfluxDB v0.9
                 msg['Fields']['name'] = 'logged_users'
