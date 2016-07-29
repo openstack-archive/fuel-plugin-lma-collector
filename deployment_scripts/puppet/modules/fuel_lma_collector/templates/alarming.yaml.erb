@@ -728,6 +728,66 @@ lma_collector:
             window: 60
             periods: 0
             function: min
+    - name: 'haproxy-heartbeat'
+      description: "HAProxy fails to respond"
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_heartbeat
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'rabbitmq-heartbeat'
+      description: "RabbitMQ fails to respond"
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: rabbitmq_heartbeat
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'ceph-heartbeat'
+      description: "Ceph fails to respond"
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: ceph_heartbeat
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'pacemaker-heartbeat'
+      description: "Pacemaker fails to respond"
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: pacemaker_heartbeat
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'elasticsearch-heartbeat'
+      description: "Elasticsearch fails to respond"
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: elasticsearch_heartbeat
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
 
   # Mapping between the Fuel roles and the AFD node filters
   node_cluster_roles:
@@ -775,6 +835,8 @@ lma_collector:
     ceph-mon: ['primary-controller', 'controller']
 <% end -%>
     elasticsearch: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
+    pacemaker: ['primary-controller', 'controller']
+    haproxy: ['primary-controller', 'controller']
 
   # Definition of the AFD node filters
   node_cluster_alarms:
@@ -818,6 +880,7 @@ lma_collector:
       queue: ['rabbitmq-queue-warning']
       memory: ['rabbitmq-memory-limit-critical', 'rabbitmq-memory-limit-warning']
       disk: ['rabbitmq-disk-limit-critical', 'rabbitmq-disk-limit-warning']
+      heartbeat: ['rabbitmq-heartbeat']
     mysql:
       node-status: ['mysql-node-connected', 'mysql-node-ready']
     apache:
@@ -855,5 +918,11 @@ lma_collector:
     ceph-mon:
       health: ['ceph-health-critical', 'ceph-health-warning']
       capacity: ['ceph-capacity-critical', 'ceph-capacity-warning']
+      heartbeat: ['ceph-heartbeat']
     elasticsearch:
       health: ['elasticsearch-health-critical', 'elasticsearch-health-warning']
+      heartbeat: ['elasticsearch-heartbeat']
+    haproxy:
+      heartbeat: ['haproxy-heartbeat']
+    pacemaker:
+      heartbeat: ['pacemaker-heartbeat']
