@@ -79,3 +79,8 @@ InfluxDB
 ++++++++
 
 .. include:: metrics/influxdb.rst
+
+HeartBeat
++++++++++
+
+.. include:: metrics/heartbeat.rst

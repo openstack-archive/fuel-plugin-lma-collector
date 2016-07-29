@@ -167,8 +167,11 @@ class HAProxyPlugin(base.Base):
             try:
                 stats = haproxy.get_server_info()
             except socket.error:
-                self.logger.warning(
-                    "Unable to connect to HAProxy socket at %s" % self.socket)
+                msg = "Unable to connect to HAProxy socket at {}".format(
+                    self.socket)
+                self.logger.warning(msg)
+                self.add_failure(msg)
+                return
             else:
                 for k, v in stats.iteritems():
                     if k not in SERVER_METRICS:
@@ -184,8 +187,10 @@ class HAProxyPlugin(base.Base):
         try:
             stats = haproxy.get_server_stats()
         except socket.error:
-            self.logger.warning(
-                "Unable to connect to HAProxy socket at %s" % self.socket)
+            msg = "Unable to connect to HAProxy socket at {}".format(
+                self.socket)
+            self.logger.warning(msg)
+            self.add_failure(msg)
             return
 
         def match(x):

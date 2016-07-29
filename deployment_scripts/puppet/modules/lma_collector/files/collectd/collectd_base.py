@@ -57,6 +57,22 @@ class Base(object):
         self.depends_on_resource = None
         self.do_collect_data = True
 
+        # attributes related to heartbeat metric
+        self._failures = []
+        self._skip_heartbeat = False
+
+    def add_failure(self, failure):
+        self._failures.append(failure)
+
+    def reset_failures(self):
+        self._failures = []
+
+    def has_failures(self):
+        return len(self._failures) > 0
+
+    def skip_heartbeat(self, skipit=True):
+        self._skip_heartbeat = skipit
+
     def config_callback(self, conf):
         for node in conf.children:
             if node.key == "Debug":
@@ -78,9 +94,29 @@ class Base(object):
             for metric in self.itermetrics():
                 self.dispatch_metric(metric)
         except Exception as e:
-            self.logger.error('%s: Failed to get metrics: %s: %s' %
-                              (self.plugin, e, traceback.format_exc()))
+            msg = '{}: Failed to get metrics: {}'.format(self.plugin, e)
+            self.logger.error('{}: {}'.format(msg, traceback.format_exc()))
+            self.add_failure(msg)
+
+        self.dispatch_heartbeat_metric()
+
+    def dispatch_heartbeat_metric(self):
+        if self._skip_heartbeat:
             return
+
+        metric = {
+            'meta': {'heartbeat': True},
+        }
+
+        heartbeat = self.OK
+        if self.has_failures():
+            heartbeat = self.FAIL
+            metric['meta']['failures'] = ', '.join(self._failures)
+
+        metric['values'] = heartbeat
+
+        self.dispatch_metric(metric)
+        self.reset_failures()
 
     def itermetrics(self):
         """Iterate over the collected metrics

@@ -35,6 +35,7 @@ class CephMonPlugin(base.CephBase):
     def itermetrics(self):
         status = self.execute_to_json('ceph -s --format json')
         if not status:
+            self.add_failure("Fail to execute 'ceph -s'")
             return
 
         yield {
