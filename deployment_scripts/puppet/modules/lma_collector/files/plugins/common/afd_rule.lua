@@ -20,6 +20,7 @@ local pairs = pairs
 local math = require 'math'
 local string = string
 local table = table
+local assert = assert
 
 -- LMA libs
 local utils = require 'lma_utils'
@@ -174,7 +175,7 @@ local function isnumber(value)
     return value ~= nil and not (value ~= value)
 end
 
-local available_functions = {avg=true, max=true, min=true, sum=true,
+local available_functions = {last=true, avg=true, max=true, min=true, sum=true,
                              variance=true, sd=true, diff=true, roc=true}
 
 -- evaluate the rule against datapoints
@@ -204,57 +205,69 @@ function Rule:evaluate(ns)
                 one_missing_data = true
                 fields[#fields+1] = {value = -1, fields = data.fields}
             else
-                if available_functions[self.fct] then
-                    local result
+                assert(available_functions[self.fct])
+                local result
 
-                    if self.fct == 'roc' then
-                        local anomaly_detected, _ = anomaly.detect(ns, self.metric, data.cbuf, self.roc_cfg)
-                        if anomaly_detected then
-                            one_match = true
-                            fields[#fields+1] = {value=-1, fields=data.fields}
-                        else
-                            one_no_match = true
-                        end
-                    elseif self.fct == 'avg' then
-                        local total
-                        total = data.cbuf:compute('sum', 1)
-                        local count = data.cbuf:compute('sum', 2)
-                        result = total/count
-                    elseif self.fct == 'diff' then
-                        local first, last
-
-                        local t = ns
-                        while (not isnumber(last)) and t >= ns - self.observation_window * 1e9 do
-                            last = data.cbuf:get(t, 1)
-                            t = t - SECONDS_PER_ROW * 1e9
-                        end
-
-                        if isnumber(last) then
-                            t = ns - self.observation_window * 1e9
-                            while (not isnumber(first)) and t <= ns do
-                                first = data.cbuf:get(t, 1)
-                                t = t + SECONDS_PER_ROW * 1e9
-                            end
-                        end
-
-                        if not isnumber(last) or not isnumber(first) then
-                            one_missing_data = true
-                            fields[#fields+1] = {value = -1, fields = data.fields}
-                        else
-                            result = last - first
-                        end
+                if self.fct == 'roc' then
+                    local anomaly_detected, _ = anomaly.detect(ns, self.metric, data.cbuf, self.roc_cfg)
+                    if anomaly_detected then
+                        one_match = true
+                        fields[#fields+1] = {value=-1, fields=data.fields}
                     else
-                        result = data.cbuf:compute(self.fct, 1)
+                        one_no_match = true
+                    end
+                elseif self.fct == 'avg' then
+                    local total
+                    total = data.cbuf:compute('sum', 1)
+                    local count = data.cbuf:compute('sum', 2)
+                    result = total/count
+                elseif self.fct == 'last' then
+                    local last
+                    local t = ns
+                    while (not isnumber(last)) and t >= ns - self.observation_window * 1e9 do
+                        last = data.cbuf:get(t, 1)
+                        t = t - SECONDS_PER_ROW * 1e9
+                    end
+                    if isnumber(last) then
+                        result = last
+                    else
+                        one_missing_data = true
+                        fields[#fields+1] = {value = -1, fields = data.fields}
+                    end
+                elseif self.fct == 'diff' then
+                    local first, last
+
+                    local t = ns
+                    while (not isnumber(last)) and t >= ns - self.observation_window * 1e9 do
+                        last = data.cbuf:get(t, 1)
+                        t = t - SECONDS_PER_ROW * 1e9
                     end
 
-                    if result then
-                        local m = self:compare_threshold(result)
-                        if m then
-                            one_match = true
-                            fields[#fields+1] = {value=result, fields=data.fields}
-                        else
-                            one_no_match = true
+                    if isnumber(last) then
+                        t = ns - self.observation_window * 1e9
+                        while (not isnumber(first)) and t <= ns do
+                            first = data.cbuf:get(t, 1)
+                            t = t + SECONDS_PER_ROW * 1e9
                         end
+                    end
+
+                    if not isnumber(last) or not isnumber(first) then
+                        one_missing_data = true
+                        fields[#fields+1] = {value = -1, fields = data.fields}
+                    else
+                        result = last - first
+                    end
+                else
+                    result = data.cbuf:compute(self.fct, 1)
+                end
+
+                if result then
+                    local m = self:compare_threshold(result)
+                    if m then
+                        one_match = true
+                        fields[#fields+1] = {value=result, fields=data.fields}
+                    else
+                        one_no_match = true
                     end
                 end
             end
