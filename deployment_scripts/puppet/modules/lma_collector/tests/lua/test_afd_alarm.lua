@@ -242,6 +242,48 @@ local alarms = {
     },
 }
 
+afd_on_multivalue = {
+    name = 'keystone-high-http-response-times',
+    description = 'The 90 percentile response time for Keystone is too high',
+    enabled = true,
+    trigger = {
+        rules = {
+            {
+                metric = 'http_response_times',
+                window = 60,
+                periods = 1,
+                ['function'] = 'max',
+                threshold = 5,
+                fields = { http_method = 'POST' },
+                relational_operator = '>=',
+                value = 'upper_90',
+            },
+        },
+    },
+    severity = 'warning',
+}
+
+missing_value_afd_on_multivalue = {
+    name = 'keystone-high-http-response-times',
+    description = 'The 90 percentile response time for Keystone is too high',
+    enabled = true,
+    trigger = {
+        rules = {
+            {
+                metric = 'http_response_times',
+                window = 30,
+                periods = 2,
+                ['function'] = 'max',
+                threshold = 5,
+                fields = { http_method = 'POST' },
+                relational_operator = '>=',
+                -- value = 'upper_90',
+            },
+        },
+    },
+    severity = 'warning',
+}
+
 TestLMAAlarm = {}
 
 local current_time = 0
@@ -704,6 +746,33 @@ function TestLMAAlarm:test_rule_with_multiple_fields()
     assertEquals(#result, 2)
     assert(result[1].alert.message ~= nil)
     assert(result[2].alert.message ~= nil)
+end
+
+function TestLMAAlarm:test_rule_with_multivalue()
+    lma_alarm.load_alarm(afd_on_multivalue)
+    lma_alarm.set_start_time(current_time)
+
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 0.4, foo = 1}, {http_method = 'POST'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 0.2, foo = 1}, {http_method = 'POST'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 6, foo = 1}, {http_method = 'POST'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 3, foo = 1}, {http_method = 'POST'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 4, foo = 1}, {http_method = 'POST'})
+    local state, result = lma_alarm.evaluate(next_time()) -- window 60 second
+    assertEquals(state, consts.WARN)
+    assertEquals(result[1].alert.value, 6)
+end
+
+function TestLMAAlarm:test_nocrash_missing_value_with_multivalue_metric()
+    lma_alarm.load_alarm(missing_value_afd_on_multivalue)
+    lma_alarm.set_start_time(current_time)
+
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 0.4, foo = 1}, {http_method = 'POST'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 0.2, foo = 1}, {http_method = 'POST'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 6, foo = 1}, {http_method = 'POST'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 3, foo = 1}, {http_method = 'POST'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 4, foo = 1}, {http_method = 'POST'})
+    local state, result = lma_alarm.evaluate(next_time()) -- window 60 second
+    assertEquals(state, consts.UNKW)
 end
 
 lu = LuaUnit
