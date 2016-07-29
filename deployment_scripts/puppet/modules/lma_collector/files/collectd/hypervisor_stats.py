@@ -85,6 +85,7 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
 
 
 plugin = HypervisorStatsPlugin(collectd)
+plugin.skip_check_metric()
 
 
 def config_callback(conf):

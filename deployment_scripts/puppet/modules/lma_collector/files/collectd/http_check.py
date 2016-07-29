@@ -72,6 +72,7 @@ class HTTPCheckPlugin(base.Base):
                     yield {'type_instance': name, 'values': self.OK}
 
 plugin = HTTPCheckPlugin(collectd)
+plugin.skip_check_metric()
 
 
 def config_callback(conf):
