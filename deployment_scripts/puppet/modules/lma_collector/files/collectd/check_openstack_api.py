@@ -113,6 +113,7 @@ class APICheckPlugin(openstack.CollectdPlugin):
 
 
 plugin = APICheckPlugin(collectd)
+plugin.skip_heartbeat()
 
 
 def config_callback(conf):
