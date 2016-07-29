@@ -156,7 +156,12 @@ lma_collector:
         group_by: hostname
         members:
           - node-status
-      haproxy:
+      haproxy-controller:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - heartbeat
+      haproxy-stacklight:
         policy: majority_of_members
         group_by: hostname
         members:
@@ -473,11 +478,17 @@ lma_collector:
 <% if not @detach_database_enabled -%>
           - controller
 <% end -%>
-      haproxy:
+      haproxy-controller:
         policy: highest_severity
         group_by: member
         members:
-          - haproxy
+          - haproxy-controller
+          - controller
+      haproxy-stacklight:
+        policy: highest_severity
+        group_by: member
+        members:
+          - haproxy-stacklight
           - controller
       apache:
         policy: highest_severity
