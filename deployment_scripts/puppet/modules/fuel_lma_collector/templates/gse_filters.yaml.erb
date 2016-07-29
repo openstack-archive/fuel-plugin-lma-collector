@@ -156,7 +156,7 @@ lma_collector:
         group_by: hostname
         members:
           - node-status
-      haproxy:
+      haproxy-openstack:
         policy: majority_of_members
         group_by: hostname
         members:
@@ -480,11 +480,11 @@ lma_collector:
 <% if not @detach_database_enabled -%>
           - controller
 <% end -%>
-      haproxy:
+      haproxy-openstack:
         policy: highest_severity
         group_by: member
         members:
-          - haproxy
+          - haproxy-openstack
           - controller
       apache:
         policy: highest_severity
