@@ -98,14 +98,14 @@ class InfluxDBClusterPlugin(base.Base):
         try:
             r = self.session.get(url, params=payload)
         except Exception as e:
-            self.logger.error("Got {0} when getting stats from {1}".format(
-                e, url))
-            return
+            msg = "Got {0} when getting stats from {1}".format(e, url)
+            self.logger.error(msg)
+            raise base.CheckException(msg)
 
         if r.status_code != 200:
-            self.logger.error("Got response {0} from {0}".format(
-                r.status_code, url))
-            return
+            msg = "Got response {0} from {0}".format(r.status_code, url)
+            self.logger.error(msg)
+            raise base.CheckException(msg)
 
         data = r.json()
         try:
