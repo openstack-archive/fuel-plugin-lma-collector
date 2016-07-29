@@ -58,9 +58,13 @@ class HTTPCheckPlugin(base.Base):
                 yield {'type_instance': name, 'values': self.FAIL}
             else:
 
-                if r.status_code != self.expected_codes.get(name, 200):
-                    self.logger.warning("{} responded with code {}".format(
-                        url, r.status_code)
+                expected_code = self.expected_codes.get(name, 200)
+                if r.status_code != expected_code:
+                    self.logger.warning(
+                        ("{} ({}) responded with code {} "
+                        "while {} is expected").format(name, url,
+                                                       r.status_code,
+                                                       expected_code)
                     )
                     yield {'type_instance': name, 'values': self.FAIL}
                 else:
