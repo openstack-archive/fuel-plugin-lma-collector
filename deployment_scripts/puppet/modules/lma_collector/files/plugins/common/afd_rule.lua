@@ -20,6 +20,7 @@ local pairs = pairs
 local math = require 'math'
 local string = string
 local table = table
+local type = type
 
 -- LMA libs
 local utils = require 'lma_utils'
@@ -64,6 +65,7 @@ function Rule.new(rule)
     r.fields = rule.fields or {}
     r.fct = rule['function']
     r.threshold = rule.threshold + 0
+    r.value = rule.value
     if r.fct == 'roc' then
         -- We use the name of the metric as the payload_name.
         --
@@ -136,11 +138,19 @@ function Rule:get_circular_buffer()
     return cbuf
 end
 
--- store datapoints in cbuf, create the cbuf if not exists
+-- store datapoints in cbuf, create the cbuf if not exists.
+-- value can be a table where the index to choose is reference by self.value
 function Rule:add_value(ts, value, fields)
     if not self:fields_accepted(fields) then
         return
     end
+    if type(value) == 'table' then
+        value = value[self.value]
+    end
+    if value == nil then
+        return
+    end
+
     local data
     local uniq_field_id = get_datastore_id(self.metric, fields, self.fct, self.window, self.periods)
     if not self.datastore[uniq_field_id] then
