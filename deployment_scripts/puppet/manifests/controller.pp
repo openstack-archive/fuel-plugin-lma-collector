@@ -21,6 +21,7 @@ $network_metadata = hiera_hash('network_metadata')
 
 $node_profiles   = hiera_hash('lma::collector::node_profiles')
 $is_rabbitmq     = $node_profiles['rabbitmq']
+$is_mysql_server = $node_profiles['mysql']
 
 $ceilometer      = hiera_hash('ceilometer', {})
 $lma_collector   = hiera_hash('lma_collector')
@@ -304,15 +305,34 @@ if hiera('lma::collector::influxdb::server', false) {
   }
 
   $pacemaker_master_resource = 'vip__management'
+  # Deal with detach-* plugins
+  if $is_mysql_server {
+    $mysql_resource = {
+      'p_mysqld' => 'mysqld',
+    }
+  }
+  else {
+    $mysql_resource = {}
+  }
+  if $is_rabbitmq {
+    $rabbitmq_resource = {
+      'p_rabbitmq-server' => 'rabbitmq',
+    }
+  }
+  else {
+    $rabbitmq_resource = {}
+  }
+
 
   class { 'lma_collector::collectd::pacemaker':
-    resources       => [
-      'vip__public',
-      'vip__management',
-      'vip__vrouter_pub',
-      'vip__vrouter',
-    ],
-    master_resource => $pacemaker_master_resource,
+    resources       => merge({
+      'vip__public'      => 'vip__public',
+      'vip__management'  => 'vip__management',
+      'vip__vrouter_pub' => 'vip__vrouter_pub',
+      'vip__vrouter'     => 'vip__vrouter',
+      'p_haproxy'        => 'haproxy',
+    }, $mysql_resource, $rabbitmq_resource),
+    notify_resource => $pacemaker_master_resource,
     hostname        => $::fqdn,
   }
 

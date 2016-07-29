@@ -737,11 +737,10 @@ which uses Pacemaker's `crm_resource` command to get statistics from Pacemaker.
 ##### Parameters
 
 * `resources`: *Required*. The Pacemaker resources to get statistics for. Valid
-  options: an array of strings.
-* `master_resource`: *Optional*. If this is set a collectd `PostCache` chain is
-  created to generate a collectd notification each time the Python plugin
-  generates a metric for the Pacemaker resource identified to by
-  `master_resource`. Users of
+  options: an hash of strings.
+* `notify_resource`: *Optional*. If this is set, the collectd plugin generates
+  a collectd notification reporting the state of the Pacemaker resource
+  identified to by `master_resource`. Users of
   [`lma_collector::collectd::openstack`](#define-lma_collectorcollectdopenstack),
   [`lma_collector::collectd::openstack_checks`](#class-lma_collectorcollectdopenstackchecks) and
   [`lma_collector::collectd::hypervisor`](#class-lma_collectorcollectdhypervisor)
