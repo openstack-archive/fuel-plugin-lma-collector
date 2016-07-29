@@ -79,3 +79,8 @@ InfluxDB
 ++++++++
 
 .. include:: metrics/influxdb.rst
+
+Checks
+++++++
+
+.. include:: metrics/checks.rst
