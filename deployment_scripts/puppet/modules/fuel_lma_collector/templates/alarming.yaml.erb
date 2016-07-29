@@ -728,6 +728,78 @@ lma_collector:
             window: 60
             periods: 0
             function: min
+    - name: 'haproxy-check'
+      description: "HAProxy cannot be checked"
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_check
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'rabbitmq-check'
+      description: "RabbitMQ cannot be checked"
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: rabbitmq_check
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'ceph-mon-check'
+      description: "Ceph mon cannot be checked"
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: ceph_mon_check
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'ceph-osd-check'
+      description: "Ceph OSD cannot be checked"
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: ceph_osd_check
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'pacemaker-check'
+      description: "Pacemaker cannot be checked"
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: pacemaker_check
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'elasticsearch-check'
+      description: "Elasticsearch cannot be checked"
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: elasticsearch_check
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
 
   # Mapping between the Fuel roles and the AFD node filters
   node_cluster_roles:
@@ -773,8 +845,11 @@ lma_collector:
     keystone-logs: ['primary-controller', 'controller']
 <% if @storage_options["volumes_ceph"] then -%>
     ceph-mon: ['primary-controller', 'controller']
+    ceph-osd: ['ceph-osd']
 <% end -%>
     elasticsearch: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
+    pacemaker: ['primary-controller', 'controller']
+    haproxy: ['primary-controller', 'controller']
 
   # Definition of the AFD node filters
   node_cluster_alarms:
@@ -818,6 +893,7 @@ lma_collector:
       queue: ['rabbitmq-queue-warning']
       memory: ['rabbitmq-memory-limit-critical', 'rabbitmq-memory-limit-warning']
       disk: ['rabbitmq-disk-limit-critical', 'rabbitmq-disk-limit-warning']
+      check: ['rabbitmq-check']
     mysql:
       node-status: ['mysql-node-connected', 'mysql-node-ready']
     apache:
@@ -855,5 +931,13 @@ lma_collector:
     ceph-mon:
       health: ['ceph-health-critical', 'ceph-health-warning']
       capacity: ['ceph-capacity-critical', 'ceph-capacity-warning']
+      check: ['ceph-mon-check']
+    ceph-osd:
+      check: ['ceph-osd-check']
     elasticsearch:
       health: ['elasticsearch-health-critical', 'elasticsearch-health-warning']
+      check: ['elasticsearch-check']
+    haproxy:
+      check: ['haproxy-check']
+    pacemaker:
+      check: ['pacemaker-check']
