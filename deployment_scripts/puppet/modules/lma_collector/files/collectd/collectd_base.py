@@ -49,13 +49,13 @@ class Base(object):
 
     MAX_IDENTIFIER_LENGTH = 63
 
-    def __init__(self, collectd):
+    def __init__(self, collectd, name=None):
         self.debug = False
         self.timeout = 5
         self.max_retries = 3
         self.logger = collectd
         self.collectd = collectd
-        self.plugin = None
+        self.plugin = name
         self.plugin_instance = ''
         # attributes controlling whether the plugin is in collect mode or not
         self.depends_on_resource = None

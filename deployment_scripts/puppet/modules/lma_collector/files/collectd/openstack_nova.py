@@ -19,7 +19,6 @@ from collections import Counter
 from collections import defaultdict
 import re
 
-import collectd_base as base
 import collectd_openstack as openstack
 
 PLUGIN_NAME = 'nova'
@@ -35,8 +34,7 @@ class NovaStatsPlugin(openstack.CollectdPlugin):
     states = {'up': 0, 'down': 1, 'disabled': 2}
     nova_re = re.compile('^nova-')
 
-    @base.read_callback_wrapper
-    def read_callback(self):
+    def collect(self):
 
         # Get information of the state per service
         # State can be: 'up', 'down' or 'disabled'
@@ -82,7 +80,7 @@ class NovaStatsPlugin(openstack.CollectdPlugin):
         )
         v.dispatch()
 
-plugin = NovaStatsPlugin(collectd)
+plugin = NovaStatsPlugin(collectd, PLUGIN_NAME)
 
 
 def config_callback(conf):
@@ -94,7 +92,7 @@ def notification_callback(notification):
 
 
 def read_callback():
-    plugin.read_callback()
+    plugin.conditional_read_callback()
 
 collectd.register_config(config_callback)
 collectd.register_notification(notification_callback)
