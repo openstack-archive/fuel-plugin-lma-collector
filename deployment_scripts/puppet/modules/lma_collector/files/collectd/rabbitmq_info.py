@@ -71,10 +71,16 @@ class RabbitMqPlugin(base.Base):
             r = self.session.get(self.api_overview_url, timeout=self.timeout)
             overview = r.json()
         except Exception as e:
-            self.logger.warning("Got exception for '{}': {}".format(
-                self.api_nodes_url, e)
-            )
-            return
+            msg = "Got exception for '{}'".format(self.api_overview_url)
+            self.logger.warning('{}: {}'.format(msg, e))
+            raise base.CheckException(msg)
+
+        if r.status_code != 200:
+            msg = "{} responded with code {}".format(
+                self.api_overview_url, r.status_code)
+            self.logger.error(msg)
+            raise base.CheckException(msg)
+
         objects = overview['object_totals']
         stats['queues'] = objects['queues']
         stats['consumers'] = objects['consumers']
@@ -94,10 +100,15 @@ class RabbitMqPlugin(base.Base):
                                  timeout=self.timeout)
             node = r.json()
         except Exception as e:
-            self.logger.warning("Got exception for '{}': {}".format(
-                self.api_node_url, e)
-            )
-            return
+            msg = "Got exception for '{}'".format(self.api_nodes_url)
+            self.logger.warning('{}: {}'.format(msg, e))
+            raise base.CheckException(msg)
+
+        if r.status_code != 200:
+            msg = "{} responded with code {}".format(
+                self.api_nodes_url, r.status_code)
+            self.logger.error(msg)
+            raise base.CheckException(msg)
 
         stats['disk_free_limit'] = node['disk_free_limit']
         stats['disk_free'] = node['disk_free']
