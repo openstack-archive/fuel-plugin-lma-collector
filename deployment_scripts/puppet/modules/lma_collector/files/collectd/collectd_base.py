@@ -55,7 +55,7 @@ class Base(object):
         self.max_retries = 3
         self.logger = collectd
         self.collectd = collectd
-        self.plugin = None
+        self.plugin = name
         self.plugin_instance = ''
         # attributes controlling whether the plugin is in collect mode or not
         self.depends_on_resource = None

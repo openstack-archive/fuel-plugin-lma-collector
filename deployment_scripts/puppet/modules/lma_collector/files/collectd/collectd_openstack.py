@@ -18,6 +18,7 @@ import dateutil.parser
 import dateutil.tz
 import requests
 import simplejson as json
+import traceback
 
 import collectd_base as base
 
@@ -27,6 +28,10 @@ from collections import defaultdict
 # less than the default group by interval (which is 60 seconds) to avoid gaps
 # in the Grafana graphs.
 INTERVAL = 50
+
+
+class KeystoneException(Exception):
+    pass
 
 
 class OSClient(object):
@@ -58,8 +63,6 @@ class OSClient(object):
         self.session.mount(
             'https://', requests.adapters.HTTPAdapter(max_retries=max_retries))
 
-        self.get_token()
-
     def is_valid_token(self):
         now = datetime.datetime.now(tz=dateutil.tz.tzutc())
         return self.token and self.valid_until and self.valid_until > now
@@ -86,14 +89,12 @@ class OSClient(object):
                               '%s/tokens' % self.keystone_url, data=data,
                               token_required=False)
         if not r:
-            self.logger.error("Cannot get a valid token from %s" %
-                              self.keystone_url)
-            return
+            raise KeystoneException("Cannot get a valid token from %s" %
+                                    self.keystone_url)
 
         if r.status_code < 200 or r.status_code > 299:
-            self.logger.error("%s responded with code %d" %
-                              (self.keystone_url, r.status_code))
-            return
+            raise KeystoneException("%s responded with code %d" %
+                                    (self.keystone_url, r.status_code))
 
         data = r.json()
         self.logger.debug("Got response from Keystone: '%s'" % data)
@@ -202,37 +203,44 @@ class CollectdPlugin(base.Base):
             entry = 'services'
 
         ost_services_r = self.get(service, endpoint)
-        r_status = ost_services_r.status_code
-        try:
-            r_json = ost_services_r.json()
-        except ValueError:
-            r_json = {}
 
-        if r_status == 200 and entry in r_json:
-            for val in r_json[entry]:
-                data = {'host': val['host'], 'service': val['binary']}
-
-                if service == 'neutron':
-                    if not val['admin_state_up']:
-                        data['state'] = 'disabled'
-                    else:
-                        data['state'] = 'up' if val['alive'] else 'down'
-                else:
-                    if val['status'] == 'disabled':
-                        data['state'] = 'disabled'
-                    elif val['state'] == 'up' or val['state'] == 'down':
-                        data['state'] = val['state']
-                    else:
-                        msg = "Unknown state for {} workers:{}".format(
-                            service, val['state'])
-                        self.logger.warning(msg)
-                        continue
-
-                yield data
-        else:
-            msg = "Cannot get state of {} workers: Got {} ({})".format(
-                service, r_status, ost_services_r.content)
+        msg = "Cannot get state of {} workers".format(service)
+        if ost_services_r is None:
             self.logger.warning(msg)
+        elif ost_services_r.status_code != 200:
+            msg = "{}: Got {} ({})".format(
+                msg, ost_services_r.status_code, ost_services_r.content)
+            self.logger.warning(msg)
+        else:
+            try:
+                r_json = ost_services_r.json()
+            except ValueError:
+                r_json = {}
+
+            if entry not in r_json:
+                msg = "{}: couldn't find '{}' key".format(msg, entry)
+                self.logger.warning(msg)
+            else:
+                for val in r_json[entry]:
+                    data = {'host': val['host'], 'service': val['binary']}
+
+                    if service == 'neutron':
+                        if not val['admin_state_up']:
+                            data['state'] = 'disabled'
+                        else:
+                            data['state'] = 'up' if val['alive'] else 'down'
+                    else:
+                        if val['status'] == 'disabled':
+                            data['state'] = 'disabled'
+                        elif val['state'] == 'up' or val['state'] == 'down':
+                            data['state'] = val['state']
+                        else:
+                            msg = "Unknown state for {} workers:{}".format(
+                                service, val['state'])
+                            self.logger.warning(msg)
+                            continue
+
+                    yield data
 
     def get(self, service, resource):
         url = self._build_url(service, resource)
@@ -269,11 +277,25 @@ class CollectdPlugin(base.Base):
                                   self.max_retries)
 
     def read_callback(self):
-        """ Read metrics and dispatch values
+        """ Wrapper method
 
-        This method should be overriden by the derived classes.
+            This method call the actual parent method which performs
+            collection.
         """
-        raise "read_callback() method needs to be overriden!"
+
+        try:
+            self.collect()
+        except Exception as e:
+            msg = '{}: fail to get metrics: {}: {}'.format(
+                self.plugin, e, traceback.format_exc())
+            self.logger.error(msg)
+
+    def collect(self):
+        """ This method should be overriden by the derived classes.
+
+        """
+
+        raise 'collect() method needs to be overriden!'
 
     def get_objects(self, project, object_name, api_version='',
                     params='all_tenants=1'):
