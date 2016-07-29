@@ -357,6 +357,30 @@ if hiera('lma::collector::influxdb::server', false) {
     }
   }
 
+  if ($is_rabbitmq or $is_mysql_server) and ! $is_controller {
+    if $is_mysql_server {
+      $mysql_resource = {
+        'p_mysqld' => 'mysqld',
+      }
+    }
+    else {
+      $mysql_resource = {}
+    }
+    if $is_rabbitmq {
+      $rabbitmq_resource = {
+        'p_rabbitmq-server' => 'rabbitmq',
+      }
+    }
+    else {
+      $rabbitmq_resource = {}
+    }
+
+    class { 'lma_collector::collectd::pacemaker':
+      resources => merge($rabbitmq_resource, $mysql_resource),
+      hostname  => $::hostname,
+    }
+  }
+
   class { 'lma_collector::influxdb':
     server     => hiera('lma::collector::influxdb::server'),
     port       => hiera('lma::collector::influxdb::port'),
