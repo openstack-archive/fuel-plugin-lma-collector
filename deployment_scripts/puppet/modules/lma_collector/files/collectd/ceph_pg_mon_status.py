@@ -35,7 +35,7 @@ class CephMonPlugin(base.CephBase):
     def itermetrics(self):
         status = self.execute_to_json('ceph -s --format json')
         if not status:
-            return
+            raise base.CheckException("Fail to execute 'ceph -s'")
 
         yield {
             'type': 'health',
@@ -79,6 +79,7 @@ class CephMonPlugin(base.CephBase):
             }
 
 plugin = CephMonPlugin(collectd)
+plugin.set_service_name('ceph')
 
 
 def init_callback():

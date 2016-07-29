@@ -28,8 +28,6 @@ METRICS = ['number_of_nodes', 'active_primary_shards', 'active_primary_shards',
            'active_shards', 'relocating_shards', 'unassigned_shards',
            'number_of_pending_tasks', 'initializing_shards']
 
-HEALTH_ON_ERROR = {'type_instance': 'health', 'values': HEALTH_MAP['red']}
-
 
 class ElasticsearchClusterHealthPlugin(base.Base):
     def __init__(self, *args, **kwargs):
@@ -63,15 +61,14 @@ class ElasticsearchClusterHealthPlugin(base.Base):
         try:
             r = self.session.get(self.url)
         except Exception as e:
-            self.logger.error("Got exception for '{}': {}".format(self.url, e))
-            yield HEALTH_ON_ERROR
-            return
+            msg = "Got exception for '{}': {}".format(self.url, e)
+            raise base.CheckException(msg)
 
         if r.status_code != 200:
-            self.logger.error("{} responded with code {}".format(
-                self.url, r.status_code))
-            yield HEALTH_ON_ERROR
-            return
+            msg = "{} responded with code {}".format(
+                self.url, r.status_code)
+            raise base.CheckException(msg)
+
         data = r.json()
         self.logger.debug("Got response from Elasticsearch: '%s'" % data)
 
@@ -79,6 +76,7 @@ class ElasticsearchClusterHealthPlugin(base.Base):
             'type_instance': 'health',
             'values': HEALTH_MAP[data['status']]
         }
+
         for metric in METRICS:
             value = data.get(metric)
             if value is None:
@@ -92,6 +90,7 @@ class ElasticsearchClusterHealthPlugin(base.Base):
             }
 
 plugin = ElasticsearchClusterHealthPlugin(collectd)
+plugin.set_service_name('elasticsearch')
 
 
 def init_callback():

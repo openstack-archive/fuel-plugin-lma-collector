@@ -30,7 +30,7 @@ class CephOSDStatsPlugin(base.CephBase):
     def itermetrics(self):
         osd_stats = self.execute_to_json('ceph pg dump osds --format json')
         if not osd_stats:
-            return
+            raise base.CheckException("Fail to execute 'pg dump osds'")
 
         for osd in osd_stats:
             osd_id = osd['osd']
@@ -49,6 +49,7 @@ class CephOSDStatsPlugin(base.CephBase):
             }
 
 plugin = CephOSDStatsPlugin(collectd)
+plugin.set_service_name('ceph')
 
 
 def init_callback():

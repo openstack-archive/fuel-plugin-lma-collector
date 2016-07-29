@@ -48,8 +48,9 @@ class PacemakerResourcePlugin(base.Base):
                                      '--quiet', '--resource', resource],
                                     shell=False)
             if not out:
-                self.logger.error("%s: Failed to get the status for '%s'" %
-                                  (self.plugin, resource))
+                msg = "{}: Failed to get the status for '%s'".format(
+                    self.plugin, resource)
+                raise base.CheckException(msg)
 
             else:
                 value = 0
@@ -61,6 +62,7 @@ class PacemakerResourcePlugin(base.Base):
                 }
 
 plugin = PacemakerResourcePlugin(collectd)
+plugin.set_service_name('pacemaker')
 
 
 def init_callback():

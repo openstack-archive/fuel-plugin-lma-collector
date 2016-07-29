@@ -30,7 +30,7 @@ class CephPoolPlugin(base.CephBase):
     def itermetrics(self):
         df = self.execute_to_json('ceph df --format json')
         if not df:
-            return
+            raise base.CheckException("Fail to run 'ceph df'")
 
         objects_count = 0
         for pool in df['pools']:
@@ -73,7 +73,7 @@ class CephPoolPlugin(base.CephBase):
 
         stats = self.execute_to_json('ceph osd pool stats --format json')
         if not stats:
-            return
+            raise base.CheckException("Fail to run 'ceph osd pool stats'")
 
         for pool in stats:
             client_io_rate = pool.get('client_io_rate', {})
@@ -91,7 +91,7 @@ class CephPoolPlugin(base.CephBase):
 
         osd = self.execute_to_json('ceph osd dump --format json')
         if not osd:
-            return
+            raise base.CheckException("Fail to run 'ceph osd dump'")
 
         for pool in osd['pools']:
             for name in ('size', 'pg_num', 'pg_placement_num'):
@@ -118,6 +118,7 @@ class CephPoolPlugin(base.CephBase):
         }
 
 plugin = CephPoolPlugin(collectd)
+plugin.set_service_name('ceph')
 
 
 def init_callback():
