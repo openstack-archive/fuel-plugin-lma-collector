@@ -30,6 +30,7 @@ class CephPoolPlugin(base.CephBase):
     def itermetrics(self):
         df = self.execute_to_json('ceph df --format json')
         if not df:
+            self.add_failure("Fail to run 'ceph df'")
             return
 
         objects_count = 0
@@ -73,6 +74,7 @@ class CephPoolPlugin(base.CephBase):
 
         stats = self.execute_to_json('ceph osd pool stats --format json')
         if not stats:
+            self.add_failure("Fail to run 'ceph osd pool stats'")
             return
 
         for pool in stats:
@@ -91,6 +93,7 @@ class CephPoolPlugin(base.CephBase):
 
         osd = self.execute_to_json('ceph osd dump --format json')
         if not osd:
+            self.add_failure("Fail to run 'ceph osd dump'")
             return
 
         for pool in osd['pools']:

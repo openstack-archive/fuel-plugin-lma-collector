@@ -70,6 +70,8 @@ class CephOSDPerfPlugin(base.CephBase):
             perf_dump = self.execute_to_json('ceph --admin-daemon %s perf dump'
                                              % socket_name)
             if not perf_dump:
+                self.add_failure(
+                    "Fail to run 'ceph perf dump' for OSD {}".format(osd_id))
                 continue
 
             for prefix, stats in perf_dump.iteritems():
