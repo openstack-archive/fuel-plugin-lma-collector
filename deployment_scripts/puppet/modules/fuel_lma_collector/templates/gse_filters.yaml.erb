@@ -156,7 +156,12 @@ lma_collector:
         group_by: hostname
         members:
           - node-status
-      haproxy:
+      haproxy-controller:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - heartbeat
+      haproxy-stacklight:
         policy: majority_of_members
         group_by: hostname
         members:
@@ -376,7 +381,12 @@ lma_collector:
         members:
           - endpoint
 <% end -%>
-      pacemaker:
+      pacemaker-controller:
+        policy: highest_severity
+        group_by: member
+        members:
+          - heartbeat
+      pacemaker-stacklight:
         policy: highest_severity
         group_by: member
         members:
@@ -473,11 +483,17 @@ lma_collector:
 <% if not @detach_database_enabled -%>
           - controller
 <% end -%>
-      haproxy:
+      haproxy-controller:
         policy: highest_severity
         group_by: member
         members:
-          - haproxy
+          - haproxy-controller
+          - controller
+      haproxy-stacklight:
+        policy: highest_severity
+        group_by: member
+        members:
+          - haproxy-stacklight
           - controller
       apache:
         policy: highest_severity
@@ -654,8 +670,13 @@ lma_collector:
           - influxdb
           - influxdb-nodes
 <% end -%>
-      pacemaker:
+      pacemaker-controller:
         policy: highest_severity
         group_by: member
         members:
-          - pacemaker
+          - pacemaker-controller
+      pacemaker-stacklight:
+        policy: highest_severity
+        group_by: member
+        members:
+          - pacemaker-stacklight

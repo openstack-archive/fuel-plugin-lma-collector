@@ -835,8 +835,10 @@ lma_collector:
     ceph-mon: ['primary-controller', 'controller']
 <% end -%>
     elasticsearch: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
-    pacemaker: ['primary-controller', 'controller']
-    haproxy: ['primary-controller', 'controller']
+    pacemaker-controller: ['primary-controller', 'controller']
+    haproxy-controller: ['primary-controller', 'controller']
+    pacemaker-stacklight: ['primary-elasticsearch_kibana', 'elasticsearch_kibana','primary-influxdb_grafana', 'influxdb_grafana', 'primary-infrastructure_alerting', 'infrastructure_alerting']
+    haproxy-stacklight:  ['primary-elasticsearch_kibana', 'elasticsearch_kibana','primary-influxdb_grafana', 'influxdb_grafana']
 
   # Definition of the AFD node filters
   node_cluster_alarms:
@@ -922,7 +924,11 @@ lma_collector:
     elasticsearch:
       health: ['elasticsearch-health-critical', 'elasticsearch-health-warning']
       heartbeat: ['elasticsearch-heartbeat']
-    haproxy:
+    haproxy-controller:
       heartbeat: ['haproxy-heartbeat']
-    pacemaker:
+    pacemaker-controller:
+      heartbeat: ['pacemaker-heartbeat']
+    haproxy-stacklight:
+      heartbeat: ['haproxy-heartbeat']
+    pacemaker-stacklight:
       heartbeat: ['pacemaker-heartbeat']
