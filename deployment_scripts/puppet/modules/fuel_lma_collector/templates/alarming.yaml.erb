@@ -849,7 +849,7 @@ lma_collector:
 <% end -%>
     elasticsearch: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
     pacemaker: ['primary-controller', 'controller']
-    haproxy: ['primary-controller', 'controller']
+    haproxy-openstack: ['primary-controller', 'controller']
 
   # Definition of the AFD node filters
   node_cluster_alarms:
@@ -937,7 +937,7 @@ lma_collector:
     elasticsearch:
       health: ['elasticsearch-health-critical', 'elasticsearch-health-warning']
       check: ['elasticsearch-check']
-    haproxy:
+    haproxy-openstack:
       check: ['haproxy-check']
     pacemaker:
       check: ['pacemaker-check']
