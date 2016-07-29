@@ -306,13 +306,16 @@ if hiera('lma::collector::influxdb::server', false) {
   $pacemaker_master_resource = 'vip__management'
 
   class { 'lma_collector::collectd::pacemaker':
-    resources       => [
-      'vip__public',
-      'vip__management',
-      'vip__vrouter_pub',
-      'vip__vrouter',
-    ],
-    master_resource => $pacemaker_master_resource,
+    resources       => {
+      'vip__public'       => 'vip__public',
+      'vip__management'   => 'vip__management',
+      'vip__vrouter_pub'  => 'vip__vrouter_pub',
+      'vip__vrouter'      => 'vip__vrouter',
+      'p_rabbitmq-server' => 'rabbitmq',
+      'p_mysqld'          => 'mysqld',
+      'p_haproxy'         => 'haproxy',
+    },
+    notify_resource => $pacemaker_master_resource,
     hostname        => $::fqdn,
   }
 
