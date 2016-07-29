@@ -202,37 +202,44 @@ class CollectdPlugin(base.Base):
             entry = 'services'
 
         ost_services_r = self.get(service, endpoint)
-        r_status = ost_services_r.status_code
-        try:
-            r_json = ost_services_r.json()
-        except ValueError:
-            r_json = {}
 
-        if r_status == 200 and entry in r_json:
-            for val in r_json[entry]:
-                data = {'host': val['host'], 'service': val['binary']}
-
-                if service == 'neutron':
-                    if not val['admin_state_up']:
-                        data['state'] = 'disabled'
-                    else:
-                        data['state'] = 'up' if val['alive'] else 'down'
-                else:
-                    if val['status'] == 'disabled':
-                        data['state'] = 'disabled'
-                    elif val['state'] == 'up' or val['state'] == 'down':
-                        data['state'] = val['state']
-                    else:
-                        msg = "Unknown state for {} workers:{}".format(
-                            service, val['state'])
-                        self.logger.warning(msg)
-                        continue
-
-                yield data
-        else:
-            msg = "Cannot get state of {} workers: Got {} ({})".format(
-                service, r_status, ost_services_r.content)
+        msg = "Cannot get state of {} workers".format(service)
+        if not ost_services_r:
             self.logger.warning(msg)
+        elif ost_services_r.status_code != 200:
+            msg = "{}: Got {} ({})".format(
+                msg, ost_services_r.status_code, ost_services_r.content)
+            self.logger.warning(msg)
+        else:
+            try:
+                r_json = ost_services_r.json()
+            except ValueError:
+                r_json = {}
+
+            if entry not in r_json:
+                msg = "{}: couldn't find '{}' key".format(msg, entry)
+                self.logger.warning(msg)
+            else:
+                for val in r_json[entry]:
+                    data = {'host': val['host'], 'service': val['binary']}
+
+                    if service == 'neutron':
+                        if not val['admin_state_up']:
+                            data['state'] = 'disabled'
+                        else:
+                            data['state'] = 'up' if val['alive'] else 'down'
+                    else:
+                        if val['status'] == 'disabled':
+                            data['state'] = 'disabled'
+                        elif val['state'] == 'up' or val['state'] == 'down':
+                            data['state'] = val['state']
+                        else:
+                            msg = "Unknown state for {} workers:{}".format(
+                                service, val['state'])
+                            self.logger.warning(msg)
+                            continue
+
+                    yield data
 
     def get(self, service, resource):
         url = self._build_url(service, resource)
