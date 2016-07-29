@@ -160,7 +160,7 @@ lma_collector:
         policy: majority_of_members
         group_by: hostname
         members:
-          - heartbeat
+          - check
       apache:
         policy: majority_of_members
         group_by: hostname
@@ -170,6 +170,8 @@ lma_collector:
         policy: majority_of_members
         group_by: hostname
         members:
+          # This AFD heartbeat is emitted by a dedicated sandbox filter
+          # TODO(all): replace by a check metric
           - heartbeat
       rabbitmq:
         policy: highest_severity
@@ -178,6 +180,7 @@ lma_collector:
           - memory
           - disk
           - queue
+          - check
       nova-api:
         policy: highest_severity
         group_by: member
@@ -357,6 +360,7 @@ lma_collector:
         members:
           - health
           - capacity
+          - check
 <% end -%>
 <% if @monitor_elasticsearch -%>
       elasticsearch:
@@ -364,6 +368,7 @@ lma_collector:
         group_by: member
         members:
           - health
+          - check
 <% end -%>
 <% if @monitor_influxdb -%>
       influxdb:
@@ -371,7 +376,14 @@ lma_collector:
         group_by: member
         members:
           - endpoint
+          - check
 <% end -%>
+      pacemaker:
+        policy: highest_severity
+        group_by: member
+        members:
+          - check
+
   gse_cluster_node:
     input_message_types:
       - afd_node_metric
@@ -644,3 +656,8 @@ lma_collector:
           - influxdb
           - influxdb-nodes
 <% end -%>
+      pacemaker:
+        policy: highest_severity
+        group_by: member
+        members:
+          - pacemaker
