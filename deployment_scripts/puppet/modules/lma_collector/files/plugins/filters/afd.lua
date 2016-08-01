@@ -14,6 +14,7 @@
 
 local string = require 'string'
 
+local utils = require 'lma_utils'
 local afd = require 'afd'
 
 -- node or service
@@ -52,31 +53,10 @@ function process_message()
     local metric_name = read_message('Fields[name]')
     local ts = read_message('Timestamp')
 
-    if read_message('Fields[value_fields]') then
-        value = {}
-        local i = 0
-        local val
-        while true do
-            local f = read_message("Fields[value_fields]", 0, i)
-            if not f then
-                break
-            end
-            val = read_message(string.format('Fields[%s]', f))
-            if val ~= nil then
-                value[f] = val
-                i = i + 1
-            end
-        end
-        if i == 0 then
-           return -1, 'Fields[value_fields] does not list any valid field'
-        end
-    else
-        value = read_message("Fields[value]")
-        if not value then
-            return -1, 'Fields[value] is missing'
-        end
+    local ok, value = utils.metric_value()
+    if not ok then
+        return -1, value
     end
-
     -- retrieve field values
     local fields = {}
     for _, field in ipairs (A.get_metric_fields(metric_name)) do
