@@ -269,4 +269,36 @@ function message_timestamp(timestamp_precision, timestamp)
     return math.floor(timestamp / timestamp_divisor)
 end
 
+-- Extract the metric value(s) from message.
+-- The value can be either a simple value or a table for mulitvalue metric.
+-- Returns true plus the value or if it fails, returns false plus the error message.
+function metric_value()
+    if read_message('Fields[value_fields]') then
+        value = {}
+        local i = 0
+        local val
+        while true do
+            local f = read_message("Fields[value_fields]", 0, i)
+            if not f then
+                break
+            end
+            val = read_message(string.format('Fields[%s]', f))
+            if val ~= nil then
+                value[f] = val
+                i = i + 1
+            end
+        end
+        if i == 0 then
+           return false, 'Fields[value_fields] does not list any valid field'
+        end
+    else
+        value = read_message("Fields[value]")
+        if not value then
+            return false, 'Fields[value] is missing'
+        end
+    end
+
+    return true, value
+end
+
 return M
