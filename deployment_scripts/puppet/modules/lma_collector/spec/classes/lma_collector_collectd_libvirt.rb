@@ -21,5 +21,7 @@ describe 'lma_collector::collectd::libvirt' do
 
     describe 'with defaults' do
         it { is_expected.to contain_class('collectd::plugin::libvirt') }
+        it { is_expected.to contain_lma_collector__collectd__python('collectd_libvirt_check') \
+             .with_config({'Uri' => '"qemu:///system"'}) }
     end
 end

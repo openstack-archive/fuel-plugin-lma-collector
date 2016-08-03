@@ -383,6 +383,11 @@ lma_collector:
         group_by: member
         members:
           - check
+      libvirt:
+        policy: majority_of_members
+        group_by: member
+        members:
+          - check
 
   gse_cluster_node:
     input_message_types:
@@ -518,6 +523,7 @@ lma_collector:
           - nova-novncproxy-websocket
           - controller
           - compute
+          - libvirt
         hints:
           - cinder
           - glance
