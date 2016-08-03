@@ -37,4 +37,10 @@ class lma_collector::collectd::libvirt (
     hostname_format  => 'uuid',
     refresh_interval => $refresh_interval,
   }
+
+  lma_collector::collectd::python { 'collectd_libvirt_check':
+    config => {
+      'Uri' => "\"${connection}\"",
+    },
+  }
 }
