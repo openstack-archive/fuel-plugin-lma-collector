@@ -32,6 +32,13 @@ if hiera('lma::collector::influxdb::server', false) {
   }
 
   class { 'lma_collector::collectd::libvirt': }
+
+  # Due to limitation of Python collectd plugin implementation, the
+  # libvirt_check is configured by ceph_osd manifests if it is a ceph-osd node.
+  $node_profiles = hiera_hash('lma::collector::node_profiles')
+  if ! $node_profiles['ceph_osd'] {
+    class { 'lma_collector::collectd::libvirt_check': }
+  }
 }
 
 if $ceilometer['enabled'] {

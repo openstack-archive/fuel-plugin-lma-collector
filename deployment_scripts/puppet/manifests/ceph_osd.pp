@@ -30,4 +30,10 @@ if hiera('lma::collector::influxdb::server', false) {
   }else{
     notice('ceph_osd_perf not configured to avoid messing of collectd python plugin configuration!')
   }
+
+  # Due to limitation of Python collectd plugin implementation, the
+  # libvirt_check is configured here instead of compute.pp manifest.
+  if $node_profiles['compute'] {
+    class { 'lma_collector::collectd::libvirt_check': }
+  }
 }

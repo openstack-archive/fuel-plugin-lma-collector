@@ -11,3 +11,4 @@ The value is ``1`` when successful and ``0`` if it fails.
 * ``ceph_osd_check``, for Ceph OSD.
 * ``elasticsearch_check``, for Elasticsearch.
 * ``influxdb_check``, for InfluxDB.
+* ``libvirt_check``, for Libvirt.

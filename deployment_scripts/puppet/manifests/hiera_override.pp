@@ -21,6 +21,8 @@ if ($plugin_data) {
   $network_metadata = hiera_hash('network_metadata')
   $is_controller_node = roles_include(['controller', 'primary-controller'])
   $is_base_os_node = roles_include('base-os')
+  $is_compute = roles_include('compute')
+  $is_ceph_osd = roles_include('ceph-osd')
   $has_controller = count(get_nodes_hash_by_roles($network_metadata, ['primary-controller'])) > 0
   # The detached RabbitMQ plugin has no primary role in 8.0
   $has_detached_rabbitmq = count(get_nodes_hash_by_roles($network_metadata, ['primary-standalone-rabbitmq', 'standalone-rabbitmq'])) > 0
@@ -169,6 +171,8 @@ lma::collector::node_profiles:
   rabbitmq: <%= @is_rabbitmq_node %>
   mysql: <%= @is_mysql_node %>
   base_os: <%= @is_base_os_node %>
+  compute: <%= @is_compute %>
+  ceph_osd: <%= @is_ceph_osd %>
 
 lma::collector::monitor::mysql_db: <%= @mysql_db %>
 lma::collector::monitor::mysql_username: <%= @mysql_username %>
