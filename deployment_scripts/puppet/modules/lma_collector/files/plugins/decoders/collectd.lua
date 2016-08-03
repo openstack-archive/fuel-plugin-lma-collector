@@ -336,27 +336,32 @@ function process_message ()
                 -- 'users' is a reserved name for InfluxDB v0.9
                 msg['Fields']['name'] = 'logged_users'
             elseif metric_source ==  'libvirt' then
-                -- collectd sends the instance's ID in the 'host' field
-                msg['Fields']['instance_id'] = sample['host']
-                msg['Fields']['tag_fields'] = { 'instance_id' }
-                msg['Fields']['hostname'] = hostname
-                msg['Hostname'] = hostname
-                if string.match(sample['type'], '^disk_') then
-                    msg['Fields']['name'] = 'virt' .. sep .. sample['type'] .. sep .. sample['dsnames'][i]
-                    msg['Fields']['device'] = sample['type_instance']
-                    msg['Fields']['tag_fields'][2] = 'device'
-                elseif string.match(sample['type'], '^if_') then
-                    msg['Fields']['name'] = 'virt' .. sep .. sample['type'] .. sep .. sample['dsnames'][i]
-                    msg['Fields']['interface'] = sample['type_instance']
-                    msg['Fields']['tag_fields'][2] = 'interface'
-                elseif sample['type'] == 'virt_cpu_total' then
-                    msg['Fields']['name'] = 'virt_cpu_time'
-                elseif sample['type'] == 'virt_vcpu' then
-                    msg['Fields']['name'] = 'virt_vcpu_time'
-                    msg['Fields']['vcpu_number'] = sample['type_instance']
-                    msg['Fields']['tag_fields'][2] = 'vcpu_number'
+                if sample['meta'] and sample['meta']['check_result'] then
+                    msg['Fields']['name'] = metric_source .. sep .. 'check'
+                    msg['Fields']['details'] = sample['meta']['failure']
                 else
-                    msg['Fields']['name'] = 'virt' .. sep .. metric_name
+                    -- collectd sends the instance's ID in the 'host' field
+                    msg['Fields']['instance_id'] = sample['host']
+                    msg['Fields']['tag_fields'] = { 'instance_id' }
+                    msg['Fields']['hostname'] = hostname
+                    msg['Hostname'] = hostname
+                    if string.match(sample['type'], '^disk_') then
+                        msg['Fields']['name'] = 'virt' .. sep .. sample['type'] .. sep .. sample['dsnames'][i]
+                        msg['Fields']['device'] = sample['type_instance']
+                        msg['Fields']['tag_fields'][2] = 'device'
+                    elseif string.match(sample['type'], '^if_') then
+                        msg['Fields']['name'] = 'virt' .. sep .. sample['type'] .. sep .. sample['dsnames'][i]
+                        msg['Fields']['interface'] = sample['type_instance']
+                        msg['Fields']['tag_fields'][2] = 'interface'
+                    elseif sample['type'] == 'virt_cpu_total' then
+                        msg['Fields']['name'] = 'virt_cpu_time'
+                    elseif sample['type'] == 'virt_vcpu' then
+                        msg['Fields']['name'] = 'virt_vcpu_time'
+                        msg['Fields']['vcpu_number'] = sample['type_instance']
+                        msg['Fields']['tag_fields'][2] = 'vcpu_number'
+                    else
+                        msg['Fields']['name'] = 'virt' .. sep .. metric_name
+                    end
                 end
             elseif metric_source == 'elasticsearch_cluster' or metric_source == 'influxdb' then
                 if sample['meta'] and sample['meta']['check_result'] then

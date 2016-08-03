@@ -10,3 +10,4 @@ The value is ``1`` when successful and ``0`` if it fails.
 * ``ceph_check``, for Ceph.
 * ``elasticsearch_cluster_check``, for Elasticsearch.
 * ``influxdb_check``, for Elasticsearch.
+* ``libvirt_check``, for Libvirt.

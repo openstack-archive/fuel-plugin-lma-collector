@@ -32,6 +32,7 @@ if hiera('lma::collector::influxdb::server', false) {
   }
 
   class { 'lma_collector::collectd::libvirt': }
+  class { 'lma_collector::collectd::libvirt_check': }
 }
 
 if $ceilometer['enabled'] {
