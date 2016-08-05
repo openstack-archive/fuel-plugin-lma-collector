@@ -80,7 +80,11 @@ function process_message ()
             -- Normalize metric name, unfortunately collectd plugins aren't
             -- always consistent on metric namespaces so we need a few if/else
             -- statements to cover all cases.
-            if metric_source == 'df' then
+
+            if sample['meta'] and sample['meta']['service_check'] then
+                msg['Fields']['name'] = sample['meta']['service_check'] .. sep .. 'check'
+                msg['Fields']['details'] = sample['meta']['failure']
+            elseif metric_source == 'df' then
                 local entity
                 if sample['type'] == 'df_inodes' then
                     entity = 'inodes'

@@ -25,6 +25,10 @@ import traceback
 INTERVAL = 10
 
 
+class CheckException(Exception):
+    pass
+
+
 # A decorator that will call the decorated function only when the plugin has
 # detected that it is currently active.
 def read_callback_wrapper(f):
@@ -45,7 +49,7 @@ class Base(object):
 
     MAX_IDENTIFIER_LENGTH = 63
 
-    def __init__(self, collectd):
+    def __init__(self, collectd, service_name=None):
         self.debug = False
         self.timeout = 5
         self.max_retries = 3
@@ -56,6 +60,8 @@ class Base(object):
         # attributes controlling whether the plugin is in collect mode or not
         self.depends_on_resource = None
         self.do_collect_data = True
+
+        self.service_name = service_name
 
     def config_callback(self, conf):
         for node in conf.children:
@@ -77,10 +83,27 @@ class Base(object):
         try:
             for metric in self.itermetrics():
                 self.dispatch_metric(metric)
+        except CheckException as e:
+            msg = '{}: {}'.format(self.plugin, e)
+            self.logger.warning(msg)
+            self.dispatch_check_metric(self.FAIL, msg)
         except Exception as e:
-            self.logger.error('%s: Failed to get metrics: %s: %s' %
-                              (self.plugin, e, traceback.format_exc()))
-            return
+            msg = '{}: Failed to get metrics: {}'.format(self.plugin, e)
+            self.logger.error('{}: {}'.format(msg, traceback.format_exc()))
+            self.dispatch_check_metric(self.FAIL, msg)
+        else:
+            self.dispatch_check_metric(self.OK)
+
+    def dispatch_check_metric(self, check, failure=None):
+        metric = {
+            'meta': {'service_check': self.service_name or self.plugin},
+            'values': check,
+        }
+
+        if failure is not None:
+            metric['meta']['failure'] = failure
+
+        self.dispatch_metric(metric)
 
     def itermetrics(self):
         """Iterate over the collected metrics
