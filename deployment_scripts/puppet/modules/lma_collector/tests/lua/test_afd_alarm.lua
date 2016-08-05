@@ -240,6 +240,24 @@ local alarms = {
         },
         severity = 'warning',
     },
+    { -- 11
+        name = 'heartbeat',
+        description = 'No metric!',
+        enabled = true,
+        trigger = {
+            rules = {
+                {
+                    metric = 'foo_heartbeat',
+                    window = 60,
+                    periods = 1,
+                    ['function'] = 'last',
+                    relational_operator = '==',
+                    threshold = 0,
+                },
+            },
+        },
+        severity = 'down',
+    },
 }
 
 TestLMAAlarm = {}
@@ -704,6 +722,29 @@ function TestLMAAlarm:test_rule_with_multiple_fields()
     assertEquals(#result, 2)
     assert(result[1].alert.message ~= nil)
     assert(result[2].alert.message ~= nil)
+end
+
+function TestLMAAlarm:test_last_fct()
+    lma_alarm.load_alarm(alarms[11])
+    lma_alarm.set_start_time(current_time)
+
+    lma_alarm.add_value(next_time(), 'foo_heartbeat', 1)
+    lma_alarm.add_value(next_time(), 'foo_heartbeat', 1)
+    lma_alarm.add_value(next_time(), 'foo_heartbeat', 0)
+    lma_alarm.add_value(next_time(), 'foo_heartbeat', 1)
+    lma_alarm.add_value(next_time(), 'foo_heartbeat', 0)
+    local state, result = lma_alarm.evaluate(next_time())
+    assertEquals(state, consts.DOWN)
+    next_time(61)
+    local state, result = lma_alarm.evaluate(next_time())
+    assertEquals(state, consts.UNKW)
+    lma_alarm.add_value(next_time(), 'foo_heartbeat', 0)
+    local state, result = lma_alarm.evaluate(next_time())
+    assertEquals(state, consts.DOWN)
+    lma_alarm.add_value(next_time(), 'foo_heartbeat', 1)
+    local state, result = lma_alarm.evaluate(next_time())
+    assertEquals(state, consts.OKAY)
+
 end
 
 lu = LuaUnit
