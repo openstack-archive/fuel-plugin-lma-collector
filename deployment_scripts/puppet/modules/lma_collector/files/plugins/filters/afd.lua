@@ -50,8 +50,32 @@ A.load_alarms(all_alarms)
 function process_message()
 
     local metric_name = read_message('Fields[name]')
-    local value = read_message('Fields[value]')
     local ts = read_message('Timestamp')
+
+    if read_message('Fields[value_fields]') then
+        value = {}
+        local i = 0
+        local val
+        while true do
+            local f = read_message("Fields[value_fields]", 0, i)
+            if not f then
+                break
+            end
+            val = read_message(string.format('Fields[%s]', f))
+            if val ~= nil then
+                value[f] = val
+                i = i + 1
+            end
+        end
+        if i == 0 then
+           return -1, 'Fields[value_fields] does not list any valid field'
+        end
+    else
+        value = read_message("Fields[value]")
+        if not value then
+            return -1, 'Fields[value] is missing'
+        end
+    end
 
     -- retrieve field values
     local fields = {}
