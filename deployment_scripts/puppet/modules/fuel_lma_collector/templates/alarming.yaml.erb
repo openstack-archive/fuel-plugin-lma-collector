@@ -239,6 +239,50 @@ lma_collector:
             window: 120
             periods: 0
             function: avg
+    - name: 'rabbitmq-pacemaker-down'
+      description: 'The RabbitMQ cluster is down because less than half of the nodes are up'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'and'
+        rules:
+          - metric: pacemaker_resource_percent
+            fields:
+              resource: rabbitmq
+              status: online
+            relational_operator: '<'
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+          - metric: pacemaker_dc
+            relational_operator: '=='
+            threshold: 1
+            window: 60
+            periods: 0
+            function: last
+    - name: 'rabbitmq-pacemaker-warning'
+      description: 'The RabbitMQ cluster is degraded because some RabbitMQ nodes are missing'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'and'
+        rules:
+          - metric: pacemaker_resource_percent
+            fields:
+              resource: rabbitmq
+              status: online
+            relational_operator: '<'
+            threshold: 100
+            window: 60
+            periods: 0
+            function: last
+          - metric: pacemaker_dc
+            relational_operator: '=='
+            threshold: 1
+            window: 60
+            periods: 0
+            function: last
     - name: 'apache-warning'
       description: 'There is no Apache idle workers available'
       severity: 'warning'
@@ -903,6 +947,7 @@ lma_collector:
   # Definition of the AFD service filters
   service_cluster_alarms:
     rabbitmq:
+      pacemaker: ['rabbitmq-pacemaker-down', 'rabbitmq-pacemaker-warning']
       queue: ['rabbitmq-queue-warning']
       memory: ['rabbitmq-memory-limit-critical', 'rabbitmq-memory-limit-warning']
       disk: ['rabbitmq-disk-limit-critical', 'rabbitmq-disk-limit-warning']
