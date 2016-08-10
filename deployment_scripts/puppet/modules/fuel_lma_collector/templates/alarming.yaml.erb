@@ -39,6 +39,38 @@ lma_collector:
             window: 120
             periods: 0
             function: avg
+    - name: 'swap-activity-critical'
+      description: 'The SWAP activity is too high'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: swap_free
+            relational_operator: '=='
+            threshold: 0
+            window: 1800
+            periods: 0
+            function: avg
+    - name: 'swap-activity-warning'
+      description: 'High SWAP activity'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: swap_io_in
+            relational_operator: '>'
+            threshold: 1000000
+            window: 1800
+            periods: 0
+            function: avg
+          - metric: swap_io_out
+            relational_operator: '>'
+            threshold: 1000000
+            window: 1800
+            periods: 0
+            function: avg
     - name: 'cpu-critical-compute'
       description: 'The CPU usage is too high (compute node)'
       severity: 'critical'
@@ -870,6 +902,7 @@ lma_collector:
       cpu: ['cpu-critical-controller', 'cpu-warning-controller']
       root-fs: ['root-fs-critical', 'root-fs-warning']
       log-fs: ['log-fs-critical', 'log-fs-warning']
+      swap: ['swap-activity-critical', 'swap-activity-warning']
 <% if @detach_rabbitmq_enabled -%>
     rabbitmq-nodes:
       cpu: ['cpu-critical-rabbitmq', 'cpu-warning-rabbitmq']

@@ -414,6 +414,7 @@ lma_collector:
           - cpu
           - root-fs
           - log-fs
+          - swap
 <% if @detach_rabbitmq_enabled -%>
       rabbitmq-nodes:
         policy: majority_of_members
