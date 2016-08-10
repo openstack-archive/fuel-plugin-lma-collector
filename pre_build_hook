@@ -13,7 +13,7 @@ INIFILE_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppetlabs-inifile
 FIREWALL_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppetlabs-firewall-1.7.0.tar.gz"
 
 download_packages \
-    https://github.com/mozilla-services/heka/releases/download/v${HEKA_VERSION}/heka_${HEKA_VERSION}_amd64.deb \
+    https://github.com/elemoine/heka/releases/download/ratelimit-1/heka_${HEKA_VERSION}_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fonts-dejavu/fonts-dejavu-core_2.34-1ubuntu1_all.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fontconfig/fontconfig-config_2.11.0-0ubuntu4.1_all.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fontconfig/libfontconfig1_2.11.0-0ubuntu4.1_amd64.deb \
