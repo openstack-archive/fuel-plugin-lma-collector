@@ -31,6 +31,8 @@ local processes_map = {
     ps_vm = 'memory_virtual',
 }
 
+local swap_size_mb = <%= $::swapsize_mb %>
+
 -- this is needed for the libvirt metrics because in that case, collectd sends
 -- the instance's ID instead of the hostname in the 'host' attribute
 local hostname = read_config('hostname') or error('hostname must be specified')
@@ -342,6 +344,9 @@ function process_message ()
                 msg['Fields']['name'] = metric_source
                 msg['Fields']['service'] = sample['type_instance']
                 msg['Fields']['tag_fields'] = { 'service' }
+            elseif metric_source == 'swap' and metric_name == 'swap_used' then
+                msg['Fields']['name'] = metric_name
+                msg['Fields']['value'] = value / (swap_size_mb * 1048576)
             else
                 msg['Fields']['name'] = replace_dot_by_sep(metric_name)
             end

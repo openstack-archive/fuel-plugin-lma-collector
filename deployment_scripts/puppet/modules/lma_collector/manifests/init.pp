@@ -71,6 +71,14 @@ class lma_collector (
     require => File[$plugins_dir]
   }
 
+  file { "${plugins_dir}/decoders/collectd.lua":
+    ensure  => present,
+    content => template('lma_collector/collectd.lua.erb'),
+    require => File["${plugins_dir}/decoders"],
+    notify  => [Class['lma_collector::service::metric'],
+                Class['lma_collector::service::log']],
+  }
+
   file { "${plugins_dir}/filters":
     ensure  => directory,
     source  => 'puppet:///modules/lma_collector/plugins/filters',
