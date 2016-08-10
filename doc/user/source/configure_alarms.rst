@@ -311,12 +311,12 @@ file. This file has the following sections:
 
    The rule says that the alarm will evaluate to 'true' if the value of the
    metric ``cpu_idle`` has been in average (function: avg), below or equal
-   (relational_operator: <=) to 5 for the last 5 minutes (window: 120).
+   (relational_operator: <=) to 5 for the last 2 minutes (window: 120).
 
    OR (logical_operator: 'or')
 
    If the value of the metric **cpu_wait** has been in average (function: avg),
-   superior or equal (relational_operator: >=) to 35 for the last 5 minutes
+   superior or equal (relational_operator: >=) to 35 for the last 2 minutes
    (window: 120)
 
    Note that these metrics are expressed in percentage.
@@ -993,3 +993,9 @@ for the changes to take effect::
   # puppet apply --modulepath=/etc/fuel/plugins/lma_collector-<version>/puppet/modules:\
       /etc/puppet/modules \
       /etc/fuel/plugins/lma_collector-<version>/puppet/manifests/configure_afd_filters.pp
+
+and apply Puppet manifest for Nagios **on node with Nagios only**::
+
+  # puppet apply --modulepath=/etc/fuel/plugins/lma_infrastructure_alerting-<version>/puppet/modules:\
+    /etc/puppet/modules \
+    /etc/fuel/plugins/lma_infrastructure_alerting-<version>/puppet/manifests/nagios.pp
