@@ -993,3 +993,11 @@ for the changes to take effect::
   # puppet apply --modulepath=/etc/fuel/plugins/lma_collector-<version>/puppet/modules:\
       /etc/puppet/modules \
       /etc/fuel/plugins/lma_collector-<version>/puppet/manifests/configure_afd_filters.pp
+
+If you have also deployed *lma_infrastructure_alerting" plugin, Nagios must be reconfigured as well
+by running the following commands on all the nodes with the *lma_infrastructure_alerting* role::
+
+  # rm -f /etc/nagios3/conf.d/lma_* && puppet apply \
+       --modulepath=/etc/fuel/plugins/lma_infrastructure_alerting-<version>/puppet/modules:\
+      /etc/puppet/modules \
+      /etc/fuel/plugins/lma_infrastructure_alerting-<version>/puppet/manifests/nagios.pp
