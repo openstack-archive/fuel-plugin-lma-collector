@@ -3,6 +3,15 @@
 Release Notes
 =============
 
+Version 0.8.2
+-------------
+
+* Bug fixes
+
+  * Fixed the issue with Apache that could not handle the passive checks
+    workload for large deployments. See
+    `#1552772 <https://bugs.launchpad.net/lma-toolchain/+bug/1552772>`_.
+
 Version 0.8.1
 -------------
 
