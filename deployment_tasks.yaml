@@ -49,13 +49,26 @@
   reexecute_on:
     - deploy_changes
 
+- id: lma-collectd
+  type: puppet
+  version: 2.0.0
+  requires: [lma-base]
+  required_for: [post_deployment_end]
+  role: '*'
+  parameters:
+    puppet_manifest: puppet/manifests/collectd.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 600
+  reexecute_on:
+    - deploy_changes
+
 # All tasks lma-main-* must be executed before lma-aggregator. So we don't
 # need to add a requirement to post_deployment_end because it is implied
 # by the one to lma-aggregator.
 - id: lma-main-controller
   type: puppet
   version: 2.0.0
-  requires: [lma-base]
+  requires: [lma-base, lma-collectd]
   required_for: [lma-aggregator]
   role: [controller, primary-controller]
   parameters:
@@ -68,7 +81,7 @@
 - id: lma-main-compute
   type: puppet
   version: 2.0.0
-  requires: [lma-base]
+  requires: [lma-base, lma-collectd]
   required_for: [lma-aggregator]
   role: [compute]
   parameters:
@@ -81,7 +94,7 @@
 - id: lma-main-cinder
   type: puppet
   version: 2.0.0
-  requires: [lma-base]
+  requires: [lma-base, lma-collectd]
   required_for: [lma-aggregator]
   role: [cinder]
   parameters:
@@ -91,23 +104,10 @@
   reexecute_on:
     - deploy_changes
 
-- id: lma-main-ceph-osd
-  type: puppet
-  version: 2.0.0
-  requires: [lma-base]
-  required_for: [lma-aggregator]
-  role: [ceph-osd]
-  parameters:
-    puppet_manifest: puppet/manifests/ceph_osd.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 600
-  reexecute_on:
-    - deploy_changes
-
 - id: lma-aggregator
   type: puppet
   version: 2.0.0
-  requires: [lma-base]
+  requires: [lma-base, lma-collectd]
   required_for: [post_deployment_end]
   role: '*'
   parameters:
@@ -137,22 +137,6 @@
   reexecute_on:
     - deploy_changes
 
-- id: lma-backends
-  type: puppet
-  version: 2.0.0
-  requires: [lma-base]
-  required_for: [lma-cleanup-apt-config]
-  role:
-    - primary-elasticsearch_kibana
-    - elasticsearch_kibana
-    - primary-influxdb_grafana
-    - influxdb_grafana
-  parameters:
-    puppet_manifest: puppet/manifests/lma_backends.pp
-    puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 600
-  reexecute_on:
-    - deploy_changes
 
 # This task must be executed at the very end of the deployment.
 - id: lma-cleanup-apt-config
