@@ -14,36 +14,18 @@
 
 notice('fuel-plugin-lma-collector: controller.pp')
 
-prepare_network_config(hiera_hash('network_scheme', {}))
-$messaging_address = get_network_role_property('mgmt/messaging', 'ipaddr')
-$memcache_address  = get_network_role_property('mgmt/memcache', 'ipaddr')
-$network_metadata = hiera_hash('network_metadata')
-
-$node_profiles   = hiera_hash('lma::collector::node_profiles')
-$is_rabbitmq     = $node_profiles['rabbitmq']
-$is_mysql_server = $node_profiles['mysql']
-
 $ceilometer      = hiera_hash('ceilometer', {})
 $lma_collector   = hiera_hash('lma_collector')
 $rabbit          = hiera_hash('rabbit')
-$management_vip  = hiera('management_vip')
 $storage_options = hiera_hash('storage', {})
 $murano          = hiera_hash('murano')
 $sahara          = hiera_hash('sahara')
-$contrail        = hiera('contrail', false)
 
 if $ceilometer['enabled'] {
   $notification_topics = ['notifications', 'lma_notifications']
 }
 else {
   $notification_topics = ['lma_notifications']
-}
-
-if $rabbit['user'] {
-  $rabbitmq_user = $rabbit['user']
-}
-else {
-  $rabbitmq_user = 'nova'
 }
 
 # Make sure the Log and Metric collector services are configured with the
@@ -268,152 +250,9 @@ if hiera('lma::collector::elasticsearch::server', false) or hiera('lma::collecto
 
 # Metrics
 if hiera('lma::collector::influxdb::server', false) {
-
-  $nova           = hiera_hash('nova', {})
-  $neutron        = hiera_hash('quantum_settings', {})
-  $cinder         = hiera_hash('cinder', {})
-  $haproxy_socket = '/var/lib/haproxy/stats'
-
-  if $storage_options['volumes_ceph'] or $storage_options['images_ceph'] or
-      $storage_options['objects_ceph'] or $storage_options['ephemeral_ceph']{
-    $ceph_enabled = true
-  } else {
-    $ceph_enabled = false
-  }
-
   class { 'lma_collector::logs::counter':
     hostname => $::hostname,
   }
-
-  class { 'lma_collector::collectd::base':
-    processes    => ['hekad', 'collectd'],
-    # collectd plugins on controller do many network I/O operations, so
-    # it is recommended to increase this value
-    read_threads => 10,
-  }
-
-  # All collectd Python plugins must be configured in the same manifest.
-  # This limitation is imposed by the upstream collectd Puppet module.
-  # That's why we declare the RabbitMQ plugin if it is running on the
-  # controller.
-  if $is_rabbitmq {
-    class { 'lma_collector::collectd::rabbitmq':
-      username => 'nova',
-      password => $rabbit['password'],
-      require  => Class['lma_collector::collectd::base'],
-    }
-  }
-
-  $pacemaker_master_resource = 'vip__management'
-  # Deal with detach-* plugins
-  if $is_mysql_server {
-    $mysql_resource = {
-      'p_mysqld' => 'mysqld',
-    }
-  }
-  else {
-    $mysql_resource = {}
-  }
-  if $is_rabbitmq {
-    $rabbitmq_resource = {
-      'p_rabbitmq-server' => 'rabbitmq',
-    }
-  }
-  else {
-    $rabbitmq_resource = {}
-  }
-
-
-  class { 'lma_collector::collectd::pacemaker':
-    resources       => merge({
-      'vip__public'      => 'vip__public',
-      'vip__management'  => 'vip__management',
-      'vip__vrouter_pub' => 'vip__vrouter_pub',
-      'vip__vrouter'     => 'vip__vrouter',
-      'p_haproxy'        => 'haproxy',
-    }, $mysql_resource, $rabbitmq_resource),
-    notify_resource => $pacemaker_master_resource,
-    hostname        => $::fqdn,
-  }
-
-  $openstack_service_config = {
-    user                      => 'nova',
-    password                  => $nova['user_password'],
-    tenant                    => 'services',
-    keystone_url              => "http://${management_vip}:5000/v2.0",
-    pacemaker_master_resource => $pacemaker_master_resource,
-  }
-  $openstack_services = {
-    'nova'     => $openstack_service_config,
-    'cinder'   => $openstack_service_config,
-    'glance'   => $openstack_service_config,
-    'keystone' => $openstack_service_config,
-    'neutron'  => $openstack_service_config,
-  }
-  create_resources(lma_collector::collectd::openstack, $openstack_services)
-
-  # FIXME(elemoine) use the special attribute * when Fuel uses a Puppet version
-  # that supports it.
-  class { 'lma_collector::collectd::openstack_checks':
-    user                      => $openstack_service_config[user],
-    password                  => $openstack_service_config[password],
-    tenant                    => $openstack_service_config[tenant],
-    keystone_url              => $openstack_service_config[keystone_url],
-    pacemaker_master_resource => $openstack_service_config[pacemaker_master_resource],
-  }
-
-  # FIXME(elemoine) use the special attribute * when Fuel uses a Puppet version
-  # that supports it.
-  class { 'lma_collector::collectd::hypervisor':
-    user                      => $openstack_service_config[user],
-    password                  => $openstack_service_config[password],
-    tenant                    => $openstack_service_config[tenant],
-    keystone_url              => $openstack_service_config[keystone_url],
-    pacemaker_master_resource => $openstack_service_config[pacemaker_master_resource],
-    # Fuel sets cpu_allocation_ratio to 8.0 in nova.conf
-    cpu_allocation_ratio      => 8.0,
-  }
-
-  class { 'lma_collector::collectd::haproxy':
-    socket       => $haproxy_socket,
-    # Ignore internal stats ('Stats' for 6.1, 'stats' for 7.0), lma proxies and
-    # Nova EC2
-    proxy_ignore => ['Stats', 'stats', 'lma', 'nova-api-1'],
-    proxy_names  => {
-      'ceilometer'          => 'ceilometer-api',
-      'cinder-api'          => 'cinder-api',
-      'glance-api'          => 'glance-api',
-      'glance-registry'     => 'glance-registry-api',
-      'heat-api'            => 'heat-api',
-      'heat-api-cfn'        => 'heat-cfn-api',
-      'heat-api-cloudwatch' => 'heat-cloudwatch-api',
-      'horizon'             => 'horizon-web',
-      'horizon-ssl'         => 'horizon-https',
-      'keystone-1'          => 'keystone-public-api',
-      'keystone-2'          => 'keystone-admin-api',
-      'murano'              => 'murano-api',
-      'mysqld'              => 'mysqld-tcp',
-      'neutron'             => 'neutron-api',
-      # starting with Mitaka (and later)
-      'nova-api'            => 'nova-api',
-      # before Mitaka
-      'nova-api-2'          => 'nova-api',
-      'nova-novncproxy'     => 'nova-novncproxy-websocket',
-      'nova-metadata-api'   => 'nova-metadata-api',
-      'sahara'              => 'sahara-api',
-      'swift'               => 'swift-api',
-    },
-  }
-
-  if $ceph_enabled {
-    class { 'lma_collector::collectd::ceph_mon': }
-  }
-
-  class { 'lma_collector::collectd::memcached':
-    host => $memcache_address,
-  }
-
-  class { 'lma_collector::collectd::apache': }
 
   # TODO(all): This class is still called to ensure the sandbox deletion
   # when upgrading the plugin. Can be removed for next release after 0.10.0.
@@ -421,34 +260,9 @@ if hiera('lma::collector::influxdb::server', false) {
 
   class { 'lma_collector::logs::aggregated_http_metrics': }
 
-  # Enable the Apache status module
-  class { 'fuel_lma_collector::mod_status': }
-
   # AFD filters
   class { 'lma_collector::afd::api': }
   class { 'lma_collector::afd::workers': }
-
-  # VIP checks
-  if hiera('lma::collector::influxdb::server', false) {
-    $influxdb_server = hiera('lma::collector::influxdb::server')
-    $influxdb_port = hiera('lma::collector::influxdb::port')
-    $influxdb_url = "http://${influxdb_server}:${influxdb_port}/ping"
-  }
-
-  $vip_urls = {
-    'influxdb' => $influxdb_url,
-  }
-  $expected_codes = {
-    'influxdb' => 204,
-  }
-
-  class { 'lma_collector::collectd::http_check':
-    urls                      => delete_undef_values($vip_urls),
-    expected_codes            => $expected_codes,
-    timeout                   => 1,
-    max_retries               => 3,
-    pacemaker_master_resource => $pacemaker_master_resource,
-  }
 }
 
 $alerting_mode = $lma_collector['alerting_mode']
