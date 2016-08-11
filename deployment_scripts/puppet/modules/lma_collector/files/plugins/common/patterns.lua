@@ -141,4 +141,7 @@ ip_address = anywhere(l.Ct(
 -- Pattern used to match the beginning of a Python Traceback.
 traceback = l.P'Traceback (most recent call last):'
 
+-- Pattern used to match a number
+Number = l.P"-"^-1 * l.xdigit^1 * (l.S(".,") * l.xdigit^1 )^-1 / tonumber
+
 return M
