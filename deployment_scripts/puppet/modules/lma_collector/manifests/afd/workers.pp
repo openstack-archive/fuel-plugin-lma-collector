@@ -14,6 +14,7 @@
 #
 class lma_collector::afd::workers () {
   include lma_collector::params
+  include lma_collector::service::metric
 
   $lua_modules_dir = $lma_collector::params::lua_modules_dir
 
