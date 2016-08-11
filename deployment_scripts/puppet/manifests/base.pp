@@ -332,55 +332,6 @@ if hiera('lma::collector::elasticsearch::server', false) {
 }
 
 if hiera('lma::collector::influxdb::server', false) {
-  # TODO(all): this class is also applied by other role-specific manifests.
-  # This is sub-optimal and error prone. It needs to be fixed by having all
-  # collectd resources managed by a single manifest.
-  class { 'lma_collector::collectd::base':
-    processes => ['hekad', 'collectd'],
-    # Purge the default configuration shipped with the collectd package
-    purge     => true,
-    require   => Class['lma_collector'],
-  }
-
-  if $is_mysql_server {
-    class { 'lma_collector::collectd::mysql':
-      username => hiera('lma::collector::monitor::mysql_username'),
-      password => hiera('lma::collector::monitor::mysql_password'),
-      require  => Class['lma_collector::collectd::base'],
-    }
-
-    lma_collector::collectd::dbi_mysql_status { 'mysql_status':
-      username => hiera('lma::collector::monitor::mysql_username'),
-      dbname   => hiera('lma::collector::monitor::mysql_db'),
-      password => hiera('lma::collector::monitor::mysql_password'),
-      require  => Class['lma_collector::collectd::base'],
-    }
-  }
-
-  if ($is_rabbitmq or $is_mysql_server) and ! $is_controller {
-    if $is_mysql_server {
-      $mysql_resource = {
-        'p_mysqld' => 'mysqld',
-      }
-    }
-    else {
-      $mysql_resource = {}
-    }
-    if $is_rabbitmq {
-      $rabbitmq_resource = {
-        'p_rabbitmq-server' => 'rabbitmq',
-      }
-    }
-    else {
-      $rabbitmq_resource = {}
-    }
-
-    class { 'lma_collector::collectd::pacemaker':
-      resources => merge($rabbitmq_resource, $mysql_resource),
-      hostname  => $::hostname,
-    }
-  }
-
   class { 'lma_collector::influxdb':
     server     => hiera('lma::collector::influxdb::server'),
     port       => hiera('lma::collector::influxdb::port'),
@@ -404,21 +355,6 @@ if $is_rabbitmq and (hiera('lma::collector::elasticsearch::server', false) or hi
     port     => hiera('amqp_port', '5673'),
     user     => 'nova',
     password => $rabbit['password'],
-  }
-
-  if hiera('lma::collector::influxdb::server', false) {
-    class { 'lma_collector::notifications::metrics': }
-
-    # If the node has the controller role, the collectd Python plugins will be
-    # configured in controller.pp. This limitation is imposed by the upstream
-    # collectd Puppet module.
-    unless $is_controller {
-      class { 'lma_collector::collectd::rabbitmq':
-        username => 'nova',
-        password => $rabbit['password'],
-        require  => Class['lma_collector::collectd::base'],
-      }
-    }
   }
 }
 
