@@ -31,7 +31,7 @@ function get_metric_fields(metric_name)
     for name, alarm in pairs(all_alarms) do
         local mf = alarm:get_metric_fields(metric_name)
         if mf then
-            for _, field in pairs(mf) do
+            for _, field in ipairs(mf) do
                 if not table_utils.item_find(field, fields) then
                     fields[#fields+1] = field
                 end

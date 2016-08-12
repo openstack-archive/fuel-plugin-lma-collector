@@ -29,6 +29,7 @@ local table_utils = require 'table_utils'
 local consts = require 'gse_constants'
 local gse_utils = require 'gse_utils'
 local afd = require 'afd'
+local matching = require 'value_matching'
 
 local MIN_WINDOW = 10
 local MIN_PERIOD = 1
@@ -64,6 +65,17 @@ function Rule.new(rule)
     r.relational_operator = rule.relational_operator
     r.metric = rule.metric
     r.fields = rule.fields or {}
+
+    -- initiate field matching
+    r.field_matching = {}
+    for f, expression in pairs(r.fields) do
+        if expression == '*' then
+            r.field_matching[f] = expression
+        else
+            r.field_matching[f] = matching.new(expression)
+        end
+    end
+
     r.fct = rule['function']
     r.threshold = rule.threshold + 0
     r.value_index = rule.value
@@ -108,14 +120,14 @@ function Rule:fields_accepted(fields)
     end
     local matched_fields = 0
     local no_match_on_fields = true
-    for f, wanted in pairs(self.fields) do
+    for f, expression in pairs(self.field_matching) do
         no_match_on_fields = false
         for k, v in pairs(fields) do
-            if k == f and wanted == '*' then
+            if k == f and expression == '*' then
                 matched_fields = matched_fields + 1
-            elseif k == f and v == wanted then
+            elseif k == f and expression:matches(v) then
                 matched_fields = matched_fields + 1
-            elseif k == f and v ~= wanted then
+            elseif k == f then
                 return false
             end
         end

@@ -815,6 +815,77 @@ function TestLMAAlarm:test_nocrash_missing_value_with_multivalue_metric()
     assertEquals(state, consts.UNKW)
 end
 
+function TestLMAAlarm:test_complex_field_matching_alarm_trigger()
+    local alert = {
+        name = 'keystone-high-http-response-times',
+        description = 'The 90 percentile response time for Keystone is too high',
+        enabled = true,
+        trigger = {
+            rules = {
+                {
+                    metric = 'http_response_times',
+                    window = 30,
+                    periods = 2,
+                    ['function'] = 'max',
+                    threshold = 5,
+                    fields = { http_method = 'POST || GET',
+                               http_status = '2xx || ==3xx'},
+                    relational_operator = '>=',
+                    value = 'upper_90',
+                },
+            },
+        },
+        severity = 'warning',
+    }
+    lma_alarm.load_alarm(alert)
+    lma_alarm.set_start_time(current_time)
+
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 0.4, foo = 1}, {http_method = 'POST', http_status = '2xx'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 0.2, foo = 1}, {http_method = 'POST', http_status = '2xx'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 6, foo = 1}, {http_method = 'POST', http_status = '3xx'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 999, foo = 1}, {http_method = 'POST', http_status = '5xx'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 3, foo = 1}, {http_method = 'GET', http_status = '2xx'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 4, foo = 1}, {http_method = 'POST', http_status = '2xx'})
+    local state, result = lma_alarm.evaluate(next_time()) -- window 60 second
+    assertEquals(state, consts.WARN)
+    assertEquals(result[1].alert.value, 6) -- the max
+end
+
+function TestLMAAlarm:test_complex_field_matching_alarm_ok()
+    local alert = {
+        name = 'keystone-high-http-response-times',
+        description = 'The 90 percentile response time for Keystone is too high',
+        enabled = true,
+        trigger = {
+            rules = {
+                {
+                    metric = 'http_response_times',
+                    window = 30,
+                    periods = 2,
+                    ['function'] = 'avg',
+                    threshold = 5,
+                    fields = { http_method = 'POST || GET',
+                               http_status = '2xx || 3xx'},
+                    relational_operator = '>=',
+                    value = 'upper_90',
+                },
+            },
+        },
+        severity = 'warning',
+    }
+
+    lma_alarm.load_alarm(alert)
+    lma_alarm.set_start_time(current_time)
+
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 0.4, foo = 1}, {http_method = 'POST', http_status = '2xx'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 0.2, foo = 1}, {http_method = 'POST', http_status = '2xx'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 6, foo = 1}, {http_method = 'POST', http_status = '2xx'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 3, foo = 1}, {http_method = 'GET', http_status = '2xx'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 4, foo = 1}, {http_method = 'POST', http_status = '2xx'})
+    local state, result = lma_alarm.evaluate(next_time()) -- window 60 second
+    assertEquals(state, consts.OKAY)
+end
+
 lu = LuaUnit
 lu:setVerbosity( 1 )
 os.exit( lu:run() )
