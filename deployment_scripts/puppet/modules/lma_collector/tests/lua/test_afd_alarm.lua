@@ -12,7 +12,6 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-
 require('luaunit')
 package.path = package.path .. ";files/plugins/common/?.lua;tests/lua/mocks/?.lua"
 local lma_alarm = require('afd_alarms')
@@ -58,34 +57,6 @@ local alarms = {
         severity = 'critical',
     },
     { -- 3
-        name = 'RabbitMQ_Warning',
-        description = 'Number of messages becomes high',
-        enabled = true,
-        trigger = {
-            rules = {
-                {
-                    relational_operator = '>=',
-                    metric = 'rabbitmq_queue_messages',
-                    fields = { queue = '*'},
-                    window = 120,
-                    periods = 0,
-                    ['function'] = 'avg',
-                    threshold = 120,
-                },
-                {
-                    relational_operator = '>=',
-                    metric = 'rabbitmq_queue_messages',
-                    fields = { queue = 'nova'},
-                    window = 60,
-                    periods = 0,
-                    ['function'] = 'max',
-                    threshold = 250,
-                },
-            },
-        },
-        severity = 'warning',
-    },
-    { -- 4
         name = 'CPU_Critical_Controller',
         description = 'CPU is critical for the controller',
         enabled = true,
@@ -112,7 +83,7 @@ local alarms = {
         },
         severity = 'critical',
     },
-    { -- 5
+    { -- 4
         name = 'CPU_Warning_Controller',
         description = 'CPU is warning for controller',
         enabled = true,
@@ -139,7 +110,7 @@ local alarms = {
         },
         severity = 'warning',
     },
-    { -- 6
+    { -- 5
         name = 'CPU_Critical_Controller_AND',
         description = 'CPU is critical for controller',
         enabled = true,
@@ -166,7 +137,7 @@ local alarms = {
         },
         severity = 'critical',
     },
-    { -- 7
+    { -- 6
         name = 'FS_root',
         description = 'FS root',
         enabled = true,
@@ -185,26 +156,7 @@ local alarms = {
         },
         severity = 'critical',
     },
-    { -- 8
-        name = 'FS_all',
-        description = 'FS all',
-        enabled = true,
-        trigger = {
-            rules = {
-                {
-                    metric = 'fs_space_percent_free',
-                    window = 120,
-                    ['function'] = 'avg',
-                    fields = { fs='*'},
-                    relational_operator = '<=',
-                    threshold = 10,
-                },
-            },
-            logical_operator = 'and',
-        },
-        severity = 'warning',
-    },
-    { -- 9
+    { -- 7
         name = 'Backend_errors_5xx',
         description = 'Errors 5xx on backends',
         enabled = true,
@@ -223,7 +175,7 @@ local alarms = {
         },
         severity = 'warning',
     },
-    { -- 10
+    { -- 8
         name = 'nova_logs_errors_rate',
         description = 'Rate of change for nova logs in error is too high',
         enabled = true,
@@ -240,7 +192,7 @@ local alarms = {
         },
         severity = 'warning',
     },
-    { -- 11
+    { -- 9
         name = 'heartbeat',
         description = 'No metric!',
         enabled = true,
@@ -318,7 +270,7 @@ local function next_time(inc)
 end
 
 function TestLMAAlarm:test_start_evaluation()
-    lma_alarm.load_alarm(alarms[4]) -- window=120 period=2
+    lma_alarm.load_alarm(alarms[3]) -- window=120 period=2
     lma_alarm.set_start_time(current_time)
     local alarm = lma_alarm.get_alarm('CPU_Critical_Controller')
     assertEquals(alarm:is_evaluation_time(next_time(10)), false) -- 10 seconds
@@ -337,8 +289,8 @@ end
 
 function TestLMAAlarm:test_lookup_fields_for_metric()
     lma_alarm.load_alarms(alarms)
-    local fields_required = lma_alarm.get_metric_fields('rabbitmq_queue_messages')
-    assertItemsEquals(fields_required, {"queue"})
+    local fields_required = lma_alarm.get_metric_fields('fs_space_percent_free')
+    assertItemsEquals(fields_required, {"fs"})
 end
 
 function TestLMAAlarm:test_lookup_empty_fields_for_metric()
@@ -382,7 +334,8 @@ function TestLMAAlarm:test_no_datapoint()
 end
 
 function TestLMAAlarm:test_rules_logical_op_and_no_alert()
-    lma_alarm.load_alarm(alarms[6])
+    lma_alarm.load_alarms(alarms)
+    local alarm = lma_alarm.get_alarm('CPU_Critical_Controller_AND')
     lma_alarm.set_start_time(current_time)
     local t1 = next_time(60) -- 60s
     local t2 = next_time(60) -- 120s
@@ -397,13 +350,13 @@ function TestLMAAlarm:test_rules_logical_op_and_no_alert()
     lma_alarm.add_value(t2, 'cpu_idle', 10)
     lma_alarm.add_value(t3, 'cpu_idle', 10)
     lma_alarm.add_value(t4, 'cpu_idle', 20)
-    local state, result = lma_alarm.evaluate(t4)
+    local state, result = alarm:evaluate(t4)
     assertEquals(#result, 0)
     assertEquals(state, consts.OKAY)
 end
 
 function TestLMAAlarm:test_rules_logical_missing_datapoint__op_and()
-    lma_alarm.load_alarm(alarms[6])
+    lma_alarm.load_alarm(alarms[5])
     lma_alarm.set_start_time(current_time)
     local t1 = next_time(60)
     local t2 = next_time(60)
@@ -449,7 +402,7 @@ function TestLMAAlarm:test_rules_logical_missing_datapoint__op_and()
 end
 
 function TestLMAAlarm:test_rules_logical_missing_datapoint__op_and_2()
-    lma_alarm.load_alarm(alarms[6])
+    lma_alarm.load_alarm(alarms[5])
     lma_alarm.set_start_time(current_time)
     local t1 = next_time(60)
     local t2 = next_time(60)
@@ -494,7 +447,7 @@ function TestLMAAlarm:test_rules_logical_missing_datapoint__op_and_2()
 end
 
 function TestLMAAlarm:test_rules_logical_op_and_with_alerts()
-    lma_alarm.load_alarm(alarms[6])
+    lma_alarm.load_alarm(alarms[5])
     local cpu_critical_and = lma_alarm.get_alarm('CPU_Critical_Controller_AND')
     lma_alarm.add_value(next_time(1), 'cpu_wait', 30)
     lma_alarm.add_value(next_time(1), 'cpu_wait', 30)
@@ -510,7 +463,7 @@ function TestLMAAlarm:test_rules_logical_op_and_with_alerts()
 end
 
 function TestLMAAlarm:test_rules_logical_op_or_one_alert()
-    lma_alarm.load_alarm(alarms[5])
+    lma_alarm.load_alarms(alarms)
     local cpu_warn_and = lma_alarm.get_alarm('CPU_Warning_Controller')
     lma_alarm.add_value(next_time(), 'cpu_wait', 15)
     lma_alarm.add_value(next_time(), 'cpu_wait', 10)
@@ -525,7 +478,7 @@ function TestLMAAlarm:test_rules_logical_op_or_one_alert()
 end
 
 function TestLMAAlarm:test_rules_logical_op_or_all_alert()
-    lma_alarm.load_alarm(alarms[5])
+    lma_alarm.load_alarm(alarms[4])
     local cpu_warn_and = lma_alarm.get_alarm('CPU_Warning_Controller')
     lma_alarm.add_value(next_time(), 'cpu_wait', 35)
     lma_alarm.add_value(next_time(), 'cpu_wait', 20)
@@ -553,26 +506,37 @@ function TestLMAAlarm:test_min()
     assertEquals(result[1].value, 50)
 end
 
-function TestLMAAlarm:test_max()
-    lma_alarm.load_alarms(alarms)
-    local rabbitmq_warning = lma_alarm.get_alarm('RabbitMQ_Warning')
-    lma_alarm.add_value(next_time(), 'rabbitmq_queue_messages', 0, {queue = 'queue-XX', hostname = 'node-x'})
-    lma_alarm.add_value(next_time(), 'rabbitmq_queue_messages', 260, {queue = 'queue-XX', hostname = 'node-x'})
-    lma_alarm.add_value(next_time(), 'rabbitmq_queue_messages', 200, {queue = 'queue-XX', hostname = 'node-x'})
-    lma_alarm.add_value(next_time(), 'rabbitmq_queue_messages', 152, {queue = 'queue-XX', hostname = 'node-x'})
-    lma_alarm.add_value(next_time(), 'rabbitmq_queue_messages', 152, {queue = 'nova', hostname = 'node-x'})
-    lma_alarm.add_value(next_time(), 'rabbitmq_queue_messages', 532, {queue = 'nova', hostname = 'node-x'})
-    local state_warn, result = rabbitmq_warning:evaluate(current_time)
-    assertEquals(state_warn, consts.WARN)
-    assertEquals(#result, 3)
-    assertEquals(result[1]['function'], 'avg')
-    assertEquals(result[1].value, 153) -- avg() > 120 for queue=queue-XX
-    assertEquals(result[2]['function'], 'avg')
-    assertEquals(result[2].value, 342) -- avg() > 120 for queue=nova
-    assertEquals(result[3]['function'], 'max')
-    assertEquals(result[3].value, 532) -- max() > 250 for queue=nova
-
-end
+ function TestLMAAlarm:test_max()
+    local a = {
+        name = 'foo alert',
+        description = 'foo description',
+        trigger = {
+            rules = {
+                {
+                    metric = 'rabbitmq_queue_messages',
+                    window = 30,
+                    periods = 2,
+                    ['function'] = 'max',
+                    threshold = 200,
+                    relational_operator = '>=',
+                },
+            },
+        },
+        severity = 'warning',
+    }
+     lma_alarm.load_alarm(a)
+     lma_alarm.add_value(next_time(), 'rabbitmq_queue_messages', 0, {queue = 'queue-XX', hostname = 'node-x'})
+     lma_alarm.add_value(next_time(), 'rabbitmq_queue_messages', 260, {queue = 'queue-XX', hostname = 'node-x'})
+     lma_alarm.add_value(next_time(), 'rabbitmq_queue_messages', 200, {queue = 'queue-XX', hostname = 'node-x'})
+     lma_alarm.add_value(next_time(), 'rabbitmq_queue_messages', 152, {queue = 'queue-XX', hostname = 'node-x'})
+     lma_alarm.add_value(next_time(), 'rabbitmq_queue_messages', 152, {queue = 'nova', hostname = 'node-x'})
+     lma_alarm.add_value(next_time(), 'rabbitmq_queue_messages', 532, {queue = 'nova', hostname = 'node-x'})
+     local state_warn, result = lma_alarm.evaluate(current_time)
+     assertEquals(state_warn, consts.WARN)
+     assertEquals(#result, 1)
+     assertEquals(result[1].alert['function'], 'max')
+     assertEquals(result[1].alert.value, 532)
+ end
 
 function TestLMAAlarm:test_diff()
     lma_alarm.load_alarms(alarms)
@@ -661,8 +625,8 @@ function TestLMAAlarm:test_roc()
 end
 
 function TestLMAAlarm:test_alarm_first_match()
-    lma_alarm.load_alarm(alarms[4]) --  cpu critical (window 240s)
-    lma_alarm.load_alarm(alarms[5]) --  cpu warning (window 120s)
+    lma_alarm.load_alarm(alarms[3]) --  cpu critical (window 240s)
+    lma_alarm.load_alarm(alarms[4]) --  cpu warning (window 120s)
     lma_alarm.set_start_time(current_time)
 
     next_time(240) -- both alarms can now be evaluated
@@ -682,15 +646,14 @@ end
 
 function TestLMAAlarm:test_rules_fields()
     lma_alarm.load_alarm(alarms[1]) -- FS_all_no_field
-    lma_alarm.load_alarm(alarms[7]) -- FS_root
-    lma_alarm.load_alarm(alarms[8]) -- FS_all
+    lma_alarm.load_alarm(alarms[6]) -- FS_root
     lma_alarm.set_start_time(current_time)
 
     local t = next_time()
     lma_alarm.add_value(t, 'fs_space_percent_free', 6, {fs = '/'})
     lma_alarm.add_value(t, 'fs_space_percent_free', 6 )
     lma_alarm.add_value(next_time(), 'fs_space_percent_free', 12, {fs = '/'})
-    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 12 )
+    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 17 )
     lma_alarm.add_value(next_time(), 'fs_space_percent_free', 6, {fs = '/'})
     lma_alarm.add_value(next_time(), 'fs_space_percent_free', 6, {fs = 'foo'})
     lma_alarm.add_value(next_time(), 'fs_space_percent_free', 3, {fs = 'foo'})
@@ -702,72 +665,17 @@ function TestLMAAlarm:test_rules_fields()
     assertItemsEquals(result[1].fields, {{name='fs', value='/'}})
     assertEquals(result[1].value, 8)
 
-    local root_fs = lma_alarm.get_alarm('FS_all')
-    local state, result = root_fs:evaluate(t)
-    assertEquals(#result, 2)
-    assertItemsEquals(result[1].fields, {{name='fs', value='/'}})
-    assertItemsEquals(result[2].fields, {{name='fs', value='foo'}})
-    assertEquals(result[2].value, 4.5)
 
     local root_fs = lma_alarm.get_alarm('FS_all_no_field')
     local state, result = root_fs:evaluate(t)
-    assertEquals(#result, 3)
+    assertEquals(#result, 1)
 
     assertItemsEquals(result[1].fields, {{name='fs', value='/'}})
     assertEquals(result[1].value, 8)
-
-    assertItemsEquals(result[2].fields, {})
-    assertEquals(result[2].value, 9)
-
-    assertItemsEquals(result[3].fields, {{name='fs', value='foo'}})
-    assertEquals(result[3].value, 4.5)
-end
-
-function TestLMAAlarm:test_rule_with_multiple_fields()
-    lma_alarm.load_alarm(alarms[8]) -- FS_all
-    lma_alarm.set_start_time(current_time)
-
-    next_time(120)
-    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 2, {fs = '/'})
-    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 2, {fs = '/'})
-    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 2, {fs = '/boot'})
-    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 2, {fs = '/boot'})
-    local state, result = lma_alarm.evaluate(next_time())
-    assertEquals(state, consts.WARN) -- both rule match
-    assertEquals(#result, 2)
-    assertEquals(result[1].alert.fields, {{name='fs', value='/'}})
-    assertEquals(result[2].alert.fields, {{name='fs', value='/boot'}})
-
-    next_time(120)
-    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 2, {fs = '/'})
-    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 2, {fs = '/'})
-    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 50, {fs = '/boot'})
-    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 50, {fs = '/boot'})
-    local state, result = lma_alarm.evaluate(next_time())
-    assertEquals(#result, 1)
-    assertEquals(state, consts.WARN) -- one rule matches
-    assertEquals(result[1].alert.fields, {{name='fs', value='/'}})
-    assert(result[1].alert.message ~= nil)
-
-    next_time(120)
-    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 2, {fs = '/'})
-    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 2, {fs = '/'})
-    local state, result = lma_alarm.evaluate(next_time())
-    assertEquals(state, consts.WARN) -- one rule matches and one have missing datapoint
-    assertEquals(#result, 2)
-    assert(result[1].alert.message ~= nil)
-    assert(result[2].alert.message ~= nil)
-
-    next_time(120)
-    local state, result = lma_alarm.evaluate(next_time())
-    assertEquals(state, consts.UNKW) -- both have missing datapoint
-    assertEquals(#result, 2)
-    assert(result[1].alert.message ~= nil)
-    assert(result[2].alert.message ~= nil)
 end
 
 function TestLMAAlarm:test_last_fct()
-    lma_alarm.load_alarm(alarms[11])
+    lma_alarm.load_alarm(alarms[9])
     lma_alarm.set_start_time(current_time)
 
     lma_alarm.add_value(next_time(), 'foo_heartbeat', 1)
@@ -813,6 +721,77 @@ function TestLMAAlarm:test_nocrash_missing_value_with_multivalue_metric()
     lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 4, foo = 1}, {http_method = 'POST'})
     local state, result = lma_alarm.evaluate(next_time()) -- window 60 second
     assertEquals(state, consts.UNKW)
+end
+
+function TestLMAAlarm:test_complex_field_matching_alarm_trigger()
+    local alert = {
+        name = 'keystone-high-http-response-times',
+        description = 'The 90 percentile response time for Keystone is too high',
+        enabled = true,
+        trigger = {
+            rules = {
+                {
+                    metric = 'http_response_times',
+                    window = 30,
+                    periods = 2,
+                    ['function'] = 'max',
+                    threshold = 5,
+                    fields = { http_method = 'POST || GET',
+                               http_status = '2xx || ==3xx'},
+                    relational_operator = '>=',
+                    value = 'upper_90',
+                },
+            },
+        },
+        severity = 'warning',
+    }
+    lma_alarm.load_alarm(alert)
+    lma_alarm.set_start_time(current_time)
+
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 0.4, foo = 1}, {http_method = 'POST', http_status = '2xx'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 0.2, foo = 1}, {http_method = 'POST', http_status = '2xx'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 6, foo = 1}, {http_method = 'POST', http_status = '3xx'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 999, foo = 1}, {http_method = 'POST', http_status = '5xx'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 3, foo = 1}, {http_method = 'GET', http_status = '2xx'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 4, foo = 1}, {http_method = 'POST', http_status = '2xx'})
+    local state, result = lma_alarm.evaluate(next_time()) -- window 60 second
+    assertEquals(state, consts.WARN)
+    assertEquals(result[1].alert.value, 6) -- the max
+end
+
+function TestLMAAlarm:test_complex_field_matching_alarm_ok()
+    local alert = {
+        name = 'keystone-high-http-response-times',
+        description = 'The 90 percentile response time for Keystone is too high',
+        enabled = true,
+        trigger = {
+            rules = {
+                {
+                    metric = 'http_response_times',
+                    window = 30,
+                    periods = 2,
+                    ['function'] = 'avg',
+                    threshold = 5,
+                    fields = { http_method = 'POST || GET',
+                               http_status = '2xx || 3xx'},
+                    relational_operator = '>=',
+                    value = 'upper_90',
+                },
+            },
+        },
+        severity = 'warning',
+    }
+
+    lma_alarm.load_alarm(alert)
+    lma_alarm.set_start_time(current_time)
+
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 0.4, foo = 1}, {http_method = 'POST', http_status = '2xx'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 0.2, foo = 1}, {http_method = 'POST', http_status = '2xx'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 6, foo = 1}, {http_method = 'POST', http_status = '2xx'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 3, foo = 1}, {http_method = 'GET', http_status = '2xx'})
+    lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 4, foo = 1}, {http_method = 'POST', http_status = '2xx'})
+    local state, result = lma_alarm.evaluate(next_time()) -- window 60 second
+    assertEquals(state, consts.OKAY)
 end
 
 lu = LuaUnit
