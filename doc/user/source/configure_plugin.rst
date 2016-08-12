@@ -64,13 +64,18 @@ Plugin configuration
       Therefore, it is possible to install and deploy the *collector* in an
       environment that is already deployed. After the installation of the
       StackLight Collector Plugin, define the settings of the plugin and
-      run the command shown below from the *Fuel master node* for every
+      run the commands shown below from the *Fuel master node* for every
       node of your deployment starting with *the controller node(s)*:
 
       .. code-block:: console
 
-         [root@nailgun ~]# fuel nodes --env <env_id> --node <node_id> --start \
-           post_deployment_start --tasks hiera
+         [root@nailgun ~]# fuel nodes --env <env_id> --node <node_id> --tasks hiera
+
+      Once the task has completed for the node, run the following command:
+
+      .. code-block:: console
+
+         [root@nailgun ~]# fuel nodes --env <env_id> --node <node_id> --start post_deployment_start
 
 .. _plugin_verification:
 
