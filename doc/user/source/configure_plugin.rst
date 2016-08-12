@@ -69,8 +69,14 @@ Plugin configuration
 
       .. code-block:: console
 
-         [root@nailgun ~]# fuel nodes --env <env_id> --node <node_id> --start \
-           post_deployment_start --tasks hiera
+         [root@nailgun ~]# fuel nodes --env <env_id> --node <node_id> --tasks hiera
+
+      Ensure that the task is in ready state and if it is the case, run the
+      following command:
+
+      .. code-block:: console
+
+         [root@nailgun ~]# fuel nodes --env <env_id> --node <node_id> --start post_deployment_start
 
 .. _plugin_verification:
 
