@@ -844,6 +844,18 @@ lma_collector:
             window: 60
             periods: 0
             function: last
+    - name: 'influxdb-check'
+      description: "Influxdb cannot be checked"
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: influxdb_check
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
     - name: 'libvirt-check'
       description: "Libvirt cannot be checked"
       severity: 'down'
@@ -906,6 +918,7 @@ lma_collector:
 <% end -%>
     elasticsearch-cluster: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
     elasticsearch-service: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
+    influxdb-service: ['primary-influxdb_grafana', 'influxdb_grafana']
     pacemaker-service: ['primary-controller', 'controller']
     haproxy-openstack: ['primary-controller', 'controller']
     libvirt-service: ['compute']
@@ -1000,6 +1013,8 @@ lma_collector:
       health: ['elasticsearch-health-critical', 'elasticsearch-health-warning']
     elasticsearch-service:
       check: ['elasticsearch-check']
+    influxdb-service:
+      check: ['influxdb-check']
     haproxy-openstack:
       check: ['haproxy-check']
     pacemaker-service:
