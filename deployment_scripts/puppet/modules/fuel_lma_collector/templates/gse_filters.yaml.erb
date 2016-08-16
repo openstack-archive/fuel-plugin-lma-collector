@@ -389,6 +389,10 @@ lma_collector:
         group_by: member
         members:
           - endpoint
+      influxdb-service:
+        policy: majority_of_members
+        group_by: hostname
+        members:
           - check
 <% end -%>
       pacemaker-service:
@@ -676,6 +680,7 @@ lma_collector:
         group_by: member
         members:
           - influxdb-cluster
+          - influxdb-service
           - influxdb-nodes
 <% end -%>
       pacemaker:
