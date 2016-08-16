@@ -446,7 +446,7 @@ function TestLMAAlarm:test_rules_logical_missing_datapoint__op_and_2()
     assertEquals(#result, 0)
 end
 
-function TestLMAAlarm:test_rules_logical_op_and_with_alerts()
+function TestLMAAlarm:test_rules_logical_op_and()
     lma_alarm.load_alarm(alarms[5])
     local cpu_critical_and = lma_alarm.get_alarm('CPU_Critical_Controller_AND')
     lma_alarm.add_value(next_time(1), 'cpu_wait', 30)
@@ -459,7 +459,30 @@ function TestLMAAlarm:test_rules_logical_op_and_with_alerts()
     lma_alarm.add_value(next_time(2), 'cpu_idle', 2)
     local state, result = cpu_critical_and:evaluate(current_time)
     assertEquals(state, consts.CRIT)
-    assertEquals(#result, 2) -- avg(cpu_wait)>=30 and avg(cpu_idle)<=15
+    assertEquals(#result, 2) -- both rules match: avg(cpu_wait)>=30 and avg(cpu_idle)<=15
+
+    lma_alarm.add_value(next_time(120), 'cpu_idle', 70)
+    lma_alarm.add_value(next_time(), 'cpu_idle', 70)
+    lma_alarm.add_value(next_time(), 'cpu_idle', 70)
+    lma_alarm.add_value(next_time(), 'cpu_wait', 40)
+    lma_alarm.add_value(next_time(), 'cpu_wait', 38)
+    local state, result = cpu_critical_and:evaluate(current_time)
+    assertEquals(state, consts.OKAY)
+    assertEquals(#result, 0) -- avg(cpu_wait)>=30 matches but not avg(cpu_idle)<=15
+
+    lma_alarm.add_value(next_time(200), 'cpu_idle', 70)
+    lma_alarm.add_value(next_time(), 'cpu_idle', 70)
+    local state, result = cpu_critical_and:evaluate(current_time)
+    assertEquals(state, consts.UNKW)
+    assertEquals(#result, 1) -- no data for avg(cpu_wait)>=30 and avg(cpu_idle)<=3 doesn't match
+
+    lma_alarm.add_value(next_time(200), 'cpu_idle', 2)
+    lma_alarm.add_value(next_time(), 'cpu_idle', 2)
+    lma_alarm.add_value(next_time(), 'cpu_idle', 2)
+    lma_alarm.add_value(next_time(), 'cpu_idle', 2)
+    local state, result = cpu_critical_and:evaluate(current_time)
+    assertEquals(state, consts.UNKW)
+    assertEquals(#result, 2) -- no data for avg(cpu_wait)>=30 and avg(cpu_idle)<=3 matches
 end
 
 function TestLMAAlarm:test_rules_logical_op_or_one_alert()
