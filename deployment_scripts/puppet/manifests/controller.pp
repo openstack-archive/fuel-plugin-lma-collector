@@ -19,6 +19,9 @@ $messaging_address = get_network_role_property('mgmt/messaging', 'ipaddr')
 $memcache_address  = get_network_role_property('mgmt/memcache', 'ipaddr')
 $network_metadata = hiera_hash('network_metadata')
 
+$node_profiles   = hiera_hash('lma::collector::node_profiles')
+$is_rabbitmq     = $node_profiles['rabbitmq']
+
 $ceilometer      = hiera_hash('ceilometer', {})
 $lma_collector   = hiera_hash('lma_collector')
 $rabbit          = hiera_hash('rabbit')
@@ -27,9 +30,6 @@ $storage_options = hiera_hash('storage', {})
 $murano          = hiera_hash('murano')
 $sahara          = hiera_hash('sahara')
 $contrail        = hiera('contrail', false)
-$detach_rabbitmq = hiera('detach-rabbitmq', {})
-
-$detach_rabbitmq_enabled = $detach_rabbitmq['metadata'] and $detach_rabbitmq['metadata']['enabled']
 
 if $ceilometer['enabled'] {
   $notification_topics = ['notifications', 'lma_notifications']
@@ -295,7 +295,7 @@ if hiera('lma::collector::influxdb::server', false) {
   # This limitation is imposed by the upstream collectd Puppet module.
   # That's why we declare the RabbitMQ plugin if it is running on the
   # controller.
-  unless $detach_rabbitmq_enabled {
+  if $is_rabbitmq {
     class { 'lma_collector::collectd::rabbitmq':
       username => 'nova',
       password => $rabbit['password'],
