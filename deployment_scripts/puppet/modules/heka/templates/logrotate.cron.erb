@@ -21,7 +21,7 @@ fail() {
     else
         MESSAGE=$1
     fi
-    /usr/bin/logger -t logrotate "${MESSAGE}"
+    /usr/bin/logger -t logrotate "<%= @service_name %> ${MESSAGE}"
     unlock
     exit 1
 }
@@ -30,7 +30,7 @@ lock || fail "WARNING <%= @service_name %> logrotate flock failed, exiting"
 
 
 TMP_FILE=$(/bin/mktemp)
-nice ionice -c3 /usr/sbin/logrotate <%= @logrotate_conf %> >& $TMP_FILE
+nice ionice -c3 /usr/sbin/logrotate -s /var/lib/logrotate/<%= @service_name %>.status <%= @logrotate_conf %> >& $TMP_FILE
 EXITVALUE=$?
 
 if [ -f /etc/redhat-release ] || [ -f /etc/centos-release ];
