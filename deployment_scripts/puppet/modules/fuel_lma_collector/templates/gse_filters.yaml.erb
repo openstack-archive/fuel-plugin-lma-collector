@@ -436,6 +436,7 @@ lma_collector:
           - network-tx
           - root-fs
           - log-fs
+          - swap
 <% if @detach_rabbitmq_enabled -%>
       rabbitmq-nodes:
         policy: majority_of_members
@@ -445,6 +446,7 @@ lma_collector:
           - network-rx
           - network-tx
           - root-fs
+          - swap
 <% end -%>
       mysql-nodes:
         policy: majority_of_members
@@ -455,6 +457,7 @@ lma_collector:
           - network-rx
           - network-tx
           - root-fs
+          - swap
 <% end -%>
           - mysql-fs
       compute:
@@ -466,6 +469,7 @@ lma_collector:
           - network-tx
           - root-fs
           - nova-fs
+          - swap
       storage:
         policy: majority_of_members
         group_by: hostname
@@ -474,6 +478,7 @@ lma_collector:
           - network-rx
           - network-tx
           - root-fs
+          - swap
 <% if @monitor_elasticsearch -%>
       elasticsearch-nodes:
         policy: majority_of_members
@@ -484,6 +489,7 @@ lma_collector:
           - cpu
           - network-rx
           - network-tx
+          - swap
 <% end -%>
 <% if @monitor_influxdb -%>
       influxdb-nodes:
@@ -495,6 +501,7 @@ lma_collector:
           - cpu
           - network-rx
           - network-tx
+          - swap
 <% end -%>
 
   gse_cluster_global:
