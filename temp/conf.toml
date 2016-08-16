@@ -1,0 +1,50 @@
+[system_logstreamer]
+type = "LogstreamerInput"
+log_directory = "/home/isvetlov/heka_test/hdd"
+decoder = "system_decoder"
+splitter = "TokenSplitter"
+file_match = '(?P<Service>daemon\.log|cron\.log|haproxy\.log|kern\.log|auth\.log|syslog|messages|debug)'
+differentiator = [ 'system.', 'Service' ]
+
+
+[system_decoder]
+type = "SandboxDecoder"
+filename = "/home/isvetlov/heka_test/hdd/system_decoder.lua"
+module_directory = "/usr/share/heka/lua_modules;/home/isvetlov/heka_test/hdd/common"
+
+[system_decoder.config]
+
+    syslog_pattern = '<%PRI%>%TIMESTAMP% %HOSTNAME% %syslogtag%%msg:::sp-if-no-1st-sp%%msg%\n'
+
+    fallback_syslog_pattern = '%TIMESTAMP% %HOSTNAME% %syslogtag%%msg:::sp-if-no-1st-sp%%msg%\n'
+
+
+[hdd_failing_filter]
+type = "SandboxFilter"
+ticker_interval = 1
+# filename = "/home/isvetlov/heka_test/hdd/filter.lua"
+filename = "/home/isvetlov/heka_test/hdd/bulk_filter.lua"
+message_matcher = "Type == 'log' && Logger == 'system.kern'"
+module_directory = "/usr/share/heka/lua_modules;/home/isvetlov/heka_test/hdd/common"
+preserve_data = true
+profile = false
+
+[hdd_failing_filter.config]
+    interval = '10'
+    hostname = 'node-69'
+    grace_interval = '5'
+    patterns = "/error.+([sv]d[a-z][a-z]?%d?)/ /([sv]d[a-z][a-z]?%d?).+error/"
+
+
+[PayloadEncoder]
+append_newlines = true
+
+
+[counter_file]
+type = "FileOutput"
+message_matcher = "(Type == 'metric' || Type == 'heka.sandbox.metric' || Type == 'heka.sandbox.bulk_metric')"
+path = "/home/isvetlov/heka_test/hdd/counter-output.log"
+perm = "666"
+flush_count = 1
+flush_operator = "OR"
+encoder = "PayloadEncoder"
