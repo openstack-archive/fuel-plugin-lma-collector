@@ -39,6 +39,38 @@ lma_collector:
             window: 120
             periods: 0
             function: avg
+    - name: 'swap-usage-critical'
+      description: 'There is no more swap free space'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: swap_free
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: max
+    - name: 'swap-activity-warning'
+      description: 'The swap activity is high'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: swap_io_in
+            relational_operator: '>='
+            threshold: 250 # ~ 1 Mb/s
+            window: 120
+            periods: 0
+            function: avg
+          - metric: swap_io_out
+            relational_operator: '>='
+            threshold: 250 # ~ 1 Mb/s
+            window: 120
+            periods: 0
+            function: avg
     - name: 'cpu-critical-compute'
       description: 'The CPU usage is too high (compute node)'
       severity: 'critical'
@@ -870,35 +902,43 @@ lma_collector:
       cpu: ['cpu-critical-controller', 'cpu-warning-controller']
       root-fs: ['root-fs-critical', 'root-fs-warning']
       log-fs: ['log-fs-critical', 'log-fs-warning']
+      swap: ['swap-usage-critical', 'swap-activity-warning']
 <% if @detach_rabbitmq_enabled -%>
     rabbitmq-nodes:
       cpu: ['cpu-critical-rabbitmq', 'cpu-warning-rabbitmq']
       root-fs: ['root-fs-critical', 'root-fs-warning']
+      swap: ['swap-usage-critical', 'swap-activity-warning']
 <% end -%>
     mysql-nodes:
 <% if @detach_database_enabled -%>
       cpu: ['cpu-critical-mysql', 'cpu-warning-mysql']
       root-fs: ['root-fs-critical', 'root-fs-warning']
+      swap: ['swap-usage-critical', 'swap-activity-warning']
 <% end -%>
       mysql-fs: ['mysql-fs-critical', 'mysql-fs-warning']
     compute:
       cpu: ['cpu-critical-compute', 'cpu-warning-compute']
       root-fs: ['root-fs-critical', 'root-fs-warning']
       nova-fs: ['nova-fs-critical', 'nova-fs-warning']
+      swap: ['swap-usage-critical', 'swap-activity-warning']
     storage:
       cpu: ['cpu-critical-storage', 'cpu-warning-storage']
       root-fs: ['root-fs-critical', 'root-fs-warning']
+      swap: ['swap-usage-critical', 'swap-activity-warning']
     default:
       cpu: ['cpu-critical-default']
       root-fs: ['root-fs-critical', 'root-fs-warning']
+      swap: ['swap-usage-critical', 'swap-activity-warning']
     elasticsearch-nodes:
       cpu: ['cpu-critical-default']
       root-fs: ['root-fs-critical', 'root-fs-warning']
       data-fs: ['elasticsearch-fs-critical', 'elasticsearch-fs-warning']
+      swap: ['swap-usage-critical', 'swap-activity-warning']
     influxdb-nodes:
       cpu: ['cpu-critical-default']
       root-fs: ['root-fs-critical', 'root-fs-warning']
       data-fs: ['influxdb-fs-critical', 'influxdb-fs-warning']
+      swap: ['swap-usage-critical', 'swap-activity-warning']
 
   # Definition of the AFD service filters
   service_cluster_alarms:
