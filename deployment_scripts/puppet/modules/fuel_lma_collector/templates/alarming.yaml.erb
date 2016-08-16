@@ -844,6 +844,18 @@ lma_collector:
             window: 60
             periods: 0
             function: last
+    - name: 'influxdb-check'
+      description: "Influxdb cannot be checked"
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: influxdb_check
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
     - name: 'libvirt-check'
       description: "Libvirt cannot be checked"
       severity: 'down'
@@ -900,13 +912,16 @@ lma_collector:
     keystone-admin-api: ['primary-controller', 'controller']
     keystone-logs: ['primary-controller', 'controller']
 <% if @storage_options["volumes_ceph"] then -%>
-    ceph-mon: ['primary-controller', 'controller']
-    ceph-osd: ['ceph-osd']
+    ceph-mon-cluster: ['primary-controller', 'controller']
+    ceph-mon-service: ['primary-controller', 'controller']
+    ceph-osd-service: ['ceph-osd']
 <% end -%>
-    elasticsearch: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
-    pacemaker: ['primary-controller', 'controller']
+    elasticsearch-cluster: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
+    elasticsearch-service: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
+    influxdb-service: ['primary-influxdb_grafana', 'influxdb_grafana']
+    pacemaker-service: ['primary-controller', 'controller']
     haproxy-openstack: ['primary-controller', 'controller']
-    libvirt: ['compute']
+    libvirt-service: ['compute']
 
   # Definition of the AFD node filters
   node_cluster_alarms:
@@ -987,18 +1002,22 @@ lma_collector:
       error: ['keystone-logs-error']
     keystone-admin-api:
       http_errors: ['keystone-admin-api-http-errors']
-    ceph-mon:
+    ceph-mon-cluster:
       health: ['ceph-health-critical', 'ceph-health-warning']
       capacity: ['ceph-capacity-critical', 'ceph-capacity-warning']
+    ceph-mon-service:
       check: ['ceph-mon-check']
-    ceph-osd:
+    ceph-osd-service:
       check: ['ceph-osd-check']
-    elasticsearch:
+    elasticsearch-cluster:
       health: ['elasticsearch-health-critical', 'elasticsearch-health-warning']
+    elasticsearch-service:
       check: ['elasticsearch-check']
+    influxdb-service:
+      check: ['influxdb-check']
     haproxy-openstack:
       check: ['haproxy-check']
-    pacemaker:
+    pacemaker-service:
       check: ['pacemaker-check']
-    libvirt:
+    libvirt-service:
       check: ['libvirt-check']
