@@ -128,6 +128,7 @@ end
 -- }
 function Alarm:evaluate(ns)
     local state
+    local matches = 0
     local all_alerts = {}
     local function add_alarm(rule, value, message, fields)
         all_alerts[#all_alerts+1] = {
@@ -145,30 +146,44 @@ function Alarm:evaluate(ns)
     end
     local one_unknown = false
     local msg
+
     for _, rule in ipairs(self.rules) do
         local eval, context_list = rule:evaluate(ns)
         if eval == afd.MATCH then
-            state = self.severity
+            matches = matches + 1
             msg = self.description
         elseif eval == afd.MISSING_DATA then
-           msg = 'No datapoint have been received over the last ' .. rule.observation_window .. ' seconds'
-           one_unknown = true
+            msg = 'No datapoint have been received over the last ' .. rule.observation_window .. ' seconds'
+            one_unknown = true
         elseif eval == afd.NO_DATA then
-           msg = 'No datapoint have been received ever'
-           one_unknown = true
+            msg = 'No datapoint have been received ever'
+            one_unknown = true
         end
-        for _, context in pairs(context_list) do
+        for _, context in ipairs(context_list) do
             add_alarm(rule, context.value, msg,
                       convert_field_list(context.fields))
         end
     end
-    if self.logical_operator == 'and' and one_unknown then
-        state = consts.UNKW
-    elseif not state and one_unknown then
-        state = consts.UNKW
-    elseif not state then
-        state = consts.OKAY
-        all_alerts = {}
+
+    if self.logical_operator == 'and' then
+        local num_of_rules = #self.rules
+        if one_unknown then
+            state = consts.UNKW
+        elseif num_of_rules == matches then
+            state = self.severity
+        else
+            state = consts.OKAY
+            all_alerts = {}
+        end
+    elseif self.logical_operator == 'or' then
+        if matches > 0 then
+            state = self.severity
+        elseif one_unknown then
+            state = consts.UNKW
+        else
+            state = consts.OKAY
+            all_alerts = {}
+        end
     end
     return state, all_alerts
 end
