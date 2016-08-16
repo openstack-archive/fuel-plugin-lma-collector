@@ -3,7 +3,7 @@ set -eux
 
 . "$(dirname "$(readlink -f "$0")")"/functions.sh
 HEKA_VERSION="0.10.0"
-COLLECTD_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppet-collectd-4.1.2.tar.gz"
+COLLECTD_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppet-collectd-4.3.0.tar.gz"
 APACHE_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppetlabs-apache-1.4.0.tar.gz"
 STDLIB_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppetlabs-stdlib-4.7.0.tar.gz"
 CONCAT_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/puppetlabs-concat-1.2.4.tar.gz"
