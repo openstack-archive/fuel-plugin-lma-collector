@@ -354,43 +354,51 @@ lma_collector:
           - endpoint
 <% end -%>
 <% if @storage_options["volumes_ceph"] then -%>
-      ceph-mon:
+      ceph-mon-cluster:
         policy: highest_severity
         group_by: member
         members:
           - health
           - capacity
+      ceph-mon-service:
+        policy: majority_of_members
+        group_by: hostname
+        members:
           - check
-      ceph-osd:
-        policy: highest_severity
-        group_by: member
+      ceph-osd-service:
+        policy: majority_of_members
+        group_by: hostname
         members:
           - check
 <% end -%>
 <% if @monitor_elasticsearch -%>
-      elasticsearch:
+      elasticsearch-cluster:
         policy: highest_severity
         group_by: member
         members:
           - health
+      elasticsearch-service:
+        policy: majority_of_members
+        group_by: hostname
+        members:
           - check
 <% end -%>
 <% if @monitor_influxdb -%>
-      influxdb:
+      influxdb-cluster:
         policy: highest_severity
         group_by: member
         members:
           - endpoint
           - check
 <% end -%>
-      pacemaker:
-        policy: highest_severity
-        group_by: member
+      pacemaker-service:
+        policy: majority_of_members
+        group_by: hostname
         members:
           - check
-      libvirt:
+      libvirt-service:
         policy: majority_of_members
-        group_by: member
+        group_by: hostname
         members:
           - check
 
@@ -528,7 +536,7 @@ lma_collector:
           - nova-novncproxy-websocket
           - controller
           - compute
-          - libvirt
+          - libvirt-service
         hints:
           - cinder
           - glance
@@ -647,8 +655,9 @@ lma_collector:
         policy: highest_severity
         group_by: member
         members:
-          - ceph-mon
-          - ceph-osd
+          - ceph-mon-cluster
+          - ceph-mon-service
+          - ceph-osd-service
           - controller
           - storage
 <% end -%>
@@ -657,7 +666,8 @@ lma_collector:
         policy: highest_severity
         group_by: member
         members:
-          - elasticsearch
+          - elasticsearch-cluster
+          - elasticsearch-service
           - elasticsearch-nodes
 <% end -%>
 <% if @monitor_influxdb -%>
@@ -665,11 +675,11 @@ lma_collector:
         policy: highest_severity
         group_by: member
         members:
-          - influxdb
+          - influxdb-cluster
           - influxdb-nodes
 <% end -%>
       pacemaker:
         policy: highest_severity
         group_by: member
         members:
-          - pacemaker
+          - pacemaker-service
