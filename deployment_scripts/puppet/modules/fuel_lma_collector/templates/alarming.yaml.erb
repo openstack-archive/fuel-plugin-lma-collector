@@ -1001,6 +1001,18 @@ lma_collector:
             window: 60
             periods: 0
             function: avg
+    - name: 'hdd_failing'
+      description: 'The HDD is failing'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: hdd_error
+            relational_operator: '>='
+            threshold: 0
+            window: 30
+            periods: 0
+            function: avg
 
   # Mapping between the Fuel roles and the AFD node filters
   node_cluster_roles:
@@ -1069,6 +1081,7 @@ lma_collector:
       root-fs: ['root-fs-critical', 'root-fs-warning']
       log-fs: ['log-fs-critical', 'log-fs-warning']
       swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+      hdd-errors: ['hdd_failing']
 <% if @detach_rabbitmq_enabled -%>
     rabbitmq-nodes:
       cpu: ['cpu-critical-rabbitmq', 'cpu-warning-rabbitmq']
@@ -1076,6 +1089,7 @@ lma_collector:
       network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
       root-fs: ['root-fs-critical', 'root-fs-warning']
       swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+      hdd-errors: ['hdd_failing']
 <% end -%>
     mysql-nodes:
 <% if @detach_database_enabled -%>
@@ -1084,6 +1098,7 @@ lma_collector:
       network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
       root-fs: ['root-fs-critical', 'root-fs-warning']
       swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+      hdd-errors: ['hdd_failing']
 <% end -%>
       mysql-fs: ['mysql-fs-critical', 'mysql-fs-warning']
     compute:
@@ -1093,18 +1108,21 @@ lma_collector:
       root-fs: ['root-fs-critical', 'root-fs-warning']
       nova-fs: ['nova-fs-critical', 'nova-fs-warning']
       swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+      hdd-errors: ['hdd_failing']
     storage:
       cpu: ['cpu-critical-storage', 'cpu-warning-storage']
       network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
       network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
       root-fs: ['root-fs-critical', 'root-fs-warning']
       swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+      hdd-errors: ['hdd_failing']
     default:
       cpu: ['cpu-critical-default']
       network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
       network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
       root-fs: ['root-fs-critical', 'root-fs-warning']
       swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+      hdd-errors: ['hdd_failing']
     elasticsearch-nodes:
       cpu: ['cpu-critical-default']
       network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
@@ -1112,6 +1130,7 @@ lma_collector:
       root-fs: ['root-fs-critical', 'root-fs-warning']
       data-fs: ['elasticsearch-fs-critical', 'elasticsearch-fs-warning']
       swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+      hdd-errors: ['hdd_failing']
     influxdb-nodes:
       cpu: ['cpu-critical-default']
       network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
@@ -1119,6 +1138,7 @@ lma_collector:
       root-fs: ['root-fs-critical', 'root-fs-warning']
       data-fs: ['influxdb-fs-critical', 'influxdb-fs-warning']
       swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+      hdd-errors: ['hdd_failing']
 
   # Definition of the AFD service filters
   service_cluster_alarms:
