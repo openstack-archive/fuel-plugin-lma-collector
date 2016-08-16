@@ -61,6 +61,8 @@ class CephOSDPerfPlugin(base.CephBase):
                          in args])
 
     def itermetrics(self):
+        check_errors = []
+        checked = 0
         for socket_name in glob.glob(self.socket_glob):
             m = RE_OSD_ID.match(socket_name)
             if not m:
@@ -70,9 +72,10 @@ class CephOSDPerfPlugin(base.CephBase):
             perf_dump = self.execute_to_json('ceph --admin-daemon %s perf dump'
                                              % socket_name)
             if not perf_dump:
-                raise base.CheckException(
-                    "Fail to run 'ceph perf dump' for OSD {}".format(osd_id))
+                check_errors.append(osd_id)
+                continue
 
+            checked += 1
             for prefix, stats in perf_dump.iteritems():
                 if prefix not in self.PREFIXES or not stats:
                     continue
@@ -83,6 +86,17 @@ class CephOSDPerfPlugin(base.CephBase):
                         'type_instance': osd_id,
                         'values': self.convert_to_collectd_value(stats[k])
                     }
+
+        if check_errors:
+            raise base.CheckException(
+                "Fail to run 'ceph perf dump' for OSD(s): {}".format(
+                    ', '.join(check_errors)))
+
+        if checked == 0:
+            raise base.CheckException(
+                'Could not find any OSD socket in {}'.format(self.socket_glob)
+            )
+
 
 plugin = CephOSDPerfPlugin(collectd, 'ceph_osd')
 
