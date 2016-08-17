@@ -8,7 +8,7 @@ fixtures:
       ref: "1.2.4"
     collectd:
       repo: "git://github.com/puppet-community/puppet-collectd"
-      ref: "v4.1.2"
+      ref: "v4.3.0"
     apache:
       repo: "git://github.com/puppetlabs/puppetlabs-apache"
       ref: "1.4.0"
