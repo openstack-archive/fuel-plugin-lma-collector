@@ -166,13 +166,11 @@ lma_collector:
         group_by: hostname
         members:
           - worker
-      memcached:
+      memcached-service:
         policy: majority_of_members
         group_by: hostname
         members:
-          # This AFD heartbeat is emitted by a dedicated sandbox filter
-          # TODO(all): replace by a check metric
-          - heartbeat
+          - check
       rabbitmq:
         policy: highest_severity
         group_by: member
@@ -501,7 +499,7 @@ lma_collector:
         policy: highest_severity
         group_by: member
         members:
-          - memcached
+          - memcached-service
           - controller
       rabbitmq:
         policy: highest_severity
