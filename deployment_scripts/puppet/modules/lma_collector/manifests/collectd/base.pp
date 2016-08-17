@@ -86,7 +86,7 @@ class lma_collector::collectd::base (
     disks => [ "/^${ block_devices }$/" ],
   }
 
-  class { 'collectd::plugin::interface':
+  class { 'collectd::plugin::netlink':
     interfaces => reject(grep(split($::interfaces, ','), '^[a-z0-9]+$'), '^lo$')
   }
 

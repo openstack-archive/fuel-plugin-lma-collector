@@ -114,7 +114,7 @@ function process_message ()
                 msg['Fields']['name'] = 'cpu' .. sep .. sample['type_instance']
                 msg['Fields']['cpu_number'] = sample['plugin_instance']
                 msg['Fields']['tag_fields'] = { 'cpu_number' }
-            elseif metric_source == 'interface' then
+            elseif metric_source == 'netlink' then
                 msg['Fields']['name'] = sample['type'] .. sep .. sample['dsnames'][i]
                 msg['Fields']['interface'] = sample['plugin_instance']
                 msg['Fields']['tag_fields'] = { 'interface' }
