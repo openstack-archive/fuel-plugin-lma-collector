@@ -122,7 +122,8 @@ class lma_collector::collectd::base (
     config_dir       => $lma_collector::params::metric_config_dir,
     filename         => "${lma_collector::params::plugins_dir}/decoders/collectd.lua" ,
     config           => {
-      hostname => $real_hostname
+      hostname  => $real_hostname,
+      swap_size => $::swapsize_mb * 1024 * 1024,
     },
     module_directory => $lua_modules_dir,
     notify           => Class['lma_collector::service::metric'],
