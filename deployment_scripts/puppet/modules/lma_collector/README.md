@@ -453,7 +453,6 @@ Public Classes:
 * [`lma_collector::afd::workers`](#class-lma_collectorafdworkers)
 * [`lma_collector::gse_policies`](#class-lma_collectorgse_policies)
 * [`lma_collector::metrics::heka_monitoring`](#class-lma_collectormetricsheka_monitoring)
-* [`lma_collector::metrics::service_heartbeat`](#class-lma_collectormetricsservice_heartbeat)
 * [`lma_collector::smtp_alert`](#class-lma_collectorsmtp_alert)
 
 Private Classes:
@@ -895,18 +894,6 @@ Declare this class to collect metrics for the Heka services themselves.
 * `log_dashboard_port`: *Optional*. The port the Heka dashboard of
   log collector listens on.
   Valid options: a string. Default: `4352`.
-
-#### Class: `lma_collector::metrics::service_heartbeat`
-
-Declare this class to configure the AFD filter that sends the heartbeat metrics.
-
-##### Parameters
-
-* `services`: *Required*. List of services for which the AFD filter should
-  emit the heartbeat metrics.  Valid options: an array of strings.
-* `timeout`: *Optional*. Number of seconds after which the AFD filter will
-  consider a service to be down if no metric has been received during this
-  period. Valid options: an integer. Default: `30`.
 
 #### Class: `lma_collector::smtp_alert`
 
