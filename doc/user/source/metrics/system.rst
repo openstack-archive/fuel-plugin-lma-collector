@@ -77,10 +77,38 @@ Network
 Metrics have an ``interface`` field that contains the interface name the
 metric applies to. For example, 'eth0', 'eth1', and others.
 
+* ``if_collisions``, the number of collisions per second per interface.
+* ``if_dropped_rx``, the number of dropped packets per second when receiving
+  from the interface.
+* ``if_dropped_tx``, the number of dropped packets per second when transmitting
+  from the interface.
 * ``if_errors_rx``, the number of errors per second detected when receiving
   from the interface.
+* ``if_errors_rx_crc``, the number of frames received with wrong CRC (cyclic
+  redundancy check) per second.
+* ``if_errors_rx_fifo``, the number of received frames dropped per second due to
+  FIFO buffer overflows.
+* ``if_errors_rx_frame``, the number of frames with invalid frame checksum (FCS)
+  per second when receiving from the interface.
+* ``if_errors_rx_length``, the number of received frames with a length that
+  doesn't comply with the Ethernet specification.
+* ``if_errors_rx_missed``, the number of missed packets when receiving from the
+  interface.
+* ``if_errors_rx_over``, the number of frames per second that were dropped
+  due to an hardware port receive buffer overflow when receiving from the
+  interface.
 * ``if_errors_tx``, the number of errors per second detected when transmitting
   from the interface.
+* ``if_errors_tx_aborted``, the number of aborted frames per second when
+  transmitting from the interface
+* ``if_errors_tx_carrier``, the number of times per second the interface has
+  lost its link connection to the switch.
+* ``if_errors_tx_fifo``, the number of transmitted frames per second dropped
+  due to FIFO buffer overflows.
+* ``if_errors_tx_heartbeat``, the number of heartbeat errors per second.
+* ``if_errors_tx_window``, the number of late collisions per second when
+  transmitting from the interface.
+* ``if_multicast``, the number of multicast packets per second per interface.
 * ``if_octets_rx``, the number of octets (bytes) received per second by the
   interface.
 * ``if_octets_tx``, the number of octets (bytes) transmitted per second by the
