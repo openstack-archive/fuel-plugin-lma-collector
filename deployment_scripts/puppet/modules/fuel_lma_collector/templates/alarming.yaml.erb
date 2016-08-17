@@ -812,6 +812,18 @@ lma_collector:
             window: 60
             periods: 0
             function: last
+    - name: 'memcached-check'
+      description: "memcached cannot be checked"
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: memcached_check
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
 
   # Mapping between the Fuel roles and the AFD node filters
   node_cluster_roles:
@@ -863,6 +875,7 @@ lma_collector:
     pacemaker: ['primary-controller', 'controller']
     haproxy-openstack: ['primary-controller', 'controller']
     libvirt: ['compute']
+    memcached-service: ['primary-controller', 'controller']
 
   # Definition of the AFD node filters
   node_cluster_alarms:
@@ -956,3 +969,5 @@ lma_collector:
       check: ['pacemaker-check']
     libvirt:
       check: ['libvirt-check']
+    memcached-service:
+      check: ['memcached-check']
