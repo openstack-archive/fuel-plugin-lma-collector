@@ -300,9 +300,11 @@ if hiera('lma::collector::elasticsearch::server', false) {
   }
 
   class { 'lma_collector::elasticsearch':
-    server  => hiera('lma::collector::elasticsearch::server'),
-    port    => hiera('lma::collector::elasticsearch::rest_port'),
-    require => Class['lma_collector'],
+    server         => hiera('lma::collector::elasticsearch::server'),
+    port           => hiera('lma::collector::elasticsearch::rest_port'),
+    flush_interval => hiera('lma::collector::elasticsearch::flush_interval'),
+    flush_count    => hiera('lma::collector::elasticsearch::flush_count'),
+    require        => Class['lma_collector'],
   }
 
   if $is_mysql_server {

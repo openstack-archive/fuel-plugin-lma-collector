@@ -24,4 +24,18 @@ describe 'lma_collector::elasticsearch' do
         it { is_expected.to contain_heka__output__elasticsearch('elasticsearch') }
         it { is_expected.to contain_heka__encoder__es_json('elasticsearch') }
     end
+
+    describe 'with localhost server and flush_* parameters' do
+        let(:params) {{ :server => 'localhost', :port => 9200,
+                        :flush_interval => 10, :flush_count => 100,
+        }}
+        it {
+            is_expected.to contain_heka__output__elasticsearch('elasticsearch').with(
+                :flush_interval => 10,
+                :flush_count => 100,
+                :server => 'localhost',
+                :port => 9200,
+            )
+        }
+    end
 end

@@ -15,7 +15,10 @@
 class lma_collector::elasticsearch (
   $server,
   $port,
-) inherits lma_collector::params {
+  $flush_interval = 5,
+  $flush_count = 10,
+) {
+  include lma_collector::params
   include lma_collector::service::log
 
   validate_string($server)
@@ -38,6 +41,8 @@ class lma_collector::elasticsearch (
     max_buffer_size   => $lma_collector::params::buffering_max_buffer_size_for_log,
     max_file_size     => $lma_collector::params::buffering_max_file_size_for_log,
     queue_full_action => $lma_collector::params::queue_full_action_for_log,
+    flush_interval    => $flush_interval,
+    flush_count       => $flush_count,
     require           => Heka::Encoder::Es_json['elasticsearch'],
     notify            => Class['lma_collector::service::log'],
   }

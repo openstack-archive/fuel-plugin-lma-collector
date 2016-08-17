@@ -488,6 +488,10 @@ Elasticsearch for indexing.
 
 * `server`: *Required*. Elasticsearch server name. Valid options: a string.
 * `port`: *Required*. Elasticsearch service port. Valid options: an integer.
+* `flush_interval`: *Optional*. Interval at which accumulated messages should
+   be bulk indexed into Elasticsearch, in seconds. Default: `5`.
+* `flush_count`: *Optional*. Number of messages that, if processed, will
+   trigger them to be bulk indexed into Elasticsearch. Default: `10`.
 
 #### Class: `lma_collector::logs::keystone_wsgi`
 

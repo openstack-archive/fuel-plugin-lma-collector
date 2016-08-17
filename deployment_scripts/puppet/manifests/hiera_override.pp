@@ -73,6 +73,16 @@ if ($plugin_data) {
     $es_is_deployed = false
   }
 
+  $es_flush_interval = 5
+  if $is_controller_node or hiera('debug', false) {
+    # Increase the flush count when debug level log is enabled or for
+    # controllers because OpenStack APIs + Pacemaker can generate many log
+    # messages.
+    $es_flush_count = 100
+  } else {
+    $es_flush_count = 10
+  }
+
   # InfluxDB
   $is_influxdb_node = roles_include(['influxdb_grafana', 'primary-influxdb_grafana'])
   $influxdb_listen_address = get_network_role_property('influxdb_vip', 'ipaddr')
@@ -179,6 +189,8 @@ lma::collector::monitor::mysql_password: <%= @mysql_password %>
 <% if @es_is_deployed -%>
 lma::collector::elasticsearch::server: <%= @es_server %>
 lma::collector::elasticsearch::rest_port: 9200
+lma::collector::elasticsearch::flush_interval: <%= @es_flush_interval %>
+lma::collector::elasticsearch::flush_count: <%= @es_flush_count %>
 <% if @is_elasticsearch_node -%>
 lma::collector::elasticsearch::listen_address: <%= @es_listen_address %>
 <% end -%>
