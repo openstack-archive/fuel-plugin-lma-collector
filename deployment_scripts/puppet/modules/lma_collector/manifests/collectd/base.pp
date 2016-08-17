@@ -34,6 +34,17 @@ class lma_collector::collectd::base (
     before  => Class['::collectd'],
   }
 
+  # Netlink library is required by the netlink collectd plugin
+  if $::osfamily == 'RedHat' {
+    $netlink_pkg_name = 'libmnl'
+  } else {
+    $netlink_pkg_name = 'libmnl0'
+  }
+  package { $netlink_pkg_name:
+    ensure => present,
+    before => Class['::collectd'],
+  }
+
   $port = $lma_collector::params::collectd_port
   class { '::collectd':
     purge                  => $purge,
@@ -86,8 +97,8 @@ class lma_collector::collectd::base (
     disks => [ "/^${ block_devices }$/" ],
   }
 
-  class { 'collectd::plugin::interface':
-    interfaces => reject(grep(split($::interfaces, ','), '^[a-z0-9]+$'), '^lo$')
+  class { 'collectd::plugin::netlink':
+    verboseinterfaces => reject(grep(split($::interfaces, ','), '^[a-z0-9]+$'), '^lo$'),
   }
 
   class { 'collectd::plugin::load':
