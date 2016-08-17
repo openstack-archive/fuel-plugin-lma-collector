@@ -16,7 +16,8 @@ require 'spec_helper'
 describe 'lma_collector::collectd::base' do
     let(:facts) do
         {:kernel => 'Linux', :operatingsystem => 'Ubuntu',
-         :osfamily => 'Debian', :concat_basedir => '/foo'}
+         :osfamily => 'Debian', :concat_basedir => '/foo',
+         :swapsize_mb => 1024}
     end
 
     describe 'with defaults' do
@@ -27,7 +28,7 @@ describe 'lma_collector::collectd::base' do
         let(:facts) do
             {:kernel => 'Linux', :operatingsystem => 'Ubuntu',
              :osfamily => 'Debian', :concat_basedir => '/foo',
-             :interfaces => 'br-mgmt,en0,bond0,lo'}
+             :interfaces => 'br-mgmt,en0,bond0,lo', :swapsize_mb => 1024}
         end
 
         it { is_expected.to contain_class('collectd').with_purge(false) }
