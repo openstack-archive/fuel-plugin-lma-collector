@@ -16,7 +16,6 @@
 # Collectd plugin for checking the status of OpenStack API services
 import collectd
 
-import collectd_base as base
 import collectd_openstack as openstack
 
 from urlparse import urlparse
@@ -94,8 +93,7 @@ class APICheckPlugin(openstack.CollectdPlugin):
                 'region': service['region']
             }
 
-    @base.read_callback_wrapper
-    def read_callback(self):
+    def collect(self):
         for item in self.check_api():
             if item['status'] == self.UNKNOWN:
                 # skip if status is UNKNOWN
@@ -112,7 +110,7 @@ class APICheckPlugin(openstack.CollectdPlugin):
             value.dispatch()
 
 
-plugin = APICheckPlugin(collectd)
+plugin = APICheckPlugin(collectd, PLUGIN_NAME)
 
 
 def config_callback(conf):
@@ -124,7 +122,7 @@ def notification_callback(notification):
 
 
 def read_callback():
-    plugin.read_callback()
+    plugin.conditional_read_callback()
 
 collectd.register_config(config_callback)
 collectd.register_notification(notification_callback)
