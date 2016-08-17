@@ -34,6 +34,7 @@ local processes_map = {
 -- this is needed for the libvirt metrics because in that case, collectd sends
 -- the instance's ID instead of the hostname in the 'host' attribute
 local hostname = read_config('hostname') or error('hostname must be specified')
+local swap_size = (read_config('swap_size') or 0) + 0
 
 function replace_dot_by_sep (str)
     return string.gsub(str, '%.', sep)
@@ -352,6 +353,16 @@ function process_message ()
                 msg['Fields']['name'] = metric_source
                 msg['Fields']['service'] = sample['type_instance']
                 msg['Fields']['tag_fields'] = { 'service' }
+            elseif metric_source == 'swap' and metric_name == 'swap_used' and swap_size > 0 then
+                -- swap_used metric in percentage becames available since
+                -- collectd 5.5.0 currently is used 5.4.0 and percentage metric
+                -- is created additionally
+                msg['Fields']['name'] = 'swap_percent_used'
+                msg['Fields']['value'] = value / swap_size
+                utils.inject_tags(msg)
+                utils.safe_inject_message(msg)
+                msg['Fields']['name'] = metric_name
+                msg['Fields']['value'] = value
             else
                 msg['Fields']['name'] = replace_dot_by_sep(metric_name)
             end
