@@ -77,10 +77,6 @@ Network
 Metrics have an ``interface`` field that contains the interface name the
 metric applies to. For example, 'eth0', 'eth1', and others.
 
-* ``if_errors_rx``, the number of errors per second detected when receiving
-  from the interface.
-* ``if_errors_tx``, the number of errors per second detected when transmitting
-  from the interface.
 * ``if_octets_rx``, the number of octets (bytes) received per second by the
   interface.
 * ``if_octets_tx``, the number of octets (bytes) transmitted per second by the
@@ -89,6 +85,33 @@ metric applies to. For example, 'eth0', 'eth1', and others.
   interface.
 * ``if_packets_tx``, the number of packets transmitted per second by the
   interface.
+* ``if_collisions``, the number of collisions per second per interface.
+* ``if_multicast``, the number of multicast packets per second per interface.
+* ``if_dropped_rx``, the number of received packets dropped per second by
+  interface.
+* ``if_dropped_tx``, the number of transmitted packets dropped per second by
+  interface.
+* ``if_errors_rx``, the number of errors per second detected when receiving
+  from the interface.
+* ``if_errors_tx``, the number of errors per second detected when transmitting
+  from the interface.
+* ``if_rx_errors_crc``, the number of received frames with wrong CRC (cyclic
+  redundancy check) per seconds.
+* ``if_rx_errors_fifo``, the number of received frames dropped per second due to FIFO
+  buffer overflow.
+* ``if_rx_errors_frame``, the number of received frames with invalid frame
+  checksum (FCS) per seconds.
+* ``if_rx_errors_length``, the number of received frames ... todo
+* ``if_rx_errors_missed``, the number of received frames ... todo
+* ``if_rx_errors_over``, the number of received frames that were dropped per
+  second due to an hardware port receive buffer overflow.
+* ``if_tx_errors_aborted``, the number of transmitted frames ... todo
+* ``if_tx_errors_carrier``, the number of times the interface has gone from
+  down to up per second.
+* ``if_tx_errors_fifo``, the number of transmitted frames dropped due to FIFO
+  buffer issue.
+* ``if_tx_errors_heartbeat``, todo
+* ``if_tx_errors_window``, todo
 
 Processes
 ^^^^^^^^^
