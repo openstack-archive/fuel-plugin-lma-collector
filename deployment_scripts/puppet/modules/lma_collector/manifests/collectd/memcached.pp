@@ -15,10 +15,21 @@
 
 class lma_collector::collectd::memcached (
   $host,
+  $port = 11211,
 ) {
+
+  validate_integer($port)
 
   class { 'collectd::plugin::memcached':
     host => $host,
+    port => $port,
+  }
+
+  lma_collector::collectd::python { 'collectd_memcached_check':
+    config => {
+      'Host' => "\"${host}\"",
+      'Port' => "\"${port}\"",
+    },
   }
 
 }
