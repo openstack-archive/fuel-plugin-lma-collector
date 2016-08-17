@@ -77,10 +77,6 @@ Network
 Metrics have an ``interface`` field that contains the interface name the
 metric applies to. For example, 'eth0', 'eth1', and others.
 
-* ``if_errors_rx``, the number of errors per second detected when receiving
-  from the interface.
-* ``if_errors_tx``, the number of errors per second detected when transmitting
-  from the interface.
 * ``if_octets_rx``, the number of octets (bytes) received per second by the
   interface.
 * ``if_octets_tx``, the number of octets (bytes) transmitted per second by the
@@ -89,6 +85,27 @@ metric applies to. For example, 'eth0', 'eth1', and others.
   interface.
 * ``if_packets_tx``, the number of packets transmitted per second by the
   interface.
+* ``if_collisions``, the number of collisions per second per interface.
+* ``if_multicast``, the number of multicast packets per second per interface.
+* ``if_dropped_rx``, the number of received packets dropped per second by
+  interface.
+* ``if_dropped_tx``, the number of transmitted packets dropped per second by
+  interface.
+* ``if_errors_rx``, the number of errors per second detected when receiving
+  from the interface.
+* ``if_errors_tx``, the number of errors per second detected when transmitting
+  from the interface.
+* ``if_rx_errors_crc``, todo
+* ``if_rx_errors_fifo``, todo
+* ``if_rx_errors_frame``, todo
+* ``if_rx_errors_length``, todo
+* ``if_rx_errors_missed``, todo
+* ``if_rx_errors_over``, todo
+* ``if_tx_errors_aborted``, todo
+* ``if_tx_errors_carrier``, todo
+* ``if_tx_errors_fifo``, todo
+* ``if_tx_errors_heartbeat``, todo
+* ``if_tx_errors_window``, todo
 
 Processes
 ^^^^^^^^^
