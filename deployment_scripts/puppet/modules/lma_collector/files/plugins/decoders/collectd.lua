@@ -114,8 +114,25 @@ function process_message ()
                 msg['Fields']['name'] = 'cpu' .. sep .. sample['type_instance']
                 msg['Fields']['cpu_number'] = sample['plugin_instance']
                 msg['Fields']['tag_fields'] = { 'cpu_number' }
-            elseif metric_source == 'interface' then
-                msg['Fields']['name'] = sample['type'] .. sep .. sample['dsnames'][i]
+            elseif metric_source == 'netlink' then
+                local netlink_metric
+                if sample['type'] == 'if_rx_errors' then
+                    netlink_metric = 'if_errors_rx'
+                elseif sample['type'] == 'if_tx_errors' then
+                    netlink_metric = 'if_errors_tx'
+                else
+                    netlink_metric = sample['type']
+                end
+                -- Netlink plugin can send one or two values. Use dsnames only when needed.
+                if sample['dsnames'][i] == 'value' then
+                    msg['Fields']['name'] = netlink_metric
+                else
+                    msg['Fields']['name'] = netlink_metric .. sep .. sample['dsnames'][i]
+                end
+                -- and type of errors is set in type_instance
+                if sample['type_instance'] ~= '' then
+                    msg['Fields']['name'] = msg['Fields']['name'] .. sep .. sample['type_instance']
+                end
                 msg['Fields']['interface'] = sample['plugin_instance']
                 msg['Fields']['tag_fields'] = { 'interface' }
             elseif metric_source == 'processes' then
