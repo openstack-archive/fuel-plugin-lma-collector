@@ -106,6 +106,8 @@ Swap
 * ``swap_io_in``, the amount of the memory (in bytes) written per second.
 * ``swap_io_out``, the amount of the memory (in bytes) read per second.
 * ``swap_used``, the amount of used memory (in bytes) that is in the swap.
+* ``swap_percent_used``, the amount of used memory (in percentages) that is in
+  the swap.
 
 Users
 ^^^^^
