@@ -74,6 +74,14 @@ if ($plugin_data) {
     $es_is_deployed = false
   }
 
+  if $is_controller_node or $is_rabbitmq_node or $is_mysql_node {
+    $es_flush_interval = 10
+    $es_flush_count = 100
+  } else {
+    $es_flush_interval = 5
+    $es_flush_count = 10
+  }
+
   # InfluxDB
   $is_influxdb_node = roles_include(['influxdb_grafana', 'primary-influxdb_grafana'])
   $influxdb_mode = $plugin_data['influxdb_mode']
@@ -181,6 +189,8 @@ lma::collector::monitor::mysql_password: <%= @mysql_password %>
 <% if @es_is_deployed -%>
 lma::collector::elasticsearch::server: <%= @es_server %>
 lma::collector::elasticsearch::rest_port: 9200
+lma::collector::elasticsearch::flush_interval: <%= @es_flush_interval %>
+lma::collector::elasticsearch::flush_count: <%= @es_flush_count %>
 <% end -%>
 <% if @influxdb_is_deployed -%>
 lma::collector::influxdb::server: <%= @influxdb_server %>
