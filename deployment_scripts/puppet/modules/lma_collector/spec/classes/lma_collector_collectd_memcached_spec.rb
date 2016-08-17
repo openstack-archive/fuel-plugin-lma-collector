@@ -21,7 +21,14 @@ describe 'lma_collector::collectd::memcached' do
 
     describe 'with host param' do
         let(:params) {{:host => 'example.com' }}
-        it { is_expected.to contain_class('collectd::plugin::memcached') \
-             .with_host('example.com') }
+        it {
+            is_expected.to contain_class('collectd::plugin::memcached') \
+             .with_host('example.com')
+            is_expected.to contain_lma_collector__collectd__python('collectd_memcached_check') \
+             .with_config({
+                "Host" => '"example.com"',
+                "Port" => '"11211"',
+                })
+            }
     end
 end

@@ -657,12 +657,15 @@ to get statistics from RabbitMQ.
 #### Class: `lma_collector::collectd::memcached`
 
 Declare this class to configure collectd to collect Memcached statistics.
-collectd's native `memcached` plugin is used.
+collectd's native `memcached` plugin is used to collect statistics and a
+custom Python plugin is used to check the availability of Memcached server.
 
 ##### Parameters
 
 * `host`: *Required*. The Memcached host. Valid options: a string. See
   https://github.com/voxpupuli/puppet-collectd#class-collectdpluginmemcached.
+* `Port`: *Optional. The Memcached port. Valid option: an integer.
+  Default: `11211`.
 
 #### Class: `lma_collector::collectd::openstack_checks`
 
