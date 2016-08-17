@@ -77,10 +77,6 @@ Network
 Metrics have an ``interface`` field that contains the interface name the
 metric applies to. For example, 'eth0', 'eth1', and others.
 
-* ``if_errors_rx``, the number of errors per second detected when receiving
-  from the interface.
-* ``if_errors_tx``, the number of errors per second detected when transmitting
-  from the interface.
 * ``if_octets_rx``, the number of octets (bytes) received per second by the
   interface.
 * ``if_octets_tx``, the number of octets (bytes) transmitted per second by the
@@ -89,6 +85,38 @@ metric applies to. For example, 'eth0', 'eth1', and others.
   interface.
 * ``if_packets_tx``, the number of packets transmitted per second by the
   interface.
+* ``if_collisions``, the number of collisions per second per interface.
+* ``if_multicast``, the number of multicast packets per second per interface.
+* ``if_dropped_rx``, the number of dropped packets per second when receiving
+  from the interface.
+* ``if_dropped_tx``, the number of dropped packets per second when transmitting
+  from the interface.
+* ``if_errors_rx``, the number of errors per second detected when receiving
+  from the interface.
+* ``if_errors_rx_crc``, the number of frames with wrong CRC (cyclic
+  redundancy check) per seconds when receiving from the interface.
+* ``if_errors_rx_fifo``, the number of frames dropped per second due to FIFO
+  buffer overflow when receiving from the interface.
+* ``if_errors_rx_frame``, the number of frames with invalid frame checksum (FCS)
+  per seconds when receiving from the interface.
+* ``if_errors_rx_length``, the number of frame with a lenght that is less than
+  or exceeded the Ethernet standard when receiving from the interface.
+* ``if_errors_rx_missed``, the number of missed packets when receiving from the
+  interface.
+* ``if_errors_rx_over``, the number of frames that were dropped per
+  second due to an hardware port receive buffer overflow when receiving from the
+  interface.
+* ``if_errors_tx``, the number of errors per second detected when transmitting
+  from the interface.
+* ``if_errors_tx_aborted``, todo
+* ``if_errors_tx_carrier``, the number of times the interface has gone from
+  down to up per second.
+* ``if_errors_tx_fifo``, the number of frames dropped due to FIFO buffer issue
+  per second when transmitting from the interface.
+* ``if_errors_tx_heartbeat``, todo
+* ``if_errors_tx_window``, the number of late collisions (a collision that is
+  detected by a station after it has sent the 512th bit of its frame) when
+  transmitting from the interface.
 
 Processes
 ^^^^^^^^^
