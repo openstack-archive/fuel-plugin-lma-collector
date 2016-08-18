@@ -7,6 +7,14 @@
 Release notes
 -------------
 
+Version 0.10.1
+++++++++++++++
+
+* Bug fixes
+
+  * Update the documentation regarding the post-deployment of StackLight. See
+    `#1611156 <https://bugs.launchpad.net/lma-toolchain/+bug/1611156>`_.
+
 Version 0.10.0
 ++++++++++++++
 
