@@ -476,9 +476,8 @@ function TestLMAAlarm:test_rules_logical_op_and()
     assertEquals(state, consts.UNKW)
     assertEquals(#result, 1) -- no data for avg(cpu_wait)>=30 and avg(cpu_idle)<=3 doesn't match
 
-    lma_alarm.add_value(next_time(200), 'cpu_idle', 2)
-    lma_alarm.add_value(next_time(), 'cpu_idle', 2)
-    lma_alarm.add_value(next_time(), 'cpu_idle', 2)
+    next_time(240) -- spend enough time to invalidate datapoints of cpu_wait
+    lma_alarm.add_value(current_time, 'cpu_idle', 2)
     lma_alarm.add_value(next_time(), 'cpu_idle', 2)
     local state, result = cpu_critical_and:evaluate(current_time)
     assertEquals(state, consts.UNKW)
