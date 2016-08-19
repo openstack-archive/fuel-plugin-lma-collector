@@ -156,6 +156,7 @@ lma_collector:
         group_by: hostname
         members:
           - node-status
+          - check
       haproxy-openstack:
         policy: majority_of_members
         group_by: hostname
