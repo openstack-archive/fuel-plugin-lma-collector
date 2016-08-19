@@ -176,6 +176,54 @@ function TestValueMatching:test_precedence()
     end
 end
 
+function TestValueMatching:test_pattern_matching()
+    local tests = {
+        {'=~ /var/lib/ceph/osd/ceph%-%d+', "/var/lib/ceph/osd/ceph-1", true},
+        {'=~ /var/lib/ceph/osd/ceph%-%d+', "/var/lib/ceph/osd/ceph-42", true},
+        {'=~ ^/var/lib/ceph/osd/ceph%-%d+$', "/var/lib/ceph/osd/ceph-42", true},
+        {'=~ "/var/lib/ceph/osd/ceph%-%d+"', "/var/lib/ceph/osd/ceph-42", true},
+        {'=~ "ceph%-%d+"', "/var/lib/ceph/osd/ceph-42", true},
+        {'=~ "/var/lib/ceph/osd/ceph%-%d+$"', "/var/lib/ceph/osd/ceph-42 ", false}, -- trailing space
+        {'=~ /var/lib/ceph/osd/ceph%-%d+', "/var/log", false},
+        {'=~ /var/lib/ceph/osd/ceph%-%d+ || foo', "/var/lib/ceph/osd/ceph-1", true},
+        {'=~ "foo||bar" || foo', "foo||bar", true},
+        {'=~ "foo||bar" || foo', "foo", true},
+        {'=~ "foo&&bar" || foo', "foo&&bar", true},
+        {'=~ "foo&&bar" || foo', "foo", true},
+        {'=~ bar && /var/lib/ceph/osd/ceph%-%d+', "/var/lib/ceph/osd/ceph-1", false},
+        {'=~ -', "-", true},
+        {'=~ %-', "-", true},
+        {'!~ /var/lib/ceph/osd/ceph', "/var/log", true},
+        {'!~ /var/lib/ceph/osd/ceph%-%d+', "/var/log", true},
+        {'!~ .+osd%-%d+', "/var/log", true},
+        {'!~ osd%-%d+', "/var/log", true},
+        --{'=~ [', "[", true},
+    }
+
+    for _, v in ipairs(tests) do
+        local exp, value, expected = v[1], v[2], v[3]
+        local m = M.new(exp)
+        r = m:matches(value)
+        assertEquals(r, expected)
+    end
+end
+
+function TestValueMatching:test_wrong_patterns_never_match()
+    -- These patterns raise errors like:
+    -- malformed pattern (missing ']')
+    local tests = {
+        {'=~ [', "[", false},
+        {'!~ [', "[", false},
+    }
+
+    for _, v in ipairs(tests) do
+        local exp, value, expected = v[1], v[2], v[3]
+        local m = M.new(exp)
+        r = m:matches(value)
+        assertEquals(r, expected)
+    end
+end
+
 lu = LuaUnit
 lu:setVerbosity( 1 )
 os.exit( lu:run() )

@@ -14,6 +14,8 @@
 
 local l = require "lpeg"
 l.locale(l)
+local pcall = pcall
+local string = require 'string'
 
 local patterns = require 'patterns'
 local error = error
@@ -110,11 +112,11 @@ local function eval_tree(tree, value)
             elseif operator == '<=' then
                 return value <= matcher
             elseif operator == '=~' then
-                -- TODO(scroiset): implement string matching
-                return false
+                local ok, m = pcall(string.find, value, matcher)
+                return ok and m ~= nil
             elseif operator == '!~' then
-                -- TODO(scroiset): implement string matching
-                return false
+                local ok, m = pcall(string.find, value, matcher)
+                return ok and m == nil
             end
         end
     end
