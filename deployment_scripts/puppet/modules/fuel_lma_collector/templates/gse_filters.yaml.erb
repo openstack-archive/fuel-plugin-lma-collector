@@ -432,6 +432,8 @@ lma_collector:
         group_by: hostname
         members:
           - cpu
+          - network-rx
+          - network-tx
           - root-fs
           - log-fs
 <% if @detach_rabbitmq_enabled -%>
@@ -440,6 +442,8 @@ lma_collector:
         group_by: hostname
         members:
           - cpu
+          - network-rx
+          - network-tx
           - root-fs
 <% end -%>
       mysql-nodes:
@@ -448,6 +452,8 @@ lma_collector:
         members:
 <% if @detach_database_enabled -%>
           - cpu
+          - network-rx
+          - network-tx
           - root-fs
 <% end -%>
           - mysql-fs
@@ -456,6 +462,8 @@ lma_collector:
         group_by: hostname
         members:
           - cpu
+          - network-rx
+          - network-tx
           - root-fs
           - nova-fs
       storage:
@@ -463,6 +471,8 @@ lma_collector:
         group_by: hostname
         members:
           - cpu
+          - network-rx
+          - network-tx
           - root-fs
 <% if @monitor_elasticsearch -%>
       elasticsearch-nodes:
@@ -472,6 +482,8 @@ lma_collector:
           - data-fs
           - root-fs
           - cpu
+          - network-rx
+          - network-tx
 <% end -%>
 <% if @monitor_influxdb -%>
       influxdb-nodes:
@@ -481,6 +493,8 @@ lma_collector:
           - data-fs
           - root-fs
           - cpu
+          - network-rx
+          - network-tx
 <% end -%>
 
   gse_cluster_global:
