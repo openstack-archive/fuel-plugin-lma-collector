@@ -74,6 +74,7 @@ if ($plugin_data) {
 
   # InfluxDB
   $is_influxdb_node = roles_include(['influxdb_grafana', 'primary-influxdb_grafana'])
+  $influxdb_listen_address = get_network_role_property('influxdb_vip', 'ipaddr')
   $influxdb_mode = $plugin_data['influxdb_mode']
   $influxdb_nodes = get_nodes_hash_by_roles($network_metadata, ['influxdb_grafana', 'primary-influxdb_grafana'])
   $influxdb_nodes_count = count($influxdb_nodes)
@@ -185,6 +186,9 @@ lma::collector::influxdb::database: <%= @influxdb_database %>
 lma::collector::influxdb::user: <%= @influxdb_user %>
 lma::collector::influxdb::password: <%= @influxdb_password %>
 lma::collector::influxdb::root_password: <%= @influxdb_root_password %>
+<% if @is_influxdb_node -%>
+lma::collector::influxdb::listen_address: <%= @influxdb_listen_address %>
+<% end -%>
 <% end -%>
 <% if @nagios_is_deployed -%>
 lma::collector::infrastructure_alerting::server: <%= @nagios_server %>
