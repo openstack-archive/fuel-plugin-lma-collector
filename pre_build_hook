@@ -21,8 +21,8 @@ OPENSTACKLIB_TARBALL_URL="https://forgeapi.puppetlabs.com/v3/files/openstack-ope
 download_packages \
     https://github.com/elemoine/heka/releases/download/ratelimit-1/heka_${HEKA_VERSION}_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/f/fonts-dejavu/fonts-dejavu-core_2.34-1ubuntu1_all.deb \
-    http://mirrors.kernel.org/ubuntu/pool/main/f/fontconfig/fontconfig-config_2.11.0-0ubuntu4.1_all.deb \
-    http://mirrors.kernel.org/ubuntu/pool/main/f/fontconfig/libfontconfig1_2.11.0-0ubuntu4.1_amd64.deb \
+    http://security.ubuntu.com/ubuntu/pool/main/f/fontconfig/fontconfig-config_2.11.0-0ubuntu4.2_all.deb \
+    http://security.ubuntu.com/ubuntu/pool/main/f/fontconfig/libfontconfig1_2.11.0-0ubuntu4.2_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/p/pixman/libpixman-1-0_0.30.2-2ubuntu1_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/libx/libxcb/libxcb-render0_1.10-2ubuntu1_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/libx/libxcb/libxcb-shm0_1.10-2ubuntu1_amd64.deb \
@@ -34,7 +34,7 @@ download_packages \
     http://mirrors.kernel.org/ubuntu/pool/main/libt/libtool/libltdl7_2.4.2-1.7ubuntu1_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/libt/libthai/libthai-data_0.1.20-3_all.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/libt/libthai/libthai0_0.1.20-3_amd64.deb \
-    http://mirrors.kernel.org/ubuntu/pool/main/f/fontconfig/fontconfig_2.11.0-0ubuntu4.1_amd64.deb \
+    http://security.ubuntu.com/ubuntu/pool/main/f/fontconfig/fontconfig_2.11.0-0ubuntu4.2_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/p/pango1.0/libpango-1.0-0_1.36.3-1ubuntu1.1_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/p/pango1.0/libpangoft2-1.0-0_1.36.3-1ubuntu1.1_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/p/pango1.0/libpangocairo-1.0-0_1.36.3-1ubuntu1.1_amd64.deb \
