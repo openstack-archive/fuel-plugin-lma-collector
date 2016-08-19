@@ -12,3 +12,4 @@ The value is ``1`` when successful and ``0`` if it fails.
 * ``elasticsearch_check``, for Elasticsearch.
 * ``influxdb_check``, for InfluxDB.
 * ``libvirt_check``, for Libvirt.
+* ``mysql_check``, for MySQL.
