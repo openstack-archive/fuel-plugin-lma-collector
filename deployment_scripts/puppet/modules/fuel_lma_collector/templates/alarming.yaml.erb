@@ -812,6 +812,31 @@ lma_collector:
             window: 60
             periods: 0
             function: last
+    - name: 'network-dropped-rx'
+      description: "Some received packets have been dropped"
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: if_dropped_rx
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: max
+
+    - name: 'network-dropped-tx'
+      description: "Some transmitted packets have been dropped"
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: if_dropped_tx
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: max
 
   # Mapping between the Fuel roles and the AFD node filters
   node_cluster_roles:
@@ -868,35 +893,43 @@ lma_collector:
   node_cluster_alarms:
     controller:
       cpu: ['cpu-critical-controller', 'cpu-warning-controller']
+      network: ['network-dropped-rx', 'network-dropped-tx']
       root-fs: ['root-fs-critical', 'root-fs-warning']
       log-fs: ['log-fs-critical', 'log-fs-warning']
 <% if @detach_rabbitmq_enabled -%>
     rabbitmq-nodes:
       cpu: ['cpu-critical-rabbitmq', 'cpu-warning-rabbitmq']
+      network: ['network-dropped-rx', 'network-dropped-tx']
       root-fs: ['root-fs-critical', 'root-fs-warning']
 <% end -%>
     mysql-nodes:
 <% if @detach_database_enabled -%>
       cpu: ['cpu-critical-mysql', 'cpu-warning-mysql']
+      network: ['network-dropped-rx', 'network-dropped-tx']
       root-fs: ['root-fs-critical', 'root-fs-warning']
 <% end -%>
       mysql-fs: ['mysql-fs-critical', 'mysql-fs-warning']
     compute:
       cpu: ['cpu-critical-compute', 'cpu-warning-compute']
+      network: ['network-dropped-rx', 'network-dropped-tx']
       root-fs: ['root-fs-critical', 'root-fs-warning']
       nova-fs: ['nova-fs-critical', 'nova-fs-warning']
     storage:
       cpu: ['cpu-critical-storage', 'cpu-warning-storage']
+      network: ['network-dropped-rx', 'network-dropped-tx']
       root-fs: ['root-fs-critical', 'root-fs-warning']
     default:
       cpu: ['cpu-critical-default']
+      network: ['network-dropped-rx', 'network-dropped-tx']
       root-fs: ['root-fs-critical', 'root-fs-warning']
     elasticsearch-nodes:
       cpu: ['cpu-critical-default']
+      network: ['network-dropped-rx', 'network-dropped-tx']
       root-fs: ['root-fs-critical', 'root-fs-warning']
       data-fs: ['elasticsearch-fs-critical', 'elasticsearch-fs-warning']
     influxdb-nodes:
       cpu: ['cpu-critical-default']
+      network: ['network-dropped-rx', 'network-dropped-tx']
       root-fs: ['root-fs-critical', 'root-fs-warning']
       data-fs: ['influxdb-fs-critical', 'influxdb-fs-warning']
 
