@@ -15,13 +15,42 @@
 class lma_collector::collectd::mysql (
   $username,
   $password,
+  $host = 'localhost',
+  $socket = undef,
 ) inherits lma_collector::params {
 
   # With "config" as the resource title the collectd configuration
   # file will be named "mysql-config.conf".
   collectd::plugin::mysql::database { 'config':
-    host     => 'localhost',
+    host     => $host,
     username => $username,
     password => $password,
+    socket   => $socket,
+  }
+
+  $default_config = {
+      'Host'     => "\"${host}\"",
+      'Username' => "\"${username}\"",
+      'Password' => "\"${password}\"",
+  }
+
+  if $socket {
+    $config = merge($default_config, {'Socket'   => "\"${socket}\""})
+  } else {
+    $config = $default_config
+  }
+
+  if $::osfamily == 'RedHat' {
+    $pymysql_pkg_name = 'python-PyMySQL'
+  } else {
+    $pymysql_pkg_name = 'python-pymysql'
+  }
+  package { $pymysql_pkg_name:
+    ensure => present,
+  }
+
+  lma_collector::collectd::python { 'collectd_mysql_check':
+    config  => $config,
+    require => Package[$pymysql_pkg_name],
   }
 }

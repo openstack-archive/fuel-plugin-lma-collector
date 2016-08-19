@@ -177,6 +177,7 @@ lma::collector::node_profiles:
 lma::collector::monitor::mysql_db: <%= @mysql_db %>
 lma::collector::monitor::mysql_username: <%= @mysql_username %>
 lma::collector::monitor::mysql_password: <%= @mysql_password %>
+lma::collector::monitor::mysql_socket: /var/run/mysqld/mysqld.sock
 
 <% if @es_is_deployed -%>
 lma::collector::elasticsearch::server: <%= @es_server %>
