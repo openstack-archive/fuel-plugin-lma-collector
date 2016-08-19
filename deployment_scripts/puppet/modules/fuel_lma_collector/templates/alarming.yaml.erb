@@ -868,6 +868,18 @@ lma_collector:
             window: 60
             periods: 0
             function: last
+    - name: 'mysql-check'
+      description: "MySQL cannot be checked"
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: mysql_check
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
     - name: 'network-warning-dropped-rx'
       description: "Some received packets have been dropped"
       severity: 'warning'
@@ -1034,6 +1046,7 @@ lma_collector:
       check: ['rabbitmq-check']
     mysql:
       node-status: ['mysql-node-connected', 'mysql-node-ready']
+      check: ['mysql-check']
     apache:
       worker: ['apache-warning']
     nova-api:
