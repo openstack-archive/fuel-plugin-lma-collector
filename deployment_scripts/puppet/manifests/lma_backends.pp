@@ -46,7 +46,7 @@ if hiera('lma::collector::influxdb::server', false) {
     class { 'lma_collector::collectd::influxdb':
         username => 'root',
         password => hiera('lma::collector::influxdb::root_password'),
-        address  => hiera('lma::collector::influxdb::listen_address', $mgmt_address),
+        address  => hiera('lma::collector::influxdb::listen_address'),
         port     => hiera('lma::collector::influxdb::influxdb_port', 8086)
     }
   }
