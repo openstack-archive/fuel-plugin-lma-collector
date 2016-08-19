@@ -770,6 +770,10 @@ be used to connect to MySQL.
   database. Valid options: a string.
 * `password`: *Required*. The database password to use to connect to the MySQL
   database. Valid options: a string.
+* `host`: *Optional*. The IP address to use to connect to the MySQL database.
+   Valid options: a string. Default: `localhost`.
+* `socket`: *Optional*. The Unix socket to use to  connect to the MySQL database.
+   Valid options: a string. Default: `undef`.
 
 #### Class: `lma_collector::collectd::ceph_mon`
 
