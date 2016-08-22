@@ -24,7 +24,7 @@ class lma_collector::notifications::metrics {
   heka::filter::sandbox { 'resource_creation_time':
     config_dir       => $config_dir,
     filename         => "${lma_collector::params::plugins_dir}/filters/resource_creation_time.lua",
-    message_matcher  => 'Type == \'notification\' && Fields[event_type] =~ /^(compute.instance|volume).create.end$/',
+    message_matcher  => 'Type == \'notification\' && Fields[event_type] =~ /^(compute.instance|volume).(create|attach).end$/',
     module_directory => $lua_modules_dir,
     notify           => Class['lma_collector::service::log'],
   }
