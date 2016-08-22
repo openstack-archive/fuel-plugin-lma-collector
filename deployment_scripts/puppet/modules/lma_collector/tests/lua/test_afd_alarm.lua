@@ -693,7 +693,7 @@ function TestLMAAlarm:test_rules_fields()
     local state, result = root_fs:evaluate(t)
     assertEquals(#result, 1)
 
-    assertItemsEquals(result[1].fields, {{name='fs', value='/'}})
+    assertItemsEquals(result[1].fields, {})
     assertEquals(result[1].value, 8)
 end
 
@@ -730,6 +730,7 @@ function TestLMAAlarm:test_rule_with_multivalue()
     lma_alarm.add_value(next_time(), 'http_response_times', {upper_90 = 4, foo = 1}, {http_method = 'POST'})
     local state, result = lma_alarm.evaluate(next_time()) -- window 60 second
     assertEquals(state, consts.WARN)
+    assertItemsEquals(result[1].alert.fields, {{name='http_method', value='POST'}})
     assertEquals(result[1].alert.value, 6)
 end
 
@@ -780,6 +781,7 @@ function TestLMAAlarm:test_complex_field_matching_alarm_trigger()
     local state, result = lma_alarm.evaluate(next_time()) -- window 60 second
     assertEquals(state, consts.WARN)
     assertEquals(result[1].alert.value, 6) -- the max
+    assertItemsEquals(result[1].alert.fields, {{name='http_method', value='POST || GET'}, {name="http_status", value="2xx || ==3xx"}})
 end
 
 function TestLMAAlarm:test_complex_field_matching_alarm_ok()
