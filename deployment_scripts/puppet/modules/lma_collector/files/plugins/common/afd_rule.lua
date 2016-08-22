@@ -179,9 +179,13 @@ function Rule:add_value(ts, value, fields)
     local uniq_field_id = self:get_datastore_id(fields)
     if not self.datastore[uniq_field_id] then
         self.datastore[uniq_field_id] = {
-            fields = fields,
+            fields = self.fields,
             cbuf = self:get_circular_buffer()
         }
+        if #self.group_by > 0 then
+            self.datastore[uniq_field_id].fields = fields
+        end
+
         self:add_datastore(uniq_field_id)
     end
     data = self.datastore[uniq_field_id]
