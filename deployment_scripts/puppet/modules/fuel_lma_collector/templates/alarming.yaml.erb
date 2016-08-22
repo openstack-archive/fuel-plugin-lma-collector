@@ -534,6 +534,37 @@ lma_collector:
             window: 70
             periods: 0
             function: max
+    - name: 'keystone-response-times-too-long'
+      description: 'Keystone takes too long to respond'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: openstack_keystone_http_response_times
+            fields:
+              http_method: 'GET'
+            relational_operator: '>'
+            threshold: 0.3
+            window: 60
+            periods: 0
+            value: max
+            function: max
+    - name: 'keystone-public-api-http-errors'
+      description: 'Too many 5xx HTTP errors have been detected on keystone-public-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: haproxy_backend_response_5xx
+            fields:
+              backend: 'keystone-public-api'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 1
+            function: diff
     - name: 'keystone-public-api-http-errors'
       description: 'Too many 5xx HTTP errors have been detected on keystone-public-api'
       severity: 'warning'
@@ -934,7 +965,9 @@ lma_collector:
     neutron-api:
       http_errors: ['neutron-api-http-errors']
     neutron-logs:
-      error: ['neutron-logs-error']
+        error: ['neutron-logs-error']
+    keystone-response-time:
+      too_long: ['keystone-response-time-too-long']
     keystone-public-api:
       http_errors: ['keystone-public-api-http-errors']
     keystone-logs:
