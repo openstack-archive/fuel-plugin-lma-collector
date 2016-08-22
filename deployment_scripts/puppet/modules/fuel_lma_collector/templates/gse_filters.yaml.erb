@@ -103,6 +103,45 @@ lma_collector:
               function: percent
       - status: okay
 
+    # A policy which is used for a collection of services which doesn't form
+    # a logical cluster (eg. independent services).
+    # This is typically used for libvirt farm where libvirt status can be
+    # either down, okay or unknown.
+    one_member:
+      - status: down
+        trigger:
+          logical_operator: or
+          rules:
+            - function: percent
+              arguments: [ down ]
+              relational_operator: '=='
+              threshold: 100
+      - status: critical
+        trigger:
+          logical_operator: or
+          rules:
+            - function: percent
+              arguments: [ down, warning, critical ]
+              relational_operator: '>'
+              threshold: 20
+      - status: unknown
+        trigger:
+          logical_operator: or
+          rules:
+            - function: percent
+              arguments: [ unknown ]
+              relational_operator: '=='
+              threshold: 100
+      - status: warning
+        trigger:
+          logical_operator: or
+          rules:
+            - function: percent
+              arguments: [ okay ]
+              relational_operator: '!='
+              threshold: 100
+      - status: okay
+
   gse_cluster_service:
     input_message_types:
       - afd_service_metric
@@ -401,7 +440,7 @@ lma_collector:
         members:
           - check
       libvirt-service:
-        policy: majority_of_members
+        policy: one_member
         group_by: hostname
         members:
           - check
