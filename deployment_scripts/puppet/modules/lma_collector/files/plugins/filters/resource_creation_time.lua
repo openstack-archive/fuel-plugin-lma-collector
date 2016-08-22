@@ -24,10 +24,11 @@ local msg = {
 local event_type_to_name = {
     ["compute.instance.create.end"] = "openstack_nova_instance_creation_time",
     ["volume.create.end"] = "openstack_cinder_volume_creation_time",
+    ["volume.attach.end"] = "openstack_cinder_volume_attachment_time",
 }
 
 function process_message ()
-    local metric_name = event_type_to_name[read_message("Fields[event_type]")]
+    local metric_name = event_type_to_name[read_message("Field[event_type]")]
     if not metric_name then
         return -1
     end
