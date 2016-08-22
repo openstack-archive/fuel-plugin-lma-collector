@@ -24,6 +24,7 @@ local msg = {
 local event_type_to_name = {
     ["compute.instance.create.end"] = "openstack_nova_instance_creation_time",
     ["volume.create.end"] = "openstack_cinder_volume_creation_time",
+    ["volume.attach.end"] = "openstack_cinder_volume_attachment_time",
 }
 
 function process_message ()
@@ -32,12 +33,30 @@ function process_message ()
         return -1
     end
 
-    local created_at = read_message("Fields[created_at]") or ''
-    local launched_at = read_message("Fields[launched_at]") or ''
+    local started_at, completed_at
 
-    created_at = patt.Timestamp:match(created_at)
-    launched_at = patt.Timestamp:match(launched_at)
-    if created_at == nil or launched_at == nil or created_at == 0 or launched_at == 0 or created_at > launched_at then
+    if metric_name == "openstack_cinder_volume_attachment_time" then
+        --[[ To compute the time to attach a volume we need fields that are not
+          availabe in the message. So we need to decode the message, check if
+          it is a full notification or not and extract the needed values. ]]--
+        local data = read_message("Payload")
+        local ok, notif = pcall(cjson.decode, data)
+        if not ok then
+          return -1
+        end
+
+        notif = notif.payload or notif
+        local t = unpack(notif['volume_attachment'])
+        started_at   = t.created_at or ''
+        completed_at = t.attach_time or ''
+    else
+        started_at = read_message("Fields[created_at]") or ''
+        completed_at = read_message("Fields[launched_at]") or ''
+    end
+
+    started_at = patt.Timestamp:match(started_at)
+    completed_at = patt.Timestamp:match(completed_at)
+    if started_at == nil or completed_at == nil or started_at == 0 or completed_at == 0 or started_at > completed_at then
         return -1
     end
 
@@ -50,8 +69,8 @@ function process_message ()
         hostname = read_message("Fields[hostname]"),
         type = utils.metric_type['GAUGE'],
         -- Having a millisecond precision for creation time is good enough given
-        -- that the created_at field has only a 1-second precision.
-        value = {value = math.floor((launched_at - created_at)/1e6 + 0.5) / 1e3, representation = 's'},
+        -- that the started_at field has only a 1-second precision.
+        value = {value = math.floor((completed_at - started_at)/1e6 + 0.5) / 1e3, representation = 's'},
         tenant_id = read_message("Fields[tenant_id]"),
         user_id = read_message("Fields[user_id]"),
     }
