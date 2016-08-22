@@ -26,6 +26,11 @@ local alarms = {
           ['window'] = '<%= rule["window"] %>',
           ['periods'] = '<%= rule["periods"] || 0 %>',
           ['function'] = '<%= rule["function"] %>',
+          ['group_by'] = {
+<% (rule["group_by"] || []).each do |g| -%>
+              <%= g %>,
+<% end -%>
+          },
         },
 <% end -%>
       },
