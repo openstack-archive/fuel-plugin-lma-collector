@@ -102,11 +102,20 @@ Volume
 
 The following metrics are emitted per volume node:
 
+* ``openstack_cinder_volume_attachement_time``, the time in seconds it took to
+  attach a volume to an instance.
+
+
 * ``openstack_cinder_volume_creation_time``, the time in seconds it took to
   create a new volume.
 
 .. note:: When using Ceph as the back end storage for volumes, the ``hostname``
    value is always set to ``rbd``.
+
+   We also tested different scenarios and we observed that when creating a raw
+   volume, the creation time isn't correlated to the size of the volume. Also
+   when creating a volume from a Glance image, the creation time depends on
+   the size of the image because Cinder needs to stream the data from Glance.
 
 The following metrics are retrieved from the Cinder API:
 
