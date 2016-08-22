@@ -102,6 +102,8 @@ Volume
 
 The following metrics are emitted per volume node:
 
+* ``openstack_cinder_volume_attachement_time``, the time in seconds it took to
+  attach a volume to an instance.
 * ``openstack_cinder_volume_creation_time``, the time in seconds it took to
   create a new volume.
 
