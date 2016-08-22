@@ -817,6 +817,57 @@ function TestLMAAlarm:test_complex_field_matching_alarm_ok()
     assertEquals(state, consts.OKAY)
 end
 
+function TestLMAAlarm:test_group_by()
+    local alert = {
+        name = 'osd-filesystem-warning',
+        description = 'free space is too low',
+        enabled = true,
+        trigger = {
+            rules = {
+                {
+                    metric = 'fs_space_percent_free',
+                    window = 30,
+                    periods = 1,
+                    ['function'] = 'avg',
+                    fields = { fs = '=~ osd%-%d && !~ /var/log' },
+                    group_by = {'fs'},
+                    relational_operator = '<=',
+                    threshold = 5,
+                },
+            },
+        },
+        severity = 'warning',
+    }
+    lma_alarm.load_alarm(alert)
+    lma_alarm.set_start_time(current_time)
+
+    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 5, {fs = 'osd-1'})
+    lma_alarm.add_value(current_time, 'fs_space_percent_free', 4, {fs = 'osd-2'})
+    lma_alarm.add_value(current_time, 'fs_space_percent_free', 80, {fs = 'osd-3'})
+    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 4, {fs = 'osd-1'})
+    lma_alarm.add_value(current_time, 'fs_space_percent_free', 3, {fs = 'osd-2'})
+    lma_alarm.add_value(current_time, 'fs_space_percent_free', 80, {fs = 'osd-3'})
+    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 4, {fs = 'osd-1'})
+    lma_alarm.add_value(current_time, 'fs_space_percent_free', 2, {fs = 'osd-2'})
+    lma_alarm.add_value(current_time, 'fs_space_percent_free', 80, {fs = 'osd-3'})
+    lma_alarm.add_value(current_time, 'fs_space_percent_free', 1, {fs = '/var/log/osd-3'})
+
+    local state, result = lma_alarm.evaluate(next_time()) -- window 60 second
+    assertEquals(#result, 2)
+    assertEquals(state, consts.WARN)
+
+    next_time(100) -- spend enough time to invalidate datapoints
+    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 50, {fs = 'osd-1'})
+    lma_alarm.add_value(current_time, 'fs_space_percent_free', 50, {fs = 'osd-2'})
+    lma_alarm.add_value(current_time, 'fs_space_percent_free', 50, {fs = 'osd-3'})
+    lma_alarm.add_value(next_time(), 'fs_space_percent_free', 50, {fs = 'osd-1'})
+    lma_alarm.add_value(current_time, 'fs_space_percent_free', 50, {fs = 'osd-2'})
+    lma_alarm.add_value(current_time, 'fs_space_percent_free', 50, {fs = 'osd-3'})
+    local state, result = lma_alarm.evaluate(next_time()) -- window 60 second
+    assertEquals(#result, 0)
+    assertEquals(state, consts.OKAY)
+end
+
 lu = LuaUnit
 lu:setVerbosity( 1 )
 os.exit( lu:run() )

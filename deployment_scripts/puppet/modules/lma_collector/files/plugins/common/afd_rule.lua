@@ -40,10 +40,15 @@ Rule.__index = Rule
 
 setfenv(1, Rule) -- Remove external access to contain everything in the module
 
-local function get_datastore_id(metric, fields, fct, window, periods)
-    local arr = {metric, fct, window, periods}
-    for f, v in table_utils.orderedPairs(fields or {}) do
-        arr[#arr+1] = string.format('(%s=%s)', f, v)
+local function get_datastore_id(id, group_by, fields)
+    if group_by == nil or #group_by == 0 then
+        return id
+    end
+
+    local arr = {}
+    arr[#arr + 1] = id
+    for _, g in ipairs(group_by) do
+        arr[#arr + 1] = fields[g]
     end
     return table.concat(arr, '/')
 end
@@ -74,7 +79,17 @@ function Rule.new(rule)
 
     r.fct = rule['function']
     r.threshold = rule.threshold + 0
-    r.value_index = rule.value
+    r.value_index = rule.value or nil -- Can be nil
+
+    -- build uniq rule id
+    local arr = {r.metric, r.fct, r.window, r.periods}
+    for f, v in table_utils.orderedPairs(r.fields or {}) do
+        arr[#arr+1] = string.format('(%s=%s)', f, v)
+    end
+    r.rule_id = table.concat(arr, '/')
+
+    r.group_by = rule.group_by or {}
+
     if r.fct == 'roc' then
         -- We use the name of the metric as the payload_name.
         --
@@ -161,7 +176,7 @@ function Rule:add_value(ts, value, fields)
     end
 
     local data
-    local uniq_field_id = get_datastore_id(self.metric, self.fields, self.fct, self.window, self.periods)
+    local uniq_field_id = get_datastore_id(self.rule_id, self.group_by, fields)
     if not self.datastore[uniq_field_id] then
         self.datastore[uniq_field_id] = {
             fields = fields,
