@@ -142,6 +142,40 @@ lma_collector:
               threshold: 100
       - status: okay
 
+    # A policy which is used for service clusters not managed by Pacemaker.
+    # This assumes that at least 1/3 of members must be healthy to ensure
+    # high availability.
+    sufficient_members:
+      - status: down
+        trigger:
+          logical_operator: or
+          rules:
+            - function: percent
+              arguments: [ down, critical ]
+              relational_operator: '=='
+              threshold: 100
+      - status: critical
+        trigger:
+          logical_operator: or
+          rules:
+            - function: percent
+              arguments: [ down, critical ]
+              relational_operator: '>'
+              threshold: 33
+      - status: warning
+        trigger:
+          logical_operator: or
+          rules:
+            - function: percent
+              arguments: [ okay ]
+              relational_operator: '!='
+              threshold: 100
+            - function: percent
+              arguments: [ unknown ]
+              relational_operator: '!='
+              threshold: 100
+      - status: okay
+
   gse_cluster_service:
     input_message_types:
       - afd_service_metric
@@ -400,7 +434,7 @@ lma_collector:
           - health
           - capacity
       ceph-mon-service:
-        policy: majority_of_members
+        policy: sufficient_members
         group_by: hostname
         members:
           - check
@@ -417,7 +451,7 @@ lma_collector:
         members:
           - health
       elasticsearch-service:
-        policy: majority_of_members
+        policy: sufficient_members
         group_by: hostname
         members:
           - check
@@ -429,7 +463,7 @@ lma_collector:
         members:
           - endpoint
       influxdb-service:
-        policy: majority_of_members
+        policy: sufficient_members
         group_by: hostname
         members:
           - check
