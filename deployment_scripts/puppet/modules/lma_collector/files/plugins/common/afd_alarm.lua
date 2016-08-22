@@ -87,6 +87,9 @@ function Alarm:get_metric_fields(metric_name)
             for k, _ in pairs(rule.fields) do
                 fields[#fields+1] = k
             end
+            for _, g in ipairs(rule.group_by) do
+                fields[#fields+1] = g
+            end
         end
     end
     return fields
