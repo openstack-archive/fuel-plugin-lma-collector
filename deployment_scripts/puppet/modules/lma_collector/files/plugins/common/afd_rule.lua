@@ -178,8 +178,15 @@ function Rule:add_value(ts, value, fields)
     local data
     local uniq_field_id = get_datastore_id(self.rule_id, self.group_by, fields)
     if not self.datastore[uniq_field_id] then
+        local field_filters
+        if #self.group_by > 0 then
+            field_filters = fields
+        else
+            field_filters = self.fields
+        end
+
         self.datastore[uniq_field_id] = {
-            fields = fields,
+            fields = field_filters,
             cbuf = self:get_circular_buffer()
         }
         self:add_datastore(uniq_field_id)
