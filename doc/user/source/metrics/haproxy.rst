@@ -81,6 +81,10 @@ back-end server:
 * ``haproxy_backend_servers``, the count of servers grouped by state. This
   metric has an additional ``state`` field that contains the state of the
   back ends (either 'down' or 'up').
+* ``haproxy_backend_server``, the status of the backend server where values
+  ``0`` and ``1`` represent, respectively, ``DOWN`` and ``UP``.  This metric
+  has an additional ``state`` field that contains the state of the backend
+  (either 'down' or 'up').
 * ``haproxy_backend_session_current``, the number of current sessions.
 * ``haproxy_backend_session_total``, the cumulative number of sessions.
 * ``haproxy_backend_status``, the global back-end status where values ``0``
