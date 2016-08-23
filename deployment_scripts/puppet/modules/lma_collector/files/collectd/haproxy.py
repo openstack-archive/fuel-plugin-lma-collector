@@ -237,20 +237,37 @@ class HAProxyPlugin(base.Base):
         for stat in itertools.ifilter(lambda x:
                                       x['type'] == BACKEND_SERVER_TYPE, stats):
             pxname = stat['pxname']
+            svname = stat['svname']
             if pxname not in backend_server_states:
-                backend_server_states[pxname] = defaultdict(int)
-            backend_server_states[pxname][stat['status']] += 1
+                backend_server_states[pxname] = {
+                    'count': defaultdict(int),
+                    'UP': [],
+                    'DOWN': []
+                }
+
+            backend_server_states[pxname]['count'][stat['status']] += 1
+            backend_server_states[pxname][stat['status']].append(svname)
 
         for pxname, states in backend_server_states.iteritems():
             for s in STATUS_MAP.keys():
                 yield {
                     'type_instance': 'backend_servers',
-                    'values': states.get(s, 0),
+                    'values': states['count'].get(s, 0),
                     'meta': {
                         'backend': pxname,
                         'state': s.lower()
                     }
                 }
+                for host in states[s]:
+                    yield {
+                        'type_instance': 'backend_server',
+                        'values': STATUS_MAP[s],
+                        'meta': {
+                            'backend': pxname,
+                            'state': s.lower(),
+                            'host': host,
+                        }
+                    }
 
     def config_callback(self, conf):
         for node in conf.children:
