@@ -190,7 +190,7 @@ lma::collector::influxdb::database: <%= @influxdb_database %>
 lma::collector::influxdb::user: <%= @influxdb_user %>
 lma::collector::influxdb::password: <%= @influxdb_password %>
 lma::collector::influxdb::root_password: <%= @influxdb_root_password %>
-<% if $is_influxdb_node -%>
+<% if @is_influxdb_node -%>
 lma::collector::influxdb::listen_address: <%= @influxdb_listen_address %>
 <% end -%>
 <% end -%>
