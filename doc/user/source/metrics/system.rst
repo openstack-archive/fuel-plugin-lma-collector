@@ -103,8 +103,8 @@ Swap
 
 * ``swap_cached``, the amount of cached memory (in bytes) that is in the swap.
 * ``swap_free``, the amount of free memory (in bytes) that is in the swap.
-* ``swap_io_in``, the number of swap pages written per second.
-* ``swap_io_out``, the number of swap pages read per second.
+* ``swap_io_in``, the number of swap bytes written per second.
+* ``swap_io_out``, the number of swap bytes read per second.
 * ``swap_used``, the amount of used memory (in bytes) that is in the swap.
 
 Users
