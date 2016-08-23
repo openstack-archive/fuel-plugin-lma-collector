@@ -25,9 +25,12 @@ local STATUS_WEIGHTS = {
     [consts.DOWN]=4
 }
 
-
 function max_status(val1, val2)
-    if not val2 or STATUS_WEIGHTS[val1] > STATUS_WEIGHTS[val2] then
+    if not val1 then
+        return val2
+    elseif not val2 then
+        return val1
+    elseif STATUS_WEIGHTS[val1] > STATUS_WEIGHTS[val2] then
         return val1
     else
         return val2
