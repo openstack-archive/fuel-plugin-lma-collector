@@ -240,6 +240,16 @@ class HAProxyPlugin(base.Base):
             if pxname not in backend_server_states:
                 backend_server_states[pxname] = defaultdict(int)
             backend_server_states[pxname][stat['status']] += 1
+            # Emit metric for the backend server
+            yield {
+                'type_instance': 'backend_server',
+                'values': STATUS_MAP[stat['status']],
+                'meta': {
+                    'backend': pxname,
+                    'state': stat['status'].lower(),
+                    'host': stat['svname'],
+                }
+            }
 
         for pxname, states in backend_server_states.iteritems():
             for s in STATUS_MAP.keys():

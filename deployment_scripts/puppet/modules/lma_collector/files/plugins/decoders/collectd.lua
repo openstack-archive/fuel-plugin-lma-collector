@@ -289,6 +289,9 @@ function process_message ()
                         msg['Fields']['tag_fields'] = { 'frontend' }
                         msg['Fields']['frontend'] = sample['meta']['frontend']
                     end
+                    if sample['meta']['host'] then
+                        msg['Fields']['hostname'] = sample['meta']['host']
+                    end
                 end
             elseif metric_source == 'apache' then
                 metric_name = string.gsub(metric_name, 'apache_', '')
