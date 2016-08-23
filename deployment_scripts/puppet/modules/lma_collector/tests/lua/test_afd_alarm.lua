@@ -980,6 +980,101 @@ function TestLMAAlarm:test_group_by_missing_field_is_unknown()
     assertEquals(state, consts.UNKW)
 end
 
+function TestLMAAlarm:test_no_data_policy_okay()
+    local alarm = {
+        name = 'foo-alarm',
+        description = 'foo description',
+        enabled = true,
+        trigger = {
+            rules = {
+                {
+                    metric = 'foo_metric_name',
+                    window = 30,
+                    periods = 1,
+                    ['function'] = 'avg',
+                    fields = { foo = 'bar', bar = 'foo' },
+                    group_by = {'fs'},
+                    relational_operator = '<=',
+                    threshold = 5,
+                },
+            },
+        },
+        severity = 'warning',
+        no_data_policy = 'okay',
+    }
+    lma_alarm.load_alarm(alarm)
+    lma_alarm.set_start_time(current_time)
+
+    lma_alarm.add_value(next_time(100), 'another_metric', 5)
+
+    local state, result = lma_alarm.evaluate(next_time())
+    assertEquals(#result, 0)
+    assertEquals(state, consts.OKAY)
+end
+
+function TestLMAAlarm:test_no_data_policy_critical()
+    local alarm = {
+        name = 'foo-alarm',
+        description = 'foo description',
+        enabled = true,
+        trigger = {
+            rules = {
+                {
+                    metric = 'foo_metric_name',
+                    window = 30,
+                    periods = 1,
+                    ['function'] = 'avg',
+                    fields = { foo = 'bar', bar = 'foo' },
+                    group_by = {'fs'},
+                    relational_operator = '<=',
+                    threshold = 5,
+                },
+            },
+        },
+        severity = 'critical',
+        no_data_policy = 'critical',
+    }
+    lma_alarm.load_alarm(alarm)
+    lma_alarm.set_start_time(current_time)
+
+    lma_alarm.add_value(next_time(100), 'another_metric', 5)
+
+    local state, result = lma_alarm.evaluate(next_time())
+    assertEquals(#result, 1)
+    assertEquals(state, consts.CRIT)
+end
+
+function TestLMAAlarm:test_no_data_policy_skip()
+    local alarm = {
+        name = 'foo-alarm',
+        description = 'foo description',
+        enabled = true,
+        trigger = {
+            rules = {
+                {
+                    metric = 'foo_metric_name',
+                    window = 30,
+                    periods = 1,
+                    ['function'] = 'avg',
+                    fields = { foo = 'bar', bar = 'foo' },
+                    group_by = {'fs'},
+                    relational_operator = '<=',
+                    threshold = 5,
+                },
+            },
+        },
+        severity = 'critical',
+        no_data_policy = 'skip',
+    }
+    lma_alarm.load_alarm(alarm)
+    lma_alarm.set_start_time(current_time)
+
+    lma_alarm.add_value(next_time(100), 'another_metric', 5)
+
+    local state, result = lma_alarm.evaluate(next_time())
+    assertEquals(state, nil)
+end
+
 lu = LuaUnit
 lu:setVerbosity( 1 )
 os.exit( lu:run() )

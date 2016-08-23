@@ -29,6 +29,8 @@ local SEVERITIES = {
     warning = consts.WARN,
     critical = consts.CRIT,
     down = consts.DOWN,
+    unknown = consts.UNKW,
+    okay = consts.OKAY,
 }
 
 local Alarm = {}
@@ -50,6 +52,19 @@ function Alarm.new(alarm)
     a.severity_str = string.upper(alarm.severity)
     a.severity = SEVERITIES[string.lower(alarm.severity)]
     assert(a.severity ~= nil)
+
+    a.skip_when_no_data = false
+    if alarm.no_data_policy then
+        if string.lower(alarm.no_data_policy) == 'skip' then
+            a.skip_when_no_data = true
+        else
+            a.no_data_severity = SEVERITIES[string.lower(alarm.no_data_policy)]
+        end
+    else
+        a.no_data_severity = consts.UNKW
+    end
+    assert(a.skip_when_no_data or a.no_data_severity ~= nil)
+
     a.rules = {}
     a.initial_wait = 0
     for _, rule in ipairs(alarm.trigger.rules) do
@@ -130,7 +145,7 @@ end
 --  },
 -- }
 function Alarm:evaluate(ns)
-    local state
+    local state = consts.OKAY
     local matches = 0
     local all_alerts = {}
     local function add_alarm(rule, value, message, fields)
@@ -170,22 +185,28 @@ function Alarm:evaluate(ns)
 
     if self.logical_operator == 'and' then
         if one_unknown then
-            state = consts.UNKW
+            if self.skip_when_no_data then
+                state = nil
+            else
+                state = self.no_data_severity
+            end
         elseif #self.rules == matches then
             state = self.severity
-        else
-            state = consts.OKAY
-            all_alerts = {}
         end
     elseif self.logical_operator == 'or' then
         if matches > 0 then
             state = self.severity
         elseif one_unknown then
-            state = consts.UNKW
-        else
-            state = consts.OKAY
-            all_alerts = {}
+            if self.skip_when_no_data then
+                state = nil
+            else
+                state = self.no_data_severity
+            end
         end
+    end
+
+    if state == nil or state == consts.OKAY then
+        all_alerts = {}
     end
     return state, all_alerts
 end
