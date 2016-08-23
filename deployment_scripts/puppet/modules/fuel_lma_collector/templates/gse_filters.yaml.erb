@@ -173,13 +173,21 @@ lma_collector:
           # This AFD heartbeat is emitted by a dedicated sandbox filter
           # TODO(all): replace by a check metric
           - heartbeat
-      rabbitmq:
+      rabbitmq-cluster:
         policy: highest_severity
         group_by: member
         members:
           - memory
           - disk
           - queue
+          - pacemaker
+      rabbitmq-service:
+        # A check failure on a single node doesn't mean that the whole cluster
+        # is down, this is why a 'hostname' group_by and 'majority_of_members'
+        # policy are used here.
+        policy: majority_of_members
+        group_by: hostname
+        members:
           - check
       nova-api:
         policy: highest_severity
@@ -519,7 +527,8 @@ lma_collector:
         policy: highest_severity
         group_by: member
         members:
-          - rabbitmq
+          - rabbitmq-cluster
+          - rabbitmq-service
 <% if @detach_rabbitmq_enabled -%>
           - rabbitmq-nodes
 <% else -%>
