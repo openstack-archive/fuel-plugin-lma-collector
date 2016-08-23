@@ -53,7 +53,7 @@ if hiera('lma::collector::influxdb::server', false) {
 
   if $is_elasticsearch_node {
     class { 'lma_collector::collectd::elasticsearch':
-      address => hiera('lma::collector::elasticsearch::vip', $mgmt_address),
+      address => hiera('lma::collector::elasticsearch::server'),
       port    => hiera('lma::collector::elasticsearch::rest_port', 9200)
     }
   }
