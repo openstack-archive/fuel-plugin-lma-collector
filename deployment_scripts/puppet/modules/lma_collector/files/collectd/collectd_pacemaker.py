@@ -99,7 +99,7 @@ class CrmMonitorPlugin(base.Base):
             # The metric needs to be emitted too for the Lua plugins executed
             # by the metric_collector service
             yield {
-                'type_instance': 'resource_local_active',
+                'type_instance': 'local_resource_active',
                 'values': same_hostname(node),
                 'meta': {'resource': self.notify_resource}
             }
@@ -109,7 +109,7 @@ class CrmMonitorPlugin(base.Base):
         # The metric needs to be emitted for the alarms that leverage the other
         # metrics emitted by the plugin
         yield {
-            'type_instance': 'dc_local_active',
+            'type_instance': 'local_dc_active',
             'values': same_hostname(current_dc),
         }
 
