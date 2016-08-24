@@ -933,9 +933,11 @@ lma_collector:
   # Mapping between the Fuel roles and the AFD service filters
   service_cluster_roles:
 <% if @detach_rabbitmq_enabled -%>
-    rabbitmq: ['primary-standalone-rabbitmq', 'standalone-rabbitmq']
+    rabbitmq-cluster: ['primary-standalone-rabbitmq', 'standalone-rabbitmq']
+    rabbitmq-service: ['primary-standalone-rabbitmq', 'standalone-rabbitmq']
 <% else -%>
-    rabbitmq: ['primary-controller', 'controller']
+    rabbitmq-cluster: ['primary-controller', 'controller']
+    rabbitmq-service: ['primary-controller', 'controller']
 <% end -%>
 <% if @detach_database_enabled -%>
     mysql: ['primary-standalone-database', 'standalone-database']
