@@ -42,6 +42,7 @@ if ($plugin_data) {
 
   # Elasticsearch
   $is_elasticsearch_node = roles_include(['elasticsearch_kibana', 'primary-elasticsearch_kibana'])
+  $es_listen_address = get_network_role_property('elasticsearch', 'ipaddr')
   $elasticsearch_mode = $plugin_data['elasticsearch_mode']
   $es_nodes = get_nodes_hash_by_roles($network_metadata, ['elasticsearch_kibana', 'primary-elasticsearch_kibana'])
   $es_nodes_count = count($es_nodes)
@@ -182,6 +183,9 @@ lma::collector::monitor::mysql_password: <%= @mysql_password %>
 <% if @es_is_deployed -%>
 lma::collector::elasticsearch::server: <%= @es_server %>
 lma::collector::elasticsearch::rest_port: 9200
+<% if @is_elasticsearch_node -%>
+lma::collector::elasticsearch::listen_address <%= @es_listen_address %>
+<% end -%>
 <% end -%>
 <% if @influxdb_is_deployed -%>
 lma::collector::influxdb::server: <%= @influxdb_server %>
