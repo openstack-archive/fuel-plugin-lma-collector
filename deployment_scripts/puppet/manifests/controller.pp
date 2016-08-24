@@ -216,7 +216,7 @@ if hiera('lma::collector::elasticsearch::server', false) or hiera('lma::collecto
     notify => Service[$heat_api_service, $heat_engine_service],
   }
   heat_config { 'DEFAULT/notification_driver':
-    value  => $driver,
+    value  => 'messaging',
     notify => Service[$heat_api_service, $heat_engine_service],
   }
 
