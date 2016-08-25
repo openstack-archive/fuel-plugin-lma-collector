@@ -50,10 +50,14 @@ function process_message()
     local name = read_message('Fields[name]')
     local hostname = read_message('Fields[hostname]')
     if name and name == 'pacemaker_local_resource_active' and read_message("Fields[resource]") == 'vip__management' then
-        if read_message('Fields[value]') == 1 then
-            is_active = true
-        else
-            is_active = false
+        -- Skip pacemaker_local_resource_active metrics that don't
+        -- concern the local node
+        if read_message('Hostname') == hostname then
+            if read_message('Fields[value]') == 1 then
+                is_active = true
+            else
+                is_active = false
+            end
         end
         return 0
     end
