@@ -286,6 +286,7 @@ lma_collector:
     - name: 'rabbitmq-pacemaker-down'
       description: 'The RabbitMQ cluster is down because less than half of the nodes are up'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         logical_operator: 'and'
@@ -299,15 +300,10 @@ lma_collector:
             window: 60
             periods: 0
             function: last
-          - metric: pacemaker_local_dc_active
-            relational_operator: '=='
-            threshold: 1
-            window: 60
-            periods: 0
-            function: last
     - name: 'rabbitmq-pacemaker-warning'
       description: 'The RabbitMQ cluster is degraded because some RabbitMQ nodes are missing'
       severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         logical_operator: 'and'
@@ -318,12 +314,6 @@ lma_collector:
               status: up
             relational_operator: '<'
             threshold: 100
-            window: 60
-            periods: 0
-            function: last
-          - metric: pacemaker_local_dc_active
-            relational_operator: '=='
-            threshold: 1
             window: 60
             periods: 0
             function: last
