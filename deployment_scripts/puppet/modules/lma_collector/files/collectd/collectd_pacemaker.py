@@ -150,24 +150,21 @@ class CrmMonitorPlugin(base.Base):
                     yield {
                         'type_instance': 'node_status',
                         'values': MAINTENANCE_STATUS,
-                        'hostname': hostname,
-                        'meta': {'status': 'maintenance'}
+                        'meta': {'status': 'maintenance', 'host': hostname}
                     }
                 else:
                     aggregated_nodes_status['online'] += 1
                     yield {
                         'type_instance': 'node_status',
                         'values': ONLINE_STATUS,
-                        'hostname': hostname,
-                        'meta': {'status': 'online'}
+                        'meta': {'status': 'online', 'host': hostname}
                     }
             else:
                 aggregated_nodes_status['offline'] += 1
                 yield {
                     'type_instance': 'node_status',
                     'values': OFFLINE_STATUS,
-                    'hostname': hostname,
-                    'meta': {'status': 'offline'}
+                    'meta': {'status': 'offline', 'host': hostname}
                 }
 
         for status, cnt in aggregated_nodes_status.items():
@@ -224,8 +221,8 @@ class CrmMonitorPlugin(base.Base):
                         'type_instance': 'local_resource_active',
                         'values': str_to_boolint(
                             node == simple_resource.find('node').get('name')),
-                        'hostname': shorten_hostname(node),
-                        'meta': {'resource': resource_name}
+                        'meta': {'resource': resource_name,
+                                 'host': shorten_hostname(node)}
                     }
 
             for status in ('up', 'down'):
@@ -277,14 +274,12 @@ class CrmMonitorPlugin(base.Base):
                 yield {
                     'type_instance': 'resource_failures',
                     'values': v['fail_count'],
-                    'hostname': hostname,
-                    'meta': {'resource': resource_name}
+                    'meta': {'resource': resource_name, 'host': hostname}
                 }
                 yield {
                     'type_instance': 'resource_operations',
                     'values': v['ops_count'],
-                    'hostname': hostname,
-                    'meta': {'resource': resource_name}
+                    'meta': {'resource': resource_name, 'host': hostname}
                 }
 
 
