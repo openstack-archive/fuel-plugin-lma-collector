@@ -340,6 +340,10 @@ function process_message ()
                 if #t > 0 then
                     msg['Fields']['tag_fields'] = t
                 end
+
+                if sample['meta'] and sample['meta']['host'] then
+                    msg['Fields']['hostname'] = sample['meta']['host']
+                end
             elseif metric_source ==  'users' then
                 -- 'users' is a reserved name for InfluxDB v0.9
                 msg['Fields']['name'] = 'logged_users'
