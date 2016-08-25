@@ -44,7 +44,8 @@ define lma_collector::gse_cluster_filter (
   }
 
   $message_matcher = join([
-    '(Fields[name] == \'pacemaker_local_resource_active\' && Fields[resource] == \'vip__management\') || ',
+    '(Fields[name] == \'pacemaker_local_resource_active\' && Fields[resource] == \'vip__management\' && ',
+    "Fields[hostname] == '${::hostname}') || ",
     "(Fields[${lma_collector::params::aggregator_flag}] ${aggregator_flag_operator} NIL && (",
     inline_template('<%= @input_message_types.collect{|x| "Type =~ /#{x}$/"}.join(" || ") %>'),
     '))',

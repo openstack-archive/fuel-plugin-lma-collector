@@ -17,7 +17,7 @@ describe 'lma_collector::gse_cluster_filter' do
     let(:title) { :service }
     let(:facts) do
         {:kernel => 'Linux', :operatingsystem => 'Ubuntu',
-         :osfamily => 'Debian'}
+         :osfamily => 'Debian', :hostname => 'foo'}
     end
 
     describe 'with defaults' do
@@ -29,7 +29,8 @@ describe 'lma_collector::gse_cluster_filter' do
              :output_message_type => 'gse_service_cluster_metric',
              :output_metric_name => 'cluster_service_status'}
         end
-        it { is_expected.to contain_heka__filter__sandbox('gse_service').with_message_matcher("(Fields[name] == 'pacemaker_local_resource_active' && Fields[resource] == 'vip__management') || (Fields[aggregator] != NIL && (Type =~ /afd_service_metric$/))") }
+        it { is_expected.to contain_heka__filter__sandbox('gse_service').with_message_matcher(
+            "(Fields[name] == 'pacemaker_local_resource_active' && Fields[resource] == 'vip__management' && Fields[hostname] == 'foo') || (Fields[aggregator] != NIL && (Type =~ /afd_service_metric$/))") }
         it { is_expected.to contain_file('gse_service_topology') }
     end
 
@@ -56,7 +57,8 @@ describe 'lma_collector::gse_cluster_filter' do
              }
             }
         end
-        it { is_expected.to contain_heka__filter__sandbox('gse_service').with_message_matcher("(Fields[name] == 'pacemaker_local_resource_active' && Fields[resource] == 'vip__management') || (Fields[aggregator] == NIL && (Type =~ /gse_service_cluster_metric$/ || Type =~ /gse_node_cluster_metric$/))") }
+        it { is_expected.to contain_heka__filter__sandbox('gse_service').with_message_matcher(
+            "(Fields[name] == 'pacemaker_local_resource_active' && Fields[resource] == 'vip__management' && Fields[hostname] == 'foo') || (Fields[aggregator] == NIL && (Type =~ /gse_service_cluster_metric$/ || Type =~ /gse_node_cluster_metric$/))") }
         it { is_expected.to contain_file('gse_service_topology') }
     end
 end
