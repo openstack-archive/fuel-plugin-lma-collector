@@ -28,6 +28,7 @@ local msg = {
 local logger_map = {
     --cinder
     volume = 'cinder',
+    snapshot = 'cinder',
     -- glance
     image = 'glance',
     -- heat
