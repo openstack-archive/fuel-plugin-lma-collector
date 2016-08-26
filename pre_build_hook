@@ -30,7 +30,7 @@ download_packages \
     http://mirrors.kernel.org/ubuntu/pool/main/c/cairo/libcairo2_1.13.0~20140204-0ubuntu1.1_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/libd/libdatrie/libdatrie1_0.2.8-1_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/g/graphite2/libgraphite2-3_1.2.4-1ubuntu1_amd64.deb \
-    http://mirrors.kernel.org/ubuntu/pool/main/h/harfbuzz/libharfbuzz0b_0.9.27-1ubuntu1_amd64.deb \
+    http://security.ubuntu.com/ubuntu/pool/main/h/harfbuzz/libharfbuzz0b_0.9.27-1ubuntu1.1_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/libt/libtool/libltdl7_2.4.2-1.7ubuntu1_amd64.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/libt/libthai/libthai-data_0.1.20-3_all.deb \
     http://mirrors.kernel.org/ubuntu/pool/main/libt/libthai/libthai0_0.1.20-3_amd64.deb \
