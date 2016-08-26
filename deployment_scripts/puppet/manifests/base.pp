@@ -346,6 +346,7 @@ if hiera('lma::collector::influxdb::server', false) {
     class { 'lma_collector::collectd::mysql':
       username => hiera('lma::collector::monitor::mysql_username'),
       password => hiera('lma::collector::monitor::mysql_password'),
+      socket   => hiera('lma::collector::monitor::mysql_socket'),
       require  => Class['lma_collector::collectd::base'],
     }
 

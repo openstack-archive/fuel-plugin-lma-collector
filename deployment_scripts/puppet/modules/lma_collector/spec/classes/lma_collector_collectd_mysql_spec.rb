@@ -27,5 +27,30 @@ describe 'lma_collector::collectd::mysql' do
              .with_host('localhost') \
              .with_username('user') \
              .with_password('password') }
+        it { is_expected.to contain_lma_collector__collectd__python('collectd_mysql_check') \
+             .with_config({'Username' => '"user"',
+                           'Password' => '"password"',
+                           'Host' => '"localhost"',}
+                         )
+        }
+    end
+
+    describe 'with socket param' do
+        let(:params) do
+            {:username => 'user', :password => 'password', :socket => '/var/run/mysqld.sock'}
+        end
+        it { is_expected.to contain_collectd__plugin__mysql__database('config') \
+             .with_host('localhost') \
+             .with_username('user') \
+             .with_password('password') \
+             .with_socket('/var/run/mysqld.sock')
+        }
+        it { is_expected.to contain_lma_collector__collectd__python('collectd_mysql_check') \
+             .with_config({'Username' => '"user"',
+                           'Password' => '"password"',
+                           'Host' => '"localhost"',
+                           'Socket' => '"/var/run/mysqld.sock"'}
+                         )
+        }
     end
 end
