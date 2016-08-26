@@ -3,7 +3,7 @@
 Cluster
 ^^^^^^^
 
-* ``pacemaker_dc_local_active``, ``1`` when the Designated Controller (DC) is
+* ``pacemaker_local_dc_active``, ``1`` when the Designated Controller (DC) is
   the local host, if not, then ``0``.
 
 * ``pacemaker_dc`` [#f1]_, ``1`` when the Designated Controller (DC) is
@@ -34,7 +34,7 @@ one of 'offline', 'maintenance', or 'online':
 Resource
 ^^^^^^^^
 
-* ``pacemaker_resource_local_active``, ``1`` when the resource is located on
+* ``pacemaker_local_resource_active``, ``1`` when the resource is located on
   the host reporting the metric, if not, then ``0``. The metric contains a
   ``resource`` field which is one of 'vip__public', 'vip__management',
   'vip__vrouter_pub', or 'vip__vrouter'.
