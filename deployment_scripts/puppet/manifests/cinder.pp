@@ -59,7 +59,7 @@ cinder_config { 'DEFAULT/notification_topics':
 }
 
 cinder_config { 'DEFAULT/notification_driver':
-  value  => $driver,
+  value  => 'messaging',
   notify => Service[$volume_service],
 }
 
