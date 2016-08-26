@@ -34,6 +34,7 @@ local processes_map = {
 -- this is needed for the libvirt metrics because in that case, collectd sends
 -- the instance's ID instead of the hostname in the 'host' attribute
 local hostname = read_config('hostname') or error('hostname must be specified')
+local swap_size = (read_config('swap_size') or 0) + 0
 
 function replace_dot_by_sep (str)
     return string.gsub(str, '%.', sep)
@@ -375,6 +376,14 @@ function process_message ()
             if not skip_it then
                 utils.inject_tags(msg)
                 utils.safe_inject_message(msg)
+                if metric_source == 'swap' and metric_name == 'swap_used' and swap_size > 0 then
+                    -- collectd 5.4.0 doesn't report the used swap in
+                    -- percentage, this is why the metric is computed and
+                    -- injected by this plugin.
+                    msg['Fields']['name'] = 'swap_percent_used'
+                    msg['Fields']['value'] = value / swap_size
+                    utils.safe_inject_message(msg)
+                end
             end
         end
     end
