@@ -424,11 +424,6 @@ if hiera('lma::collector::influxdb::server', false) {
   # Enable the Apache status module
   class { 'fuel_lma_collector::mod_status': }
 
-  # Enable service heartbeat metrics
-  class { 'lma_collector::metrics::service_heartbeat':
-    services => ['memcached']
-  }
-
   # AFD filters
   class { 'lma_collector::afd::api': }
   class { 'lma_collector::afd::workers': }
