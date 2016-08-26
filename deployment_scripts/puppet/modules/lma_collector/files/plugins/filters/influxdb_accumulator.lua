@@ -16,6 +16,7 @@ require 'os'
 require 'string'
 require 'table'
 local utils = require 'lma_utils'
+local influxdb = require 'influxdb'
 local l = require 'lpeg'
 l.locale(l)
 
@@ -37,10 +38,7 @@ local defaults = {
 }
 local last_flush = os.time()
 local datapoints = {}
-
-function escape_string(str)
-    return tostring(str):gsub("([ ,])", "\\%1")
-end
+local encoder = influxdb.new(time_precision)
 
 -- Flush the datapoints to InfluxDB if enough items are present or if the
 -- timeout has expired
@@ -55,21 +53,18 @@ function flush ()
     end
 end
 
--- Return the Payload field decoded as JSON data, nil if the payload isn't a
--- valid JSON string
-function decode_json_payload()
-    local ok, data = pcall(cjson.decode, read_message("Payload"))
-    if not ok then
-        return
+-- return a table containing the common tags from the message
+function get_common_tags()
+    local tags = {}
+    for _, t in ipairs(tag_fields) do
+        tags[t] = read_message(string.format('Fields[%s]', t)) or defaults[t]
     end
-
-    return data
+    return tags
 end
 
+-- process a single metric
 function process_single_metric()
-    local tags = {}
     local name = read_message("Fields[name]")
-    local value
 
     if not name then
         return 'Fields[name] is missing'
@@ -79,7 +74,8 @@ function process_single_metric()
         return value
     end
 
-    -- collect Fields[tag_fields]
+    -- collect tags from Fields[tag_fields]
+    local tags = get_common_tags()
     local i = 0
     while true do
         local t = read_message("Fields[tag_fields]", 0, i)
@@ -90,102 +86,38 @@ function process_single_metric()
         i = i + 1
     end
 
-    encode_datapoint(name, value, tags)
+    datapoints[#datapoints+1] = encoder.encode_datapoint(read_message('Timestamp'), name, value, tags)
+    return
 end
 
 function process_bulk_metric()
     -- The payload contains a list of datapoints, each point being formatted
-    -- either like this: {name='foo',value=1,tags={k1=v1,...}}
-    -- or for multi_values: {name='bar',values={k1=v1, ..},tags={k1=v1,...}
+    -- either like this:
+    --      {name='foo',value=1,tags={k1=v1,...}}
+    -- or for multi_values:
+    --      {name='bar',values={k1=v1, ..},tags={k1=v1,...}
     -- datapoints can also contain a 'timestamp' in millisecond.
-    local datapoints = decode_json_payload()
-    if not datapoints then
-        return 'Invalid payload value'
+    local ok, points = pcall(cjson.decode, read_message("Payload"))
+    if not ok then
+        return 'Invalid payload value for bulk metric'
     end
 
-    for _, point in ipairs(datapoints) do
-        encode_datapoint(point.name, point.value or point.values, point.tags or {}, point.timestamp)
-    end
-end
-
-function encode_scalar_value(value)
-    if type(value) == "number" then
-        -- Always send numbers as formatted floats, so InfluxDB will accept
-        -- them if they happen to change from ints to floats between
-        -- points in time.  Forcing them to always be floats avoids this.
-        return string.format("%.6f", value)
-    elseif type(value) == "string" then
-        -- string values need to be double quoted
-        return '"' .. value:gsub('"', '\\"') .. '"'
-    elseif type(value) == "boolean" then
-        return '"' .. tostring(value) .. '"'
-    end
-end
-
-function encode_value(value)
-    if type(value) == "table" then
-        local values = {}
-        for k,v in pairs(value) do
-            table.insert(
-                values,
-                string.format("%s=%s", escape_string(k), encode_scalar_value(v))
-            )
+    local common_tags = get_common_tags()
+    local msg_timestamp = read_message('Timestamp')
+    for _, point in ipairs(points) do
+        point.tags = point.tags or {}
+        for k,v in pairs(common_tags) do
+            if point.tags[k] == nil then
+                points.tags[k] = v
+            end
         end
-        return table.concat(values, ',')
-    else
-        return "value=" .. encode_scalar_value(value)
+        datapoints[#datapoints+1] = encode_datapoint(
+            point.timestamp or msg_timestam,
+            point.name,
+            point.value or point.values,
+            point.tags)
     end
-end
-
--- encode a single datapoint using the InfluxDB line protocol
---
--- name:  the measurement's name
--- value: a scalar value or a list of key-value pairs
--- tags:  a table of tags
--- timestamp: an optional timestamp in nanosecond
---
--- Timestamp is taken from the Heka message if not provided as parameter.
-function encode_datapoint(name, value, tags, timestamp)
-    if type(name) ~= 'string' or value == nil or type(tags) ~= 'table' then
-        -- fail silently if any input parameter is invalid
-        return
-    end
-
-    local ts = timestamp or read_message('Timestamp')
-    if time_precision and time_precision ~= 'ns' then
-        ts = utils.message_timestamp(time_precision, ts)
-    end
-
-    -- Add the common tags
-    for _, t in ipairs(tag_fields) do
-        tags[t] = read_message(string.format('Fields[%s]', t)) or defaults[t]
-    end
-
-    local tags_array = {}
-    for k,v in pairs(tags) do
-        if k ~= '' and v ~= '' then
-            -- empty tag name and value aren't allowed
-            table.insert(tags_array, escape_string(k) .. '=' .. escape_string(v))
-        end
-    end
-    -- for performance reasons, it is recommended to always send the tags
-    -- in the same order.
-    table.sort(tags_array)
-
-    if #tags_array > 0 then
-        point = string.format("%s,%s %s %d",
-            escape_string(name),
-            table.concat(tags_array, ','),
-            encode_value(value),
-            ts)
-    else
-        point = string.format("%s %s %d",
-            escape_string(name),
-            encode_value(value),
-            ts)
-    end
-
-    datapoints[#datapoints+1] = point
+    return
 end
 
 function process_message()
