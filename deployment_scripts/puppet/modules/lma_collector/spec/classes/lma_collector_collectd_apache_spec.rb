@@ -25,7 +25,11 @@ describe 'lma_collector::collectd::apache' do
 
     describe 'with "host" and "port" param' do
         let(:params) {{:host => 'example.com', :port => '8081'}}
-        it { is_expected.to contain_class('collectd::plugin::apache') \
-             .with_instances({'localhost' => {'url' => 'http://example.com:8081/server-status?auto'}}) }
+        it {
+            is_expected.to contain_class('collectd::plugin::apache') \
+             .with_instances({'localhost' => {'url' => 'http://example.com:8081/server-status?auto'}})
+            is_expected.to contain_lma_collector__collectd__python('collectd_apache_check') \
+             .with_config({'Url' => "\"http://example.com:8081/server-status?auto\""})
+        }
     end
 end
