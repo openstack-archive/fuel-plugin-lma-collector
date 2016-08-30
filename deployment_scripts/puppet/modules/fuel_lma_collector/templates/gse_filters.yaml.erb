@@ -230,6 +230,15 @@ lma_collector:
         group_by: member
         members:
           - workers
+      # The AFDs are emitted by all the controller nodes because all of them
+      # collect the openstack_nova_instance_creation_time metric. Hence the
+      # service is considered not okay when a majority of controllers report
+      # not okay.
+      nova-instances:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - creation-time
       cinder-api:
         policy: highest_severity
         group_by: member
@@ -572,6 +581,7 @@ lma_collector:
           - nova-cert
           - nova-consoleauth
           - nova-novncproxy-websocket
+          - nova-instances
           - controller
           - compute
           - libvirt-service

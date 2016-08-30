@@ -1001,6 +1001,17 @@ lma_collector:
             relational_operator: '>'
             threshold: 1000
             window: 60
+    - name: 'instance-creation-time-warning'
+      description: "Instance creation takes too much time"
+      severity: 'warning'
+      no_data_policy: 'okay' # This is a sporadic metric
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_instance_creation_time
+            relational_operator: '>'
+            threshold: 20
+            window: 600
             periods: 0
             function: avg
 
@@ -1049,6 +1060,7 @@ lma_collector:
     keystone-public-api: ['primary-controller', 'controller']
     keystone-admin-api: ['primary-controller', 'controller']
     keystone-logs: ['primary-controller', 'controller']
+    nova-instances: ['primary-controller', 'controller']
 <% if @storage_options["volumes_ceph"] then -%>
     ceph-mon-cluster: ['primary-controller', 'controller']
     ceph-mon-service: ['primary-controller', 'controller']
@@ -1168,6 +1180,8 @@ lma_collector:
       error: ['keystone-logs-error']
     keystone-admin-api:
       http_errors: ['keystone-admin-api-http-errors']
+    nova-instances:
+      creation-time: ['instance-creation-time-warning']
     ceph-mon-cluster:
       health: ['ceph-health-critical', 'ceph-health-warning']
       capacity: ['ceph-capacity-critical', 'ceph-capacity-warning']
