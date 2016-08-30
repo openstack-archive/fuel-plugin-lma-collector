@@ -18,12 +18,19 @@ class lma_collector::collectd::apache (
   $port = $lma_collector::params::apache_status_port,
 ) inherits lma_collector::params {
 
+  $apache_url = "http://${host}:${port}/server-status?auto"
+
   class { 'collectd::plugin::apache':
     instances => {
       'localhost' => {
-        'url' => "http://${host}:${port}/server-status?auto"
+        'url' => $apache_url,
       },
     }
   }
 
+  lma_collector::collectd::python {'collectd_apache_check':
+    config => {
+      'URL' => $apache_url,
+    },
+  }
 }
