@@ -284,8 +284,25 @@ lma_collector:
             periods: 0
             function: avg
     - name: 'rabbitmq-pacemaker-down'
-      description: 'The RabbitMQ cluster is down because less than half of the nodes are up'
+      description: 'The RabbitMQ cluster is down'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
+      enabled: 'true'
+      trigger:
+        logical_operator: 'and'
+        rules:
+          - metric: pacemaker_resource_percent
+            fields:
+              resource: rabbitmq
+              status: up
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'rabbitmq-pacemaker-critical'
+      description: 'The RabbitMQ cluster is critical because less than half of the nodes are up'
+      severity: 'critical'
       no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
@@ -1125,7 +1142,7 @@ lma_collector:
   # Definition of the AFD service filters
   service_cluster_alarms:
     rabbitmq-cluster:
-      pacemaker: ['rabbitmq-pacemaker-down', 'rabbitmq-pacemaker-warning']
+      pacemaker: ['rabbitmq-pacemaker-down', 'rabbitmq-pacemaker-critical', 'rabbitmq-pacemaker-warning']
       queue: ['rabbitmq-queue-warning']
       memory: ['rabbitmq-memory-limit-critical', 'rabbitmq-memory-limit-warning']
       disk: ['rabbitmq-disk-limit-critical', 'rabbitmq-disk-limit-warning']
