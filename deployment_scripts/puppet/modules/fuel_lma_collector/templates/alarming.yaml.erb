@@ -221,6 +221,9 @@ lma_collector:
     - name: 'rabbitmq-disk-limit-critical'
       description: 'RabbitMQ has reached the free disk threshold. All producers are blocked'
       severity: 'critical'
+      # If the local RabbitMQ instance is down, it will be caught by the
+      # rabbitmq-check alarm
+      no_data_policy: 'okay'
       enabled: 'true'
       trigger:
         logical_operator: 'or'
@@ -234,6 +237,9 @@ lma_collector:
     - name: 'rabbitmq-disk-limit-warning'
       description: 'RabbitMQ is getting close to the free disk threshold'
       severity: 'warning'
+      # If the local RabbitMQ instance is down, it will be caught by the
+      # rabbitmq-check alarm
+      no_data_policy: 'okay'
       enabled: 'true'
       trigger:
         logical_operator: 'or'
@@ -247,6 +253,9 @@ lma_collector:
     - name: 'rabbitmq-memory-limit-critical'
       description: 'RabbitMQ has reached the memory threshold. All producers are blocked'
       severity: 'critical'
+      # If the local RabbitMQ instance is down, it will be caught by the
+      # rabbitmq-check alarm
+      no_data_policy: 'okay'
       enabled: 'true'
       trigger:
         logical_operator: 'or'
@@ -260,6 +269,9 @@ lma_collector:
     - name: 'rabbitmq-memory-limit-warning'
       description: 'RabbitMQ is getting close to the memory threshold'
       severity: 'warning'
+      # If the local RabbitMQ instance is down, it will be caught by the
+      # rabbitmq-check alarm
+      no_data_policy: 'okay'
       enabled: 'true'
       trigger:
         logical_operator: 'or'
@@ -273,6 +285,9 @@ lma_collector:
     - name: 'rabbitmq-queue-warning'
       description: 'The number of outstanding messages is too high'
       severity: 'warning'
+      # If the local RabbitMQ instance is down, it will be caught by the
+      # rabbitmq-check alarm
+      no_data_policy: 'okay'
       enabled: 'true'
       trigger:
         logical_operator: 'or'
@@ -284,8 +299,25 @@ lma_collector:
             periods: 0
             function: avg
     - name: 'rabbitmq-pacemaker-down'
-      description: 'The RabbitMQ cluster is down because less than half of the nodes are up'
+      description: 'The RabbitMQ cluster is down'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
+      enabled: 'true'
+      trigger:
+        logical_operator: 'and'
+        rules:
+          - metric: pacemaker_resource_percent
+            fields:
+              resource: rabbitmq
+              status: up
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'rabbitmq-pacemaker-critical'
+      description: 'The RabbitMQ cluster is critical because less than half of the nodes are up'
+      severity: 'critical'
       no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
@@ -849,7 +881,11 @@ lma_collector:
             function: last
     - name: 'rabbitmq-check'
       description: "RabbitMQ cannot be checked"
-      severity: 'down'
+      # This alarm's severity is warning because the effective status of the
+      # RabbitMQ cluster is computed by rabbitmq-pacemaker-* alarms.
+      # This alarm is still useful because it will report the node(s) on which
+      # RabbitMQ isn't running.
+      severity: 'warning'
       enabled: 'true'
       trigger:
         rules:
@@ -1125,7 +1161,7 @@ lma_collector:
   # Definition of the AFD service filters
   service_cluster_alarms:
     rabbitmq-cluster:
-      pacemaker: ['rabbitmq-pacemaker-down', 'rabbitmq-pacemaker-warning']
+      pacemaker: ['rabbitmq-pacemaker-down', 'rabbitmq-pacemaker-critical', 'rabbitmq-pacemaker-warning']
       queue: ['rabbitmq-queue-warning']
       memory: ['rabbitmq-memory-limit-critical', 'rabbitmq-memory-limit-warning']
       disk: ['rabbitmq-disk-limit-critical', 'rabbitmq-disk-limit-warning']
