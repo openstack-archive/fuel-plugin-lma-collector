@@ -330,6 +330,18 @@ lma_collector:
             window: 60
             periods: 0
             function: min
+    - name: 'apache-check'
+      description: 'Apache cannot be checked'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: apache_check
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
     - name: 'log-fs-warning'
       description: "The log filesystem's free space is low"
       severity: 'warning'
@@ -1136,6 +1148,7 @@ lma_collector:
       check: ['mysql-check']
     apache:
       worker: ['apache-warning']
+      check: ['apache-check']
     nova-api:
       http_errors: ['nova-api-http-errors']
     nova-logs:
