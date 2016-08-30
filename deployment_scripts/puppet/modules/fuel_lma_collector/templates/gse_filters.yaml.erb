@@ -167,6 +167,7 @@ lma_collector:
         group_by: hostname
         members:
           - worker
+          - check
       memcached-service:
         policy: majority_of_members
         group_by: hostname
