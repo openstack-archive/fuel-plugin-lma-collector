@@ -86,7 +86,7 @@ function process_single_metric()
         i = i + 1
     end
 
-    datapoints[#datapoints+1] = encoder.encode_datapoint(read_message('Timestamp'), name, value, tags)
+    datapoints[#datapoints+1] = encoder:encode_datapoint(read_message('Timestamp'), name, value, tags)
     return
 end
 
@@ -119,7 +119,7 @@ function process_bulk_metric()
                 point.tags[k] = v
             end
         end
-        datapoints[#datapoints+1] = encoder.encode_datapoint(
+        datapoints[#datapoints+1] = encoder:encode_datapoint(
             msg_timestamp,
             point.name,
             point.value or point.values,
