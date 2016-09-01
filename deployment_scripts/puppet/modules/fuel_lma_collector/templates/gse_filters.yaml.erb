@@ -156,23 +156,23 @@ lma_collector:
         group_by: hostname
         members:
           - node-status
-          - check
+          - endpoint
       haproxy-openstack:
         policy: majority_of_members
         group_by: hostname
         members:
-          - check
+          - endpoint
       apache:
         policy: majority_of_members
         group_by: hostname
         members:
           - worker
-          - check
+          - endpoint
       memcached-service:
         policy: majority_of_members
         group_by: hostname
         members:
-          - check
+          - endpoint
       rabbitmq-cluster:
         policy: highest_severity
         group_by: member
@@ -188,7 +188,7 @@ lma_collector:
         policy: majority_of_members
         group_by: hostname
         members:
-          - check
+          - endpoint
       nova-api:
         policy: highest_severity
         group_by: member
@@ -386,12 +386,12 @@ lma_collector:
         policy: majority_of_members
         group_by: hostname
         members:
-          - check
+          - endpoint
       ceph-osd-service:
         policy: majority_of_members
         group_by: hostname
         members:
-          - check
+          - endpoint
 <% end -%>
 <% if @monitor_elasticsearch -%>
       elasticsearch-cluster:
@@ -403,7 +403,7 @@ lma_collector:
         policy: majority_of_members
         group_by: hostname
         members:
-          - check
+          - endpoint
 <% end -%>
 <% if @monitor_influxdb -%>
       influxdb-cluster:
@@ -415,18 +415,18 @@ lma_collector:
         policy: majority_of_members
         group_by: hostname
         members:
-          - check
+          - endpoint
 <% end -%>
       pacemaker-service:
         policy: majority_of_members
         group_by: hostname
         members:
-          - check
+          - endpoint
       libvirt-service:
         policy: majority_of_members
         group_by: hostname
         members:
-          - check
+          - endpoint
 
   gse_cluster_node:
     input_message_types:
