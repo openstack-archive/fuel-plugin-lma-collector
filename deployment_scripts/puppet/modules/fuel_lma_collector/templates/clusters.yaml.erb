@@ -196,7 +196,7 @@ lma_collector:
         group_by: member
         members:
           - backends
-          - endpoint
+          - vip
           - http_errors
       nova-novncproxy-websocket:
         policy: highest_severity
@@ -247,14 +247,14 @@ lma_collector:
         group_by: member
         members:
           - backends
-          - endpoint
+          - vip
           - http_errors
       cinder-v2-api:
         policy: highest_severity
         group_by: member
         members:
           # Cinder V2 backends are in fact the same as the Cinder backends
-          - endpoint
+          - vip
       cinder-scheduler:
         policy: highest_severity
         group_by: member
@@ -270,7 +270,7 @@ lma_collector:
         group_by: member
         members:
           - backends
-          - endpoint
+          - vip
           - http_errors
       neutron-l3:
         policy: highest_severity
@@ -302,13 +302,13 @@ lma_collector:
         group_by: member
         members:
           - backends
-          - endpoint
+          - vip
           - http_errors
       keystone-admin-api:
         policy: highest_severity
         group_by: member
         members:
-          # TODO(pasquier-s): add a metric reporting the status of the keystone-admin-api endpoint
+          # TODO(pasquier-s): add a metric reporting the status of the keystone-admin-api vip
           - backends
           - http_errors
       glance-api:
@@ -316,7 +316,7 @@ lma_collector:
         group_by: member
         members:
           - backends
-          - endpoint
+          - vip
           - http_errors
       glance-registry-api:
         policy: highest_severity
@@ -328,14 +328,14 @@ lma_collector:
         group_by: member
         members:
           - backends
-          - endpoint
+          - vip
           - http_errors
       heat-cfn-api:
         policy: highest_severity
         group_by: member
         members:
           - backends
-          - endpoint
+          - vip
       heat-cloudwatch-api:
         policy: highest_severity
         group_by: member
@@ -357,14 +357,14 @@ lma_collector:
         group_by: member
         members:
           - backends
-          - endpoint
+          - vip
           - http_errors
       swift-s3-api:
         policy: highest_severity
         group_by: member
         members:
           # Swift S3 backends are in fact the same as the Swift backends
-          - endpoint
+          - vip
 <% end -%>
 <% if @ceilometer_enabled -%>
       ceilometer-api:
@@ -372,7 +372,7 @@ lma_collector:
         group_by: member
         members:
           - backends
-          - endpoint
+          - vip
 <% end -%>
 <% if @storage_options["volumes_ceph"] then -%>
       ceph-mon-cluster:
@@ -409,7 +409,7 @@ lma_collector:
         policy: highest_severity
         group_by: member
         members:
-          - endpoint
+          - vip
       influxdb-service:
         policy: majority_of_members
         group_by: hostname
