@@ -21,6 +21,5 @@ describe 'lma_collector::afd::api' do
 
     describe 'with defaults' do
         it { is_expected.to contain_heka__filter__sandbox('afd_api_backends') }
-        it { is_expected.to contain_heka__filter__sandbox('afd_api_endpoints') }
     end
 end
