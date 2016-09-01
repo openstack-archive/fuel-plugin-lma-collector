@@ -25,13 +25,4 @@ class lma_collector::afd::api () {
     module_directory => $lua_modules_dir,
     notify           => Class['lma_collector::service::metric'],
   }
-
-  heka::filter::sandbox { 'afd_api_endpoints':
-    config_dir       => $lma_collector::params::metric_config_dir,
-    filename         => "${lma_collector::params::plugins_dir}/filters/afd_api_endpoints.lua",
-    message_matcher  => join(['(Type == \'metric\' || Type == \'heka.sandbox.metric\') &&',
-      ' (Fields[name] =~ /^openstack.*check_api$/ || Fields[name] == \'http_check\')'], ''),
-    module_directory => $lua_modules_dir,
-    notify           => Class['lma_collector::service::metric'],
-  }
 }
