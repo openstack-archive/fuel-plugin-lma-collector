@@ -1015,6 +1015,189 @@ lma_collector:
             window: 60
             periods: 0
             function: avg
+    #
+    # Following are the OpenStack service check API definitions and
+    # also InfluxDB API
+    - name: 'influxdb-api-check-failed'
+      description: 'Endpoint check for InfluxDB failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the active node
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: http_check
+            fields:
+              service: 'influxdb'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-api-check-failed'
+      description: 'Endpoint check for nova-api failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the active node
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'nova-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-api-check-failed'
+      description: 'Endpoint check for neutron-api failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the active node
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'neutron-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-api-check-failed'
+      description: 'Endpoint check for cinder-api failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the active node
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'cinder-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-v2-api-check-failed'
+      description: 'Endpoint check for cinder-v2-api failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the active node
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'cinder-v2-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'glance-api-check-failed'
+      description: 'Endpoint check for glance-api failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the active node
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'glance-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-api-check-failed'
+      description: 'Endpoint check for heat-api failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the active node
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'heat-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-cfn-api-check-failed'
+      description: 'Endpoint check for heat-cfn-api failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the active node
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'heat-cfn-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'swift-api-check-failed'
+      description: 'Endpoint check for swift-api failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the active node
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'swift-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'swift-s3-api-check-failed'
+      description: 'Endpoint check for swift-s3-api failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the active node
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'swift-s3-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'keystone-public-api-check-failed'
+      description: 'Endpoint check for keystone-public-api failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the active node
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'keystone-public-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'ceilometer-api-check-failed'
+      description: 'Endpoint check for ceilometer-api failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the active node
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'ceilometer-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
 
   # Mapping between the Fuel roles and the AFD node filters
   node_cluster_roles:
@@ -1051,6 +1234,9 @@ lma_collector:
 <% if not @storage_options["objects_ceph"] then -%>
     swift-api: ['primary-controller', 'controller']
 <% end -%>
+<% if @ceilometer_enabled -%>
+    ceilometer-api: ['primary-controller', 'controller']
+<% end -%>
     cinder-api: ['primary-controller', 'controller']
     cinder-logs: ['primary-controller', 'controller', 'cinder']
     glance-api: ['primary-controller', 'controller']
@@ -1069,6 +1255,7 @@ lma_collector:
     elasticsearch-cluster: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
     elasticsearch-service: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
     influxdb-service: ['primary-influxdb_grafana', 'influxdb_grafana']
+    influxdb-cluster: ['primary-influxdb_grafana', 'influxdb_grafana']
     pacemaker-service: ['primary-controller', 'controller']
     haproxy-openstack: ['primary-controller', 'controller']
     libvirt-service: ['compute']
@@ -1151,32 +1338,47 @@ lma_collector:
       check: ['apache-check']
     nova-api:
       http_errors: ['nova-api-http-errors']
+      check: ['nova-api-check-failed']
     nova-logs:
       error: ['nova-logs-error']
+    heat-cfn-api:
+      check: ['heat-cfn-api-check-failed']
     heat-api:
       http_errors: ['heat-api-http-errors']
+      check: ['heat-api-check-failed']
     heat-logs:
       error: ['heat-logs-error']
     swift-api:
       http_errors: ['swift-api-http-errors']
+      check: ['swift-api-check-failed']
+    swift-s3-api:
+      check: ['swift-s3-check-failed']
     swift-logs:
       error: ['swift-logs-error']
+    ceilometer-api:
+      check: ['ceilomter-api-check-failed']
     cinder-api:
       http_errors: ['cinder-api-http-errors']
+      check: ['cinder-api-check-failed']
+    cinder-v2-api:
+      check: ['cinder-v2-api-check-failed']
     cinder-logs:
       error: ['cinder-logs-error']
     glance-api:
       http_errors: ['glance-api-http-errors']
+      check: ['glance-api-check-failed']
     glance-logs:
       error: ['glance-logs-error']
     neutron-api:
       http_errors: ['neutron-api-http-errors']
+      check: ['neutron-api-check-failed']
     neutron-logs:
       error: ['neutron-logs-error']
     keystone-response-time:
       duration: ['keystone-response-time-duration']
     keystone-public-api:
       http_errors: ['keystone-public-api-http-errors']
+      check: ['keystone-public-api-check-failed']
     keystone-logs:
       error: ['keystone-logs-error']
     keystone-admin-api:
@@ -1194,6 +1396,8 @@ lma_collector:
       check: ['elasticsearch-check']
     influxdb-service:
       check: ['influxdb-check']
+    influxdb_cluster:
+      check: ['influxdb-api-check-failed']
     haproxy-openstack:
       check: ['haproxy-check']
     pacemaker-service:
