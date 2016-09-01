@@ -1179,6 +1179,190 @@ lma_collector:
             periods: 0
             function: max
 
+    # Following are the OpenStack service check API definitions and
+    # also InfluxDB API
+    - name: 'influxdb-api-check-failed'
+      description: 'Endpoint check for InfluxDB is failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: http_check
+            fields:
+              service: 'influxdb'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-api-check-failed'
+      description: 'Endpoint check for nova-api is failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'nova-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-api-check-failed'
+      description: 'Endpoint check for neutron-api is failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'neutron-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-api-check-failed'
+      description: 'Endpoint check for cinder-api is failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'cinder-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-v2-api-check-failed'
+      description: 'Endpoint check for cinder-v2-api is failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'cinder-v2-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'glance-api-check-failed'
+      description: 'Endpoint check for glance-api is failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'glance-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-api-check-failed'
+      description: 'Endpoint check for heat-api is failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'heat-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-cfn-api-check-failed'
+      description: 'Endpoint check for heat-cfn-api is failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'heat-cfn-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'swift-api-check-failed'
+      description: 'Endpoint check for swift-api is failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'swift-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'swift-s3-api-check-failed'
+      description: 'Endpoint check for swift-s3-api is failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'swift-s3-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'keystone-public-api-check-failed'
+      description: 'Endpoint check for keystone-public-api is failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'keystone-public-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'ceilometer-api-check-failed'
+      description: 'Endpoint check for ceilometer-api is failed'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_api
+            fields:
+              service: 'ceilometer-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+
+
   # Definition of the AFD node filters
   node_cluster_alarms:
     controller:
@@ -1327,6 +1511,11 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['nova-api-http-errors']
+    nova-api-check:
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            vip: ['nova-api-check-failed']
     nova-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1339,6 +1528,16 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['heat-api-http-errors']
+    heat-api-check:
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            vip: ['heat-api-check-failed']
+    heat-cfn-api-check:
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            vip: ['heat-cfn-api-check-failed']
     heat-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1352,6 +1551,16 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['swift-api-http-errors']
+    swift-api-check:
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            vip: ['swift-api-check-failed']
+    swift-s3-api-check:
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            vip: ['swift-s3-api-check-failed']
     swift-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1365,6 +1574,16 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['cinder-api-http-errors']
+    cinder-api-check:
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            vip: ['cinder-api-check-failed']
+    cinder-v2-api-check:
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            vip: ['cinder-v2-api-check-failed']
     cinder-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1377,6 +1596,11 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['glance-api-http-errors']
+    glance-api-check:
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            vip: ['glance-api-check-failed']
     glance-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1389,6 +1613,11 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['neutron-api-http-errors']
+    neutron-api-check:
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            vip: ['neutron-api-check-failed']
     neutron-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1407,6 +1636,11 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['keystone-public-api-http-errors']
+    keystone-public-api-check:
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            vip: ['keystone-public-api-check-failed']
     keystone-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1485,6 +1719,11 @@ lma_collector:
         activate_alerting: true
         alarms:
             check: ['influxdb-check']
+    influxdb-api-check:
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            vip: ['influxdb-api-check-failed']
     haproxy-openstack:
         apply_to_node: controller
         enable_notification: false
@@ -1509,3 +1748,8 @@ lma_collector:
         activate_alerting: true
         alarms:
             check: ['memcached-check']
+    ceilometer-api-check:
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            vip: ['ceilometer-api-check-failed']

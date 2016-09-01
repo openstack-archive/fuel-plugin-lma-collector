@@ -196,8 +196,12 @@ lma_collector:
         group_by: member
         members:
           - backends
-          - endpoint
           - http_errors
+      nova-api-check:
+        policy: highest_severity
+        group_by: member
+        members:
+          - vip
       nova-novncproxy-websocket:
         policy: highest_severity
         group_by: member
@@ -247,14 +251,18 @@ lma_collector:
         group_by: member
         members:
           - backends
-          - endpoint
           - http_errors
-      cinder-v2-api:
+      cinder-api-check:
+        policy: highest_severity
+        group_by: member
+        members:
+          - vip
+      cinder-v2-api-check:
         policy: highest_severity
         group_by: member
         members:
           # Cinder V2 backends are in fact the same as the Cinder backends
-          - endpoint
+          - vip
       cinder-scheduler:
         policy: highest_severity
         group_by: member
@@ -270,8 +278,12 @@ lma_collector:
         group_by: member
         members:
           - backends
-          - endpoint
           - http_errors
+      neutron-api-check:
+        policy: highest_severity
+        group_by: member
+        members:
+          - vip
       neutron-l3:
         policy: highest_severity
         group_by: member
@@ -302,13 +314,17 @@ lma_collector:
         group_by: member
         members:
           - backends
-          - endpoint
           - http_errors
+      keystone-public-api-check:
+        policy: highest_severity
+        group_by: member
+        members:
+          - vip
       keystone-admin-api:
         policy: highest_severity
         group_by: member
         members:
-          # TODO(pasquier-s): add a metric reporting the status of the keystone-admin-api endpoint
+          # TODO(pasquier-s): add a metric reporting the status of the keystone-admin-api vip
           - backends
           - http_errors
       glance-api:
@@ -316,8 +332,12 @@ lma_collector:
         group_by: member
         members:
           - backends
-          - endpoint
           - http_errors
+      glance-api-check:
+        policy: highest_severity
+        group_by: member
+        members:
+          - vip
       glance-registry-api:
         policy: highest_severity
         group_by: member
@@ -328,14 +348,22 @@ lma_collector:
         group_by: member
         members:
           - backends
-          - endpoint
           - http_errors
+      heat-api-check:
+        policy: highest_severity
+        group_by: member
+        members:
+          - vip
       heat-cfn-api:
         policy: highest_severity
         group_by: member
         members:
           - backends
-          - endpoint
+      heat-cfn-api-check:
+        policy: highest_severity
+        group_by: member
+        members:
+          - vip
       heat-cloudwatch-api:
         policy: highest_severity
         group_by: member
@@ -357,14 +385,18 @@ lma_collector:
         group_by: member
         members:
           - backends
-          - endpoint
           - http_errors
-      swift-s3-api:
+      swift-api-check:
+        policy: highest_severity
+        group_by: member
+        members:
+          - vip
+      swift-s3-api-check:
         policy: highest_severity
         group_by: member
         members:
           # Swift S3 backends are in fact the same as the Swift backends
-          - endpoint
+          - vip
 <% end -%>
 <% if @ceilometer_enabled -%>
       ceilometer-api:
@@ -372,7 +404,11 @@ lma_collector:
         group_by: member
         members:
           - backends
-          - endpoint
+      ceilometer-api-check:
+        policy: highest_severity
+        group_by: member
+        members:
+          - vip
 <% end -%>
 <% if @storage_options["volumes_ceph"] then -%>
       ceph-mon-cluster:
@@ -405,11 +441,11 @@ lma_collector:
           - check
 <% end -%>
 <% if @monitor_influxdb -%>
-      influxdb-cluster:
+      influxdb-api-check:
         policy: highest_severity
         group_by: member
         members:
-          - endpoint
+          - vip
       influxdb-service:
         policy: majority_of_members
         group_by: hostname
@@ -606,6 +642,7 @@ lma_collector:
         members:
           - nova-logs
           - nova-api
+          - nova-api-check
           - nova-metadata-api
           - nova-scheduler
           - nova-compute
@@ -632,7 +669,8 @@ lma_collector:
         members:
           - cinder-logs
           - cinder-api
-          - cinder-v2-api
+          - cinder-api-check
+          - cinder-v2-api-check
           - cinder-scheduler
           - cinder-volume
           - controller
@@ -647,6 +685,7 @@ lma_collector:
         members:
           - neutron-logs
           - neutron-api
+          - neutron-api-check
 <% if not @contrail_plugin then -%>
           - neutron-l3
           - neutron-dhcp
@@ -665,6 +704,7 @@ lma_collector:
           - keystone-logs
           - keystone-response-time
           - keystone-public-api
+          - keystone-public-api-check
           - keystone-admin-api
           - controller
         hints:
@@ -676,6 +716,7 @@ lma_collector:
         members:
           - glance-logs
           - glance-api
+          - glance-api-check
           - glance-registry-api
           - controller
         hints:
@@ -687,7 +728,9 @@ lma_collector:
         members:
           - heat-logs
           - heat-api
+          - heat-api-check
           - heat-cfn-api
+          - heat-cfn-api-check
           - heat-cloudwatch-api
           - controller
         hints:
@@ -717,7 +760,8 @@ lma_collector:
         group_by: member
         members:
           - swift-api
-          - swift-s3-api
+          - swift-api-check
+          - swift-s3-api-check
           - controller
         hints:
           - keystone
@@ -728,6 +772,7 @@ lma_collector:
         group_by: member
         members:
           - ceilometer-api
+          - ceilometer-api-check
           - controller
         hints:
           - keystone
@@ -758,7 +803,7 @@ lma_collector:
         policy: highest_severity
         group_by: member
         members:
-          - influxdb-cluster
+          - influxdb-api-check
           - influxdb-service
           - influxdb-nodes
 <% end -%>
