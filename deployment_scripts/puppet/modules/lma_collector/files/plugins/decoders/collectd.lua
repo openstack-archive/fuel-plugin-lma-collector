@@ -283,15 +283,16 @@ function process_message ()
                         msg['Fields']['tag_fields'] = { 'backend' }
                         msg['Fields']['backend'] = sample['meta']['backend']
                         if sample['meta']['state'] then
-                            msg['Fields']['tag_fields'][2] = 'state'
                             msg['Fields']['state'] = sample['meta']['state']
+                            table.insert(msg['Fields']['tag_fields'], 'state')
+                        end
+                        if sample['meta']['host'] then
+                            msg['Fields']['server'] = sample['meta']['host']
+                            table.insert(msg['Fields']['tag_fields'], 'server')
                         end
                     elseif sample['meta']['frontend'] then
                         msg['Fields']['tag_fields'] = { 'frontend' }
                         msg['Fields']['frontend'] = sample['meta']['frontend']
-                    end
-                    if sample['meta']['host'] then
-                        msg['Fields']['hostname'] = sample['meta']['host']
                     end
                 end
             elseif metric_source == 'apache' then
