@@ -247,7 +247,7 @@ class HAProxyPlugin(base.Base):
                 'meta': {
                     'backend': pxname,
                     'state': stat['status'].lower(),
-                    'host': stat['svname'],
+                    'server': stat['svname'],
                 }
             }
 
