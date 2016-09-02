@@ -16,7 +16,8 @@ require 'os'
 require 'string'
 require 'table'
 local utils = require 'lma_utils'
-local influxdb = require 'influxdb'
+local Accumulator = require 'accumulator'
+local Influxdb = require 'influxdb'
 local l = require 'lpeg'
 l.locale(l)
 
@@ -36,22 +37,15 @@ local defaults = {
     tenant_id=default_tenant_id,
     user_id=default_user_id,
 }
-local last_flush = os.time()
-local datapoints = {}
-local encoder = influxdb.new(time_precision)
 
--- Flush the datapoints to InfluxDB if enough items are present or if the
--- timeout has expired
-function flush ()
-    local now = os.time()
-    if #datapoints > 0 and (#datapoints > flush_count or now - last_flush > flush_interval) then
+function flush_cb(datapoints)
+    if #datapoints > 0 then
         datapoints[#datapoints+1] = ''
         utils.safe_inject_payload("txt", payload_name, table.concat(datapoints, "\n"))
-
-        datapoints = {}
-        last_flush = now
     end
 end
+local accumulator = Accumulator.new(flush_count, flush_interval, flush_cb)
+local encoder = Influxdb.new(time_precision)
 
 -- return a table containing the common tags from the message
 function get_common_tags()
@@ -86,7 +80,12 @@ function process_single_metric()
         i = i + 1
     end
 
-    datapoints[#datapoints+1] = encoder:encode_datapoint(read_message('Timestamp'), name, value, tags)
+    accumulator:append(
+        encoder:encode_datapoint(
+            read_message('Timestamp'),
+            name,
+            value,
+            tags))
     return
 end
 
@@ -119,11 +118,12 @@ function process_bulk_metric()
                 point.tags[k] = v
             end
         end
-        datapoints[#datapoints+1] = encoder:encode_datapoint(
-            msg_timestamp,
-            point.name,
-            point.value or point.values,
-            point.tags)
+        accumulator:append(
+            encoder:encode_datapoint(
+                msg_timestamp,
+                point.name,
+                point.value or point.values,
+                point.tags))
     end
     return
 end
@@ -137,8 +137,6 @@ function process_message()
         err_msg = process_single_metric()
     end
 
-    flush()
-
     if err_msg then
         return -1, err_msg
     else
@@ -147,5 +145,5 @@ function process_message()
 end
 
 function timer_event(ns)
-    flush()
+    accumulator:flush(ns)
 end
