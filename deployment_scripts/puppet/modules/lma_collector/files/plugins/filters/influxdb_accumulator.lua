@@ -23,8 +23,6 @@ l.locale(l)
 
 local flush_count = (read_config('flush_count') or 100) + 0
 local flush_interval = (read_config('flush_interval') or 5) + 0
-local default_tenant_id = read_config("default_tenant_id")
-local default_user_id = read_config("default_user_id")
 local time_precision = read_config("time_precision")
 local payload_name = read_config("payload_name") or "influxdb"
 local bulk_metric_type_matcher = read_config("bulk_metric_type_matcher") or "bulk_metric$"
@@ -32,11 +30,6 @@ local bulk_metric_type_matcher = read_config("bulk_metric_type_matcher") or "bul
 -- the tag_fields parameter is a list of tags separated by spaces
 local tag_grammar = l.Ct((l.C((l.P(1) - l.P" ")^1) * l.P" "^0)^0)
 local tag_fields = tag_grammar:match(read_config("tag_fields") or "")
-
-local defaults = {
-    tenant_id=default_tenant_id,
-    user_id=default_user_id,
-}
 
 function flush_cb(datapoints)
     if #datapoints > 0 then
@@ -51,7 +44,7 @@ local encoder = Influxdb.new(time_precision)
 function get_common_tags()
     local tags = {}
     for _, t in ipairs(tag_fields) do
-        tags[t] = read_message(string.format('Fields[%s]', t)) or defaults[t]
+        tags[t] = read_message(string.format('Fields[%s]', t))
     end
     return tags
 end
