@@ -22,7 +22,7 @@ local influxdb = require('influxdb')
 TestInfluxDB = {}
 
     function TestInfluxDB:test_ms_precision_encoder()
-        encoder = influxdb.new("ms")
+        local encoder = influxdb.new("ms")
         assertEquals(encoder:encode_datapoint(1e9 * 1000, 'foo', 1), 'foo value=1.000000 1000000')
         assertEquals(encoder:encode_datapoint(1e9 * 1000, 'foo', 'bar'), 'foo value="bar" 1000000')
         assertEquals(encoder:encode_datapoint(1e9 * 1000, 'foo', 'b"ar'), 'foo value="b\\"ar" 1000000')
@@ -31,17 +31,17 @@ TestInfluxDB = {}
     end
 
     function TestInfluxDB:test_second_precision_encoder()
-        encoder = influxdb.new("s")
+        local encoder = influxdb.new("s")
         assertEquals(encoder:encode_datapoint(1e9 * 1000, 'foo', 1), 'foo value=1.000000 1000')
     end
 
     function TestInfluxDB:test_us_precision_encoder()
-        encoder = influxdb.new("us")
+        local encoder = influxdb.new("us")
         assertEquals(encoder:encode_datapoint(1e9 * 1000, 'foo', 1), 'foo value=1.000000 1000000000')
     end
 
     function TestInfluxDB:test_encoder_with_bad_input()
-        encoder = influxdb.new()
+        local encoder = influxdb.new()
         assertEquals(encoder:encode_datapoint(1e9 * 1000, nil, 1), '')
     end
 

@@ -19,8 +19,6 @@ local pairs = pairs
 local tostring = tostring
 local type = type
 
-local print = print
-
 local utils = require 'lma_utils'
 
 local InfluxEncoder = {}
