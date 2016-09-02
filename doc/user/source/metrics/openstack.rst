@@ -1,8 +1,8 @@
 .. _openstack_metrics:
 
-Service checks
-^^^^^^^^^^^^^^
-.. _service_checks:
+Service API checks
+^^^^^^^^^^^^^^^^^^
+.. _service_api_checks:
 
 * ``openstack_check_api``, the service's API status, ``1`` if it is responsive,
     if not, then ``0``. The metric contains a ``service`` field that identifies
