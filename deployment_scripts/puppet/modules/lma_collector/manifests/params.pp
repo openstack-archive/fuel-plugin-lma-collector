@@ -37,7 +37,7 @@ class lma_collector::params {
   $aggregator_flag = 'aggregator'
   # matcher for the messages sent to the aggregator
   $aggregator_client_message_matcher = join([
-    "Fields[${aggregator_flag}] == NIL", ' && ',
+    "(Fields[${aggregator_flag}] == NIL || Fields[hostname] == NIL)", ' && ',
     'Type =~ /^heka\\.sandbox\\.afd.*metric$/'
   ], '')
 
