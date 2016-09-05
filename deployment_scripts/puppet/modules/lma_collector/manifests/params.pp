@@ -37,9 +37,9 @@ class lma_collector::params {
   $aggregator_flag = 'aggregator'
   # matcher for the messages sent to the aggregator
   $aggregator_client_message_matcher = join([
-    "Fields[${aggregator_flag}] == NIL", ' && ',
-    'Type =~ /^heka\\.sandbox\\.afd.*metric$/'
-  ], '')
+    "(Fields[${aggregator_flag}] == NIL && ",
+    '(Type =~ /^heka\\.sandbox\\.afd.*metric$/ || ',
+    '(Fields[hostname] == NIL && Type =~ /^.*metric$/)))'], '')
 
   $log_watchdog_file = "/tmp/${log_service_name}.watchdog"
   $log_watchdog_payload_name = "${log_service_name}.watchdog"
