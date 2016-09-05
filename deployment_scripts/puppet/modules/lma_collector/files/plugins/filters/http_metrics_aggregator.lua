@@ -160,7 +160,7 @@ function timer_event(ns)
                     end
                 end
                 bucket.times = nil
-                utils.add_to_bulk_metric(metric_name, bucket, {http_method=method, http_status=status})
+                utils.add_to_bulk_metric(metric_name, bucket, {hostname=hostname, http_method=method, http_status=status})
                 all_times[service][method][status] = nil
                 num = num + 1
                 num_metrics = num_metrics - 1
