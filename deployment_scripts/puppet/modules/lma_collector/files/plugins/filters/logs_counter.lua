@@ -106,7 +106,7 @@ function timer_event(ns)
                    service = service_name,
                    level = string.lower(level),
                    hostname = hostname,
-                   tag_fields = {'service', 'level'},
+                   tag_fields = {'service', 'level', 'hostname'},
                }
 
                utils.inject_tags(msg)
