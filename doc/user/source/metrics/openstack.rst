@@ -1,11 +1,12 @@
 .. _openstack_metrics:
 
-Service checks
-^^^^^^^^^^^^^^
-.. _service_checks:
+Service API checks
+^^^^^^^^^^^^^^^^^^
+.. _service_api_checks:
 
-* ``openstack_check_api``, the service's API status, ``1`` if it is responsive,
-    if not, then ``0``. The metric contains a ``service`` field that identifies
+* ``openstack_check_api``, the service's API status through the load balancer
+    VIP, ``1`` if it is responsive, if not, then ``0``.
+    The metric contains a ``service`` field that identifies
     the OpenStack service being checked.
 
 ``<service>`` is one of the following values with their respective resource
