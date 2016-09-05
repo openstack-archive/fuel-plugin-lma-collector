@@ -239,17 +239,25 @@ class HAProxyPlugin(base.Base):
             pxname = stat['pxname']
             if pxname not in backend_server_states:
                 backend_server_states[pxname] = defaultdict(int)
-            backend_server_states[pxname][stat['status']] += 1
-            # Emit metric for the backend server
-            yield {
-                'type_instance': 'backend_server',
-                'values': STATUS_MAP[stat['status']],
-                'meta': {
-                    'backend': pxname,
-                    'state': stat['status'].lower(),
-                    'server': stat['svname'],
+
+            # The status field for a server has the following syntax when a
+            # transition occurs with HAproxy >=1.6: "DOWN 17/30" or "UP 1/3".
+            status = stat['status'].split(' ')[0]
+
+            # We only pick up the UP and DOWN status while it can be one of
+            # NOLB/MAINT/MAINT(via)...
+            if status in STATUS_MAP:
+                backend_server_states[pxname][status] += 1
+                # Emit metric for the backend server
+                yield {
+                    'type_instance': 'backend_server',
+                    'values': STATUS_MAP[status],
+                    'meta': {
+                        'backend': pxname,
+                        'state': status.lower(),
+                        'server': stat['svname'],
+                    }
                 }
-            }
 
         for pxname, states in backend_server_states.iteritems():
             for s in STATUS_MAP.keys():
