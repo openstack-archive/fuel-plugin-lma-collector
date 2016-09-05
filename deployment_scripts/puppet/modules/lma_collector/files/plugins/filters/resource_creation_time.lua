@@ -67,13 +67,14 @@ function process_message ()
         name = metric_name,
         -- preserve the original hostname in the Fields attribute because
         -- sandboxed filters cannot override the Hostname attribute
-        hostname = read_message("Fields[hostname]"),
+        created_on = read_message("Fields[hostname]"),
         type = utils.metric_type['GAUGE'],
         -- Having a millisecond precision for creation time is good enough given
         -- that the started_at field has only a 1-second precision.
         value = {value = math.floor((completed_at - started_at)/1e6 + 0.5) / 1e3, representation = 's'},
         tenant_id = read_message("Fields[tenant_id]"),
         user_id = read_message("Fields[user_id]"),
+        tag_fields = {'created_on'},
     }
     utils.inject_tags(msg)
 
