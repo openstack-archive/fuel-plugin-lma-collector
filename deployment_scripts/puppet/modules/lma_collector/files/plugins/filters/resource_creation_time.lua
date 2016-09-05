@@ -74,6 +74,7 @@ function process_message ()
         value = {value = math.floor((completed_at - started_at)/1e6 + 0.5) / 1e3, representation = 's'},
         tenant_id = read_message("Fields[tenant_id]"),
         user_id = read_message("Fields[user_id]"),
+        tag_fields = {'hostname'},
     }
     utils.inject_tags(msg)
 
