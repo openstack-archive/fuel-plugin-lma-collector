@@ -1048,6 +1048,7 @@ lma_collector:
           - metric: if_dropped_tx
             relational_operator: '>'
             threshold: 1000
+            function: avg
             window: 60
     - name: 'instance-creation-time-warning'
       description: "Instance creation takes too much time"
