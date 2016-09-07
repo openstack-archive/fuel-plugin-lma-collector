@@ -260,15 +260,35 @@ class HAProxyPlugin(base.Base):
                 }
 
         for pxname, states in backend_server_states.iteritems():
-            for s in STATUS_MAP.keys():
-                yield {
-                    'type_instance': 'backend_servers',
-                    'values': states.get(s, 0),
-                    'meta': {
-                        'backend': pxname,
-                        'state': s.lower()
-                    }
+
+            nb_up = states.get('UP', 0)
+            nb_down = states.get('DOWN', 0)
+
+            yield {
+                'type_instance': 'backend_servers_percent_up',
+                'values': (100.0 * nb_up) / (nb_up + nb_down),
+                'meta': {
+                    'backend': pxname,
                 }
+            }
+
+            yield {
+                'type_instance': 'backend_servers',
+                'values': nb_up,
+                'meta': {
+                    'backend': pxname,
+                    'state': 'up'
+                }
+            }
+
+            yield {
+                'type_instance': 'backend_servers',
+                'values': nb_down,
+                'meta': {
+                    'backend': pxname,
+                    'state': 'down'
+                }
+            }
 
     def config_callback(self, conf):
         for node in conf.children:
