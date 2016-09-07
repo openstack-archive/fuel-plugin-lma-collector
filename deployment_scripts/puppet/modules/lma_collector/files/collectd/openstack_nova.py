@@ -53,7 +53,15 @@ class NovaStatsPlugin(openstack.CollectdPlugin):
                                  'state': state})
 
         for service in aggregated_workers:
+            tw = aggregated_workers[service]['up'] + \
+                    aggregated_workers[service]['down'] + \
+                    aggregated_workers[service]['disabled']
+
             for state in self.states:
+                self.dispatch_value('nova_services_percentage', '',
+                                    float(aggregated_workers[service][state]) / tw,
+                                    {'state': state, 'service': service})
+
                 self.dispatch_value('nova_services', '',
                                     aggregated_workers[service][state],
                                     {'state': state, 'service': service})
