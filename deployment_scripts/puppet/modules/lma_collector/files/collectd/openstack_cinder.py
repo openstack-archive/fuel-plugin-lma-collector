@@ -55,6 +55,13 @@ class CinderStatsPlugin(openstack.CollectdPlugin):
                                  'state': state})
 
         for service in aggregated_workers:
+            # We want to compare the number of workers up vs down
+            totalw = aggregated_workers[service]['up'] + \
+                    aggregated_workers[service]['down']
+            percent = (100.0 * aggregated_workers[service]['up']) / totalw
+            self.dispatch_value('cinder_services_percent_up', '', percent,
+                                {'service': service})
+
             for state in self.states:
                 self.dispatch_value('cinder_services', '',
                                     aggregated_workers[service][state],
