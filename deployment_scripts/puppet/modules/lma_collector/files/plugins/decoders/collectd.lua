@@ -209,7 +209,7 @@ function process_message ()
                 end
             elseif metric_source == 'nova' then
                 if sample['plugin_instance'] == 'nova_services' or
-                   sample['plugin_instance'] == 'nova_service'  then
+                   sample['plugin_instance'] == 'nova_service' then
                     msg['Fields']['name'] = 'openstack_' .. sample['plugin_instance']
                     msg['Fields']['tag_fields'] = { 'service', 'state' }
                     msg['Fields']['service'] = sample['meta']['service']
@@ -217,6 +217,10 @@ function process_message ()
                     if sample['plugin_instance'] == 'nova_service'  then
                         msg['Fields']['hostname'] = sample['meta']['host']
                     end
+                elseif sample['plugin_instance'] == 'nova_services_percent_up' then
+                    msg['Fields']['name'] = 'openstack_' .. sample['plugin_instance']
+                    msg['Fields']['tag_fields'] = { 'service', 'state' }
+                    msg['Fields']['service'] = sample['meta']['service']
                 else
                     msg['Fields']['name'] = 'openstack' .. sep .. 'nova' .. sep .. replace_dot_by_sep(sample['plugin_instance'])
                     msg['Fields']['tag_fields'] = { 'state' }
@@ -232,6 +236,11 @@ function process_message ()
                     if sample['plugin_instance'] == 'cinder_service' then
                         msg['Fields']['hostname'] = sample['meta']['host']
                     end
+                elseif
+                   sample['plugin_instance'] == 'cinder_services_percent_up' then
+                    msg['Fields']['name'] = 'openstack_' .. sample['plugin_instance']
+                    msg['Fields']['tag_fields'] = { 'service', 'state' }
+                    msg['Fields']['service'] = sample['meta']['service']
                 else
                     msg['Fields']['name'] = 'openstack' .. sep .. 'cinder' .. sep .. replace_dot_by_sep(sample['plugin_instance'])
                     msg['Fields']['tag_fields'] = { 'state' }
@@ -262,6 +271,10 @@ function process_message ()
                     if sample['type_instance'] == 'neutron_agent'  then
                         msg['Fields']['hostname'] = sample['meta']['host']
                     end
+                elseif sample['type_instance'] == 'neutron_agents_percent_up' then
+                    msg['Fields']['name'] = 'openstack_' .. sample['type_instance']
+                    msg['Fields']['tag_fields'] = { 'service', 'state' }
+                    msg['Fields']['service'] = sample['meta']['service']
                 elseif string.match(sample['type_instance'], '^ports') then
                     local resource, owner, state = string.match(sample['type_instance'], '^([^.]+)%.([^.]+)%.(.+)$')
                     msg['Fields']['name'] = 'openstack'  .. sep .. 'neutron' .. sep .. replace_dot_by_sep(resource)

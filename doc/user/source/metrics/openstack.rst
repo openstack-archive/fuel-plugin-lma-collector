@@ -87,6 +87,11 @@ The following metrics are retrieved from the Nova API:
   'conductor', 'scheduler', 'cert' or 'consoleauth') and a ``state`` field (one
   of 'up', 'down', or 'disabled').
 
+* ``openstack_nova_services_percent_up``, the percentage of Nova services that
+  are up compared to how many are up and down. The metric contains a
+  ``service`` field (one of 'compute', 'conductor', 'scheduler', 'cert' or
+  'consoleauth'). It is a float.
+
 Identity
 ^^^^^^^^
 
@@ -136,6 +141,10 @@ The following metrics are retrieved from the Cinder API:
 * ``openstack_cinder_services``, the total count of Cinder services by state.
   The metric contains a ``service`` field (one of 'volume', 'backup',
   'scheduler') and a ``state`` field (one of 'up', 'down' or 'disabled').
+
+* ``openstack_cinder_services_percent``, the percentage of Cinder services that
+  are up compared to how many are up and down. The metric contains a
+  ``service`` field (one of 'volume', 'backup', 'scheduler'). It is a float.
 
 Image
 ^^^^^
@@ -187,6 +196,10 @@ The following metrics are retrieved from the Neutron API:
 * ``openstack_neutron_agents``, the total number of Neutron agents by service
   and state. The metric contains ``service`` (one of 'dhcp', 'l3', 'metadata'
   or 'openvswitch') and ``state`` (one of 'up', 'down' or 'disabled') fields.
+
+* ``openstack_neutron_agents_percent_up``, the percentage of Neutron agents by
+  service that are up compared to how many are up and down. The metric contains
+  ``service`` (one of 'dhcp', 'l3', 'metadata' or 'openvswitch'). It is a float.
 
 API response times
 ^^^^^^^^^^^^^^^^^^
