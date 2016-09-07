@@ -85,6 +85,13 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
                                  'state': state})
 
         for service in aggregated_agents:
+            # We want to compare the number of agents up vs down
+            totala = aggregated_agents[service]['up'] + \
+                aggregated_agents[service]['down']
+            percent = (100.0 * aggregated_agents[service]['up']) / totala
+            self.dispatch_value('neutron_agents_percent', percent,
+                                {'service': service})
+
             for state in self.states:
                 self.dispatch_value('neutron_agents',
                                     aggregated_agents[service][state],
