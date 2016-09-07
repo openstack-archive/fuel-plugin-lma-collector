@@ -66,6 +66,8 @@ back-end server:
 * ``haproxy_backend_downtime``, the total downtime in seconds.
 * ``haproxy_backend_error_connection``, the number of error connections.
 * ``haproxy_backend_error_responses``, the number of error responses.
+* ``haproxy_backend_percent_up``, the percentage of backends that are up. It
+  is a float between 0% (all are down) and 100% (all are up).
 * ``haproxy_backend_queue_current``, the number of requests in queue.
 * ``haproxy_backend_redistributed``, the number of times a request was
   redispatched to another server.
