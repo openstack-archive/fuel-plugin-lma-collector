@@ -85,7 +85,16 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
                                  'state': state})
 
         for service in aggregated_agents:
+            totala = aggregated_agents[service]['up'] + \
+                aggregated_agents[service]['down'] + \
+                aggregated_agents[service]['disabled']
+
             for state in self.states:
+                percent = (100.0 * aggregated_agents[service][state]) / totala
+                self.dispatch_value('neutron_agents_percent',
+                                    percent,
+                                    {'state': state, 'service': service})
+
                 self.dispatch_value('neutron_agents',
                                     aggregated_agents[service][state],
                                     {'service': service, 'state': state})
