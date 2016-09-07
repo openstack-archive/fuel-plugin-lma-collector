@@ -300,6 +300,10 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
   }
 }
 
+class { 'lma_collector::logs::hdd_errors_counter':
+  require => Class['lma_collector']
+}
+
 if hiera('lma::collector::elasticsearch::server', false) {
   class { 'lma_collector::logs::system':
     require => Class['lma_collector'],
