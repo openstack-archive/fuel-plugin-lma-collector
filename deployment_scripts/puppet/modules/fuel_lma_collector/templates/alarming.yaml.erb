@@ -1256,6 +1256,936 @@ lma_collector:
             periods: 0
             function: last
 
+    # Following are the AFD generated to check API backends
+    # All backends are down
+    - name: 'elasticsearch-api-backends-all-down'
+      description: 'All API backends are down for elasticsearch'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'elasticsearch-rest'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'kibana-api-backends-all-down'
+      description: 'All API backends are down for kibana'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'kibana'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'influxdb-api-backends-all-down'
+      description: 'All API backends are down for influxdb'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'influxdb'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'grafana-api-backends-all-down'
+      description: 'All API backends are down for grafana'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'grafana'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'glance-registry-api-backends-all-down'
+      description: 'All API backends are down for glance-registry-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'glance-registry-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-api-backends-all-down'
+      description: 'All API backends are down for nova-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'nova-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-api-backends-all-down'
+      description: 'All API backends are down for cinder-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'cinder-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'object-storage-api-backends-all-down'
+      description: 'All API backends are down for object-storage'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'object-storage'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-cfn-api-backends-all-down'
+      description: 'All API backends are down for heat-cfn-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'heat-cfn-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'horizon-web-api-backends-all-down'
+      description: 'All API backends are down for horizon-web'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'horizon-web'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-novncproxy-websocket-api-backends-all-down'
+      description: 'All API backends are down for nova-novncproxy-websocket'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'nova-novncproxy-websocket'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-api-backends-all-down'
+      description: 'All API backends are down for heat-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'heat-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'keystone-public-api-backends-all-down'
+      description: 'All API backends are down for keystone-public-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'keystone-public-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-cloudwatch-api-backends-all-down'
+      description: 'All API backends are down for heat-cloudwatch-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'heat-cloudwatch-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-metadata-api-backends-all-down'
+      description: 'All API backends are down for nova-metadata-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'nova-metadata-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'mysqld-tcp-api-backends-all-down'
+      description: 'All API backends are down for mysqld-tcp'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'mysqld-tcp'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'keystone-admin-api-backends-all-down'
+      description: 'All API backends are down for keystone-admin-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'keystone-admin-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'glance-api-backends-all-down'
+      description: 'All API backends are down for glance-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'glance-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-api-backends-all-down'
+      description: 'All API backends are down for neutron-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'neutron-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'swift-api-backends-all-down'
+      description: 'All API backends are down for swift-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'swift-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'ceilometer-api-backends-all-down'
+      description: 'All API backends are down for ceilometer-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'ceilometer-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    # At least one backend is down
+    - name: 'elasticsearch-api-backends-one-down'
+      description: 'At least one API backends is down for elasticsearch'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'elasticsearch-rest'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'kibana-api-backends-one-down'
+      description: 'At least one API backends is down for kibana'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'kibana'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'influxdb-api-backends-one-down'
+      description: 'At least one API backends is down for influxdb'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'influxdb'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'grafana-api-backends-one-down'
+      description: 'At least one API backends is down for grafana'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'grafana'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'glance-registry-api-backends-one-down'
+      description: 'At least one API backends is down for glance-registry-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'glance-registry-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-api-backends-one-down'
+      description: 'At least one API backends is down for nova-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'nova-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-api-backends-one-down'
+      description: 'At least one API backends is down for cinder-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'cinder-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'object-storage-api-backends-one-down'
+      description: 'At least one API backends is down for object-storage'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'object-storage'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-cfn-api-backends-one-down'
+      description: 'At least one API backends is down for heat-cfn-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'heat-cfn-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'horizon-web-api-backends-one-down'
+      description: 'At least one API backends is down for horizon-web'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'horizon-web'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-novncproxy-websocket-api-backends-one-down'
+      description: 'At least one API backends is down for nova-novncproxy-websocket'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'nova-novncproxy-websocket'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-api-backends-one-down'
+      description: 'At least one API backends is down for heat-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'heat-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'keystone-public-api-backends-one-down'
+      description: 'At least one API backends is down for keystone-public-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'keystone-public-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-cloudwatch-api-backends-one-down'
+      description: 'At least one API backends is down for heat-cloudwatch-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'heat-cloudwatch-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-metadata-api-backends-one-down'
+      description: 'At least one API backends is down for nova-metadata-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'nova-metadata-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'mysqld-tcp-api-backends-one-down'
+      description: 'At least one API backends is down for mysqld-tcp'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'mysqld-tcp'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'keystone-admin-api-backends-one-down'
+      description: 'At least one API backends is down for keystone-admin-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'keystone-admin-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'glance-api-backends-one-down'
+      description: 'At least one API backends is down for glance-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'glance-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-api-backends-one-down'
+      description: 'At least one API backends is down for neutron-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'neutron-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'swift-api-backends-one-down'
+      description: 'At least one API backends is down for swift-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'swift-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'ceilometer-api-backends-one-down'
+      description: 'At least one API backends is down for ceilometer-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'ceilometer-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    # Less than 50% of backends are up
+    - name: 'elasticsearch-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for elasticsearch'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'elasticsearch-rest'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'kibana-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for kibana'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'kibana'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'influxdb-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for influxdb'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'influxdb'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'grafana-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for grafana'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'grafana'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'glance-registry-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for glance-registry-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'glance-registry-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for nova-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'nova-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for cinder-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'cinder-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'object-storage-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for object-storage'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'object-storage'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-cfn-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for heat-cfn-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'heat-cfn-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'horizon-web-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for horizon-web'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'horizon-web'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-novncproxy-websocket-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for nova-novncproxy-websocket'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'nova-novncproxy-websocket'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for heat-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'heat-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'keystone-public-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for keystone-public-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'keystone-public-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-cloudwatch-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for heat-cloudwatch-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'heat-cloudwatch-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-metadata-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for nova-metadata-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'nova-metadata-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'mysqld-tcp-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for mysqld-tcp'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'mysqld-tcp'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'keystone-admin-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for keystone-admin-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'keystone-admin-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'glance-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for glance-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'glance-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for neutron-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'neutron-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'swift-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for swift-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'swift-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'ceilometer-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for ceilometer-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'ceilometer-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+
+
   # Mapping between the Fuel roles and the AFD node filters
   node_cluster_roles:
     controller: ['primary-controller', 'controller']
@@ -1280,11 +2210,15 @@ lma_collector:
 <% end -%>
 <% if @detach_database_enabled -%>
     mysql: ['primary-standalone-database', 'standalone-database']
+    mysqld-tcp: ['primary-standalone-database', 'standalone-database']
 <% else -%>
     mysql: ['primary-controller', 'controller']
+    mysqld-tcp: ['primary-controller', 'controller']
 <% end -%>
     apache: ['primary-controller', 'controller']
     nova-api: ['primary-controller', 'controller']
+    nova-novncproxy-websocket: ['primary-controller', 'controller']
+    nova-metadata-api: ['primary-controller', 'controller']
     nova-logs: ['primary-controller', 'controller', 'compute']
     heat-api: ['primary-controller', 'controller']
     heat-logs: ['primary-controller', 'controller']
@@ -1318,6 +2252,7 @@ lma_collector:
     haproxy-openstack: ['primary-controller', 'controller']
     libvirt-service: ['compute']
     memcached-service: ['primary-controller', 'controller']
+    horizon: ['primary-controller', 'controller']
 
   # Definition of the AFD node filters
   node_cluster_alarms:
@@ -1399,33 +2334,77 @@ lma_collector:
     mysql:
       node-status: ['mysql-node-connected', 'mysql-node-ready']
       check: ['mysql-check']
+    mysqld-tcp:
+      backends:
+        - 'mysqld-tcp-api-backends-all-down'
+        - 'mysqld-tcp-api-backends-majority-down'
+        - 'mysqld-tcp-api-backends-one-down'
     apache:
       worker: ['apache-warning']
       check: ['apache-check']
     nova-api:
       http_errors: ['nova-api-http-errors']
       endpoint: ['nova-api-check-failed']
+      backends:
+        - 'nova-api-backends-all-down'
+        - 'nova-api-backends-majority-down'
+        - 'nova-api-backends-one-down'
+    nova-metadata-api:
+      backends:
+        - 'nova-metadata-api-backends-all-down'
+        - 'nova-metadata-api-backends-majority-down'
+        - 'nova-metadata-api-backends-one-down'
+    nova-novncproxy-websocket:
+      backends:
+        - 'nova-novncproxy-websocket-api-backends-all-down'
+        - 'nova-novncproxy-websocket-api-backends-majority-down'
+        - 'nova-novncproxy-websocket-api-backends-one-down'
     nova-logs:
       error: ['nova-logs-error']
     heat-cfn-api:
       endpoint: ['heat-cfn-api-check-failed']
+      backends:
+        - 'heat-cfn-api-backends-all-down'
+        - 'heat-cfn-api-backends-majority-down'
+        - 'heat-cfn-api-backends-one-down'
+    heat-cloudwatch-api:
+      backends:
+        - 'heat-cloudwatch-api-backends-all-down'
+        - 'heat-cloudwatch-api-backends-majority-down'
+        - 'heat-cloudwatch-api-backends-one-down'
     heat-api:
       http_errors: ['heat-api-http-errors']
       endpoint: ['heat-api-check-failed']
+      backends:
+        - 'heat-api-backends-all-down'
+        - 'heat-api-backends-majority-down'
+        - 'heat-api-backends-one-down'
     heat-logs:
       error: ['heat-logs-error']
     swift-api:
       http_errors: ['swift-api-http-errors']
       endpoint: ['swift-api-check-failed']
+      backends:
+        - 'swift-api-backends-all-down'
+        - 'swift-api-backends-majority-down'
+        - 'swift-api-backends-one-down'
     swift-s3-api:
       endpoint: ['swift-s3-check-failed']
     swift-logs:
       error: ['swift-logs-error']
     ceilometer-api:
       endpoint: ['ceilomter-api-check-failed']
+      backends:
+        - 'ceilometer-api-backends-all-down'
+        - 'ceilometer-api-backends-majority-down'
+        - 'ceilometer-api-backends-one-down'
     cinder-api:
       http_errors: ['cinder-api-http-errors']
       endpoint: ['cinder-api-check-failed']
+      backends:
+        - 'cinder-api-backends-all-down'
+        - 'cinder-api-backends-majority-down'
+        - 'cinder-api-backends-one-down'
     cinder-v2-api:
       endpoint: ['cinder-v2-api-check-failed']
     cinder-logs:
@@ -1433,11 +2412,29 @@ lma_collector:
     glance-api:
       http_errors: ['glance-api-http-errors']
       endpoint: ['glance-api-check-failed']
+      backends:
+        - 'glance-api-backends-all-down'
+        - 'glance-api-backends-majority-down'
+        - 'glance-api-backends-one-down'
     glance-logs:
       error: ['glance-logs-error']
+    glance-registry-api:
+      backends:
+        - 'glance-registry-api-backends-all-down'
+        - 'glance-registry-api-backends-majority-down'
+        - 'glance-registry-api-backends-one-down'
+    horizon:
+      backends:
+        - 'horizon-web-api-backends-all-down'
+        - 'horizon-web-api-backends-majority-down'
+        - 'horizon-web-api-backends-one-down'
     neutron-api:
       http_errors: ['neutron-api-http-errors']
       endpoint: ['neutron-api-check-failed']
+      backends:
+        - 'neutron-api-backends-all-down'
+        - 'neutron-api-backends-majority-down'
+        - 'neutron-api-backends-one-down'
     neutron-logs:
       error: ['neutron-logs-error']
     keystone-response-time:
@@ -1445,10 +2442,18 @@ lma_collector:
     keystone-public-api:
       http_errors: ['keystone-public-api-http-errors']
       endpoint: ['keystone-public-api-check-failed']
+      backends:
+        - 'keystone-public-api-backends-all-down'
+        - 'keystone-public-api-backends-majority-down'
+        - 'keystone-public-api-backends-one-down'
     keystone-logs:
       error: ['keystone-logs-error']
     keystone-admin-api:
       http_errors: ['keystone-admin-api-http-errors']
+      backends:
+        - 'keystone-admin-api-backends-all-down'
+        - 'keystone-admin-api-backends-majority-down'
+        - 'keystone-admin-api-backends-one-down'
     nova-instances:
       creation-time: ['instance-creation-time-warning']
     ceph-mon-cluster:
