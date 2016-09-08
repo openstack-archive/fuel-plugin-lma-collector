@@ -1,0 +1,26 @@
+---
+lma_collector:
+    metrics:
+        openstack_nova_instance_creation_time:
+            evaluate_on_cluster: aggregator
+            description: '....'
+            dimensions:
+                - deployment_id
+                - environment_label
+                - tenant_id
+                - user_id
+        openstack_nova_total_free_vcpus:
+            evaluate_on_cluster: aggregator
+            description: '....'
+            dimensions:
+                - deployment_id
+                - environment_label
+                - ...
+        openstack_nova_free_vcpus:
+            evaluate_on_cluster: aggregator
+            description: '....'
+            dimensions:
+                - deployment_id
+                - environment_label
+                - ...
+
