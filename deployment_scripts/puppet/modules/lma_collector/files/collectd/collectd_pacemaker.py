@@ -14,9 +14,8 @@
 # limitations under the License.
 
 import collectd
-from collections import Counter
-from collections import defaultdict
-from sets import Set
+import collections
+import sets
 import socket
 import xml.etree.ElementTree as ET
 
@@ -182,7 +181,7 @@ class CrmMonitorPlugin(base.Base):
         # Report the number of resources per status
         # Clone resources can run on multipe nodes while "simple" resources run
         # only one node at the same time
-        aggregated_resources = defaultdict(Counter)
+        aggregated_resources = collections.defaultdict(collections.Counter)
         resources = root.find('resources')
         for resource_id, resource_name in self.resources.iteritems():
             resource_elts = []
@@ -254,7 +253,7 @@ class CrmMonitorPlugin(base.Base):
                     self.history[hostname][resource_id] = {
                         'fail_count': 0,
                         'ops_count': 0,
-                        'call_ids': Set([])
+                        'call_ids': sets.Set([])
                     }
                 v = self.history[hostname][resource_id]
 
@@ -264,7 +263,7 @@ class CrmMonitorPlugin(base.Base):
                     # For simple resources, the resource_history element only
                     # exists for the node that runs the resource
                     v['fail_count'] += int(res_history.get('fail-count', 0))
-                    call_ids = Set([
+                    call_ids = sets.Set([
                         i.get('call') for i in res_history.findall(
                             'operation_history')])
                     if call_ids:

@@ -15,8 +15,7 @@
 #
 # Collectd plugin for getting statistics from Cinder
 import collectd
-from collections import Counter
-from collections import defaultdict
+import collections
 import re
 
 import collectd_openstack as openstack
@@ -40,7 +39,7 @@ class CinderStatsPlugin(openstack.CollectdPlugin):
 
         # Get information of the state per service
         # State can be: 'up', 'down' or 'disabled'
-        aggregated_workers = defaultdict(Counter)
+        aggregated_workers = collections.defaultdict(collections.Counter)
 
         for worker in self.iter_workers('cinder'):
             host = worker['host'].split('.')[0]

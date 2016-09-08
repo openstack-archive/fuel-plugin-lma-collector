@@ -15,8 +15,7 @@
 #
 # Collectd plugin for getting statistics from Nova
 import collectd
-from collections import Counter
-from collections import defaultdict
+import collections
 import re
 
 import collectd_openstack as openstack
@@ -38,7 +37,7 @@ class NovaStatsPlugin(openstack.CollectdPlugin):
 
         # Get information of the state per service
         # State can be: 'up', 'down' or 'disabled'
-        aggregated_workers = defaultdict(Counter)
+        aggregated_workers = collections.defaultdict(collections.Counter)
 
         for worker in self.iter_workers('nova'):
             host = worker['host'].split('.')[0]

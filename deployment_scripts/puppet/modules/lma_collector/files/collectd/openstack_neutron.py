@@ -15,8 +15,7 @@
 #
 # Collectd plugin for getting resource statistics from Neutron
 import collectd
-from collections import Counter
-from collections import defaultdict
+import collections
 import re
 
 import collectd_openstack as openstack
@@ -69,7 +68,7 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
 
         # Get information of the state per agent
         # State can be up or down
-        aggregated_agents = defaultdict(Counter)
+        aggregated_agents = collections.defaultdict(collections.Counter)
 
         for agent in self.iter_workers('neutron'):
             host = agent['host'].split('.')[0]
