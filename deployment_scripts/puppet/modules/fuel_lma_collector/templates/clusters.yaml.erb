@@ -117,63 +117,87 @@ lma_collector:
     warm_up_period: 20
     clusters:
       nova-logs:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: hostname
         members:
           - error
       heat-logs:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: hostname
         members:
           - error
       cinder-logs:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: hostname
         members:
           - error
       glance-logs:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: hostname
         members:
           - error
       neutron-logs:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: hostname
         members:
           - error
       keystone-logs:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: hostname
         members:
           - error
       mysqld-tcp:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - backends
       mysql:
+        enable_notification: false
+        activate_alerting: false
         policy: majority_of_members
         group_by: hostname
         members:
           - node-status
           - check
       haproxy-openstack:
+        enable_notification: false
+        activate_alerting: false
         policy: majority_of_members
         group_by: hostname
         members:
           - check
       apache:
+        enable_notification: false
+        activate_alerting: false
         policy: majority_of_members
         group_by: hostname
         members:
           - worker
           - check
       memcached-service:
+        enable_notification: false
+        activate_alerting: false
         policy: majority_of_members
         group_by: hostname
         members:
           - check
       rabbitmq-cluster:
+        enable_notification: true
+        activate_alerting: true 
         policy: highest_severity
         group_by: member
         members:
@@ -182,6 +206,8 @@ lma_collector:
           - queue
           - pacemaker
       rabbitmq-service:
+        enable_notification: false
+        activate_alerting: false
         # A check failure on a single node doesn't mean that the whole cluster
         # is down, this is why a 'hostname' group_by and 'majority_of_members'
         # policy are used here.
@@ -190,6 +216,8 @@ lma_collector:
         members:
           - check
       nova-api:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
@@ -197,50 +225,66 @@ lma_collector:
           - endpoint
           - http_errors
       nova-novncproxy-websocket:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - backends
       nova-metadata-api:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - backends
       nova-scheduler:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - workers
       nova-cert:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - workers
       nova-consoleauth:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - workers
       nova-compute:
-        policy: highest_severity
-        group_by: member
+        enable_notification: false
+        activate_alerting: false
+        policy: highest_severity # TODO: write new policy
+        group_by: hostname
         members:
           - workers
       nova-conductor:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - workers
       # The AFDs are emitted by all the controller nodes because all of them
-      # collect the openstack_nova_instance_creation_time metric. Hence the
-      # service is considered not okay when a majority of controllers report
-      # not okay.
+      # collect the openstack_nova_instance_creation_time metric.
       nova-instances:
-        policy: majority_of_members
+        enable_notification: false
+        activate_alerting: false
+        policy: highest_severity
         group_by: hostname
         members:
-          - creation-time
+          - instance-creation-times
       cinder-api:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
@@ -248,22 +292,30 @@ lma_collector:
           - endpoint
           - http_errors
       cinder-v2-api:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           # Cinder V2 backends are in fact the same as the Cinder backends
           - endpoint
       cinder-scheduler:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - workers
       cinder-volume:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - workers
       neutron-api:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
@@ -271,31 +323,43 @@ lma_collector:
           - endpoint
           - http_errors
       neutron-l3:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - workers
       neutron-dhcp:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - workers
       neutron-metadata:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - workers
       neutron-openvswitch:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - workers
       keystone-response-time:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - duration
       keystone-public-api:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
@@ -303,6 +367,8 @@ lma_collector:
           - endpoint
           - http_errors
       keystone-admin-api:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
@@ -310,6 +376,8 @@ lma_collector:
           - backends
           - http_errors
       glance-api:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
@@ -317,11 +385,15 @@ lma_collector:
           - endpoint
           - http_errors
       glance-registry-api:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - backends
       heat-api:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
@@ -329,24 +401,32 @@ lma_collector:
           - endpoint
           - http_errors
       heat-cfn-api:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - backends
           - endpoint
       heat-cloudwatch-api:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - backends
 <% if @tls_enabled then -%>
       horizon-https:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - backends
 <% else -%>
       horizon-ui:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
@@ -354,6 +434,8 @@ lma_collector:
 <% end -%>
 <% if not @storage_options["objects_ceph"] then -%>
       swift-api:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
@@ -361,6 +443,8 @@ lma_collector:
           - endpoint
           - http_errors
       swift-s3-api:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
@@ -369,6 +453,8 @@ lma_collector:
 <% end -%>
 <% if @ceilometer_enabled -%>
       ceilometer-api:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
@@ -377,17 +463,23 @@ lma_collector:
 <% end -%>
 <% if @storage_options["volumes_ceph"] then -%>
       ceph-mon-cluster:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - health
           - capacity
       ceph-mon-service:
+        enable_notification: false
+        activate_alerting: false
         policy: majority_of_members
         group_by: hostname
         members:
           - check
       ceph-osd-service:
+        enable_notification: false
+        activate_alerting: false
         policy: majority_of_members
         group_by: hostname
         members:
@@ -395,11 +487,15 @@ lma_collector:
 <% end -%>
 <% if @monitor_elasticsearch -%>
       elasticsearch-cluster:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - health
       elasticsearch-service:
+        enable_notification: false
+        activate_alerting: false
         policy: majority_of_members
         group_by: hostname
         members:
@@ -407,26 +503,62 @@ lma_collector:
 <% end -%>
 <% if @monitor_influxdb -%>
       influxdb-cluster:
+        enable_notification: false
+        activate_alerting: false
         policy: highest_severity
         group_by: member
         members:
           - endpoint
       influxdb-service:
+        enable_notification: false
+        activate_alerting: false
         policy: majority_of_members
         group_by: hostname
         members:
           - check
 <% end -%>
       pacemaker-service:
+        enable_notification: false
+        activate_alerting: false
         policy: majority_of_members
         group_by: hostname
         members:
           - check
       libvirt-service:
+        enable_notification: false
+        activate_alerting: false
         policy: majority_of_members
         group_by: hostname
         members:
           - check
+      nova-instances:
+        enable_notification: false
+        activate_alerting: true
+        policy: highest_severity
+        group_by: hostname
+        members:
+          - instance-creation-times
+
+      # XXX
+      nova-free-resources:
+        enable_notification: false
+        activate_alerting: true
+        # There is only one source which emits AFDs, hence the policy doesn't
+        # matter in this case!
+        policy: highest_severity
+        group_by: member
+        members:
+          - nova-free-vcpu
+          - nova-free-memory
+
+      nova-compute-free-resources:
+        enable_notification: false
+        activate_alerting: true
+        policy: highest_severity  # TODO: which policy ?
+        group_by: hostname
+        members:
+          - nova-free-vcpu
+          - nova-free-memory
 
   gse_cluster_node:
     input_message_types:
@@ -442,6 +574,8 @@ lma_collector:
     warm_up_period: 80
     clusters:
       controller:
+        enable_notification: true
+        activate_alerting: true
         policy: majority_of_members
         group_by: hostname
         members:
@@ -452,7 +586,9 @@ lma_collector:
           - log-fs
           - swap
 <% if @detach_rabbitmq_enabled -%>
-      rabbitmq-nodes:
+      rabbitmq:
+        enable_notification: true
+        activate_alerting: true
         policy: majority_of_members
         group_by: hostname
         members:
@@ -462,7 +598,9 @@ lma_collector:
           - root-fs
           - swap
 <% end -%>
-      mysql-nodes:
+      mysql:
+        enable_notification: true
+        activate_alerting: true
         policy: majority_of_members
         group_by: hostname
         members:
@@ -475,6 +613,8 @@ lma_collector:
 <% end -%>
           - mysql-fs
       compute:
+        enable_notification: true
+        activate_alerting: true
         policy: majority_of_members
         group_by: hostname
         members:
@@ -485,6 +625,8 @@ lma_collector:
           - nova-fs
           - swap
       storage:
+        enable_notification: true
+        activate_alerting: true
         policy: majority_of_members
         group_by: hostname
         members:
@@ -494,7 +636,9 @@ lma_collector:
           - root-fs
           - swap
 <% if @monitor_elasticsearch -%>
-      elasticsearch-nodes:
+      elasticsearch:
+        enable_notification: true
+        activate_alerting: true
         policy: majority_of_members
         group_by: hostname
         members:
@@ -506,7 +650,9 @@ lma_collector:
           - swap
 <% end -%>
 <% if @monitor_influxdb -%>
-      influxdb-nodes:
+      influxdb:
+        enable_notification: true
+        activate_alerting: true
         policy: majority_of_members
         group_by: hostname
         members:
@@ -531,45 +677,57 @@ lma_collector:
     warm_up_period: 30
     clusters:
       mysql:
+        enable_notification: true
+        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
           - mysqld-tcp
           - mysql
-          - mysql-nodes
+          - mysql
 <% if not @detach_database_enabled -%>
           - controller
 <% end -%>
       haproxy-openstack:
+        enable_notification: true
+        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
           - haproxy-openstack
           - controller
       apache:
+        enable_notification: true
+        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
           - apache
           - controller
       memcached:
+        enable_notification: true
+        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
           - memcached-service
           - controller
       rabbitmq:
+        enable_notification: true
+        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
           - rabbitmq-cluster
           - rabbitmq-service
 <% if @detach_rabbitmq_enabled -%>
-          - rabbitmq-nodes
+          - rabbitmq
 <% else -%>
           - controller
 <% end -%>
       nova:
+        enable_notification: true
+        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
@@ -577,15 +735,11 @@ lma_collector:
           - nova-api
           - nova-metadata-api
           - nova-scheduler
-          - nova-compute
           - nova-conductor
           - nova-cert
           - nova-consoleauth
           - nova-novncproxy-websocket
-          - nova-instances
           - controller
-          - compute
-          - libvirt-service
         hints:
           - cinder
           - glance
@@ -594,6 +748,8 @@ lma_collector:
           - mysql
           - rabbitmq
       cinder:
+        enable_notification: true
+        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
@@ -609,6 +765,8 @@ lma_collector:
           - mysql
           - rabbitmq
       neutron:
+        enable_notification: true
+        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
@@ -626,6 +784,8 @@ lma_collector:
           - mysql
           - rabbitmq
       keystone:
+        enable_notification: true
+        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
@@ -638,6 +798,8 @@ lma_collector:
           - mysql
           - apache
       glance:
+        enable_notification: true
+        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
@@ -649,6 +811,8 @@ lma_collector:
           - keystone
           - mysql
       heat:
+        enable_notification: true
+        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
@@ -666,6 +830,8 @@ lma_collector:
           - mysql
           - rabbitmq
       horizon:
+        enable_notification: true
+        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
@@ -680,6 +846,8 @@ lma_collector:
           - apache
 <% if not @storage_options["objects_ceph"] then -%>
       swift:
+        enable_notification: true
+        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
@@ -691,6 +859,8 @@ lma_collector:
 <% end -%>
 <% if @ceilometer_enabled -%>
       ceilometer:
+        enable_notification: true
+        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
@@ -702,6 +872,8 @@ lma_collector:
 <% end -%>
 <% if @storage_options["volumes_ceph"] then -%>
       ceph:
+        enable_notification: true
+        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
@@ -713,24 +885,54 @@ lma_collector:
 <% end -%>
 <% if @monitor_elasticsearch -%>
       elasticsearch:
+        enable_notification: true
+        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
           - elasticsearch-cluster
           - elasticsearch-service
-          - elasticsearch-nodes
+          - elasticsearch
 <% end -%>
 <% if @monitor_influxdb -%>
       influxdb:
+        enable_notification: true
+        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
           - influxdb-cluster
           - influxdb-service
-          - influxdb-nodes
+          - influxdb
 <% end -%>
       pacemaker:
+        enable_notification: true
+        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
           - pacemaker-service
+
+      # XXX
+      nova-dataplane:
+        enable_notification: true
+        activate_alerting: true
+        policy: highest_severity
+        group_by: member
+        members:
+            - nova-free-resources
+            - nova-compute-free-resources
+            - libvirt-service
+            - nova-compute-logs
+            - nova-compute
+            - nova-instances
+            - compute
+      neutron-dataplane:
+        enable_notification: true
+        activate_alerting: true
+        policy: highest_severity
+        group_by: member
+        members:
+            - neutron-compute-logs
+            - neutron-compute-openvswitch # TODO
+            - compute

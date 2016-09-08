@@ -1,0 +1,40 @@
+---
+lma_collector:
+  # Mapping between the Fuel roles and the AFD filters
+  node_clusters:
+    controller:
+        roles: ['primary-controller', 'controller']
+        description: 'Controller nodes'
+    ceph-mon:
+        roles: ['primary-controller', 'controller']
+        description: 'Ceph monitor nodes'
+    mysql:
+<% if @detach_database_enabled -%>
+        roles: ['primary-standalone-database', 'standalone-database']
+<% else -%>
+        roles: ['primary-controller', 'controller']
+<% end -%>
+        description: 'Mysql nodes'
+    compute:
+        roles: ['compute']
+        description: 'Compute nodes'
+    storage:
+        roles: ['cinder', 'ceph-osd']
+        description: 'Storage nodes'
+    elasticsearch:
+        roles: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
+        description: 'Elasticsearch nodes'
+    influxdb:
+        roles: ['primary-influxdb_grafana', 'influxdb_grafana']
+        description: 'InfluxDB nodes'
+    rabbitmq:
+<% if @detach_rabbitmq_enabled -%>
+        roles: ['primary-standalone-rabbitmq', 'standalone-rabbitmq']
+<% else -%>
+        roles: ['primary-controller', 'controller']
+<% end -%>
+        description: 'Rabbitmq nodes'
+    # XXX
+    aggregator:
+        roles: ['primary-controller', 'controller']
+        description: 'Aggregator nodes'

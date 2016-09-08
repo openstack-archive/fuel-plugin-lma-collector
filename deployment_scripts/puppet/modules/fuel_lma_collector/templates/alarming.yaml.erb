@@ -1052,7 +1052,6 @@ lma_collector:
     - name: 'instance-creation-time-warning'
       description: "Instance creation takes too much time"
       severity: 'warning'
-      no_data_policy: 'okay' # This is a sporadic metric
       enabled: 'true'
       trigger:
         rules:
@@ -1063,192 +1062,302 @@ lma_collector:
             periods: 0
             function: avg
 
-  # Mapping between the Fuel roles and the AFD node filters
-  node_cluster_roles:
-    controller: ['primary-controller', 'controller']
-<% if @detach_database_enabled -%>
-    mysql-nodes: ['primary-standalone-database', 'standalone-database']
-<% else -%>
-    mysql-nodes: ['primary-controller', 'controller']
-<% end -%>
-    compute: ['compute']
-    storage: ['cinder', 'ceph-osd']
-    elasticsearch-nodes: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
-    influxdb-nodes: ['primary-influxdb_grafana', 'influxdb_grafana']
-
-  # Mapping between the Fuel roles and the AFD service filters
-  service_cluster_roles:
-<% if @detach_rabbitmq_enabled -%>
-    rabbitmq-cluster: ['primary-standalone-rabbitmq', 'standalone-rabbitmq']
-    rabbitmq-service: ['primary-standalone-rabbitmq', 'standalone-rabbitmq']
-<% else -%>
-    rabbitmq-cluster: ['primary-controller', 'controller']
-    rabbitmq-service: ['primary-controller', 'controller']
-<% end -%>
-<% if @detach_database_enabled -%>
-    mysql: ['primary-standalone-database', 'standalone-database']
-<% else -%>
-    mysql: ['primary-controller', 'controller']
-<% end -%>
-    apache: ['primary-controller', 'controller']
-    nova-api: ['primary-controller', 'controller']
-    nova-logs: ['primary-controller', 'controller', 'compute']
-    heat-api: ['primary-controller', 'controller']
-    heat-logs: ['primary-controller', 'controller']
-<% if not @storage_options["objects_ceph"] then -%>
-    swift-api: ['primary-controller', 'controller']
-<% end -%>
-    cinder-api: ['primary-controller', 'controller']
-    cinder-logs: ['primary-controller', 'controller', 'cinder']
-    glance-api: ['primary-controller', 'controller']
-    glance-logs: ['primary-controller', 'controller']
-    neutron-api: ['primary-controller', 'controller']
-    neutron-logs: ['primary-controller', 'controller', 'compute']
-    keystone-response-time: ['primary-controller', 'controller']
-    keystone-public-api: ['primary-controller', 'controller']
-    keystone-admin-api: ['primary-controller', 'controller']
-    keystone-logs: ['primary-controller', 'controller']
-    nova-instances: ['primary-controller', 'controller']
-<% if @storage_options["volumes_ceph"] then -%>
-    ceph-mon-cluster: ['primary-controller', 'controller']
-    ceph-mon-service: ['primary-controller', 'controller']
-    ceph-osd-service: ['ceph-osd']
-<% end -%>
-    elasticsearch-cluster: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
-    elasticsearch-service: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
-    influxdb-service: ['primary-influxdb_grafana', 'influxdb_grafana']
-    pacemaker-service: ['primary-controller', 'controller']
-    haproxy-openstack: ['primary-controller', 'controller']
-    libvirt-service: ['compute']
-    memcached-service: ['primary-controller', 'controller']
-
   # Definition of the AFD node filters
   node_cluster_alarms:
     controller:
-      cpu: ['cpu-critical-controller', 'cpu-warning-controller']
-      network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
-      network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
-      root-fs: ['root-fs-critical', 'root-fs-warning']
-      log-fs: ['log-fs-critical', 'log-fs-warning']
-      swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+      apply_to_node: controller
+      # XXX weither or not enable notification in nagios for all these alarms
+      enable_notification: true  # default true
+      # XXX weither or not configure nagios with all these alarms
+      display_in_alerting: true  # default true
+      alarms:
+          cpu: ['cpu-critical-controller', 'cpu-warning-controller']
+          network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
+          network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
+          root-fs: ['root-fs-critical', 'root-fs-warning']
+          log-fs: ['log-fs-critical', 'log-fs-warning']
+          swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
 <% if @detach_rabbitmq_enabled -%>
-    rabbitmq-nodes:
-      cpu: ['cpu-critical-rabbitmq', 'cpu-warning-rabbitmq']
-      network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
-      network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
-      root-fs: ['root-fs-critical', 'root-fs-warning']
-      swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+    rabbitmq:
+      apply_to_node: rabbitmq
+      alarms:
+          cpu: ['cpu-critical-rabbitmq', 'cpu-warning-rabbitmq']
+          network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
+          network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
+          root-fs: ['root-fs-critical', 'root-fs-warning']
+          swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
 <% end -%>
-    mysql-nodes:
+    mysql:
+      apply_to_node: mysql
 <% if @detach_database_enabled -%>
-      cpu: ['cpu-critical-mysql', 'cpu-warning-mysql']
-      network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
-      network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
-      root-fs: ['root-fs-critical', 'root-fs-warning']
-      swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+      alarms:
+          cpu: ['cpu-critical-mysql', 'cpu-warning-mysql']
+          network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
+          network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
+          root-fs: ['root-fs-critical', 'root-fs-warning']
+          swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
 <% end -%>
-      mysql-fs: ['mysql-fs-critical', 'mysql-fs-warning']
+          mysql-fs: ['mysql-fs-critical', 'mysql-fs-warning']
     compute:
-      cpu: ['cpu-critical-compute', 'cpu-warning-compute']
-      network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
-      network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
-      root-fs: ['root-fs-critical', 'root-fs-warning']
-      nova-fs: ['nova-fs-critical', 'nova-fs-warning']
-      swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+      apply_to_node: compute
+      alarms:
+          cpu: ['cpu-critical-compute', 'cpu-warning-compute']
+          network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
+          network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
+          root-fs: ['root-fs-critical', 'root-fs-warning']
+          nova-fs: ['nova-fs-critical', 'nova-fs-warning']
+          swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
     storage:
-      cpu: ['cpu-critical-storage', 'cpu-warning-storage']
-      network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
-      network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
-      root-fs: ['root-fs-critical', 'root-fs-warning']
-      swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
-    default:
-      cpu: ['cpu-critical-default']
-      network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
-      network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
-      root-fs: ['root-fs-critical', 'root-fs-warning']
-      swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
-    elasticsearch-nodes:
-      cpu: ['cpu-critical-default']
-      network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
-      network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
-      root-fs: ['root-fs-critical', 'root-fs-warning']
-      data-fs: ['elasticsearch-fs-critical', 'elasticsearch-fs-warning']
-      swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
-    influxdb-nodes:
-      cpu: ['cpu-critical-default']
-      network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
-      network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
-      root-fs: ['root-fs-critical', 'root-fs-warning']
-      data-fs: ['influxdb-fs-critical', 'influxdb-fs-warning']
-      swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+      apply_to_node: storage
+      alarms:
+          cpu: ['cpu-critical-storage', 'cpu-warning-storage']
+          network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
+          network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
+          root-fs: ['root-fs-critical', 'root-fs-warning']
+          swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+    elasticsearch:
+      apply_to_node: elasticsearch
+      alarms:
+          cpu: ['cpu-critical-default']
+          network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
+          network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
+          root-fs: ['root-fs-critical', 'root-fs-warning']
+          data-fs: ['elasticsearch-fs-critical', 'elasticsearch-fs-warning']
+          swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+    influxdb:
+      apply_to_node: influxdb
+      alarms:
+          cpu: ['cpu-critical-default']
+          network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
+          network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
+          root-fs: ['root-fs-critical', 'root-fs-warning']
+          data-fs: ['influxdb-fs-critical', 'influxdb-fs-warning']
+          swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
 
   # Definition of the AFD service filters
   service_cluster_alarms:
     rabbitmq-cluster:
-      pacemaker: ['rabbitmq-pacemaker-down', 'rabbitmq-pacemaker-critical', 'rabbitmq-pacemaker-warning']
-      queue: ['rabbitmq-queue-warning']
-      memory: ['rabbitmq-memory-limit-critical', 'rabbitmq-memory-limit-warning']
-      disk: ['rabbitmq-disk-limit-critical', 'rabbitmq-disk-limit-warning']
+      apply_to_node: rabbitmq
+      # XXX weither or not enable notification in nagios for all these alarms
+      enable_notification: false # default true
+      # XXX weither or not configure nagios with all these alarms
+      activate_alerting: false # default true
+      alarms:
+        pacemaker: ['rabbitmq-pacemaker-down', 'rabbitmq-pacemaker-critical', 'rabbitmq-pacemaker-warning']
+        queue: ['rabbitmq-queue-warning']
+        memory: ['rabbitmq-memory-limit-critical', 'rabbitmq-memory-limit-warning']
+        disk: ['rabbitmq-disk-limit-critical', 'rabbitmq-disk-limit-warning']
     rabbitmq-service:
-      check: ['rabbitmq-check']
+      apply_to_node: rabbitmq
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          check: ['rabbitmq-check']
     mysql:
-      node-status: ['mysql-node-connected', 'mysql-node-ready']
-      check: ['mysql-check']
+      apply_to_node: mysql
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          node-status: ['mysql-node-connected', 'mysql-node-ready']
+          check: ['mysql-check']
     apache:
-      worker: ['apache-warning']
-      check: ['apache-check']
+      apply_to_node: controller
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          worker: ['apache-warning']
+          check: ['apache-check']
     nova-api:
-      http_errors: ['nova-api-http-errors']
+      apply_to_node: controller
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          http_errors: ['nova-api-http-errors']
+
     nova-logs:
-      error: ['nova-logs-error']
+      apply_to_node: controller
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          error: ['nova-logs-error']
+    # XXX separate dataplane
+    nova-compute-logs:
+      apply_to_node: compute
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          error: ['nova-logs-error']
+
     heat-api:
-      http_errors: ['heat-api-http-errors']
+      apply_to_node: controller
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          http_errors: ['heat-api-http-errors']
     heat-logs:
-      error: ['heat-logs-error']
+      apply_to_node: controller
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          error: ['heat-logs-error']
     swift-api:
-      http_errors: ['swift-api-http-errors']
+      apply_to_node: controller
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          http_errors: ['swift-api-http-errors']
     swift-logs:
-      error: ['swift-logs-error']
+      apply_to_node: controller
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          error: ['swift-logs-error']
     cinder-api:
-      http_errors: ['cinder-api-http-errors']
+      apply_to_node: controller
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          http_errors: ['cinder-api-http-errors']
     cinder-logs:
-      error: ['cinder-logs-error']
+      apply_to_node: controller
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          error: ['cinder-logs-error']
     glance-api:
-      http_errors: ['glance-api-http-errors']
+      apply_to_node: controller
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          http_errors: ['glance-api-http-errors']
     glance-logs:
-      error: ['glance-logs-error']
+      apply_to_node: controller
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          error: ['glance-logs-error']
     neutron-api:
-      http_errors: ['neutron-api-http-errors']
+      apply_to_node: controller
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          http_errors: ['neutron-api-http-errors']
+
     neutron-logs:
-      error: ['neutron-logs-error']
+      apply_to_node: controller
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+        error: ['neutron-logs-error']
+    # XXX separate dataplane
+    neutron-compute-logs:
+      apply_to_node: compute
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+        error: ['neutron-logs-error']
+
     keystone-response-time:
-      duration: ['keystone-response-time-duration']
+      apply_to_node: controller
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          duration: ['keystone-response-time-duration']
     keystone-public-api:
-      http_errors: ['keystone-public-api-http-errors']
+      apply_to_node: controller
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          http_errors: ['keystone-public-api-http-errors']
     keystone-logs:
-      error: ['keystone-logs-error']
+      apply_to_node: controller
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          error: ['keystone-logs-error']
     keystone-admin-api:
-      http_errors: ['keystone-admin-api-http-errors']
-    nova-instances:
-      creation-time: ['instance-creation-time-warning']
+      apply_to_node: controller
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          http_errors: ['keystone-admin-api-http-errors']
     ceph-mon-cluster:
-      health: ['ceph-health-critical', 'ceph-health-warning']
-      capacity: ['ceph-capacity-critical', 'ceph-capacity-warning']
+      apply_to_node: ceph-mon
+      alarms:
+          health: ['ceph-health-critical', 'ceph-health-warning']
+          capacity: ['ceph-capacity-critical', 'ceph-capacity-warning']
     ceph-mon-service:
-      check: ['ceph-mon-check']
+      apply_to_node: ceph-mon
+      alarms:
+          check: ['ceph-mon-check']
     ceph-osd-service:
-      check: ['ceph-osd-check']
+      apply_to_node: controller
+      alarms:
+          check: ['ceph-osd-check']
     elasticsearch-cluster:
-      health: ['elasticsearch-health-critical', 'elasticsearch-health-warning']
+      apply_to_node: elasticsearch
+      alarms:
+          health: ['elasticsearch-health-critical', 'elasticsearch-health-warning']
     elasticsearch-service:
-      check: ['elasticsearch-check']
+      apply_to_node: elasticsearch
+      alarms:
+          check: ['elasticsearch-check']
     influxdb-service:
-      check: ['influxdb-check']
+      apply_to_node: influxdb
+      alarms:
+          check: ['influxdb-check']
     haproxy-openstack:
-      check: ['haproxy-check']
+      apply_to_node: controller
+      alarms:
+          check: ['haproxy-check']
     pacemaker-service:
-      check: ['pacemaker-check']
+      apply_to_node: controller
+      alarms:
+          check: ['pacemaker-check']
     libvirt-service:
-      check: ['libvirt-check']
+      apply_to_node: compute
+      alarms:
+          check: ['libvirt-check']
     memcached-service:
-      check: ['memcached-check']
+      apply_to_node: controller
+      alarms:
+          check: ['memcached-check']
+
+    nova-instances:
+      # XXX
+      # In Nagios, an instance-creation-time service can be created for each
+      # compute nodes
+      apply_to_node: compute
+      enable_notification: false # default true
+      activate_alerting: true # default true
+      alarms:
+          instance-creation-times: ['instance-creation-time-warning']
+
+    nova-free-resources:
+      # XXX
+      # This is the total free resource available to spawn virtual instances,
+      # There is no apply_to_node property since this is a global alarm.
+      # However, the 'nova-free-resources' is part of the GSE service.
+      enable_notification: false # false is the default since it not concerns a node cluster.
+      activate_alerting: true # false is the default since it not concerns a node cluster.
+      alarms:
+          # This alarm is evaluated by the 'aggregator' cluster due to its
+          # metric property described in metrics.yaml
+          nova-free-vcpu: ['nova-free-vcpu-warning']
+
+    nova-compute-free-resources:
+      # XXX
+      apply_to_node: compute
+      enable_notification: false
+      activate_alerting: false
+      alarms:
+          nova-free-vcpu: ['nova-compute-free-vcpu-warning']
+          nova-free-memory: ['nova-compute-memory-vcpu-warning']
+
+    # XXX
+    nova-compute:
+      apply_to_node: compute
+      enable_notification: false # default true
+      activate_alerting: false # default true
+      alarms:
+          worker: ['nova-compute-service']
