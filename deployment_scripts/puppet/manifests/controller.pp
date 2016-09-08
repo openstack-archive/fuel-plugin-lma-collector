@@ -261,7 +261,6 @@ if hiera('lma::collector::influxdb::server', false) {
   class { 'lma_collector::logs::aggregated_http_metrics': }
 
   # AFD filters
-  class { 'lma_collector::afd::api': }
   class { 'lma_collector::afd::workers': }
 }
 
