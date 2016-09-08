@@ -449,7 +449,6 @@ Public Classes:
 * [`lma_collector::notifications::metrics`](#class-lma_collectornotificationsmetrics)
 * [`lma_collector::aggregator::client`](#class-lma_collectoraggregatorclient)
 * [`lma_collector::aggregator::server`](#class-lma_collectoraggregatorserver)
-* [`lma_collector::afd::api`](#class-lma_collectorafdapi)
 * [`lma_collector::afd::workers`](#class-lma_collectorafdworkers)
 * [`lma_collector::gse_policies`](#class-lma_collectorgse_policies)
 * [`lma_collector::metrics::heka_monitoring`](#class-lma_collectormetricsheka_monitoring)
@@ -870,11 +869,6 @@ Declare this class to make Heka run the aggregator service.
 * `http_check_port`: *Optional*. The HTTP port that an external service can use
   to check the health of the aggregator service. Valid options: an integer.
   Default: `undef`.
-
-#### Class: `lma_collector::afd::api`
-
-Declare this class to configure the Heka filter that sends AFD metrics
-reporting the availability of the OpenStack API endpoints.
 
 #### Class: `lma_collector::afd::workers`
 
