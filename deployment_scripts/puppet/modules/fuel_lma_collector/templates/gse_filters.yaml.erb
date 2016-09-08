@@ -339,19 +339,6 @@ lma_collector:
         group_by: member
         members:
           - backends
-<% if @tls_enabled then -%>
-      horizon-https:
-        policy: highest_severity
-        group_by: member
-        members:
-          - backends
-<% else -%>
-      horizon-ui:
-        policy: highest_severity
-        group_by: member
-        members:
-          - backends
-<% end -%>
 <% if not @storage_options["objects_ceph"] then -%>
       swift-api:
         policy: highest_severity
@@ -676,11 +663,7 @@ lma_collector:
         policy: highest_severity
         group_by: member
         members:
-<% if @tls_enabled then -%>
-          - horizon-https
-<% else -%>
-          - horizon-ui
-<% end -%>
+          - backends
           - controller
         hints:
           - keystone
