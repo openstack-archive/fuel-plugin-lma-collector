@@ -222,7 +222,7 @@ lma_collector:
         members:
           - workers
       nova-compute:
-        policy: highest_severity
+        policy: dataplane  # TODO: write new policy
         group_by: member
         members:
           - workers
@@ -232,14 +232,12 @@ lma_collector:
         members:
           - workers
       # The AFDs are emitted by all the controller nodes because all of them
-      # collect the openstack_nova_instance_creation_time metric. Hence the
-      # service is considered not okay when a majority of controllers report
-      # not okay.
+      # collect the openstack_nova_instance_creation_time metric.
       nova-instances:
-        policy: majority_of_members
+        policy: dataplane  # TODO: write new policy
         group_by: hostname
         members:
-          - creation-time
+          - instance-creation-times
       cinder-api:
         policy: highest_severity
         group_by: member
@@ -441,7 +439,7 @@ lma_collector:
     interval: 10
     warm_up_period: 80
     clusters:
-      controller:
+      controller-nodes:
         policy: majority_of_members
         group_by: hostname
         members:
@@ -474,7 +472,7 @@ lma_collector:
           - swap
 <% end -%>
           - mysql-fs
-      compute:
+      compute-nodes:
         policy: majority_of_members
         group_by: hostname
         members:
@@ -484,7 +482,7 @@ lma_collector:
           - root-fs
           - nova-fs
           - swap
-      storage:
+      storage-nodes:
         policy: majority_of_members
         group_by: hostname
         members:
@@ -583,8 +581,8 @@ lma_collector:
           - nova-consoleauth
           - nova-novncproxy-websocket
           - nova-instances
-          - controller
-          - compute
+          - controller-nodes
+          - compute-nodes
           - libvirt-service
         hints:
           - cinder
@@ -602,8 +600,8 @@ lma_collector:
           - cinder-v2-api
           - cinder-scheduler
           - cinder-volume
-          - controller
-          - storage
+          - controller-nodes
+          - storage-nodes
         hints:
           - keystone
           - mysql
@@ -620,7 +618,7 @@ lma_collector:
           - neutron-metadata
           - neutron-openvswitch
 <% end -%>
-          - controller
+          - controller-nodes
         hints:
           - keystone
           - mysql
@@ -633,7 +631,7 @@ lma_collector:
           - keystone-response-time
           - keystone-public-api
           - keystone-admin-api
-          - controller
+          - controller-nodes
         hints:
           - mysql
           - apache
@@ -644,7 +642,7 @@ lma_collector:
           - glance-logs
           - glance-api
           - glance-registry-api
-          - controller
+          - controller-nodes
         hints:
           - keystone
           - mysql
@@ -656,7 +654,7 @@ lma_collector:
           - heat-api
           - heat-cfn-api
           - heat-cloudwatch-api
-          - controller
+          - controller-nodes
         hints:
           - cinder
           - glance
@@ -674,7 +672,7 @@ lma_collector:
 <% else -%>
           - horizon-ui
 <% end -%>
-          - controller
+          - controller-nodes
         hints:
           - keystone
           - apache
@@ -685,7 +683,7 @@ lma_collector:
         members:
           - swift-api
           - swift-s3-api
-          - controller
+          - controller-nodes
         hints:
           - keystone
 <% end -%>
@@ -695,7 +693,7 @@ lma_collector:
         group_by: member
         members:
           - ceilometer-api
-          - controller
+          - controller-nodes
         hints:
           - keystone
           - rabbitmq
@@ -708,8 +706,8 @@ lma_collector:
           - ceph-mon-cluster
           - ceph-mon-service
           - ceph-osd-service
-          - controller
-          - storage
+          - controller-nodes
+          - storage-nodes
 <% end -%>
 <% if @monitor_elasticsearch -%>
       elasticsearch:
