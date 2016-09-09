@@ -2405,6 +2405,539 @@ lma_collector:
             periods: 0
             function: last
 
+    # Following are the AFD generated to check workers
+    # All workers are down
+    - name: 'nova-scheduler-all-down'
+      description: 'All Nova schedulers are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'scheduler'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-cert-all-down'
+      description: 'All Nova certs are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'cert'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-consoleauth-all-down'
+      description: 'All Nova consoleauths are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'consoleauth'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-compute-all-down'
+      description: 'All Nova computes are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'compute'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-conductor-all-down'
+      description: 'All Nova conductors are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'conductor'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-scheduler-all-down'
+      description: 'All Cinder schedulers are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_services
+            fields:
+              service: 'scheduler'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-volume-all-down'
+      description: 'All Cinder volumes are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_services
+            fields:
+              service: 'volume'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-l3-all-down'
+      description: 'All Neutron L3 agents are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'l3'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-dhcp-all-down'
+      description: 'All Neutron DHCP agents are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'dhcp'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-metadata-all-down'
+      description: 'All Neutron metadata agents are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'metadata'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-openvswitch-all-down'
+      description: 'All Neutron openvswitch agents are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'openvswitch'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    # At least one backend is down
+    - name: 'nova-scheduler-one-down'
+      description: 'At least one Nova scheduler is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'scheduler'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-cert-one-down'
+      description: 'At least one Nova cert is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'cert'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-consoleauth-one-down'
+      description: 'At least one Nova consoleauth is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'consoleauth'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-compute-one-down'
+      description: 'At least one Nova compute is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'compute'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-conductor-one-down'
+      description: 'At least one Nova conductor is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'conductor'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-scheduler-one-down'
+      description: 'At least one Cinder scheduler is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_services
+            fields:
+              service: 'scheduler'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-volume-one-down'
+      description: 'At least one Cinder volume is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_services
+            fields:
+              service: 'volume'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-l3-one-down'
+      description: 'At least one L3 agent is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'l3'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-dhcp-one-down'
+      description: 'At least one DHCP agent is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'dhcp'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-metadata-one-down'
+      description: 'At least one metadata agents is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'metadata'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-openvswitch-one-down'
+      description: 'At least one openvswitch agents is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'openvswitch'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    # Less than 50% of service are up (compared to up and down).
+    - name: 'nova-scheduler-majority-down'
+      description: 'Less than 50% of Nova schedulers are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services_percent
+            fields:
+              service: 'scheduler'
+              status: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-cert-majority-down'
+      description: 'Less than 50% of Nova certs are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services_percent
+            fields:
+              service: 'cert'
+              status: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-consoleauth-majority-down'
+      description: 'Less than 50% of Nova consoleauths are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services_percent
+            fields:
+              service: 'consoleauth'
+              status: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-compute-majority-down'
+      description: 'Less than 50% of Nova computes are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services_percent
+            fields:
+              service: 'compute'
+              status: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-conductor-majority-down'
+      description: 'Less than 50% of Nova conductors are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services_percent
+            fields:
+              service: 'conductor'
+              status: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-scheduler-majority-down'
+      description: 'Less than 50% of Cinder schedulers are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_services_percent
+            fields:
+              service: 'scheduler'
+              status: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-volume-majority-down'
+      description: 'Less than 50% of Cinder volumes are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_services_percent
+            fields:
+              service: 'volume'
+              status: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-l3-majority-down'
+      description: 'Less than 50% of Neutron L3 agents are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_neutron_agents_percent
+            fields:
+              service: 'l3'
+              status: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-dhcp-majority-down'
+      description: 'Less than 50% of Neutron DHCP agents are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_neutron_agents_percent
+            fields:
+              service: 'dhcp'
+              status: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-metadata-majority-down'
+      description: 'Less than 50% of Neutron metadata agents are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_neutron_agents_percent
+            fields:
+              service: 'metadata'
+              status: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-openvswitch-majority-down'
+      description: 'Less than 50% of Neutron openvswitch agents are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_neutron_agents_percent
+            fields:
+              service: 'openvswitch'
+              status: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+
   # Definition of the AFD node filters
   node_cluster_alarms:
     controller:
@@ -2598,6 +3131,51 @@ lma_collector:
         activate_alerting: true
         alarms:
             error: ['nova-logs-error']
+    nova-cert:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            workers:
+                - 'nova-cert-all-down'
+                - 'nova-cert-majority-down'
+                - 'nova-cert-one-down'
+    nova-consoleauth:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            workers:
+                - 'nova-consoleauth-all-down'
+                - 'nova-consoleauth-majority-down'
+                - 'nova-consoleauth-one-down'
+    nova-compute:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            workers:
+                - 'nova-compute-all-down'
+                - 'nova-compute-majority-down'
+                - 'nova-compute-one-down'
+    nova-conductor:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            workers:
+                - 'nova-conductor-all-down'
+                - 'nova-conductor-majority-down'
+                - 'nova-conductor-one-down'
+    nova-scheduler:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            workers:
+                - 'nova-scheduler-all-down'
+                - 'nova-scheduler-majority-down'
+                - 'nova-scheduler-one-down'
     heat-api:
         apply_to_node: controller
         enable_notification: false
@@ -2714,6 +3292,24 @@ lma_collector:
         activate_alerting: true
         alarms:
             error: ['cinder-logs-error']
+    cinder-scheduler:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            workers:
+                - 'cinder-scheduler-all-down'
+                - 'cinder-scheduler-majority-down'
+                - 'cinder-scheduler-one-down'
+    cinder-volume:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            workers:
+                - 'cinder-volume-all-down'
+                - 'cinder-volume-majority-down'
+                - 'cinder-volume-one-down'
 <% if not @storage_options["volumes_ceph"] then -%>
     cinder-volume-logs:
         apply_to_node: storage
@@ -2785,6 +3381,42 @@ lma_collector:
         activate_alerting: true
         alarms:
             error: ['neutron-logs-error']
+    neutron-l3:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            workers:
+                - 'neutron-l3-all-down'
+                - 'neutron-l3-majority-down'
+                - 'neutron-l3-one-down'
+    neutron-dhcp:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            workers:
+                - 'neutron-dhcp-all-down'
+                - 'neutron-dhcp-majority-down'
+                - 'neutron-dhcp-one-down'
+    neutron-metadata:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            workers:
+                - 'neutron-metadata-all-down'
+                - 'neutron-metadata-majority-down'
+                - 'neutron-metadata-one-down'
+    neutron-openvswitch:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            workers:
+                - 'neutron-openvswitch-all-down'
+                - 'neutron-openvswitch-majority-down'
+                - 'neutron-openvswitch-one-down'
     neutron-logs-compute:
         apply_to_node: compute
         enable_notification: false
