@@ -1301,6 +1301,28 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['nova-api-http-errors']
+            backends:
+                - 'nova-api-backends-all-down'
+                - 'nova-api-backends-majority-down'
+                - 'nova-api-backends-one-down'
+    nova-metadata-api:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            backends:
+                - 'nova-metadata-api-backends-all-down'
+                - 'nova-metadata-api-backends-majority-down'
+                - 'nova-metadata-api-backends-one-down'
+    nova-novncproxy-websocket:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            backends:
+                - 'nova-novncproxy-websocket-api-backends-all-down'
+                - 'nova-novncproxy-websocket-api-backends-majority-down'
+                - 'nova-novncproxy-websocket-api-backends-one-down'
     nova-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1313,6 +1335,28 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['heat-api-http-errors']
+            backends:
+                - 'heat-api-backends-all-down'
+                - 'heat-api-backends-majority-down'
+                - 'heat-api-backends-one-down'
+    heat-cfn-api:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            backends:
+                - 'heat-cfn-api-backends-all-down'
+                - 'heat-cfn-api-backends-majority-down'
+                - 'heat-cfn-api-backends-one-down'
+    heat-cloudwatch-api:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            backends:
+                - 'heat-cloudwatch-api-backends-all-down'
+                - 'heat-cloudwatch-api-backends-majority-down'
+                - 'heat-cloudwatch-api-backends-one-down'
     heat-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1326,6 +1370,10 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['swift-api-http-errors']
+            backends:
+                - 'swift-api-backends-all-down'
+                - 'swift-api-backends-majority-down'
+                - 'swift-api-backends-one-down'
     swift-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1339,6 +1387,10 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['cinder-api-http-errors']
+            backends:
+                - 'cinder-api-backends-all-down'
+                - 'cinder-api-backends-majority-down'
+                - 'cinder-api-backends-one-down'
     cinder-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1351,6 +1403,20 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['glance-api-http-errors']
+            backends:
+                - 'glance-api-backends-all-down'
+                - 'glance-api-backends-majority-down'
+                - 'glance-api-backends-one-down'
+    glance-registry-api:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            http_errors: ['glance-api-http-errors']
+            backends:
+                - 'glance-registry-api-backends-all-down'
+                - 'glance-registry-api-backends-majority-down'
+                - 'glance-registry-api-backends-one-down'
     glance-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1363,6 +1429,10 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['neutron-api-http-errors']
+            backends:
+                - 'neutron-api-backends-all-down'
+                - 'neutron-api-backends-majority-down'
+                - 'neutron-api-backends-one-down'
     neutron-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1381,6 +1451,10 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['keystone-public-api-http-errors']
+            backends:
+                - 'keystone-public-api-backends-all-down'
+                - 'keystone-public-api-backends-majority-down'
+                - 'keystone-public-api-backends-one-down'
     keystone-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1393,6 +1467,10 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['keystone-admin-api-http-errors']
+            backends:
+                - 'keystone-admin-api-backends-all-down'
+                - 'keystone-admin-api-backends-majority-down'
+                - 'keystone-admin-api-backends-one-down'
 <% if @tls_enabled then -%>
     horizon-https:
 <% else -%>
@@ -1403,6 +1481,10 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['horizon-web-http-errors']
+            backends:
+                - 'horizon-web-api-backends-all-down'
+                - 'horizon-web-api-backends-majority-down'
+                - 'horizon-web-api-backends-one-down'
     nova-instances:
         #TODO(scroiset): apply on compute nodes
         apply_to_node: controller
