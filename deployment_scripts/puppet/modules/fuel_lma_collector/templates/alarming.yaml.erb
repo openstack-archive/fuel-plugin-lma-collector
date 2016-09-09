@@ -2190,6 +2190,505 @@ lma_collector:
             periods: 0
             function: last
 
+    # Following are the AFD generated to check workers
+    # All workers are down
+    - name: 'nova-scheduler-all-down'
+      description: 'All Nova schedulers are down'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'scheduler'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-cert-all-down'
+      description: 'All Nova certs are down'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'cert'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-consoleauth-all-down'
+      description: 'All Nova consoleauths are down'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'consoleauth'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-compute-all-down'
+      description: 'All Nova computes are down'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'compute'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-conductor-all-down'
+      description: 'All Nova conductors are down'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'conductor'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-scheduler-all-down'
+      description: 'All Cinder schedulers are down'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_services
+            fields:
+              service: 'scheduler'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-volume-all-down'
+      description: 'All Cinder volumes are down'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_services
+            fields:
+              service: 'volume'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-l3-all-down'
+      description: 'All Neutron L3 agents are down'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'l3'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-dhcp-all-down'
+      description: 'All Neutron DHCP agents are down'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'dhcp'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-metadata-all-down'
+      description: 'All Neutron metadata agents are down'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'metadata'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-openvswitch-all-down'
+      description: 'All Neutron openvswitch agents are down'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'openvswitch'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    # At least one backend is down
+    - name: 'nova-scheduler-one-down'
+      description: 'At least one Nova scheduler is down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'scheduler'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-cert-one-down'
+      description: 'At least one Nova cert is down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'cert'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-consoleauth-one-down'
+      description: 'At least one Nova consoleauth is down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'consoleauth'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-compute-one-down'
+      description: 'At least one Nova compute is down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'compute'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-conductor-one-down'
+      description: 'At least one Nova conductor is down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'conductor'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-scheduler-one-down'
+      description: 'At least one Cinder scheduler is down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_services
+            fields:
+              service: 'scheduler'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-volume-one-down'
+      description: 'At least one Cinder volume is down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_services
+            fields:
+              service: 'volume'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-l3-one-down'
+      description: 'At least one L3 agent is down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'l3'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-dhcp-one-down'
+      description: 'At least one DHCP agent is down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'dhcp'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-metadata-one-down'
+      description: 'At least one metadata agents is down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'metadata'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-openvswitch-one-down'
+      description: 'At least one openvswitch agents is down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'openvswitch'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    # Less than 50% of service are up
+    - name: 'nova-scheduler-majority-down'
+      description: 'Less than 50% of Nova schedulers are down'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services_percent
+            fields:
+              service: 'scheduler'
+              state: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-cert-majority-down'
+      description: 'Less than 50% of Nova certs are down'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services_percent
+            fields:
+              service: 'cert'
+              state: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-consoleauth-majority-down'
+      description: 'Less than 50% of Nova consoleauths are down'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services_percent
+            fields:
+              service: 'consoleauth'
+              state: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-compute-majority-down'
+      description: 'Less than 50% of Nova computes are down'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services_percent
+            fields:
+              service: 'compute'
+              state: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-conductor-majority-down'
+      description: 'Less than 50% of Nova conductors are down'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services_percent
+            fields:
+              service: 'conductor'
+              state: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-scheduler-majority-down'
+      description: 'Less than 50% of Cinder schedulers are down'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_services_percent
+            fields:
+              service: 'scheduler'
+              state: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-volume-majority-down'
+      description: 'Less than 50% of Cinder volumes are down'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_services_percent
+            fields:
+              service: 'volume'
+              state: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-l3-majority-down'
+      description: 'Less than 50% of Neutron L3 agents are down'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_neutron_agents_percent
+            fields:
+              service: 'l3'
+              state: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-dhcp-majority-down'
+      description: 'Less than 50% of Neutron DHCP agents are down'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_neutron_agents_percent
+            fields:
+              service: 'dhcp'
+              state: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-metadata-majority-down'
+      description: 'Less than 50% of Neutron metadata agents are down'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_neutron_agents_percent
+            fields:
+              service: 'metadata'
+              state: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-openvswitch-majority-down'
+      description: 'Less than 50% of Neutron openvswitch agents are down'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_neutron_agents_percent
+            fields:
+              service: 'openvswitch'
+              state: 'up'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
 
   # Mapping between the Fuel roles and the AFD node filters
   node_cluster_roles:
@@ -2224,6 +2723,11 @@ lma_collector:
     nova-api: ['primary-controller', 'controller']
     nova-novncproxy-websocket: ['primary-controller', 'controller']
     nova-metadata-api: ['primary-controller', 'controller']
+    nova-scheduler: ['primary-controller', 'controller']
+    nova-cert: ['primary-controller', 'controller']
+    nova-consoleauth: ['primary-controller', 'controller']
+    nova-compute: ['primary-controller', 'controller']
+    nova-conductor: ['primary-controller', 'controller']
     nova-logs: ['primary-controller', 'controller', 'compute']
     heat-api: ['primary-controller', 'controller']
     heat-logs: ['primary-controller', 'controller']
@@ -2234,10 +2738,16 @@ lma_collector:
     ceilometer-api: ['primary-controller', 'controller']
 <% end -%>
     cinder-api: ['primary-controller', 'controller']
+    cinder-scheduler: ['primary-controller', 'controller']
+    cinder-volume: ['primary-controller', 'controller']
     cinder-logs: ['primary-controller', 'controller', 'cinder']
     glance-api: ['primary-controller', 'controller']
     glance-logs: ['primary-controller', 'controller']
     neutron-api: ['primary-controller', 'controller']
+    neutron-l3: ['primary-controller', 'controller']
+    neutron-dhcp: ['primary-controller', 'controller']
+    neutron-metadata: ['primary-controller', 'controller']
+    neutron-openvswith: ['primary-controller', 'controller']
     neutron-logs: ['primary-controller', 'controller', 'compute']
     keystone-response-time: ['primary-controller', 'controller']
     keystone-public-api: ['primary-controller', 'controller']
@@ -2354,6 +2864,31 @@ lma_collector:
         - 'nova-api-backends-all-down'
         - 'nova-api-backends-majority-down'
         - 'nova-api-backends-one-down'
+    nova-scheduler:
+      workers:
+        - 'nova-scheduler-all-down'
+        - 'nova-scheduler-majority-down'
+        - 'nova-scheduler-one-down'
+    nova-cert:
+      workers:
+        - 'nova-cert-all-down'
+        - 'nova-cert-majority-down'
+        - 'nova-cert-one-down'
+    nova-consoleauth:
+      workers:
+        - 'nova-consoleauth-all-down'
+        - 'nova-consoleauth-majority-down'
+        - 'nova-consoleauth-one-down'
+    nova-compute:
+      workers:
+        - 'nova-compute-all-down'
+        - 'nova-compute-majority-down'
+        - 'nova-compute-one-down'
+    nova-conductor:
+      workers:
+        - 'nova-conductor-all-down'
+        - 'nova-conductor-majority-down'
+        - 'nova-conductor-one-down'
     nova-metadata-api:
       backends:
         - 'nova-metadata-api-backends-all-down'
@@ -2412,6 +2947,16 @@ lma_collector:
         - 'cinder-api-backends-one-down'
     cinder-v2-api:
       endpoint: ['cinder-v2-api-check-failed']
+    cinder-scheduler:
+      workers:
+        - 'cinder-scheduler-all-down'
+        - 'cinder-scheduler-majority-down'
+        - 'cinder-scheduler-one-down'
+    cinder-volume:
+      workers:
+        - 'cinder-volume-all-down'
+        - 'cinder-volume-majority-down'
+        - 'cinder-volume-one-down'
     cinder-logs:
       error: ['cinder-logs-error']
     glance-api:
@@ -2440,6 +2985,26 @@ lma_collector:
         - 'neutron-api-backends-all-down'
         - 'neutron-api-backends-majority-down'
         - 'neutron-api-backends-one-down'
+    neutron-l3:
+      workers:
+        - 'neutron-l3-all-down'
+        - 'neutron-l3-majority-down'
+        - 'neutron-l3-one-down'
+    neutron-dhcp:
+      workers:
+        - 'neutron-dhcp-all-down'
+        - 'neutron-dhcp-majority-down'
+        - 'neutron-dhcp-one-down'
+    neutron-metadata:
+      workers:
+        - 'neutron-metadata-all-down'
+        - 'neutron-metadata-majority-down'
+        - 'neutron-metadata-one-down'
+    neutron-openvswitch:
+      workers:
+        - 'neutron-openvswitch-all-down'
+        - 'neutron-openvswitch-majority-down'
+        - 'neutron-openvswitch-one-down'
     neutron-logs:
       error: ['neutron-logs-error']
     keystone-response-time:
