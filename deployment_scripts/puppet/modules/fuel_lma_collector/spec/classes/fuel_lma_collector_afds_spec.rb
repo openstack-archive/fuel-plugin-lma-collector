@@ -22,10 +22,24 @@ describe 'fuel_lma_collector::afds' do
     describe 'with defaults' do
         let(:params) do
             {:roles => ['primary-controller'],
-             :node_cluster_roles => {'controller' => ['primary-controller']},
-             :service_cluster_roles => {'mysql' => ['primary-controller']},
-             :node_cluster_alarms => {'controller' => {'cpu' => ['cpu_warning']}},
-             :service_cluster_alarms => {'mysql' => {'all' => ['db_warning']}},
+             :node_profiles => {'controller' => {'roles' => ['primary-controller']}},
+             :node_cluster_alarms => {
+                 'controller' =>
+                 {
+                     'apply_to_node' => 'controller',
+                     'alarms' => {
+                        'cpu' => ['cpu_warning']
+                     }
+                 }
+             },
+             :service_cluster_alarms => {
+                 'mysql' => {
+                     'apply_to_node' => 'controller',
+                     'alarms' => {
+                         'all' => ['db_warning']
+                     }
+                 }
+             },
              :alarms => [
                  {"name"=>"cpu_warning",
                   "description"=>"Fake alarm",
@@ -63,9 +77,15 @@ describe 'fuel_lma_collector::afds' do
     describe 'with enabled false' do
         let(:params) do
             {:roles => ['primary-controller'],
-             :node_cluster_roles => {'controller' => ['primary-controller']},
-             :service_cluster_roles => {},
-             :node_cluster_alarms => {'controller' => {'cpu' => ['cpu_warning']}},
+             :node_profiles => {'controller' => {'roles' => ['primary-controller']}},
+             :node_cluster_alarms => {
+                 'controller' => {
+                     'apply_to_node' => 'controller',
+                     'alarms' => {
+                         'cpu' => ['cpu_warning']
+                     }
+                 }
+             },
              :service_cluster_alarms => {},
              :alarms => [
                  {"name"=>"cpu_warning",

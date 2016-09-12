@@ -239,11 +239,15 @@ lma::collector::infrastructure_alerting::password: <%= @nagios_password %>
   $detach_database = hiera('detach-database', {})
   $detach_database_enabled = $detach_database['metadata'] and $detach_database['metadata']['enabled']
 
-  fuel_lma_collector::hiera_data { 'gse_filters':
-    content => template('fuel_lma_collector/gse_filters.yaml.erb')
+  fuel_lma_collector::hiera_data { 'clusters':
+    content => template('fuel_lma_collector/clusters.yaml.erb')
   }
 
   fuel_lma_collector::hiera_data { 'alarming':
     content => template('fuel_lma_collector/alarming.yaml.erb')
+  }
+
+  fuel_lma_collector::hiera_data { 'node_profiles':
+    content => template('fuel_lma_collector/node_profiles.yaml.erb')
   }
 }
