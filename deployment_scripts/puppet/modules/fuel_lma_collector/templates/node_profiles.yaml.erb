@@ -1,0 +1,34 @@
+---
+lma_collector:
+  # Fuel roles mapping to alarm evaluator key.
+  node_profiles:
+    controller:
+        roles: ['primary-controller', 'controller']
+<% if @detach_database_enabled -%>
+    mysql-nodes:
+        roles: ['primary-standalone-database', 'standalone-database']
+<% else -%>
+    mysql-nodes:
+        roles: ['primary-controller', 'controller']
+<% end -%>
+<% if @detach_rabbitmq_enabled -%>
+    rabbitmq-nodes:
+        roles: ['primary-standalone-rabbitmq', 'standalone-rabbitmq']
+<% else -%>
+    rabbitmq-nodes:
+        roles: ['primary-controller', 'controller']
+<% end -%>
+<% if @storage_options["volumes_ceph"] then -%>
+    ceph-mon:
+        roles: ['primary-controller', 'controller']
+    ceph-osd:
+        roles: ['ceph-osd']
+<% end -%>
+    compute:
+        roles: ['compute']
+    storage:
+        roles: ['cinder']
+    elasticsearch-nodes:
+        roles: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
+    influxdb-nodes:
+        roles: ['primary-influxdb_grafana', 'influxdb_grafana']

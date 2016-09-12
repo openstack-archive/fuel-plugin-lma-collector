@@ -38,8 +38,7 @@ if $is_controller or $is_rabbitmq or $is_mysql_server {
 
 class { 'fuel_lma_collector::afds':
     roles                  => hiera('roles'),
-    node_cluster_roles     => $lma['node_cluster_roles'],
-    service_cluster_roles  => $lma['service_cluster_roles'],
+    node_profiles          => $lma['node_profiles'],
     node_cluster_alarms    => $lma['node_cluster_alarms'],
     service_cluster_alarms => $lma['service_cluster_alarms'],
     alarms                 => $alarms_definitions,
