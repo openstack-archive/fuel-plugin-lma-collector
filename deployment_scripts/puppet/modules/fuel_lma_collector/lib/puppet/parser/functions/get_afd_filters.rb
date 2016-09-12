@@ -23,10 +23,10 @@
 # Ex:
 #
 # ARG0:
-#  {"rabbitmq"=>{"queue"=>["rabbitmq-queue-warning"]},
-#   "apache"=>{"worker"=>["apache-warning"]},
-#   "memcached"=>{"all"=>["memcached-warning"]},
-#   "haproxy"=>{"alive"=>["haproxy-warning"]}}
+#  {"rabbitmq"=>{"apply_to_node" => "controller", "alarms" => {"queue"=>["rabbitmq-queue-warning"]}},
+#   "apache"=>{"apply_to_node" => "controller", "alarms" => {"worker"=>["apache-warning"]}},
+#   "memcached"=>{"apply_to_node"=>"controller", "alarms" => {"all"=>["memcached-warning"]}},
+#   "haproxy"=>{"apply_to_node" => "controller", "alarms" => {"alive"=>["haproxy-warning"]}}}
 #
 # ARG1:
 #
@@ -63,7 +63,7 @@
 #          "function"=>"min"}]}}
 #   ]
 #
-# ARG2: ["rabbitmq", "apache"]
+# ARG2: ["controller", "compute"]
 #
 # ARG3: type (node|service)
 #
@@ -96,31 +96,47 @@ module Puppet::Parser::Functions
     afd_filters = {}
 
     afd_profiles.each do |afd_profile|
-        next unless afd_alarms.has_key?(afd_profile)
-
-        afd_alarms[afd_profile].each do |afd_name, alarms|
-            # Collect the metrics which are required by this AFD filter
-            metrics = Set.new([])
-            alarms.each do |a_name|
-                alarm_definitions.each do |alarm_def|
-                    if alarm_def['name'] == a_name
-                        alarm_def['trigger']['rules'].each do |r|
-                            metrics << r['metric']
-                        end
-                    end
+        afds = afd_alarms.select {|k,v| v.has_key?('apply_to_node') and v['apply_to_node'] == afd_profile }
+        afds.each do |k, v|
+            activate_alerting=true
+            if v.has_key?('activate_alerting')
+                if v['activate_alerting'] == false
+                    activate_alerting=false
                 end
             end
+            enable_notification=false
+            if v.has_key?('enable_notification')
+                if v['enable_notification'] == true
+                    enable_notification=true
+                end
+            end
+            afd_cluster_name = k
+            v['alarms'].each do |afd_name, alarms|
+                # Collect the metrics which are required by this AFD filter
+                metrics = Set.new([])
+                alarms.each do |a_name|
+                    alarm_definitions.each do |alarm_def|
+                        if alarm_def['name'] == a_name
+                            alarm_def['trigger']['rules'].each do |r|
+                                metrics << r['metric']
+                            end
+                        end
 
-            message_matcher = metrics.collect{|x| "Fields[name] == \'#{x}\'" }.join(' || ')
+                    end
+                end
+                message_matcher = metrics.collect{|x| "Fields[name] == \'#{x}\'" }.join(' || ')
 
-            afd_filters["#{afd_profile}_#{afd_name}"] = {
-                'type' => type,
-                'cluster_name' => afd_profile,
-                'logical_name' => afd_name,
-                'alarms' => alarms,
-                'alarms_definitions' => alarm_definitions,
-                'message_matcher' => message_matcher
-            }
+                afd_filters["#{afd_cluster_name}_#{afd_name}"] = {
+                    'type' => type,
+                    'cluster_name' => afd_cluster_name,
+                    'logical_name' => afd_name,
+                    'alarms' => alarms,
+                    'alarms_definitions' => alarm_definitions,
+                    'message_matcher' => message_matcher,
+                    'activate_alerting' => activate_alerting,
+                    'enable_notification' => enable_notification,
+                }
+            end
         end
     end
 

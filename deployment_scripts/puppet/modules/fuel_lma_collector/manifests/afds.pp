@@ -15,37 +15,28 @@
 
 class fuel_lma_collector::afds (
     $roles = undef,
-    $node_cluster_roles = undef,
-    $service_cluster_roles = undef,
+    $node_profiles = undef,
     $node_cluster_alarms = undef,
     $service_cluster_alarms = undef,
     $alarms = undef,
 ){
 
     validate_array($roles)
-    validate_hash($node_cluster_roles)
-    validate_hash($service_cluster_roles)
+    validate_hash($node_profiles)
     validate_hash($node_cluster_alarms)
     validate_hash($service_cluster_alarms)
     validate_array($alarms)
 
-    $node_cluster_names_tmp = get_cluster_names($node_cluster_roles, $roles)
-    $service_cluster_names = get_cluster_names($service_cluster_roles, $roles)
-
-    if size($node_cluster_names_tmp) == 0 and $node_cluster_alarms['default'] {
-        $node_cluster_names = ['default']
-    } else {
-        $node_cluster_names = $node_cluster_names_tmp
-    }
+    $clusters = get_cluster_names($node_profiles, $roles)
 
     $node_afd_filters = get_afd_filters($node_cluster_alarms,
                                         $alarms,
-                                        $node_cluster_names,
+                                        $clusters,
                                         'node')
 
     $service_afd_filters = get_afd_filters($service_cluster_alarms,
                                             $alarms,
-                                            $service_cluster_names,
+                                            $clusters,
                                             'service')
 
     create_resources(lma_collector::afd_filter, $node_afd_filters)
