@@ -44,7 +44,7 @@ module Puppet::Parser::Functions
 
     roles.each do |role|
         data.each do |k,v|
-            cluster_names << k if v.include?(role)
+            cluster_names << k if v['roles'].include?(role)
         end
     end
 

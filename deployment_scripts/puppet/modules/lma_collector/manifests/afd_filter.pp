@@ -20,6 +20,8 @@ define lma_collector::afd_filter (
     $alarms,
     $alarms_definitions,
     $message_matcher,
+    $activate_alerting = true,
+    $enable_notification = false,
 ) {
     include lma_collector::params
     include lma_collector::service::metric
@@ -44,11 +46,13 @@ define lma_collector::afd_filter (
       message_matcher  => "(Type == \'metric\' || Type == \'heka.sandbox.metric\') && (${message_matcher})",
       ticker_interval  => 10,
       config           => {
-        hostname         => $::hostname,
-        afd_type         => $type,
-        afd_file         => $afd_file,
-        afd_cluster_name => $cluster_name,
-        afd_logical_name => $logical_name,
+        hostname            => $::hostname,
+        afd_type            => $type,
+        afd_file            => $afd_file,
+        afd_cluster_name    => $cluster_name,
+        afd_logical_name    => $logical_name,
+        activate_alerting   => $activate_alerting,
+        enable_notification => $enable_notification,
       },
       module_directory => $lua_modules_dir,
       require          => File[$afd_filename],
