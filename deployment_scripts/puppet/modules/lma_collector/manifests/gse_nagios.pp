@@ -50,7 +50,7 @@ define lma_collector::gse_nagios (
     ensure            => $ensure,
     config_dir        => $lma_collector::params::metric_config_dir,
     url               => $url,
-    message_matcher   => "Type == 'heka.sandbox.${message_type}'",
+    message_matcher   => "Type == 'heka.sandbox.${message_type}' && Fields[no_alerting] == NIL",
     username          => $user,
     password          => $password,
     encoder           => "nagios_gse_${title}",
