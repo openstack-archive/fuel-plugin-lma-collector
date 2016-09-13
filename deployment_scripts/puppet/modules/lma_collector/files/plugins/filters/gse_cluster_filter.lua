@@ -29,6 +29,7 @@ local interval = (read_config('interval') or error('interval must be specified!'
 local interval_in_ns = interval * 1e9
 local max_inject = (read_config('max_inject') or 10) + 0
 local warm_up_period = ((read_config('warm_up_period') or 0) + 0) * 1e9
+local to_alerting = read_config('activate_alerting') or true
 
 local is_active = false
 local first_tick
@@ -122,7 +123,8 @@ function timer_event(ns)
                 cluster_name,
                 output_metric_name,
                 interval,
-                source
+                source,
+                to_alerting
             )
             last_index = i
             injected = injected + 1

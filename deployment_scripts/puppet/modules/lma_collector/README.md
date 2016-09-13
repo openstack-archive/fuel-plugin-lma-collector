@@ -1123,6 +1123,10 @@ results](https://assets.nagios.com/downloads/nagioscore/docs/nagioscore/3/en/pas
   Valid options: a string.
 * `openstack_deployment_name`: *Optional*. Additional label to identify the
   environment.  Valid options: a string. Default: empty string.
+* `enable_notification`: *Optional*. Whether or not enable notifications in the
+  alerting system. Valid options: a boolean. Default: true.
+* `activate_alerting`: *Optional*. Whether or not configure alerting system
+  for all clusters. Valid options: a boolean. Default: true.
 
 Limitations
 -----------
