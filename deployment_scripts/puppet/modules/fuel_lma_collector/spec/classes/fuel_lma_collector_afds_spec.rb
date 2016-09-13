@@ -106,4 +106,40 @@ describe 'fuel_lma_collector::afds' do
         it { is_expected.to contain_file('/usr/share/lma_collector_modules/lma_alarms_controller_cpu.lua').with_content(/local alarms = {\n}/) }
 
     end
+
+    describe 'with profile per default' do
+        let(:params) do
+            {:roles => ['foo-role'],
+             :node_profiles => {'controller' => {'roles' => ['primary-controller']}},
+             :node_cluster_alarms => {
+                 'others' =>
+                 {
+                     'apply_to_node' => 'default',
+                     'alarms' => {
+                        'cpu' => ['cpu_warning']
+                     }
+                 }
+             },
+             :service_cluster_alarms => {
+             },
+             :alarms => [
+                 {"name"=>"cpu_warning",
+                  "description"=>"Fake alarm",
+                  "severity"=>"warning",
+                  "trigger"=>
+                   {"logical_operator"=>"or",
+                    "rules"=>
+                     [{"metric"=>"fake_cpu",
+                       "relational_operator"=>">=",
+                       "threshold"=>200,
+                       "window"=>120,
+                       "periods"=>0,
+                       "function"=>"avg"}]}},
+             ]}
+        end
+
+        it { is_expected.to contain_heka__filter__sandbox('afd_node_others_cpu') }
+        it { is_expected.to contain_file('/usr/share/lma_collector_modules/lma_alarms_others_cpu.lua') }
+
+    end
 end
