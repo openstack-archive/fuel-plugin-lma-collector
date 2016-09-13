@@ -42,11 +42,15 @@ define lma_collector::afd_nagios(
     notify           => Class['lma_collector::service::metric'],
   }
 
+  $matcher = join(["Fields[${lma_collector::params::aggregator_flag}] == NIL",
+                    "Type == 'heka.sandbox.${message_type}'",
+                    'Fields[no_alerting] == NIL'], ' && ')
+
   heka::output::http { "nagios_afd_${title}":
     ensure            => $ensure,
     config_dir        => $lma_collector::params::metric_config_dir,
     url               => $url,
-    message_matcher   => "Fields[${lma_collector::params::aggregator_flag}] == NIL && Type == 'heka.sandbox.${message_type}'",
+    message_matcher   => $matcher,
     username          => $user,
     password          => $password,
     encoder           => "nagios_afd_${title}",
