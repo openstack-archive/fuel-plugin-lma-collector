@@ -21,6 +21,8 @@ define lma_collector::gse_cluster_filter (
   $cluster_field = undef,
   $clusters = {},
   $warm_up_period = undef,
+  $enable_notification = true,
+  $activate_alerting = true,
   $ensure = present,
 ) {
   include lma_collector::params
@@ -66,6 +68,8 @@ define lma_collector::gse_cluster_filter (
       member_field        => $member_field,
       max_inject          => $lma_collector::params::hekad_max_timer_inject,
       warm_up_period      => $warm_up_period,
+      enable_notification => $enable_notification,
+      activate_alerting   => $activate_alerting,
     },
     module_directory => $lua_modules_dir,
     require          => File[$topology_file],
