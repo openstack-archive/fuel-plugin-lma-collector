@@ -415,6 +415,8 @@ function process_message ()
                 msg['Fields']['name'] = metric_source
                 msg['Fields']['service'] = sample['type_instance']
                 table.insert(msg['Fields']['tag_fields'], 'service')
+            elseif metric_source == 'check_local_endpoint' then
+                msg['Fields']['name'] = string.gsub('openstack_' .. sample['type_instance'], '-', '_')
             else
                 msg['Fields']['name'] = replace_dot_by_sep(metric_name)
             end
