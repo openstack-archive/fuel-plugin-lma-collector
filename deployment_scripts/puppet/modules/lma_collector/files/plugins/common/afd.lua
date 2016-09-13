@@ -129,7 +129,7 @@ end
 
 -- inject an AFD event into the Heka pipeline
 function inject_afd_metric(msg_type, msg_tag_name, msg_tag_value, metric_name,
-                           value, hostname, interval, source)
+                           value, hostname, interval, source, to_alerting)
     local payload
 
     if #alarms > 0 then
@@ -143,6 +143,11 @@ function inject_afd_metric(msg_type, msg_tag_name, msg_tag_value, metric_name,
         payload = '{"alarms":[]}'
     end
 
+    local no_alerting
+    if to_alerting ~= nil and to_alerting == false then
+        no_alerting = true
+    end
+
     local msg = {
         Type = msg_type,
         Payload = payload,
@@ -153,6 +158,7 @@ function inject_afd_metric(msg_type, msg_tag_name, msg_tag_value, metric_name,
             interval=interval,
             source=source,
             tag_fields={msg_tag_name, 'source'},
+            no_alerting = no_alerting,
         }
     }
     msg.Fields[msg_tag_name] = msg_tag_value,
