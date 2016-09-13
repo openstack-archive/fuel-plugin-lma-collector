@@ -1,3 +1,19 @@
+# The OCF script should exist before any node tries to configure the
+# collector services with Pacemaker. This is why it is shipped by this
+# manifest.
+- id: install-ocf-script
+  type: puppet
+  version: 2.0.0
+  requires: [deploy_start]
+  required_for: [globals]
+  role: '*'
+  parameters:
+    puppet_manifest: puppet/manifests/install_ocf_script.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
+  reexecute_on:
+    - deploy_changes
+
 # The Hiera data needs to be populated first so that other plugins (eg LMA
 # Infrastructure Alerting) can use it
 - id: lma-hiera-override
