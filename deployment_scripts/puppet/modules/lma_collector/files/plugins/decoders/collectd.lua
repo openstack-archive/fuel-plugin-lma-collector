@@ -373,7 +373,8 @@ function process_message ()
                 end
             elseif metric_source == 'elasticsearch_cluster' or metric_source == 'influxdb' then
                 msg['Fields']['name'] = metric_source .. sep .. sample['type_instance']
-            elseif metric_source == 'http_check' then
+            elseif metric_source == 'http_check' or
+                metric_source == 'http_local_check' then
                 msg['Fields']['name'] = metric_source
                 msg['Fields']['service'] = sample['type_instance']
                 msg['Fields']['tag_fields'] = { 'service' }
