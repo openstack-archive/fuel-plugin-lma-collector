@@ -19,6 +19,7 @@ local afd = require 'afd'
 
 -- node or service
 local afd_type = read_config('afd_type') or error('afd_type must be specified!')
+local to_alerting = read_config('activate_alerting') or true
 local msg_type
 local msg_field_name
 local afd_entity
@@ -90,7 +91,7 @@ function timer_event(ns)
             end
 
             afd.inject_afd_metric(msg_type, afd_entity, afd_entity_value, msg_field_name,
-                state, hostname, interval, msg_field_source)
+                state, hostname, interval, msg_field_source, to_alerting)
         end
     else
         A.set_start_time(ns)
