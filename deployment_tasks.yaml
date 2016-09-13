@@ -1,15 +1,46 @@
+# Groups definitions
+# ##################
+- id: lma-collector-deploy
+  type: group
+  version: 2.0.0
+  role: '*'
+  tasks:
+    - lma-hiera-override
+    - install-ocf-script
+  requires: [deploy_start]
+  required_for: [deploy_end]
+  parameters:
+    strategy:
+      type: one_by_one
+
+# Tasks definitions for the depoyment
+# ###################################
+
 # The Hiera data needs to be populated first so that other plugins (eg LMA
 # Infrastructure Alerting) can use it
 - id: lma-hiera-override
   type: puppet
   version: 2.0.0
-  requires: [post_deployment_start]
-  required_for: [post_deployment_end]
-  role: '*'
+  requires: [globals]
+  required_for: [logging]
   parameters:
     puppet_manifest: puppet/manifests/hiera_override.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 600
+  reexecute_on:
+    - deploy_changes
+
+# The OCF script should exist before any nodes try to configure the
+# collector services with Pacemaker.
+- id: install-ocf-script
+  type: puppet
+  version: 2.0.0
+  requires: [fuel_pkgs, lma-hiera-override]
+  required_for: [cluster]
+  parameters:
+    puppet_manifest: puppet/manifests/install_ocf_script.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 120
   reexecute_on:
     - deploy_changes
 
@@ -19,7 +50,7 @@
   # We use upload_nodes_info as an anchor to order the post-deployment tasks executed
   # by this plugin and the InfluxDB & Elasticsearch plugins. The dependency chain is:
   # Other plugins tasks -> upload_nodes_info -> (LMA collector tasks)
-  requires: [post_deployment_start, upload_nodes_info, lma-hiera-override]
+  requires: [post_deployment_start, upload_nodes_info]
   required_for: [post_deployment_end]
   role: '*'
   parameters:
