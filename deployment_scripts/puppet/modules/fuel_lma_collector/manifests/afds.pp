@@ -27,7 +27,12 @@ class fuel_lma_collector::afds (
     validate_hash($service_cluster_alarms)
     validate_array($alarms)
 
-    $clusters = get_cluster_names($node_profiles, $roles)
+    $clusters_tmp = get_cluster_names($node_profiles, $roles)
+    if size($clusters_tmp) == 0 {
+      $clusters = ['default']
+    } else {
+      $clusters = $clusters_tmp
+    }
 
     $node_afd_filters = get_afd_filters($node_cluster_alarms,
                                         $alarms,
