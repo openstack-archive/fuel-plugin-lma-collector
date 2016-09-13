@@ -47,12 +47,25 @@ class { 'fuel_lma_collector::afds':
 # Forward AFD status to Nagios if deployed
 if hiera('lma::collector::infrastructure_alerting::server', false) {
   lma_collector::afd_nagios { 'nodes':
-    ensure    => present,
-    hostname  => $::hostname,
-    server    => hiera('lma::collector::infrastructure_alerting::server'),
-    http_port => hiera('lma::collector::infrastructure_alerting::http_port'),
-    http_path => hiera('lma::collector::infrastructure_alerting::http_path'),
-    user      => hiera('lma::collector::infrastructure_alerting::user'),
-    password  => hiera('lma::collector::infrastructure_alerting::password'),
+    ensure           => present,
+    hostname         => $::hostname,
+    server           => hiera('lma::collector::infrastructure_alerting::server'),
+    http_port        => hiera('lma::collector::infrastructure_alerting::http_port'),
+    http_path        => hiera('lma::collector::infrastructure_alerting::http_path'),
+    user             => hiera('lma::collector::infrastructure_alerting::user'),
+    password         => hiera('lma::collector::infrastructure_alerting::password'),
+    service_template => '%{node_role}.%{source}',
+    message_type     => 'afd_node_metric',
+  }
+  lma_collector::afd_nagios { 'services':
+    ensure           => present,
+    hostname         => $::hostname,
+    server           => hiera('lma::collector::infrastructure_alerting::server'),
+    http_port        => hiera('lma::collector::infrastructure_alerting::http_port'),
+    http_path        => hiera('lma::collector::infrastructure_alerting::http_path'),
+    user             => hiera('lma::collector::infrastructure_alerting::user'),
+    password         => hiera('lma::collector::infrastructure_alerting::password'),
+    service_template => '%{service}.%{source}',
+    message_type     => 'afd_service_metric',
   }
 }
