@@ -26,6 +26,10 @@ checks:
 
 .. note:: All checks except for Ceilometer are performed without authentication.
 
+* ``openstack_<service>_api``, the service's API status checked locally. ``1``
+  if it is responsive, if not, then ``0``. ``<service>`` identifies the
+  OpenStack service being checked. See above for possible values of ``<service>``.
+
 Compute
 ^^^^^^^
 
