@@ -17,16 +17,18 @@ define fuel_lma_collector::hiera_data (
 ) {
   $hiera_directory = '/etc/hiera/override'
 
-  $parsed_yaml = parseyaml($content)
+  if $ensure == present {
+    $parsed_yaml = parseyaml($content)
 
-  if ! $parsed_yaml {
-    # With stlib <= 4.9, parseyaml() will raise an exception if the generated
-    # YAML is invalid so the Puppet parse will never get to the fail()
-    # instruction.
-    fail('Invalid YAML content!')
+    if ! $parsed_yaml {
+      # With stlib <= 4.9, parseyaml() will raise an exception if the generated
+      # YAML is invalid so the Puppet parse will never get to the fail()
+      # instruction.
+      fail('Invalid YAML content!')
+    }
+    validate_hash($parsed_yaml)
+    validate_hash($parsed_yaml['lma_collector'])
   }
-  validate_hash($parsed_yaml)
-  validate_hash($parsed_yaml['lma_collector'])
 
   if !defined(Package['ruby-deep-merge']){
     package {'ruby-deep-merge':
@@ -41,12 +43,12 @@ define fuel_lma_collector::hiera_data (
   }
 
   file { "${hiera_directory}/${name}.yaml":
-    ensure  => file,
+    ensure  => $ensure,
     content => $content,
     require => File[$hiera_directory],
   }
 
   hiera_custom_source { "override/${name}":
-    ensure => present
+    ensure => $ensure
   }
 }

@@ -250,4 +250,10 @@ lma::collector::infrastructure_alerting::password: <%= @nagios_password %>
   fuel_lma_collector::hiera_data { 'node_profiles':
     content => template('fuel_lma_collector/node_profiles.yaml.erb')
   }
+
+  # This file has been renamed 'clusters.yaml' and need to be removed
+  # for rolling upgrade
+  file { '/etc/hiera/override/gse_filters.yaml':
+    ensure => absent,
+  }
 }
