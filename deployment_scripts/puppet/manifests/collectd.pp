@@ -237,7 +237,45 @@ if hiera('lma::collector::influxdb::server', false) {
       require  => Class['lma_collector::collectd::base'],
     }
 
-    # VIP checks
+    # Check local endpoint
+    $nova_api       = get_network_role_property('nova/api', 'ipaddr')
+    $cinder_api     = get_network_role_property('cinder/api', 'ipaddr')
+    $ceilometer_api = get_network_role_property('ceilometer/api', 'ipaddr')
+    $keystone_api   = get_network_role_property('keystone/api', 'ipaddr')
+    $swift_api      = get_network_role_property('swift/api', 'ipaddr')
+    $neutron_api    = get_network_role_property('neutron/api', 'ipaddr')
+    $heat_api       = get_network_role_property('heat/api', 'ipaddr')
+    $glance_api     = get_network_role_property('glance/api', 'ipaddr')
+    class { 'lma_collector::collectd::check_local_endpoint':
+      urls           => {
+        'cinder-api'          => "http://${cinder_api}:8776",
+        #'cinder-v2-api'       => "http://${cinder_api}:????",
+        'glance-api'          => "http://${glance_api}:9292",
+        'heat-api'            => "http://${heat_api}:8004",
+        #'heat-cfn-api'        => "http://${heat_api}:???",
+        'keystone-public-api' => "http://${keystone_api}:5000",
+        'neutron-api'         => "http://${neutron_api}:9696",
+        'nova-api'            => "http://${nova_api}:8774",
+        #'swift-api'           => "http://${swift_api}:????/healthcheck",
+        #'swift-s3-api'        => "http://${swift_api}:????/healthcheck",
+      },
+      expected_codes => {
+        'cinder-api'          => 300,
+        #'cinder-v2-api'       => 300,
+        'glance-api'          => 300,
+        'heat-api'            => 300,
+        #'heat-cfn-api'        => 300,
+        'keystone-public-api' => 300,
+        'neutron-api'         => 200,
+        'nova-api'            => 200,
+        #'swift-api'           => 200,
+        #'swift-s3-api'        => 200,
+      },
+      timeout        => 1,
+      max_retries    => 3,
+      require        => Class['lma_collector::collectd::base'],
+    }
+
     $influxdb_server = hiera('lma::collector::influxdb::server')
     $influxdb_port = hiera('lma::collector::influxdb::port')
     class { 'lma_collector::collectd::http_check':
@@ -245,7 +283,7 @@ if hiera('lma::collector::influxdb::server', false) {
         'influxdb' => "http://${influxdb_server}:${influxdb_port}/ping",
       },
       expected_codes            => {
-        'influxdb' => 204
+        'influxdb' => 204,
       },
       timeout                   => 1,
       max_retries               => 3,
