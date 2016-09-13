@@ -115,6 +115,8 @@ lma_collector:
     output_metric_name: cluster_service_status
     interval: 10
     warm_up_period: 20
+    enable_notification: false
+    activate_alerting: true
     clusters:
       nova-logs:
         policy: highest_severity
@@ -440,6 +442,8 @@ lma_collector:
     output_metric_name: cluster_node_status
     interval: 10
     warm_up_period: 80
+    enable_notification: false
+    activate_alerting: true
     clusters:
       controller:
         policy: majority_of_members
@@ -536,6 +540,8 @@ lma_collector:
     output_metric_name: cluster_status
     interval: 10
     warm_up_period: 30
+    enable_notification: true
+    activate_alerting: true
     clusters:
       mysql:
         policy: highest_severity
