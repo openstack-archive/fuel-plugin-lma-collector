@@ -9,6 +9,11 @@ Service API checks
     The metric contains a ``service`` field that identifies
     the OpenStack service being checked.
 
+* ``openstack_check_local_api``, the service's API status checked locally. ``1``
+  if it is responsive, if not, then ``0``. The metric contains a ``service``
+  field that identifies ``<service>`` identifies the OpenStack service being
+  checked.
+
 ``<service>`` is one of the following values with their respective resource
 checks:
 
