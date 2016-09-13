@@ -1178,6 +1178,19 @@ lma_collector:
             data-fs: ['influxdb-fs-critical', 'influxdb-fs-warning']
             swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
             hdd-errors: ['hdd-errors-critical']
+    # This is the default alarms configured for all nodes with unknown roles
+    default:
+        apply_to_node: default
+        # Operator wants to receive alert notification for individual nodes
+        enable_notification: true
+        activate_alerting: true
+        alarms:
+            cpu: ['cpu-critical-default']
+            network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
+            network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
+            root-fs: ['root-fs-critical', 'root-fs-warning']
+            swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+            hdd-errors: ['hdd-errors-critical']
 
   # Definition of the AFD service filters
   service_cluster_alarms:

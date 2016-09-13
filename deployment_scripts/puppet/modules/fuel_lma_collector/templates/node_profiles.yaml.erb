@@ -4,31 +4,42 @@ lma_collector:
   node_profiles:
     controller:
         roles: ['primary-controller', 'controller']
-<% if @detach_database_enabled -%>
+        description: 'The Controller nodes'
     mysql-nodes:
+<% if @detach_database_enabled -%>
         roles: ['primary-standalone-database', 'standalone-database']
 <% else -%>
-    mysql-nodes:
         roles: ['primary-controller', 'controller']
 <% end -%>
-<% if @detach_rabbitmq_enabled -%>
+        description: 'The MySQL nodes'
     rabbitmq-nodes:
+<% if @detach_rabbitmq_enabled -%>
         roles: ['primary-standalone-rabbitmq', 'standalone-rabbitmq']
 <% else -%>
-    rabbitmq-nodes:
         roles: ['primary-controller', 'controller']
 <% end -%>
+        description: 'The RabbitMQ nodes'
 <% if @storage_options["volumes_ceph"] then -%>
     ceph-mon:
         roles: ['primary-controller', 'controller']
+        description: 'The Ceph monitor nodes'
     ceph-osd:
         roles: ['ceph-osd']
+        description: 'The Ceph OSD nodes'
 <% end -%>
     compute:
         roles: ['compute']
+        description: 'The Compute nodes'
     storage:
         roles: ['cinder']
+        description: 'The Cinder nodes'
     elasticsearch-nodes:
         roles: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
+        description: 'The Elasticsearch and Kibana nodes'
     influxdb-nodes:
         roles: ['primary-influxdb_grafana', 'influxdb_grafana']
+        description: 'The InfluxDB and Grafana nodes'
+
+    default:
+        roles: []
+        description: 'The default profile includes all nodes which are not falling into a definied profile'
