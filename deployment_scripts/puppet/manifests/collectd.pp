@@ -237,7 +237,41 @@ if hiera('lma::collector::influxdb::server', false) {
       require  => Class['lma_collector::collectd::base'],
     }
 
-    # VIP checks
+    # Check local endpoint
+    $nova_api       = get_network_role_property('nova/api', 'ipaddr')
+    $cinder_api     = get_network_role_property('cinder/api', 'ipaddr')
+    $ceilometer_api = get_network_role_property('ceilometer/api', 'ipaddr')
+    $keystone_api   = get_network_role_property('keystone/api', 'ipaddr')
+    $swift_api      = get_network_role_property('swift/api', 'ipaddr')
+    $neutron_api    = get_network_role_property('neutron/api', 'ipaddr')
+    $heat_api       = get_network_role_property('heat/api', 'ipaddr')
+    $glance_api     = get_network_role_property('glance/api', 'ipaddr')
+    class { 'lma_collector::collectd::check_local_endpoint':
+      urls           => {
+        'nova-api'     => "http://${nova_api}:8774",
+        'cinder-api'   => "http://${cinder_api}:8776",
+        #'ceilometer-api' => "http://${ceilometer_api}:????/v2/capabilities",
+        'keystone-api' => "http://${keystone_api}:5000",
+        #'swift-api'      => "http://${swift_api}:????/healthcheck",
+        'neutron-api'  => "http://${neutron_api}:9696",
+        'heat-api'     => "http://${heat_api}:8004",
+        'glance-api'   => "http://${glance_api}:9292",
+      },
+      expected_codes => {
+        'nova-api'     => 200,
+        'cinder-api'   => 300,
+        #'ceilometer-api' => 200,
+        'keystone-api' => 300,
+        #'swift-api'      => 200,
+        'neutron-api'  => 200,
+        'heat-api'     => 300,
+        'glance-api'   => 300,
+      },
+      timeout        => 1,
+      max_retries    => 3,
+      require        => Class['lma_collector::collectd::base'],
+    }
+
     $influxdb_server = hiera('lma::collector::influxdb::server')
     $influxdb_port = hiera('lma::collector::influxdb::port')
     class { 'lma_collector::collectd::http_check':
@@ -245,7 +279,7 @@ if hiera('lma::collector::influxdb::server', false) {
         'influxdb' => "http://${influxdb_server}:${influxdb_port}/ping",
       },
       expected_codes            => {
-        'influxdb' => 204
+        'influxdb' => 204,
       },
       timeout                   => 1,
       max_retries               => 3,
