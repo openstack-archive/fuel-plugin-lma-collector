@@ -1072,6 +1072,103 @@ lma_collector:
             window: 60
             periods: 0
             function: max
+    # Adds alarm on local check for OpenStack services endpoint
+    - name: 'cinder-api-local-endpoint'
+      description: 'Cinder API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_api
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'glance-api-local-endpoint'
+      description: 'Glance API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_glance_api
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-api-local-endpoint'
+      description: 'Heat API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_heat_api
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-cfn-api-local-endpoint'
+      description: 'Heat CFN API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_heat_cfn_api
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'keystone-public-api-local-endpoint'
+      description: 'Keystone public API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_keystone_public_api
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-api-local-endpoint'
+      description: 'Neutron API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_neutron_api
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-api-local-endpoint'
+      description: 'Nova API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_api
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'swift-api-local-endpoint'
+      description: 'Swift API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_swift_api
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
 
   # Mapping between the Fuel roles and the AFD node filters
   node_cluster_roles:
@@ -1104,6 +1201,7 @@ lma_collector:
     nova-api: ['primary-controller', 'controller']
     nova-logs: ['primary-controller', 'controller', 'compute']
     heat-api: ['primary-controller', 'controller']
+    heat-cfn-api: ['primary-controller', 'controller']
     heat-logs: ['primary-controller', 'controller']
 <% if not @storage_options["objects_ceph"] then -%>
     swift-api: ['primary-controller', 'controller']
@@ -1217,32 +1315,41 @@ lma_collector:
       check: ['apache-check']
     nova-api:
       http_errors: ['nova-api-http-errors']
+      local_endpoint: ['nova-api-local-endpoint']
     nova-logs:
       error: ['nova-logs-error']
     heat-api:
       http_errors: ['heat-api-http-errors']
+      local_endpoint: ['heat-api-local-endpoint']
+    heat-cfn-api:
+      local_endpoint: ['heat-cfn-api-local-endpoint']
     heat-logs:
       error: ['heat-logs-error']
     swift-api:
       http_errors: ['swift-api-http-errors']
+      local_endpoint: ['swift-api-local-endpoint']
     swift-logs:
       error: ['swift-logs-error']
     cinder-api:
       http_errors: ['cinder-api-http-errors']
+      local_endpoint: ['cinder-api-local-endpoint']
     cinder-logs:
       error: ['cinder-logs-error']
     glance-api:
       http_errors: ['glance-api-http-errors']
+      local_endpoint: ['glance-api-local-endpoint']
     glance-logs:
       error: ['glance-logs-error']
     neutron-api:
       http_errors: ['neutron-api-http-errors']
+      local_endpoint: ['neutron-api-local-endpoint']
     neutron-logs:
       error: ['neutron-logs-error']
     keystone-response-time:
       duration: ['keystone-response-time-duration']
     keystone-public-api:
       http_errors: ['keystone-public-api-http-errors']
+      local_endpoint: ['keystone-public-api-local-endpoint']
     keystone-logs:
       error: ['keystone-logs-error']
     keystone-admin-api:
