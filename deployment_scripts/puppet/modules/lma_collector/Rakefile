@@ -59,7 +59,7 @@ task :lua_libraries => ['tests/lua/mocks/date_time.lua', 'tests/lua/mocks/inspec
 
 file 'tests/lua/mocks/annotation.lua' do |t|
     verbose(false) do
-        sh "curl", "-s", "-o", t.name, "https://raw.githubusercontent.com/mozilla-services/heka/dev/sandbox/lua/modules/annotation.lua" do |ok, res|
+        sh "curl", "-s", "-o", t.name, "https://raw.githubusercontent.com/mozilla-services/heka/versions/0.10/sandbox/lua/modules/annotation.lua" do |ok, res|
             if ! ok then
                 raise "Fail to download annotation.lua from lua_sandbox repository!"
             end
@@ -69,7 +69,7 @@ end
 
 file 'tests/lua/mocks/anomaly.lua' do |t|
     verbose(false) do
-        sh "curl", "-s", "-o", t.name, "https://raw.githubusercontent.com/mozilla-services/heka/dev/sandbox/lua/modules/anomaly.lua" do |ok, res|
+        sh "curl", "-s", "-o", t.name, "https://raw.githubusercontent.com/mozilla-services/heka/versions/0.10/sandbox/lua/modules/anomaly.lua" do |ok, res|
             if ! ok then
                 raise "Fail to download anomaly.lua from lua_sandbox repository!"
             end
@@ -79,7 +79,7 @@ end
 
 file 'tests/lua/mocks/date_time.lua' do |t|
     verbose(false) do
-        sh "curl", "-s", "-o", t.name, "https://raw.githubusercontent.com/mozilla-services/lua_sandbox/master/modules/lpeg/date_time.lua" do |ok, res|
+        sh "curl", "-s", "-o", t.name, "https://raw.githubusercontent.com/mozilla-services/lua_sandbox/97331863d3e05d25131b786e3e9199e805b9b4ba/modules/date_time.lua" do |ok, res|
             if ! ok then
                 raise "Fail to download date_time.lua from lua_sandbox repository!"
             end
