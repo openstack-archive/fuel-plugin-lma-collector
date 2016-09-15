@@ -282,7 +282,7 @@ if $alerting_mode == 'standalone' {
 }
 
 if hiera('lma::collector::infrastructure_alerting::server', false) {
-  lma_collector::gse_nagios { 'global_clusters':
+  lma_collector::gse_nagios { 'global':
     openstack_deployment_name => $deployment_id,
     server                    => hiera('lma::collector::infrastructure_alerting::server'),
     http_port                 => hiera('lma::collector::infrastructure_alerting::http_port'),
@@ -294,7 +294,7 @@ if hiera('lma::collector::infrastructure_alerting::server', false) {
     virtual_hostname          => '00-global-clusters',
   }
 
-  lma_collector::gse_nagios { 'node_clusters':
+  lma_collector::gse_nagios { 'nodes':
     openstack_deployment_name => $deployment_id,
     server                    => hiera('lma::collector::infrastructure_alerting::server'),
     http_port                 => hiera('lma::collector::infrastructure_alerting::http_port'),
@@ -304,5 +304,17 @@ if hiera('lma::collector::infrastructure_alerting::server', false) {
     message_type              => $lma_collector['gse_cluster_node']['output_message_type'],
     # Following parameter must match the lma_infrastructure_alerting::params::nagios_node_vhostname_prefix
     virtual_hostname          => '00-node-clusters',
+  }
+
+  lma_collector::gse_nagios { 'services':
+    openstack_deployment_name => $deployment_id,
+    server                    => hiera('lma::collector::infrastructure_alerting::server'),
+    http_port                 => hiera('lma::collector::infrastructure_alerting::http_port'),
+    http_path                 => hiera('lma::collector::infrastructure_alerting::http_path'),
+    user                      => hiera('lma::collector::infrastructure_alerting::user'),
+    password                  => hiera('lma::collector::infrastructure_alerting::password'),
+    message_type              => $lma_collector['gse_cluster_service']['output_message_type'],
+    # Following parameter must match the lma_infrastructure_alerting::params::nagios_node_vhostname_prefix
+    virtual_hostname          => '00-service-clusters',
   }
 }

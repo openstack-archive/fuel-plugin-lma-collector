@@ -36,7 +36,10 @@ define lma_collector::gse_nagios (
   # This must be identical logic than in lma-infra-alerting-plugin
   $_nagios_host = "${virtual_hostname}-env${openstack_deployment_name}"
 
-  $config = {'nagios_host' => $_nagios_host, 'service_template' => $service_template}
+  $config = {
+    'nagios_host' => $_nagios_host,
+    'service_template' => "${title}-${service_template}",
+  }
   heka::encoder::sandbox { "nagios_gse_${title}":
     ensure           => $ensure,
     config_dir       => $lma_collector::params::metric_config_dir,
