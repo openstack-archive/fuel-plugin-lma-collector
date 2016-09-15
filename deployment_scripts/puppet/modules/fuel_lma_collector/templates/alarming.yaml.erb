@@ -1152,6 +1152,119 @@ lma_collector:
             window: 60
             periods: 0
             function: max
+    # Adds alarm on local check for OpenStack services endpoint
+    - name: 'cinder-api-local-endpoint'
+      description: 'Cinder API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_local_api
+            fields:
+              service: 'cinder-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'glance-api-local-endpoint'
+      description: 'Glance API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_local_api
+            fields:
+              service: 'glance-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-api-local-endpoint'
+      description: 'Heat API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_local_api
+            fields:
+              service: 'heat-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-cfn-api-local-endpoint'
+      description: 'Heat CFN API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_local_api
+            fields:
+              service: 'heat-cfn-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'keystone-public-api-local-endpoint'
+      description: 'Keystone public API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_local_api
+            fields:
+              service: 'keystone-public-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-api-local-endpoint'
+      description: 'Neutron API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_local_api
+            fields:
+              service: 'neutron-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-api-local-endpoint'
+      description: 'Nova API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_local_api
+            fields:
+              service: 'nova-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'swift-api-local-endpoint'
+      description: 'Swift API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_local_api
+            fields:
+              service: 'swift-api'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
 
     # Following are the OpenStack service check API definitions and
     # also InfluxDB API
@@ -1486,6 +1599,12 @@ lma_collector:
         alarms:
             http_errors: ['nova-api-http-errors']
             vip: ['nova-api-check-failed']
+    nova-api-endpoint:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            endpoint: ['nova-api-local-endpoint']
     nova-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1499,12 +1618,24 @@ lma_collector:
         alarms:
             http_errors: ['heat-api-http-errors']
             vip: ['heat-api-check-failed']
+    heat-api-endpoint:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            endpoint: ['heat-api-local-endpoint']
     heat-cfn-api:
         apply_to_node: controller
         enable_notification: false
         activate_alerting: true
         alarms:
             vip: ['heat-cfn-api-check-failed']
+    heat-cfn-api-endpoint:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            endpoint: ['heat-cfn-api-local-endpoint']
     heat-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1519,6 +1650,12 @@ lma_collector:
         alarms:
             http_errors: ['swift-api-http-errors']
             vip: ['swift-api-check-failed']
+    swift-api-endpoint:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            endpoint: ['swift-api-local-endpoint']
     swift-s3-api:
         apply_to_node: controller
         enable_notification: false
@@ -1539,6 +1676,12 @@ lma_collector:
         alarms:
             http_errors: ['cinder-api-http-errors']
             vip: ['cinder-api-check-failed']
+    cinder-api-endpoint:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            endpoint: ['cinder-api-local-endpoint']
     cinder-v2-api:
         apply_to_node: controller
         enable_notification: false
@@ -1558,6 +1701,12 @@ lma_collector:
         alarms:
             http_errors: ['glance-api-http-errors']
             vip: ['glance-api-check-failed']
+    glance-api-endpoint:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            endpoint: ['glance-api-local-endpoint']
     glance-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1571,6 +1720,12 @@ lma_collector:
         alarms:
             http_errors: ['neutron-api-http-errors']
             vip: ['neutron-api-check-failed']
+    neutron-api-endpoint:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            endpoint: ['neutron-api-local-endpoint']
     neutron-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1590,6 +1745,12 @@ lma_collector:
         alarms:
             http_errors: ['keystone-public-api-http-errors']
             vip: ['keystone-public-api-check-failed']
+    keystone-public-api-endpoint:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            endpoint: ['keystone-public-api-local-endpoint']
     keystone-logs:
         apply_to_node: controller
         enable_notification: false
