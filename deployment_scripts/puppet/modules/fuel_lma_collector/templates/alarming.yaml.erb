@@ -1152,6 +1152,119 @@ lma_collector:
             window: 60
             periods: 0
             function: max
+    # Adds alarm on local check for OpenStack services endpoint
+    - name: 'cinder-api-local-endpoint'
+      description: 'Cinder API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_local_api
+            fields:
+              service: 'cinder'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'glance-api-local-endpoint'
+      description: 'Glance API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_local_api
+            fields:
+              service: 'glance'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-api-local-endpoint'
+      description: 'Heat API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_local_api
+            fields:
+              service: 'heat'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-cfn-api-local-endpoint'
+      description: 'Heat CFN API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_local_api
+            fields:
+              service: 'heat-cfn'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'keystone-public-api-local-endpoint'
+      description: 'Keystone public API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_local_api
+            fields:
+              service: 'keystone-public'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-api-local-endpoint'
+      description: 'Neutron API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_local_api
+            fields:
+              service: 'neutron'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-api-local-endpoint'
+      description: 'Nova API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_local_api
+            fields:
+              service: 'nova'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'swift-api-local-endpoint'
+      description: 'Swift API is locally down'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_check_local_api
+            fields:
+              service: 'swift'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
 
   # Definition of the AFD node filters
   node_cluster_alarms:
@@ -1301,6 +1414,7 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['nova-api-http-errors']
+            local_endpoint: ['nova-api-local-endpoint']
     nova-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1313,6 +1427,13 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['heat-api-http-errors']
+            local_endpoint: ['heat-api-local-endpoint']
+    heat-cfn-api:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            local_endpoint: ['heat-cfn-api-local-endpoint']
     heat-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1326,6 +1447,7 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['swift-api-http-errors']
+            local_endpoint: ['swift-api-local-endpoint']
     swift-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1339,6 +1461,7 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['cinder-api-http-errors']
+            local_endpoint: ['cinder-api-local-endpoint']
     cinder-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1351,6 +1474,7 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['glance-api-http-errors']
+            local_endpoint: ['glance-api-local-endpoint']
     glance-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1363,6 +1487,7 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['neutron-api-http-errors']
+            local_endpoint: ['neutron-api-local-endpoint']
     neutron-logs:
         apply_to_node: controller
         enable_notification: false
@@ -1381,6 +1506,7 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['keystone-public-api-http-errors']
+            local_endpoint: ['keystone-public-api-local-endpoint']
     keystone-logs:
         apply_to_node: controller
         enable_notification: false
