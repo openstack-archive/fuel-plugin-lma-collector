@@ -726,6 +726,21 @@ lma_collector:
             window: 60
             periods: 1
             function: diff
+    - name: 'horizon-web-http-errors'
+      description: 'Too many 5xx HTTP errors have been detected on horizon'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: haproxy_backend_response_5xx
+            fields:
+              backend: 'horizon-web || horizon-https'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 1
+            function: diff
     - name: 'keystone-logs-error'
       description: 'Too many errors have been detected in Keystone logs'
       severity: 'warning'
@@ -1321,6 +1336,12 @@ lma_collector:
         activate_alerting: true
         alarms:
             http_errors: ['keystone-admin-api-http-errors']
+    horizon-web:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            http_errors: ['keystone-web-http-errors']
     nova-instances:
         #TODO(scroiset): apply on compute nodes
         apply_to_node: controller
