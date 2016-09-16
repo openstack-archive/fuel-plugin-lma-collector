@@ -95,7 +95,7 @@ TestAfd = {}
             severity='CRITICAL',
             ['function']='avg',
             metric='fs_space_percent_free',
-            fields={{name='fs',value='/'}},
+            fields={fs='/'},
             tags={},
             operator='<=',
             value=2,
