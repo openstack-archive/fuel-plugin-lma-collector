@@ -226,7 +226,9 @@ lma::collector::infrastructure_alerting::password: <%= @nagios_password %>
   }
 
   $storage_options = hiera_hash('storage', {})
-  $tls_enabled = hiera('public_ssl', false)
+  $public_ssl = hiera('public_ssl', {})
+  $tls_enabled = $public_ssl['horizon'] or false
+
   $ceilometer = hiera_hash('ceilometer', {})
   $ceilometer_enabled = pick($ceilometer['enabled'], false)
   $contrail_plugin = hiera('contrail', false)
