@@ -21,6 +21,7 @@ local consts = require 'gse_constants'
 local read_message = read_message
 local assert = assert
 local ipairs = ipairs
+local pairs = pairs
 local pcall = pcall
 local table = table
 
@@ -47,11 +48,11 @@ end
 -- for instance: "CPU load too high (WARNING, rule='last(load_midterm)>=5', current=7)"
 function get_alarm_for_human(alarm)
     local metric
-    if #(alarm.fields) > 0 then
-        local fields = {}
-        for _, field in ipairs(alarm.fields) do
-            fields[#fields+1] = field.name .. '="' .. field.value .. '"'
-        end
+    local fields = {}
+    for name, value in pairs(alarm.fields) do
+        fields[#fields+1] = name .. '="' .. value .. '"'
+    end
+    if #fields > 0 then
         metric = string.format('%s[%s]', alarm.metric, table.concat(fields, ','))
     else
         metric = alarm.metric
