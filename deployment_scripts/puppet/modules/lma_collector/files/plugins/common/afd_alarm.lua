@@ -124,16 +124,6 @@ function Alarm:add_value(ts, metric, value, fields)
     end
 end
 
--- convert fields to fields map
--- {foo="bar"} --> {name="foo", value="bar"}
-local function convert_field_list(fields)
-    local named_fields = {}
-    for name, value in pairs(fields or {}) do
-        named_fields[#named_fields+1] = {name=name, value=value}
-    end
-    return named_fields
-end
-
 -- return: state of alarm and a list of alarm details.
 --
 -- with alarm list when state != OKAY:
@@ -179,7 +169,7 @@ function Alarm:evaluate(ns)
         end
         for _, context in ipairs(context_list) do
             add_alarm(rule, context.value, msg,
-                      convert_field_list(context.fields))
+                      context.fields)
         end
     end
 
