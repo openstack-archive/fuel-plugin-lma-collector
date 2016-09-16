@@ -955,7 +955,7 @@ lma_collector:
           - metric: ceph_osd_check
             relational_operator: '=='
             threshold: 0
-            window: 60
+            window: 80  # The metric interval collection is 60s
             periods: 0
             function: last
     - name: 'pacemaker-check'
