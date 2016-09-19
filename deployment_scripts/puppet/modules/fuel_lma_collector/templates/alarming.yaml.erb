@@ -1420,7 +1420,7 @@ lma_collector:
         alarms:
             check: ['ceph-mon-check']
     ceph-osd-service:
-        apply_to_node: ceph-osd
+        apply_to_node: storage
         enable_notification: false
         activate_alerting: true
         alarms:

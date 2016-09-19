@@ -23,16 +23,13 @@ lma_collector:
     ceph-mon:
         roles: ['primary-controller', 'controller']
         description: 'The Ceph monitor nodes'
-    ceph-osd:
-        roles: ['ceph-osd']
-        description: 'The Ceph OSD nodes'
 <% end -%>
     compute:
         roles: ['compute']
         description: 'The Compute nodes'
     storage:
-        roles: ['cinder']
-        description: 'The Cinder nodes'
+        roles: ['cinder', 'ceph-osd']
+        description: 'The Storage nodes (either Cinder of Ceph-OSD)'
     elasticsearch-nodes:
         roles: ['primary-elasticsearch_kibana', 'elasticsearch_kibana']
         description: 'The Elasticsearch and Kibana nodes'
