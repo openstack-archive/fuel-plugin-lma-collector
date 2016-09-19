@@ -451,6 +451,7 @@ lma_collector:
           - network-tx
           - root-fs
           - log-fs
+          - other-fs
           - swap
           - hdd-errors
 <% if @detach_rabbitmq_enabled -%>
@@ -462,6 +463,7 @@ lma_collector:
           - network-rx
           - network-tx
           - root-fs
+          - other-fs
           - swap
           - hdd-errors
 <% end -%>
@@ -474,6 +476,7 @@ lma_collector:
           - network-rx
           - network-tx
           - root-fs
+          - other-fs
           - swap
           - hdd-errors
 <% end -%>
@@ -487,6 +490,7 @@ lma_collector:
           - network-tx
           - root-fs
           - nova-fs
+          - other-fs
           - swap
           - hdd-errors
       storage:
@@ -497,6 +501,7 @@ lma_collector:
           - network-rx
           - network-tx
           - root-fs
+          - other-fs
           - swap
           - hdd-errors
 <% if @monitor_elasticsearch -%>
