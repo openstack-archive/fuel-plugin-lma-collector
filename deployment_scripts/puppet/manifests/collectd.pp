@@ -242,10 +242,10 @@ if hiera('lma::collector::influxdb::server', false) {
     $influxdb_port = hiera('lma::collector::influxdb::port')
     class { 'lma_collector::collectd::http_check':
       urls                      => {
-        'influxdb' => "http://${influxdb_server}:${influxdb_port}/ping",
+        'influxdb-cluster' => "http://${influxdb_server}:${influxdb_port}/ping",
       },
       expected_codes            => {
-        'influxdb' => 204
+        'influxdb-cluster' => 204
       },
       timeout                   => 1,
       max_retries               => 3,
