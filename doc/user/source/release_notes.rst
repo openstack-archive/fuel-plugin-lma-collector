@@ -10,16 +10,16 @@ Release notes
 Version 0.10.1
 ++++++++++++++
 
-* Bug fixes
+The StackLight Collector plugin 0.10.1 for Fuel contains the following updates:
 
-  * Fix Elasticsearch address for collectd when using network templates. See
-    `#1614944 <https://bugs.launchpad.net/lma-toolchain/+bug/1614944>`_.
+* Fixed Elasticsearch address for collectd when using network templates. See
+  `#1614944 <https://bugs.launchpad.net/lma-toolchain/+bug/1614944>`_.
 
-  * Fix InfluxDB address for collectd when using network templates. See
-    `#1614945 <https://bugs.launchpad.net/lma-toolchain/+bug/1614945>`_.
+* Fixed InfluxDB address for collectd when using network templates. See
+  `#1614945 <https://bugs.launchpad.net/lma-toolchain/+bug/1614945>`_.
 
-  * Update the documentation regarding the post-deployment of StackLight. See
-    `#1611156 <https://bugs.launchpad.net/lma-toolchain/+bug/1611156>`_.
+* Updated the documentation regarding the post-deployment of StackLight. See
+  `#1611156 <https://bugs.launchpad.net/lma-toolchain/+bug/1611156>`_.
 
 Version 0.10.0
 ++++++++++++++
