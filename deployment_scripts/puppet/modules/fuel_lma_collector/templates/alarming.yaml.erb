@@ -559,7 +559,7 @@ lma_collector:
         rules:
           - metric: haproxy_backend_response_5xx
             fields:
-              backend: 'swift-api'
+              backend: 'swift-api || object-storage'
             relational_operator: '>'
             threshold: 0
             window: 60
