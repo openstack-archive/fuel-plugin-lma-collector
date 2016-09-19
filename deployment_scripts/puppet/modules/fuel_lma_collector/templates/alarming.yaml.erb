@@ -565,6 +565,23 @@ lma_collector:
             window: 60
             periods: 1
             function: diff
+    - name: 'swift-logs-error'
+      description: 'Too many errors have been detected in Swift logs'
+      severity: 'warning'
+      no_data_policy: 'okay'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: log_messages
+            fields:
+              service: 'swift'
+              level: 'error'
+            relational_operator: '>'
+            threshold: 0.1
+            window: 70
+            periods: 0
+            function: max
     - name: 'cinder-api-http-errors'
       description: 'Too many 5xx HTTP errors have been detected on cinder-api'
       severity: 'warning'
