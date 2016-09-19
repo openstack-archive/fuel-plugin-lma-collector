@@ -1423,12 +1423,14 @@ lma_collector:
         activate_alerting: true
         alarms:
             check: ['ceph-mon-check']
+<% if @storage_options["volumes_ceph"] then -%>
     ceph-osd-service:
-        apply_to_node: ceph-osd
+        apply_to_node: storage
         enable_notification: false
         activate_alerting: true
         alarms:
             check: ['ceph-osd-check']
+<% end -%>
     elasticsearch-cluster:
         apply_to_node: elasticsearch-nodes
         enable_notification: false
