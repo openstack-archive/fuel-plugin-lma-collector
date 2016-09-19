@@ -508,6 +508,9 @@ lma_collector:
           - other-fs
           - swap
           - hdd-errors
+<% if @storage_options["volumes_ceph"] then -%>
+          - osd-disk
+<% end -%>
 <% if @monitor_elasticsearch -%>
       elasticsearch-nodes:
         policy: majority_of_members

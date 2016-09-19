@@ -495,7 +495,7 @@ lma_collector:
         rules:
           - metric: fs_space_percent_free
             fields:
-              fs: '!= /var/lib/nova && != /var/log && != /var/lib/mysql && != /'
+              fs: '!= /var/lib/nova && != /var/log && != /var/lib/mysql && != / && !~ ceph%-%d+$'
             group_by: [fs]
             relational_operator: '<'
             threshold: 10
@@ -511,7 +511,23 @@ lma_collector:
         rules:
           - metric: fs_space_percent_free
             fields:
-              fs: '!= /var/lib/nova && != /var/log && != /var/lib/mysql && != /'
+              fs: '!= /var/lib/nova && != /var/log && != /var/lib/mysql && != / && !~ ceph%-%d+$'
+            group_by: [fs]
+            relational_operator: '<'
+            threshold: 5
+            window: 60
+            periods: 0
+            function: min
+    - name: 'osd-disk-critical'
+      description: "The filesystem's free space is too low (OSD disk)"
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: fs_space_percent_free
+            fields:
+              # Real FS is /var/lib/ceph/osd/ceph-0 but Collectd substituted '/' by '-'
+              fs: '=~ ceph/%d+$'
             group_by: [fs]
             relational_operator: '<'
             threshold: 5
@@ -1206,6 +1222,9 @@ lma_collector:
             other-fs: ['other-fs-critical', 'other-fs-warning']
             swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
             hdd-errors: ['hdd-errors-critical']
+<% if @storage_options["volumes_ceph"] then -%>
+            osd-disk: ['osd-disk-critical']
+<% end -%>
     elasticsearch-nodes:
         apply_to_node: elasticsearch-nodes
         enable_notification: false
