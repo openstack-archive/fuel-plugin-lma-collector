@@ -41,6 +41,7 @@ class { 'fuel_lma_collector::afds':
     node_profiles          => $lma['node_profiles'],
     node_cluster_alarms    => $lma['node_cluster_alarms'],
     service_cluster_alarms => $lma['service_cluster_alarms'],
+    metrics                => $lma['metrics'],
     alarms                 => $alarms_definitions,
 }
 

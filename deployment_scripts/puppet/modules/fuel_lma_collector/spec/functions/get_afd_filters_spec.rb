@@ -284,5 +284,91 @@ describe 'get_afd_filters' do
              )
              }
     end
+    describe 'For services with apply_to_node overriden by metric collected_on' do
+        alarms_services_o = [
+            {"name"=>"free_vcpu_warning",
+             "description"=>"",
+             "severity"=>"warning",
+             "trigger"=>
+              {"logical_operator"=>"or",
+               "rules"=>
+                [{"metric"=>"free_vcpu",
+                  "relational_operator"=>"<=",
+                  "threshold"=>1,
+                  "window"=>60,
+                  "periods"=>0,
+                  "function"=>"min"},
+                  ]}},
+            {"name"=>"total_free_vcpu_warning",
+             "description"=>"",
+             "severity"=>"warning",
+             "trigger"=>
+              {"logical_operator"=>"or",
+               "rules"=>
+                [{"metric"=>"total_free_vcpu",
+                  "relational_operator"=>"<=",
+                  "threshold"=>10,
+                  "window"=>60,
+                  "periods"=>0,
+                  "function"=>"min"},
+                  ]}},
+
+        ]
+        afds_services_overriden = {
+            "nova-free-resources" => {
+                "apply_to_node" => "compute",
+                "enable_notification" => false,
+                "activate_alerting" => true,
+                "enable_notification" => false,
+                "alarms" => {
+                    "free-vcpu" => ['free_vcpu_warning'],
+                },
+            },
+            "nova-total-free-resources" => {
+                "enable_notification" => false,
+                "activate_alerting" => true,
+                "enable_notification" => false,
+                "alarms" => {
+                    "total-free-vcpu" => ['total_free_vcpu_warning'],
+                },
+            },
+        }
+        metrics = {
+            "free_vcpu" => {
+                "collected_on" => "controller"
+            },
+            "total_free_vcpu" => {
+                "collected_on" => "controller"
+            }
+        }
+        it { should run.with_params(afds_services_overriden, alarms_services_o, ['controller'], 'service', metrics)
+             .and_return(
+                 {
+                     "nova-free-resources_free-vcpu"=>
+                     {
+                         "type"=>"service",
+                         "cluster_name"=>"nova-free-resources",
+                         "logical_name"=>"free-vcpu",
+                         "alarms_definitions"=> alarms_services_o,
+                         "alarms"=>["free_vcpu_warning"],
+                         "message_matcher"=>"Fields[name] == 'free_vcpu'",
+                         "activate_alerting" => true,
+                         "enable_notification" => false,
+                     },
+                     "nova-total-free-resources_total-free-vcpu"=>
+                     {
+                         "type"=>"service",
+                         "cluster_name"=>"nova-total-free-resources",
+                         "logical_name"=>"total-free-vcpu",
+                         "alarms_definitions"=> alarms_services_o,
+                         "alarms"=>["total_free_vcpu_warning"],
+                         "message_matcher"=>"Fields[name] == 'total_free_vcpu'",
+                         "activate_alerting" => true,
+                         "enable_notification" => false,
+                     },
+                }
+             )
+             }
+    end
 end
 
