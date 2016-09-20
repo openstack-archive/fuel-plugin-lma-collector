@@ -19,6 +19,7 @@
 # ARG1: Array of alarm definitions
 # ARG2: Array of AFD profiles
 # ARG3: Type of AFD (either 'node' or 'service')
+# ARG4: Hash table mapping metric names to the place where there are collected.
 #
 # Ex:
 #
@@ -67,6 +68,8 @@
 #
 # ARG3: type (node|service)
 #
+# ARG4: {"openstack_nova_total_free_vcpus" => {"collected_on": "aggregator"}}
+#
 # Results -> {
 #              'rabbitmq_queue' => {
 #                'type' => 'service',
@@ -93,9 +96,38 @@ module Puppet::Parser::Functions
     alarm_definitions = args[1]
     afd_profiles = args[2]
     type = args[3]
+    if not args[4]
+        metric_defs = {}
+    else
+        metric_defs = args[4]
+    end
+   #{
+   #    'cpu_idle' => {'collectd_on' => 'foo'}
+   #}
     afd_filters = {}
 
     afd_profiles.each do |afd_profile|
+        # Override apply_to_node with collectd_on if present in metrics definitions.
+        afd_alarms.each do |k ,v|
+            puts k
+            v['alarms'].each do |afd_name, alarms|
+                alarms.each do |a_name|
+                    puts a_name
+                    a = alarm_definitions.select {|defi| defi['name'] == a_name}
+                    next if a.empty?
+                    a[0]['trigger']['rules'].each do |r|
+                        puts metric_defs
+                        if metric_defs.has_key?(r['metric'])
+                            v['apply_to_node'] = metric_defs[r['metric']]['collected_on']
+                            puts "OVERRIDE #{r['metric']}"
+                        end
+                    end
+
+                end
+            end
+            puts '.....'
+        end
+
         afds = afd_alarms.select {|k,v| v.has_key?('apply_to_node') and v['apply_to_node'] == afd_profile }
         afds.each do |k, v|
             activate_alerting=true
