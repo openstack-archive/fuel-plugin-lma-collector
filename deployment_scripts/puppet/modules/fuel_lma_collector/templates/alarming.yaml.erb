@@ -1333,6 +1333,12 @@ lma_collector:
         activate_alerting: true
         alarms:
             error: ['nova-logs-error']
+    nova-logs-compute:
+        apply_to_node: compute
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            error: ['nova-logs-error']
     heat-api:
         apply_to_node: controller
         enable_notification: false
@@ -1391,6 +1397,18 @@ lma_collector:
             http_errors: ['neutron-api-http-errors']
     neutron-logs:
         apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            error: ['neutron-logs-error']
+    neutron-logs-compute:
+        apply_to_node: compute
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            error: ['neutron-logs-error']
+    neutron-logs-compute:
+        apply_to_node: compute
         enable_notification: false
         activate_alerting: true
         alarms:
