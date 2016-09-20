@@ -123,6 +123,11 @@ lma_collector:
         group_by: hostname
         members:
           - error
+      nova-logs-compute:
+        policy: highest_severity
+        group_by: hostname
+        members:
+          - error
       heat-logs:
         policy: highest_severity
         group_by: hostname
@@ -139,6 +144,11 @@ lma_collector:
         members:
           - error
       neutron-logs:
+        policy: highest_severity
+        group_by: hostname
+        members:
+          - error
+      nova-logs-compute:
         policy: highest_severity
         group_by: hostname
         members:
@@ -287,11 +297,13 @@ lma_collector:
         group_by: member
         members:
           - workers
+<% if not @contrail_plugin then -%>
       neutron-openvswitch:
         policy: highest_severity
         group_by: member
         members:
           - workers
+<% end -%>
       keystone-response-time:
         policy: highest_severity
         group_by: member
@@ -600,7 +612,7 @@ lma_collector:
 <% else -%>
           - controller
 <% end -%>
-      nova:
+      nova-control-plane:
         policy: highest_severity
         group_by: member
         members:
@@ -608,17 +620,11 @@ lma_collector:
           - nova-api
           - nova-metadata-api
           - nova-scheduler
-          - nova-compute
           - nova-conductor
           - nova-cert
           - nova-consoleauth
           - nova-novncproxy-websocket
-          - nova-instances
           - controller
-          - compute
-          - libvirt-service
-          - nova-free-vcpu
-          - nova-free-memory
         hints:
           - cinder
           - glance
@@ -626,6 +632,19 @@ lma_collector:
           - neutron
           - mysql
           - rabbitmq
+      nova-data-plane:
+        policy: highest_severity
+        group_by: member
+        members:
+          - nova-logs-compute
+          - nova-compute
+          - nova-instances
+          - compute
+          - libvirt-service
+          - nova-free-vcpu
+          - nova-free-memory
+        hints:
+          - neutron-data-plane
       cinder:
         policy: highest_severity
         group_by: member
@@ -641,7 +660,7 @@ lma_collector:
           - keystone
           - mysql
           - rabbitmq
-      neutron:
+      neutron-control-plane:
         policy: highest_severity
         group_by: member
         members:
@@ -658,6 +677,15 @@ lma_collector:
           - keystone
           - mysql
           - rabbitmq
+      neutron-data-plane:
+        policy: highest_severity
+        group_by: member
+        members:
+          - neutron-logs-compute
+<% if not @contrail_plugin then -%>
+          - neutron-openvswitch
+<% end -%>
+          - compute
       keystone:
         policy: highest_severity
         group_by: member
