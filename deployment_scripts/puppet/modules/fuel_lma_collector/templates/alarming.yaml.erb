@@ -2754,6 +2754,25 @@ lma_collector:
             periods: 0
             function: last
 
+    # Here are some definitions of alarms based on haproxy_backend_server.
+    # Alarms are triggered when one server is down from the point of view of
+    # the HAProxy.
+    - name: 'nova-api-one-server-down'
+      description: 'At least one HAProxy backend server is down for nova-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_server
+            fields:
+              backend: 'nova-api'
+            group_by: server
+            relational_operator: '!='
+            threshold: 1
+            window: 60
+            periods: 0
+            function: last
+
   # Definition of the AFD node filters
   node_cluster_alarms:
     controller:
