@@ -1152,6 +1152,32 @@ lma_collector:
             window: 60
             periods: 0
             function: max
+    - name: 'total-nova-free-vcpu-warning'
+      description: 'There is none VCPU available for new instances'
+      severity: 'warning'
+      enabled: 'true'
+      no_data_policy: skip # the metric is only collected from the aggregator node
+      trigger:
+        rules:
+          - metric: openstack_nova_total_free_vcpus
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: max
+    - name: 'total-nova-free-memory-warning'
+      description: 'There is none memory available for new instances'
+      severity: 'warning'
+      enabled: 'true'
+      no_data_policy: skip  # the metric is only collected from the aggregator node
+      trigger:
+        rules:
+          - metric: openstack_nova_total_free_ram
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: max
 
   # Definition of the AFD node filters
   node_cluster_alarms:
@@ -1410,6 +1436,16 @@ lma_collector:
         activate_alerting: true
         alarms:
             creation-time: ['instance-creation-time-warning']
+    nova-free-vcpu:
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            nova-free-vcpu: ['total-nova-free-vcpu-warning']
+    nova-free-memory:
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            nova-free-memory: ['total-nova-free-memory-warning']
     ceph-mon-cluster:
         apply_to_node: ceph-mon
         enable_notification: false

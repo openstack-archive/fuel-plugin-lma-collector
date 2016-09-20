@@ -426,6 +426,20 @@ lma_collector:
         group_by: hostname
         members:
           - check
+      nova-free-vcpu:
+        enable_notification: false
+        activate_alerting: true
+        policy: highest_severity
+        group_by: member
+        members:
+          - nova-free-vcpu
+      nova-free-memory:
+        enable_notification: false
+        activate_alerting: true
+        policy: highest_severity
+        group_by: member
+        members:
+          - nova-free-memory
 
   gse_cluster_node:
     input_message_types:
@@ -533,7 +547,6 @@ lma_collector:
           - swap
           - hdd-errors
 <% end -%>
-
   gse_cluster_global:
     input_message_types:
       - gse_service_cluster_metric
@@ -604,6 +617,8 @@ lma_collector:
           - controller
           - compute
           - libvirt-service
+          - nova-free-vcpu
+          - nova-free-memory
         hints:
           - cinder
           - glance
