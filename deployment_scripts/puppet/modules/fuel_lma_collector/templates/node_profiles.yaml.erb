@@ -36,6 +36,9 @@ lma_collector:
     influxdb-nodes:
         roles: ['primary-influxdb_grafana', 'influxdb_grafana']
         description: 'The InfluxDB and Grafana nodes'
+    aggregator:
+        roles: ['primary-controller', 'controller']
+        description: 'The Aggregator nodes'
 
     default:
         roles: []
