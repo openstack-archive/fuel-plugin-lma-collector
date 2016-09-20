@@ -1153,6 +1153,1476 @@ lma_collector:
             periods: 0
             function: max
 
+    # Following are the AFD generated to check API backends
+    # All backends are down
+    - name: 'elasticsearch-api-backends-all-down'
+      description: 'All API backends are down for elasticsearch'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'elasticsearch-rest'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'kibana-api-backends-all-down'
+      description: 'All API backends are down for kibana'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'kibana'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'influxdb-api-backends-all-down'
+      description: 'All API backends are down for influxdb'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'influxdb'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'grafana-api-backends-all-down'
+      description: 'All API backends are down for grafana'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'grafana'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'glance-registry-api-backends-all-down'
+      description: 'All API backends are down for glance-registry-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'glance-registry-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-api-backends-all-down'
+      description: 'All API backends are down for nova-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'nova-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-api-backends-all-down'
+      description: 'All API backends are down for cinder-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'cinder-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'object-storage-api-backends-all-down'
+      description: 'All API backends are down for object-storage'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'object-storage'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-cfn-api-backends-all-down'
+      description: 'All API backends are down for heat-cfn-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'heat-cfn-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'horizon-web-api-backends-all-down'
+      description: 'All API backends are down for horizon-web'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'horizon-web'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-novncproxy-websocket-api-backends-all-down'
+      description: 'All API backends are down for nova-novncproxy-websocket'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'nova-novncproxy-websocket'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-api-backends-all-down'
+      description: 'All API backends are down for heat-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'heat-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'keystone-public-api-backends-all-down'
+      description: 'All API backends are down for keystone-public-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'keystone-public-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-cloudwatch-api-backends-all-down'
+      description: 'All API backends are down for heat-cloudwatch-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'heat-cloudwatch-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-metadata-api-backends-all-down'
+      description: 'All API backends are down for nova-metadata-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'nova-metadata-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'mysqld-tcp-api-backends-all-down'
+      description: 'All API backends are down for mysqld-tcp'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'mysqld-tcp'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'keystone-admin-api-backends-all-down'
+      description: 'All API backends are down for keystone-admin-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'keystone-admin-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'glance-api-backends-all-down'
+      description: 'All API backends are down for glance-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'glance-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-api-backends-all-down'
+      description: 'All API backends are down for neutron-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'neutron-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'swift-api-backends-all-down'
+      description: 'All API backends are down for swift-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'swift-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'ceilometer-api-backends-all-down'
+      description: 'All API backends are down for ceilometer-api'
+      severity: 'down'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'ceilometer-api'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    # At least one backend is down
+    - name: 'elasticsearch-api-backends-one-down'
+      description: 'At least one API backends is down for elasticsearch'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'elasticsearch-rest'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'kibana-api-backends-one-down'
+      description: 'At least one API backends is down for kibana'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'kibana'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'influxdb-api-backends-one-down'
+      description: 'At least one API backends is down for influxdb'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'influxdb'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'grafana-api-backends-one-down'
+      description: 'At least one API backends is down for grafana'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'grafana'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'glance-registry-api-backends-one-down'
+      description: 'At least one API backends is down for glance-registry-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'glance-registry-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-api-backends-one-down'
+      description: 'At least one API backends is down for nova-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'nova-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-api-backends-one-down'
+      description: 'At least one API backends is down for cinder-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'cinder-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'object-storage-api-backends-one-down'
+      description: 'At least one API backends is down for object-storage'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'object-storage'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-cfn-api-backends-one-down'
+      description: 'At least one API backends is down for heat-cfn-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'heat-cfn-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'horizon-web-api-backends-one-down'
+      description: 'At least one API backends is down for horizon-web'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'horizon-web'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-novncproxy-websocket-api-backends-one-down'
+      description: 'At least one API backends is down for nova-novncproxy-websocket'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'nova-novncproxy-websocket'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-api-backends-one-down'
+      description: 'At least one API backends is down for heat-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'heat-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'keystone-public-api-backends-one-down'
+      description: 'At least one API backends is down for keystone-public-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'keystone-public-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-cloudwatch-api-backends-one-down'
+      description: 'At least one API backends is down for heat-cloudwatch-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'heat-cloudwatch-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-metadata-api-backends-one-down'
+      description: 'At least one API backends is down for nova-metadata-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'nova-metadata-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'mysqld-tcp-api-backends-one-down'
+      description: 'At least one API backends is down for mysqld-tcp'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'mysqld-tcp'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'keystone-admin-api-backends-one-down'
+      description: 'At least one API backends is down for keystone-admin-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'keystone-admin-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'glance-api-backends-one-down'
+      description: 'At least one API backends is down for glance-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'glance-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-api-backends-one-down'
+      description: 'At least one API backends is down for neutron-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'neutron-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'swift-api-backends-one-down'
+      description: 'At least one API backends is down for swift-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'swift-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'ceilometer-api-backends-one-down'
+      description: 'At least one API backends is down for ceilometer-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers
+            fields:
+              backend: 'ceilometer-api'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    # Less than 50% of backends are up
+    - name: 'elasticsearch-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for elasticsearch'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'elasticsearch-rest'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'kibana-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for kibana'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'kibana'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'influxdb-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for influxdb'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'influxdb'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'grafana-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for grafana'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'grafana'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'glance-registry-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for glance-registry-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'glance-registry-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for nova-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'nova-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for cinder-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'cinder-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'object-storage-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for object-storage'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'object-storage'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-cfn-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for heat-cfn-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'heat-cfn-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'horizon-web-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for horizon-web'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'horizon-web'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-novncproxy-websocket-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for nova-novncproxy-websocket'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'nova-novncproxy-websocket'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for heat-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'heat-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'keystone-public-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for keystone-public-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'keystone-public-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'heat-cloudwatch-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for heat-cloudwatch-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'heat-cloudwatch-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-metadata-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for nova-metadata-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'nova-metadata-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'mysqld-tcp-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for mysqld-tcp'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'mysqld-tcp'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'keystone-admin-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for keystone-admin-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'keystone-admin-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'glance-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for glance-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'glance-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for neutron-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'neutron-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'swift-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for swift-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'swift-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'ceilometer-api-backends-majority-down'
+      description: 'Less than 50% of backends are up for ceilometer-api'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_servers_percent_up
+            fields:
+              backend: 'ceilometer-api'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+
+    # Following are the AFD generated to check workers
+    # All workers are down
+    - name: 'nova-scheduler-all-down'
+      description: 'All Nova schedulers are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'scheduler'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-cert-all-down'
+      description: 'All Nova certs are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'cert'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-consoleauth-all-down'
+      description: 'All Nova consoleauths are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'consoleauth'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-compute-all-down'
+      description: 'All Nova computes are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'compute'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-conductor-all-down'
+      description: 'All Nova conductors are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'conductor'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'inder-scheduler-all-down'
+      description: 'All Cinder schedulers are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_services
+            fields:
+              service: 'scheduler'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-volume-all-down'
+      description: 'All Cinder volumes are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_services
+            fields:
+              service: 'volume'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-l3-all-down'
+      description: 'All Neutron L3 agents are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'l3'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-dhcp-all-down'
+      description: 'All Neutron DHCP agents are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'dhcp'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-metadata-all-down'
+      description: 'All Neutron metadata agents are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'metadata'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-openvswitch-all-down'
+      description: 'All Neutron openvswitch agents are down'
+      severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'openvswitch'
+              state: 'up'
+            relational_operator: '=='
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    # At least one backend is down
+    - name: 'nova-scheduler-one-down'
+      description: 'At least one Nova scheduler is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'scheduler'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-cert-one-down'
+      description: 'At least one Nova cert is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'cert'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-consoleauth-one-down'
+      description: 'At least one Nova consoleauth is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'consoleauth'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-compute-one-down'
+      description: 'At least one Nova compute is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'compute'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-conductor-one-down'
+      description: 'At least one Nova conductor is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services
+            fields:
+              service: 'conductor'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-scheduler-one-down'
+      description: 'At least one Cinder scheduler is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_services
+            fields:
+              service: 'scheduler'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-volume-one-down'
+      description: 'At least one Cinder volume is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_services
+            fields:
+              service: 'volume'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-l3-one-down'
+      description: 'At least one L3 agent is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'l3'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-dhcp-one-down'
+      description: 'At least one DHCP agent is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'dhcp'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-metadata-one-down'
+      description: 'At least one metadata agents is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'metadata'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-openvswitch-one-down'
+      description: 'At least one openvswitch agents is down'
+      severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_agents
+            fields:
+              service: 'openvswitch'
+              state: 'down'
+            relational_operator: '>'
+            threshold: 0
+            window: 60
+            periods: 0
+            function: last
+    # Less than 50% of service are up (compared to up and down).
+    - name: 'nova-scheduler-majority-down'
+      description: 'Less than 50% of Nova schedulers are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services_percent_up
+            fields:
+              service: 'scheduler'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-cert-majority-down'
+      description: 'Less than 50% of Nova certs are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services_percent_up
+            fields:
+              service: 'cert'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-consoleauth-majority-down'
+      description: 'Less than 50% of Nova consoleauths are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services_percent_up
+            fields:
+              service: 'consoleauth'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-compute-majority-down'
+      description: 'Less than 50% of Nova computes are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services_percent_up
+            fields:
+              service: 'compute'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'nova-conductor-majority-down'
+      description: 'Less than 50% of Nova conductors are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_nova_services_percent_up
+            fields:
+              service: 'conductor'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-scheduler-majority-down'
+      description: 'Less than 50% of Cinder schedulers are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_services_percent_up
+            fields:
+              service: 'scheduler'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'cinder-volume-majority-down'
+      description: 'Less than 50% of Cinder volumes are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_cinder_services_percent_up
+            fields:
+              service: 'volume'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-l3-majority-down'
+      description: 'Less than 50% of Neutron L3 agents are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_neutron_agents_percent_up
+            fields:
+              service: 'l3'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-dhcp-majority-down'
+      description: 'Less than 50% of Neutron DHCP agents are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_neutron_agents_percent_up
+            fields:
+              service: 'dhcp'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-metadata-majority-down'
+      description: 'Less than 50% of Neutron metadata agents are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_neutron_agents_percent_up
+            fields:
+              service: 'metadata'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+    - name: 'neutron-openvswitch-majority-down'
+      description: 'Less than 50% of Neutron openvswitch agents are up'
+      severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: openstack_neutron_agents_percent_up
+            fields:
+              service: 'openvswitch'
+            relational_operator: '<='
+            threshold: 50
+            window: 60
+            periods: 0
+            function: last
+
+    # Here are some definitions of alarms based on haproxy_backend_server.
+    # Alarms are triggered when one server is down from the point of view of
+    # the HAProxy.
+    - name: 'nova-api-one-server-down'
+      description: 'At least one HAProxy backend server is down for nova-api'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        rules:
+          - metric: haproxy_backend_server
+            fields:
+              backend: 'nova-api'
+            group_by: server
+            relational_operator: '!='
+            threshold: 1
+            window: 60
+            periods: 0
+            function: last
+
   # Definition of the AFD node filters
   node_cluster_alarms:
     controller:
