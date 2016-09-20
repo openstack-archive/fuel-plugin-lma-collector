@@ -40,7 +40,7 @@ function process_message ()
         tenant_id = read_message("Fields[tenant_id]"),
         user_id = read_message("Fields[user_id]"),
         state = state,
-        tag_fields = { 'state', 'hostname' },
+        tag_fields = { 'state' },
     }
     utils.inject_tags(msg)
 

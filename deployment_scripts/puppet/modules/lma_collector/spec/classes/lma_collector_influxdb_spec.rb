@@ -35,7 +35,7 @@ describe 'lma_collector::influxdb' do
         it { is_expected.to contain_heka__output__http('influxdb') }
         it { is_expected.to contain_heka__encoder__payload('influxdb') }
         it { is_expected.to contain_heka__filter__sandbox('influxdb_accumulator').with_config({
-            "tag_fields" => "foo zzz", "flush_interval"=> :undef,
+            "tag_fields" => "foo hostname zzz", "flush_interval"=> :undef,
             "flush_count"=> :undef, "time_precision" => "ms"}) }
         it { is_expected.to contain_heka__filter__sandbox('influxdb_annotation') }
     end
