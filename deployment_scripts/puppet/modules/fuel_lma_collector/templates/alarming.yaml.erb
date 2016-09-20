@@ -1642,6 +1642,12 @@ lma_collector:
         activate_alerting: true
         alarms:
             error: ['nova-logs-error']
+    nova-logs-compute:
+        apply_to_node: compute
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            error: ['nova-logs-error']
     heat-api:
         apply_to_node: controller
         enable_notification: false
@@ -1728,6 +1734,14 @@ lma_collector:
         activate_alerting: true
         alarms:
             error: ['cinder-logs-error']
+<% if not @storage_options["volumes_ceph"] then -%>
+    cinder-volume-logs:
+        apply_to_node: storage
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            error: ['cinder-logs-error']
+<% end -%>
     glance-api:
         apply_to_node: controller
         enable_notification: false
@@ -1770,6 +1784,12 @@ lma_collector:
             endpoint: ['neutron-api-local-endpoint']
     neutron-logs:
         apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            error: ['neutron-logs-error']
+    neutron-logs-compute:
+        apply_to_node: compute
         enable_notification: false
         activate_alerting: true
         alarms:

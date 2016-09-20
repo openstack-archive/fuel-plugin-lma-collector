@@ -123,6 +123,11 @@ lma_collector:
         group_by: hostname
         members:
           - error
+      nova-logs-compute:
+        policy: highest_severity
+        group_by: hostname
+        members:
+          - error
       heat-logs:
         policy: highest_severity
         group_by: hostname
@@ -139,6 +144,11 @@ lma_collector:
         members:
           - error
       neutron-logs:
+        policy: highest_severity
+        group_by: hostname
+        members:
+          - error
+      neutron-logs-compute:
         policy: highest_severity
         group_by: hostname
         members:
@@ -314,11 +324,13 @@ lma_collector:
         group_by: member
         members:
           - workers
+<% if not @contrail_plugin then -%>
       neutron-openvswitch:
         policy: highest_severity
         group_by: member
         members:
           - workers
+<% end -%>
       keystone-response-time:
         policy: highest_severity
         group_by: member
@@ -677,27 +689,21 @@ lma_collector:
 <% else -%>
           - controller
 <% end -%>
-      nova:
+      nova-control-plane:
         policy: highest_severity
         group_by: member
         members:
           - nova-logs
-          - nova-api
-          - nova-api-check
-          - nova-api-endpoint
-          - nova-metadata-api
-          - nova-scheduler
-          - nova-compute
-          - nova-conductor
-          - nova-cert
-          - nova-consoleauth
-          - nova-novncproxy-websocket
-          - nova-instances
-          - controller
-          - compute
-          - libvirt-service
-          - nova-free-vcpu
-          - nova-free-memory
+          - nova-api          # backends and http errors
+          - nova-api-check    # vip check
+          - nova-api-endpoint # local check
+          - nova-metadata-api # worker
+          - nova-scheduler    # worker
+          - nova-conductor    # worker
+          - nova-cert         # worker
+          - nova-consoleauth  # worker
+          - nova-novncproxy-websocket # worker
+          - controller        # node cluster
         hints:
           - cinder
           - glance
@@ -705,7 +711,20 @@ lma_collector:
           - neutron
           - mysql
           - rabbitmq
-      cinder:
+      nova-data-plane:
+        policy: highest_severity
+        group_by: member
+        members:
+          - nova-logs-compute
+          - nova-compute
+          - nova-instances
+          - compute
+          - libvirt-service
+          - nova-free-vcpu
+          - nova-free-memory
+        hints:
+          - neutron-data-plane
+      cinder-control-plane:
         policy: highest_severity
         group_by: member
         members:
@@ -715,14 +734,21 @@ lma_collector:
           - cinder-v2-api-check
           - cinder-api-endpoint
           - cinder-scheduler
-          - cinder-volume
           - controller
-          - storage
         hints:
           - keystone
           - mysql
           - rabbitmq
-      neutron:
+<% if not @storage_options["volumes_ceph"] then -%>
+      cinder-data-plane:
+        policy: highest_severity
+        group_by: member
+        members:
+          - cinder-volume-logs
+          - cinder-volume
+          - storage
+<% end -%>
+      neutron-control-plane:
         policy: highest_severity
         group_by: member
         members:
@@ -741,6 +767,15 @@ lma_collector:
           - keystone
           - mysql
           - rabbitmq
+      neutron-data-plane:
+        policy: highest_severity
+        group_by: member
+        members:
+          - neutron-logs-compute
+<% if not @contrail_plugin then -%>
+          - neutron-openvswitch
+<% end -%>
+          - compute
       keystone:
         policy: highest_severity
         group_by: member
