@@ -429,7 +429,7 @@ lma_collector:
         members:
           - check
       libvirt-service:
-        policy: majority_of_members
+        policy: highest_severity
         group_by: hostname
         members:
           - check
