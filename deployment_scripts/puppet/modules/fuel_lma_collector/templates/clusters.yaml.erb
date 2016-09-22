@@ -198,6 +198,11 @@ lma_collector:
           - backends
           - vip
           - http_errors
+      nova-api-endpoint:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - endpoint
       nova-novncproxy-websocket:
         policy: highest_severity
         group_by: member
@@ -249,6 +254,11 @@ lma_collector:
           - backends
           - vip
           - http_errors
+      cinder-api-endpoint:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - endpoint
       cinder-v2-api:
         policy: highest_severity
         group_by: member
@@ -272,6 +282,11 @@ lma_collector:
           - backends
           - vip
           - http_errors
+      neutron-api-endpoint:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - endpoint
       neutron-l3:
         policy: highest_severity
         group_by: member
@@ -304,6 +319,11 @@ lma_collector:
           - backends
           - vip
           - http_errors
+      keystone-public-api-endpoint:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - endpoint
       keystone-admin-api:
         policy: highest_severity
         group_by: member
@@ -318,6 +338,11 @@ lma_collector:
           - backends
           - vip
           - http_errors
+      glance-api-endpoint:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - endpoint
       glance-registry-api:
         policy: highest_severity
         group_by: member
@@ -330,12 +355,22 @@ lma_collector:
           - backends
           - vip
           - http_errors
+      heat-api-endpoint:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - endpoint
       heat-cfn-api:
         policy: highest_severity
         group_by: member
         members:
           - backends
           - vip
+      heat-cfn-api-endpoint:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - endpoint
       heat-cloudwatch-api:
         policy: highest_severity
         group_by: member
@@ -359,6 +394,11 @@ lma_collector:
           - backends
           - vip
           - http_errors
+      swift-api-endpoint:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - endpoint
       swift-s3-api:
         policy: highest_severity
         group_by: member
@@ -547,6 +587,7 @@ lma_collector:
           - swap
           - hdd-errors
 <% end -%>
+
   gse_cluster_global:
     input_message_types:
       - gse_service_cluster_metric
@@ -606,6 +647,7 @@ lma_collector:
         members:
           - nova-logs
           - nova-api
+          - nova-api-endpoint
           - nova-metadata-api
           - nova-scheduler
           - nova-compute
@@ -632,6 +674,7 @@ lma_collector:
         members:
           - cinder-logs
           - cinder-api
+          - cinder-api-endpoint
           - cinder-v2-api
           - cinder-scheduler
           - cinder-volume
@@ -647,6 +690,7 @@ lma_collector:
         members:
           - neutron-logs
           - neutron-api
+          - neutron-api-endpoint
 <% if not @contrail_plugin then -%>
           - neutron-l3
           - neutron-dhcp
@@ -665,6 +709,7 @@ lma_collector:
           - keystone-logs
           - keystone-response-time
           - keystone-public-api
+          - keystone-public-api-endpoint
           - keystone-admin-api
           - controller
         hints:
@@ -676,6 +721,7 @@ lma_collector:
         members:
           - glance-logs
           - glance-api
+          - glance-api-endpoint
           - glance-registry-api
           - controller
         hints:
@@ -687,7 +733,9 @@ lma_collector:
         members:
           - heat-logs
           - heat-api
+          - heat-api-endpoint
           - heat-cfn-api
+          - heat-cfn-api-endpoint
           - heat-cloudwatch-api
           - controller
         hints:
@@ -717,6 +765,7 @@ lma_collector:
         group_by: member
         members:
           - swift-api
+          - swift-api-endpoint
           - swift-s3-api
           - controller
         hints:
