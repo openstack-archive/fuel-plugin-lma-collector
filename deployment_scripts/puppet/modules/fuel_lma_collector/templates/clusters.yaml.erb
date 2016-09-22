@@ -202,6 +202,11 @@ lma_collector:
         group_by: member
         members:
           - vip
+      nova-api-endpoint:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - endpoint
       nova-novncproxy-websocket:
         policy: highest_severity
         group_by: member
@@ -263,6 +268,11 @@ lma_collector:
         members:
           # Cinder V2 backends are in fact the same as the Cinder backends
           - vip
+      cinder-api-endpoint:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - endpoint
       cinder-scheduler:
         policy: highest_severity
         group_by: member
@@ -284,6 +294,11 @@ lma_collector:
         group_by: member
         members:
           - vip
+      neutron-api-endpoint:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - endpoint
       neutron-l3:
         policy: highest_severity
         group_by: member
@@ -320,6 +335,11 @@ lma_collector:
         group_by: member
         members:
           - vip
+      keystone-public-api-endpoint:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - endpoint
       keystone-admin-api:
         policy: highest_severity
         group_by: member
@@ -338,6 +358,11 @@ lma_collector:
         group_by: member
         members:
           - vip
+      glance-api-endpoint:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - endpoint
       glance-registry-api:
         policy: highest_severity
         group_by: member
@@ -354,6 +379,11 @@ lma_collector:
         group_by: member
         members:
           - vip
+      heat-api-endpoint:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - endpoint
       heat-cfn-api:
         policy: highest_severity
         group_by: member
@@ -364,6 +394,11 @@ lma_collector:
         group_by: member
         members:
           - vip
+      heat-cfn-api-endpoint:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - endpoint
       heat-cloudwatch-api:
         policy: highest_severity
         group_by: member
@@ -397,6 +432,11 @@ lma_collector:
         members:
           # Swift S3 backends are in fact the same as the Swift backends
           - vip
+      swift-api-endpoint:
+        policy: majority_of_members
+        group_by: hostname
+        members:
+          - endpoint
 <% end -%>
 <% if @ceilometer_enabled -%>
       ceilometer-api:
@@ -583,6 +623,7 @@ lma_collector:
           - swap
           - hdd-errors
 <% end -%>
+
   gse_cluster_global:
     input_message_types:
       - gse_service_cluster_metric
@@ -643,6 +684,7 @@ lma_collector:
           - nova-logs
           - nova-api
           - nova-api-check
+          - nova-api-endpoint
           - nova-metadata-api
           - nova-scheduler
           - nova-compute
@@ -671,6 +713,7 @@ lma_collector:
           - cinder-api
           - cinder-api-check
           - cinder-v2-api-check
+          - cinder-api-endpoint
           - cinder-scheduler
           - cinder-volume
           - controller
@@ -686,6 +729,7 @@ lma_collector:
           - neutron-logs
           - neutron-api
           - neutron-api-check
+          - neutron-api-endpoint
 <% if not @contrail_plugin then -%>
           - neutron-l3
           - neutron-dhcp
@@ -705,6 +749,7 @@ lma_collector:
           - keystone-response-time
           - keystone-public-api
           - keystone-public-api-check
+          - keystone-public-api-endpoint
           - keystone-admin-api
           - controller
         hints:
@@ -717,6 +762,7 @@ lma_collector:
           - glance-logs
           - glance-api
           - glance-api-check
+          - glance-api-endpoint
           - glance-registry-api
           - controller
         hints:
@@ -729,8 +775,10 @@ lma_collector:
           - heat-logs
           - heat-api
           - heat-api-check
+          - heat-api-endpoint
           - heat-cfn-api
           - heat-cfn-api-check
+          - heat-cfn-api-endpoint
           - heat-cloudwatch-api
           - controller
         hints:
@@ -762,6 +810,7 @@ lma_collector:
           - swift-api
           - swift-api-check
           - swift-s3-api-check
+          - swift-api-endpoint
           - controller
         hints:
           - keystone
