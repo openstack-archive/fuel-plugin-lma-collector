@@ -158,7 +158,7 @@ function inject_afd_metric(msg_type, msg_tag_name, msg_tag_value, metric_name,
             hostname=hostname,
             interval=interval,
             source=source,
-            tag_fields={msg_tag_name, 'source'},
+            tag_fields={msg_tag_name, 'source', 'hostname'},
             no_alerting = no_alerting,
         }
     }
