@@ -3,9 +3,37 @@ lma_collector:
   metrics:
     openstack_nova_total_free_vcpus:
       collected_on: aggregator
+      depends_on:
+          metric: internal_status
+          fields:
+            internal: '== aggregator'
+            source: '== election'
+          value: '== 0'
     openstack_nova_total_free_ram:
       collected_on: aggregator
+      depends_on:
+          metric: internal_status
+          fields:
+            internal: aggregator
+            source: election
+          value: 0
     http_check:
       collected_on: aggregator
+      depends_on:
+          metric: internal_status
+          fields:
+            internal: aggregator
+            source: election
+          value: 0
     openstack_check_api:
       collected_on: aggregator
+      depends_on:
+          metric: internal_status
+          fields:
+            internal: aggregator
+            source: election
+          value: 0
+    pacemaker_resource_percent:
+      depends_on:
+          metric: pacemaker_dc
+          value: 0

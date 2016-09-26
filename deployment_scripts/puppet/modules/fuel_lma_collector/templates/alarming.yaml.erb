@@ -301,7 +301,6 @@ lma_collector:
     - name: 'rabbitmq-pacemaker-down'
       description: 'The RabbitMQ cluster is down'
       severity: 'down'
-      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         logical_operator: 'and'
@@ -318,7 +317,6 @@ lma_collector:
     - name: 'rabbitmq-pacemaker-critical'
       description: 'The RabbitMQ cluster is critical because less than half of the nodes are up'
       severity: 'critical'
-      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         logical_operator: 'and'
@@ -335,7 +333,6 @@ lma_collector:
     - name: 'rabbitmq-pacemaker-warning'
       description: 'The RabbitMQ cluster is degraded because some RabbitMQ nodes are missing'
       severity: 'warning'
-      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         logical_operator: 'and'
@@ -1156,7 +1153,6 @@ lma_collector:
       description: 'There is none VCPU available for new instances'
       severity: 'warning'
       enabled: 'true'
-      no_data_policy: skip # the metric is only collected from the aggregator node
       trigger:
         rules:
           - metric: openstack_nova_total_free_vcpus
@@ -1169,7 +1165,6 @@ lma_collector:
       description: 'There is none memory available for new instances'
       severity: 'warning'
       enabled: 'true'
-      no_data_policy: skip  # the metric is only collected from the aggregator node
       trigger:
         rules:
           - metric: openstack_nova_total_free_ram
@@ -1298,7 +1293,6 @@ lma_collector:
     - name: 'influxdb-api-check-failed'
       description: 'Endpoint check for InfluxDB is failed'
       severity: 'down'
-      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1313,7 +1307,6 @@ lma_collector:
     - name: 'nova-api-check-failed'
       description: 'Endpoint check for nova-api is failed'
       severity: 'down'
-      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1328,7 +1321,6 @@ lma_collector:
     - name: 'neutron-api-check-failed'
       description: 'Endpoint check for neutron-api is failed'
       severity: 'down'
-      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1343,7 +1335,6 @@ lma_collector:
     - name: 'cinder-api-check-failed'
       description: 'Endpoint check for cinder-api is failed'
       severity: 'down'
-      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1358,7 +1349,6 @@ lma_collector:
     - name: 'cinder-v2-api-check-failed'
       description: 'Endpoint check for cinder-v2-api is failed'
       severity: 'down'
-      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1373,7 +1363,6 @@ lma_collector:
     - name: 'glance-api-check-failed'
       description: 'Endpoint check for glance-api is failed'
       severity: 'down'
-      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1388,7 +1377,6 @@ lma_collector:
     - name: 'heat-api-check-failed'
       description: 'Endpoint check for heat-api is failed'
       severity: 'down'
-      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1403,7 +1391,6 @@ lma_collector:
     - name: 'heat-cfn-api-check-failed'
       description: 'Endpoint check for heat-cfn-api is failed'
       severity: 'down'
-      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1418,7 +1405,6 @@ lma_collector:
     - name: 'swift-api-check-failed'
       description: 'Endpoint check for swift-api is failed'
       severity: 'down'
-      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1433,7 +1419,6 @@ lma_collector:
     - name: 'swift-s3-api-check-failed'
       description: 'Endpoint check for swift-s3-api is failed'
       severity: 'down'
-      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1448,7 +1433,6 @@ lma_collector:
     - name: 'keystone-public-api-check-failed'
       description: 'Endpoint check for keystone-public-api is failed'
       severity: 'down'
-      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1463,7 +1447,6 @@ lma_collector:
     - name: 'ceilometer-api-check-failed'
       description: 'Endpoint check for ceilometer-api is failed'
       severity: 'down'
-      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
