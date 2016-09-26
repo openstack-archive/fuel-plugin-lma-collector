@@ -22,5 +22,10 @@
 * ``memcached_ops_misses``, the number of items that have been requested and
   not found.
 * ``memcached_percent_hitratio``, the percentage of get command hits (in cache).
+* ``memcached_ps_cputime_syst``, the percentage of CPU time spent in system
+  mode by memcached. It can be greater than 100% when the node has more than
+  one CPU.
+* ``memcached_ps_cputime_user``, the percentage of CPU time spent in user mode
+  by memcached. It can be greater than 100% when the node has more than one CPU.
 
 For details, see the `Memcached documentation <https://github.com/memcached/memcached/blob/master/doc/protocol.txt#L488>`_.
