@@ -16,6 +16,7 @@ local cjson = require 'cjson'
 
 local afd = require 'afd'
 local gse = require 'gse'
+local consts = require 'gse_constants'
 local lma = require 'lma_utils'
 
 local output_message_type = read_config('output_message_type') or error('output_message_type must be specified!')
@@ -50,15 +51,19 @@ end
 function process_message()
     local name = read_message('Fields[name]')
     local hostname = read_message('Fields[hostname]')
-    if name and name == 'pacemaker_local_resource_active' and read_message("Fields[resource]") == 'vip__management' then
-        -- Skip pacemaker_local_resource_active metrics that don't
-        -- concern the local node
-        if read_message('Hostname') == hostname then
-            if read_message('Fields[value]') == 1 then
-                is_active = true
-            else
-                is_active = false
-            end
+    local status = afd.get_status()
+    if not status then
+        return -1, "Cannot find status in the AFD/GSE message"
+    end
+
+    if name and name == 'internal_status'
+      and read_message('Fields[internal]') == 'aggregator'
+      and read_message('Fields[source]') == 'election' then
+
+        if status == consts.OKAY then
+            is_active = true
+        else
+            is_active = false
         end
         return 0
     end
@@ -66,11 +71,6 @@ function process_message()
     local member_id = afd.get_entity_name(member_field)
     if not member_id then
         return -1, "Cannot find entity's name in the AFD/GSE message"
-    end
-
-    local status = afd.get_status()
-    if not status then
-        return -1, "Cannot find status in the AFD/GSE message"
     end
 
     local alarms = afd.extract_alarms()

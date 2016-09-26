@@ -33,7 +33,9 @@ elseif afd_type == 'service' then
     msg_field_name = 'service_status'
     afd_entity = 'service'
 else
-    error('invalid afd_type value')
+    msg_type = afd_type .. '_metric'
+    msg_field_name = afd_type .. '_status'
+    afd_entity = afd_type
 end
 
 -- ie: controller for node AFD / rabbitmq for service AFD
@@ -43,7 +45,6 @@ local afd_entity_value = read_config('afd_cluster_name') or error('afd_cluster_n
 local msg_field_source = read_config('afd_logical_name') or error('afd_logical_name must be specified!')
 
 local hostname = read_config('hostname') or error('hostname must be specified')
-
 local afd_file = read_config('afd_file') or error('afd_file must be specified')
 local all_alarms = require(afd_file)
 local A = require 'afd_alarms'

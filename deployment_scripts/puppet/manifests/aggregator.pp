@@ -106,4 +106,40 @@ if $is_controller {
   class { 'lma_collector::gse_policies':
     policies => $lma_collector['gse_policies']
   }
+
+  # Configure filter to emit the aggregator election message
+  $metric_name = 'pacemaker_local_resource_active'
+  $rsrc_name = 'vip__management'
+  $rules = {
+    'metric' => $metric_name,
+    'fields' => {
+      'resource' => $rsrc_name,
+      'hostname' => $::hostname,
+    },
+    'relational_operator' => '!=',
+    'threshold' => '1',
+    'window' => '60',
+    'periods' => '1',
+    'function' => 'last',
+  }
+
+  lma_collector::afd_filter { 'aggregator_election':
+    type                => 'internal',
+    cluster_name        => 'aggregator',
+    logical_name        => 'election',
+    message_matcher     => "Fields[name] == '${metric_name}' && Fields[resource] == '${rsrc_name}'",
+    alarms              => ['is_aggregator_active'],
+    alarms_definitions  => [{
+      'name'        => 'is_aggregator_active',
+      'description' => '',
+      'severity'    => 'down',
+      'trigger'     => {
+        'logical_operator' => 'or',
+        'rules'            => [$rules]
+      }
+    }],
+    activate_alerting   => false,
+    enable_notification => false,
+  }
+
 }
