@@ -7,6 +7,18 @@
 Release notes
 -------------
 
+Version 0.10.2
+++++++++++++++
+
+The StackLight Collector plugin 0.10.2 for Fuel contains the following updates:
+
+* Updated the documentation with new definitions for memcached_ps_cputime_syst
+  and memcached_ps_cputime_user. See
+  `#1576265 <https://bugs.launchpad.net/lma-toolchain/+bug/1576265>`_.
+
+* Fixed issue when installing the OCF script. See
+  `#1575039 <https://bugs.launchpad.net/lma-toolchain/+bug/1575039>`_.
+
 Version 0.10.1
 ++++++++++++++
 
