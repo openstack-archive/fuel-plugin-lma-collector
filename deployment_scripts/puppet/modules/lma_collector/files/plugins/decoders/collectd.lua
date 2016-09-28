@@ -32,25 +32,19 @@ local processes_map = {
 }
 
 -- The following table keeps a list of metrics from plugin where the
--- hostname is not relevant.
+-- Fields[hostname] shouldn't be set by default.
 local hostname_free = {
-    -- Add "metric_source = true" to skip the hostname for all metrics
-    -- from the metric_source
-    -- Add "metric_source = { list of metrics } to skip hostname for a
-    -- subset of metrics. The list of metrics is referenced through the
-    -- field 'type_instance'.
-    hypervisor_stats = {
-        total_free_disk_GB = true,
-        total_free_ram_MB = true,
-        total_free_vcpus = true,
-        total_used_disk_GB = true,
-        total_used_ram_MB = true,
-        total_used_vcpus = true,
-        total_running_instances = true,
-        total_running_tasks = true,
-    },
+    ceph_mon = true,
+    ceph_pool = true,
     check_openstack_api = true,
+    cinder = true,
+    glance = true,
     http_check = true,
+    hypervisor_stats = true,
+    keystone = true,
+    neutron = true,
+    nova = true,
+    pacemaker = true,
 }
 
 -- this is needed for the libvirt metrics because in that case, collectd sends
@@ -100,27 +94,21 @@ function process_message ()
                 }
             }
 
+            -- Check if Fields[hostname] should be added or not to the metric message
+            if not hostname_free[metric_source] then
+                msg['Fields']['hostname'] = sample['host']
+            end
+
             -- Normalize metric name, unfortunately collectd plugins aren't
             -- always consistent on metric namespaces so we need a few if/else
             -- statements to cover all cases.
-
-            -- Check if hostname is needed or not
-            local add_hostname = true
-            if hostname_free[metric_source] == true then
-                add_hostname = false
-            elseif hostname_free[metric_source] and
-                hostname_free[metric_source][sample['type_instance']] then
-                add_hostname = false
-            end
-
-            if add_hostname then
-                msg['Fields']['hostname'] = sample['host']
-                table.insert(msg['Fields']['tag_fields'], 'hostname')
-            end
-
             if sample['meta'] and sample['meta']['service_check'] then
                 msg['Fields']['name'] = sample['meta']['service_check'] .. sep .. 'check'
                 msg['Fields']['details'] = sample['meta']['failure']
+                if sample['meta']['local_check'] then
+                    -- if the check is local to the node, add the hostname
+                    msg['Fields']['hostname'] = sample['host']
+                end
             elseif metric_source == 'df' then
                 local entity
                 if sample['type'] == 'df_inodes' then
@@ -235,6 +223,9 @@ function process_message ()
                     msg.Fields['value'] = {value = msg.Fields['value'], representation = unit}
                 else
                     msg['Fields']['name'] = msg['Fields']['name'] .. sample['type_instance']
+                end
+                if sample['meta'] and sample['meta']['host'] then
+                    msg['Fields']['hostname'] = sample['meta']['host']
                 end
             elseif metric_source == 'rabbitmq_info' then
                 msg['Fields']['name'] = 'rabbitmq' .. sep .. sample['type_instance']
@@ -424,6 +415,9 @@ function process_message ()
             end
 
             if not skip_it then
+                if msg['Fields']['hostname'] then
+                     table.insert(msg['Fields']['tag_fields'], 'hostname')
+                end
                 utils.inject_tags(msg)
                 -- Before injecting the message we need to check that tag_fields is not an
                 -- empty table otherwise the protobuf encoder fails to encode the table.

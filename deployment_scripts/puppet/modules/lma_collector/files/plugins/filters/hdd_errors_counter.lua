@@ -78,9 +78,12 @@ function timer_event(ns)
 
     local delta_sec = (ns - (enter_at or 0)) / 1e9
     for dev, value in pairs(error_counters) do
-        -- Don`t send values from first ticker interval
+        -- Don`t send values at the first ticker interval
         if enter_at ~= nil then
-            utils.add_to_bulk_metric("hdd_errors_rate", value / delta_sec, {device=dev})
+            utils.add_to_bulk_metric(
+                "hdd_errors_rate",
+                value / delta_sec,
+                {device=dev, hostname=hostname})
         end
         error_counters[dev] = 0
     end
