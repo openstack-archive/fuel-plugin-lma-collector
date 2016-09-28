@@ -423,6 +423,7 @@ function diag_system {
   tail_file /var/log/puppet.log
   run_cmd 'grep -E "MODULAR|fuel-plugin-" /var/log/puppet.log' $diag_output/puppet_tasks.list
 
+  run_cmd "netstat -nalp" $diag_output/netstat
   run_cmd "ip route" $diag_output/ip_route
   run_cmd "ip link" $diag_output/ip_link
   run_cmd "ip address" $diag_output/ip_address
