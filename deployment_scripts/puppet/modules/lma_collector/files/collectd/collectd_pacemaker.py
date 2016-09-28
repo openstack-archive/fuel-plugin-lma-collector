@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# Copyright 2016 Mirantis, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -101,7 +99,8 @@ class CrmMonitorPlugin(base.Base):
             yield {
                 'type_instance': 'local_resource_active',
                 'values': same_hostname(node),
-                'meta': {'resource': self.notify_resource}
+                'meta': {'resource': self.notify_resource,
+                         'host': self.hostname}
             }
 
         summary = root.find('summary')
@@ -111,6 +110,7 @@ class CrmMonitorPlugin(base.Base):
         yield {
             'type_instance': 'local_dc_active',
             'values': same_hostname(current_dc),
+            'meta': {'host': self.hostname}
         }
 
         if current_dc.get('name') != self.hostname:
