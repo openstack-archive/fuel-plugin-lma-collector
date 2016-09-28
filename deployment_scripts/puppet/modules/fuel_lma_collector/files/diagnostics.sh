@@ -142,10 +142,10 @@ function copy_file {
   mkdir -p "$out_dir"
   if [ -d "$src" ]; then
     log_info "Copy directory $src -> $out_dir"
-    cp -rf "$src" "$out_dir" 2>/dev/null || log_err "Failed to copy $src into $out_dir/"
+    cp -rfL "$src" "$out_dir" 2>/dev/null || log_err "Failed to copy $src into $out_dir/"
   elif [ -f "$src" ]; then
     log_info "Copy file $src -> $out_dir/"
-    cp -f "$src" "$out_dir" 2>/dev/null || log_err "Failed to copy $src into $out_dir/"
+    cp -fL "$src" "$out_dir" 2>/dev/null || log_err "Failed to copy $src into $out_dir/"
   else
     log_err "Fail to copy .. '$src' doesn't exist"
   fi
