@@ -219,6 +219,7 @@ function diag_influxdb {
   check_process grafana-server "${diag_output}/processes"
   check_net_listen grafana "${diag_output}/netstat" 1 $GRAFANA_PORT
 
+  address=$(hiera lma::grafana::vip)
   if [ $FRONTEND_GRAFANA_PORT == "443" ]; then
     run_cmd "curl -S -k -i https://${address}:${FRONTEND_GRAFANA_PORT}/login" "${diag_output}/vip_test" 5
   else
