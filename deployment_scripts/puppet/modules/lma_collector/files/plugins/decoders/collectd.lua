@@ -49,8 +49,17 @@ local hostname_free = {
         total_running_instances = true,
         total_running_tasks = true,
     },
+    ceph_mon = true,
+    ceph_pool = true,
     check_openstack_api = true,
+    cinder = true,
+    glance = true,
+    keystone = true,
+    neutron = true,
+    nova = true,
+    elasticsearch_cluster = true,
     http_check = true,
+    pacemaker = true,
 }
 
 -- this is needed for the libvirt metrics because in that case, collectd sends
@@ -100,24 +109,15 @@ function process_message ()
                 }
             }
 
+            -- Check if Fields[hostname] should be added or not to the metric message
+            if not hostname_free[metric_source] or
+               not (type(hostname_free[metric_source]) == 'table' and hostname_free[metric_source][sample['type_instance']]) then
+                msg['Fields']['hostname'] = sample['host']
+            end
+
             -- Normalize metric name, unfortunately collectd plugins aren't
             -- always consistent on metric namespaces so we need a few if/else
             -- statements to cover all cases.
-
-            -- Check if hostname is needed or not
-            local add_hostname = true
-            if hostname_free[metric_source] == true then
-                add_hostname = false
-            elseif hostname_free[metric_source] and
-                hostname_free[metric_source][sample['type_instance']] then
-                add_hostname = false
-            end
-
-            if add_hostname then
-                msg['Fields']['hostname'] = sample['host']
-                table.insert(msg['Fields']['tag_fields'], 'hostname')
-            end
-
             if sample['meta'] and sample['meta']['service_check'] then
                 msg['Fields']['name'] = sample['meta']['service_check'] .. sep .. 'check'
                 msg['Fields']['details'] = sample['meta']['failure']
@@ -424,6 +424,9 @@ function process_message ()
             end
 
             if not skip_it then
+                if msg['Fields']['hostname'] then
+                     table.insert(msg['Fields']['tag_fields'], 'hostname')
+                end
                 utils.inject_tags(msg)
                 -- Before injecting the message we need to check that tag_fields is not an
                 -- empty table otherwise the protobuf encoder fails to encode the table.

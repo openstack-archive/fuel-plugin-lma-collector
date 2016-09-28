@@ -16,7 +16,7 @@ require 'string'
 require 'math'
 local utils  = require 'lma_utils'
 
-function process_table(typ, array)
+function process_table(typ, array, tags)
     -- NOTE: It has been written for "filters" and "decoders". If we need to
     -- use it to collect metrics from other components  of the Heka pipeline,
     -- we need to ensure that JSON provides names and table with
@@ -41,10 +41,8 @@ function process_table(typ, array)
             -- strip off the '_decoder'/'_filter' suffix
             local name = v['Name']:gsub("_" .. typ, "")
 
-            local tags = {
-                ['type'] = typ,
-                ['name'] = name,
-            }
+            tags['type'] = typ
+            tags['name'] = name
 
             utils.add_to_bulk_metric('hekad_msg_count', v.ProcessMessageCount.value, tags)
             utils.add_to_bulk_metric('hekad_msg_avg_duration', v.ProcessMessageAvgDuration.value, tags)
@@ -76,7 +74,7 @@ function process_message ()
 
     for k, v in pairs(data) do
         if k == "filters" or k == "decoders" then
-            process_table(singularize(k), v)
+            process_table(singularize(k), v, {hostname=hostname})
         end
     end
 
