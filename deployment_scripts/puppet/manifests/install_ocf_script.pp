@@ -14,14 +14,11 @@
 
 notice('fuel-plugin-lma-collector: install_ocf_scripts.pp')
 
-$node_profiles   = hiera_hash('lma::collector::node_profiles')
-if $node_profiles['controller'] or $node_profiles['rabbitmq'] or $node_profiles['mysql'] {
-  file { 'ocf-lma_collector':
-    ensure => present,
-    source => 'puppet:///modules/lma_collector/ocf-lma_collector',
-    path   => '/usr/lib/ocf/resource.d/fuel/ocf-lma_collector',
-    mode   => '0755',
-    owner  => 'root',
-    group  => 'root',
-  }
+file { 'ocf-lma_collector':
+  ensure => present,
+  source => 'puppet:///modules/lma_collector/ocf-lma_collector',
+  path   => '/usr/lib/ocf/resource.d/fuel/ocf-lma_collector',
+  mode   => '0755',
+  owner  => 'root',
+  group  => 'root',
 }
