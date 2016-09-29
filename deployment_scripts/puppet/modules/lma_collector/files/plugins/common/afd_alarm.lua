@@ -52,18 +52,12 @@ function Alarm.new(alarm)
     a.severity_str = string.upper(alarm.severity)
     a.severity = SEVERITIES[string.lower(alarm.severity)]
     assert(a.severity ~= nil)
-
-    a.skip_when_no_data = false
-    if alarm.no_data_policy then
-        if string.lower(alarm.no_data_policy) == 'skip' then
-            a.skip_when_no_data = true
-        else
-            a.no_data_severity = SEVERITIES[string.lower(alarm.no_data_policy)]
-        end
+    local no_data_severity = SEVERITIES[string.lower(alarm.no_data_severity)]
+    if alarm.no_data_severity and no_data_severity then
+        a.no_data_severity = no_data_severity
     else
         a.no_data_severity = consts.UNKW
     end
-    assert(a.skip_when_no_data or a.no_data_severity ~= nil)
 
     a.rules = {}
     a.initial_wait = 0
@@ -175,11 +169,7 @@ function Alarm:evaluate(ns)
 
     if self.logical_operator == 'and' then
         if one_unknown then
-            if self.skip_when_no_data then
-                state = nil
-            else
-                state = self.no_data_severity
-            end
+             state = self.no_data_severity
         elseif #self.rules == matches then
             state = self.severity
         end
@@ -187,11 +177,7 @@ function Alarm:evaluate(ns)
         if matches > 0 then
             state = self.severity
         elseif one_unknown then
-            if self.skip_when_no_data then
-                state = nil
-            else
-                state = self.no_data_severity
-            end
+            state = self.no_data_severity
         end
     end
 
