@@ -78,6 +78,8 @@
 #                'alarms' => ['rabbitmq-queue-warning'],
 #                'alarms_definitions' => {...},
 #                'message_matcher' => "Fields[name] == 'rabbitmq_messages'"
+#                'enable_notification' => true,
+#                'activate_alerting' => true,
 #              },
 #              'apache_worker' => {
 #                'type' => 'service',
@@ -86,6 +88,8 @@
 #                'alarms' => ['apache-warning'],
 #                'alarms_definitions' => {...},
 #                'message_matcher' => "Fields[name] == 'apache_idle_workers' || Fields[name] == 'apache_status'"
+#                'enable_notification' => true,
+#                'activate_alerting' => true,
 #              }
 #            }
 
@@ -102,59 +106,53 @@ module Puppet::Parser::Functions
         metric_defs = args[4]
     end
     afd_filters = {}
-    afd_profiles.each do |afd_profile|
-        # Override apply_to_node with collectd_on if present in metrics definitions.
-        afd_alarms.each do |k ,v|
-            v['alarms'].each do |afd_name, alarms|
-                alarms.each do |a_name|
-                    a = alarm_definitions.select {|defi| defi['name'] == a_name}
-                    next if a.empty?
-                    a[0]['trigger']['rules'].each do |r|
-                        if metric_defs.has_key?(r['metric'])
-                            # TODO(all): This overrides the whole cluster while it is better
-                            # to treat per AFD. This implies that a cluster must be tied to
-                            # only one AFD.
-                            v['apply_to_node'] = metric_defs[r['metric']]['collected_on']
-                        end
-                    end
 
-                end
-            end
+    afd_alarms.each do |cluster_name , afds|
+        if afds.has_key?('apply_to_node')
+            default_profile = afds['apply_to_node']
+        else
+            default_profile = false
         end
 
-        afds = afd_alarms.select {|k,v| v.has_key?('apply_to_node') and v['apply_to_node'] == afd_profile }
-        afds.each do |k, v|
-            activate_alerting=true
-            if v.has_key?('activate_alerting')
-                if v['activate_alerting'] == false
-                    activate_alerting=false
-                end
+        activate_alerting=true
+        enable_notification=false
+        if afds.has_key?('alerting')
+            if afds['alerting'] == 'disabled'
+                activate_alerting=false
+            elsif afds['alerting'] == 'enabled_with_notification'
+                enable_notification = true
             end
-            enable_notification=false
-            if v.has_key?('enable_notification')
-                if v['enable_notification'] == true
-                    enable_notification=true
-                end
-            end
-            afd_cluster_name = k
-            v['alarms'].each do |afd_name, alarms|
-                # Collect the metrics which are required by this AFD filter
-                metrics = Set.new([])
-                alarms.each do |a_name|
-                    alarm_definitions.each do |alarm_def|
-                        if alarm_def['name'] == a_name
-                            alarm_def['trigger']['rules'].each do |r|
-                                metrics << r['metric']
-                            end
-                        end
+        end
+        afds['alarms'].each do |afd_name, alarms|
+            metrics = Set.new([])
+            matches = false
+            alarms.each do |a_name|
+                afd = alarm_definitions.select {|defi| defi['name'] == a_name}
+                next if afd.empty? # user mention an unknown alarm for this AFD
+                #if afd[0].has_key('alerting')
+                #    if afd[0]['alerting'] == 'disabled'
+                #        activate_alerting=false
+                #    elsif afd[0]['alerting'] == 'enabled_with_notification'
+                #        enable_notification = true
+                #    end
+                #end
 
+                afd[0]['trigger']['rules'].each do |r|
+                    if metric_defs.has_key?(r['metric']) and metric_defs[r['metric']].has_key?('collected_on') and afd_profiles.include? metric_defs[r['metric']]['collected_on']
+                        matches = true
+                    elsif afd_profiles.include?(default_profile)
+                        matches = true
+                    end
+                    if matches
+                        metrics << r['metric']
                     end
                 end
+            end
+            if matches
                 message_matcher = metrics.collect{|x| "Fields[name] == \'#{x}\'" }.join(' || ')
-
-                afd_filters["#{afd_cluster_name}_#{afd_name}"] = {
+                afd_filters["#{cluster_name}_#{afd_name}"] = {
                     'type' => type,
-                    'cluster_name' => afd_cluster_name,
+                    'cluster_name' => cluster_name,
                     'logical_name' => afd_name,
                     'alarms' => alarms,
                     'alarms_definitions' => alarm_definitions,
@@ -165,7 +163,6 @@ module Puppet::Parser::Functions
             end
         end
     end
-
     return afd_filters
   end
 end
