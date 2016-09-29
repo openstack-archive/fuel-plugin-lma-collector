@@ -2914,8 +2914,7 @@ lma_collector:
   node_cluster_alarms:
     controller:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             cpu: ['cpu-critical-controller', 'cpu-warning-controller']
             network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
@@ -2928,8 +2927,7 @@ lma_collector:
 <% if @detach_rabbitmq_enabled -%>
     rabbitmq-nodes:
         apply_to_node: rabbitmq-nodes
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             cpu: ['cpu-critical-rabbitmq', 'cpu-warning-rabbitmq']
             network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
@@ -2941,8 +2939,7 @@ lma_collector:
 <% end -%>
     mysql-nodes:
         apply_to_node: mysql-nodes
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
 <% if @detach_database_enabled -%>
             cpu: ['cpu-critical-mysql', 'cpu-warning-mysql']
@@ -2956,8 +2953,7 @@ lma_collector:
             mysql-fs: ['mysql-fs-critical', 'mysql-fs-warning']
     compute:
         apply_to_node: compute
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             cpu: ['cpu-critical-compute', 'cpu-warning-compute']
             network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
@@ -2969,8 +2965,7 @@ lma_collector:
             hdd-errors: ['hdd-errors-critical']
     storage:
         apply_to_node: storage
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             cpu: ['cpu-critical-storage', 'cpu-warning-storage']
             network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
@@ -2984,8 +2979,7 @@ lma_collector:
 <% end -%>
     elasticsearch-nodes:
         apply_to_node: elasticsearch-nodes
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             cpu: ['cpu-critical-default']
             network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
@@ -2996,8 +2990,7 @@ lma_collector:
             hdd-errors: ['hdd-errors-critical']
     influxdb-nodes:
         apply_to_node: influxdb-nodes
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             cpu: ['cpu-critical-default']
             network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
@@ -3010,8 +3003,7 @@ lma_collector:
     default:
         apply_to_node: default
         # Operator wants to receive alert notification for individual nodes
-        enable_notification: true
-        activate_alerting: true
+        alerting: enabled_with_notification
         alarms:
             cpu: ['cpu-critical-default']
             network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
@@ -3025,8 +3017,7 @@ lma_collector:
   service_cluster_alarms:
     rabbitmq-cluster:
         apply_to_node: rabbitmq-nodes
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             pacemaker: ['rabbitmq-pacemaker-down', 'rabbitmq-pacemaker-critical', 'rabbitmq-pacemaker-warning']
             queue: ['rabbitmq-queue-warning']
@@ -3034,28 +3025,24 @@ lma_collector:
             disk: ['rabbitmq-disk-limit-critical', 'rabbitmq-disk-limit-warning']
     rabbitmq-service:
         apply_to_node: rabbitmq-nodes
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             check: ['rabbitmq-check']
     mysql:
         apply_to_node: mysql-nodes
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             node-status: ['mysql-node-connected', 'mysql-node-ready']
             check: ['mysql-check']
     apache:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             worker: ['apache-warning']
             check: ['apache-check']
     nova-api:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             http_errors: ['nova-api-http-errors']
             backends:
@@ -3063,14 +3050,12 @@ lma_collector:
                 - 'nova-api-backends-majority-down'
                 - 'nova-api-backends-one-down'
     nova-api-check:
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             vip: ['nova-api-check-failed']
     nova-metadata-api:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             backends:
                 - 'nova-metadata-api-backends-all-down'
@@ -3078,8 +3063,7 @@ lma_collector:
                 - 'nova-metadata-api-backends-one-down'
     nova-novncproxy-websocket:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             backends:
                 - 'nova-novncproxy-websocket-api-backends-all-down'
@@ -3087,26 +3071,22 @@ lma_collector:
                 - 'nova-novncproxy-websocket-api-backends-one-down'
     nova-api-endpoint:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             endpoint: ['nova-api-local-endpoint']
     nova-logs:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             error: ['nova-logs-error']
     nova-logs-compute:
         apply_to_node: compute
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             error: ['nova-logs-error']
     nova-cert:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             workers:
                 - 'nova-cert-all-down'
@@ -3114,8 +3094,7 @@ lma_collector:
                 - 'nova-cert-one-down'
     nova-consoleauth:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             workers:
                 - 'nova-consoleauth-all-down'
@@ -3123,8 +3102,7 @@ lma_collector:
                 - 'nova-consoleauth-one-down'
     nova-compute:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             workers:
                 - 'nova-compute-all-down'
@@ -3132,8 +3110,7 @@ lma_collector:
                 - 'nova-compute-one-down'
     nova-conductor:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             workers:
                 - 'nova-conductor-all-down'
@@ -3141,8 +3118,7 @@ lma_collector:
                 - 'nova-conductor-one-down'
     nova-scheduler:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             workers:
                 - 'nova-scheduler-all-down'
@@ -3150,8 +3126,7 @@ lma_collector:
                 - 'nova-scheduler-one-down'
     heat-api:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             http_errors: ['heat-api-http-errors']
             backends:
@@ -3160,8 +3135,7 @@ lma_collector:
                 - 'heat-api-backends-one-down'
     heat-cfn-api:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             backends:
                 - 'heat-cfn-api-backends-all-down'
@@ -3169,46 +3143,39 @@ lma_collector:
                 - 'heat-cfn-api-backends-one-down'
     heat-cloudwatch-api:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             backends:
                 - 'heat-cloudwatch-api-backends-all-down'
                 - 'heat-cloudwatch-api-backends-majority-down'
                 - 'heat-cloudwatch-api-backends-one-down'
     heat-api-check:
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             vip: ['heat-api-check-failed']
     heat-cfn-api-check:
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             vip: ['heat-cfn-api-check-failed']
     heat-api-endpoint:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             endpoint: ['heat-api-local-endpoint']
     heat-cfn-api-endpoint:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             endpoint: ['heat-cfn-api-local-endpoint']
     heat-logs:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             error: ['heat-logs-error']
 <% if not @storage_options["objects_ceph"] then -%>
     swift-api:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             http_errors: ['swift-api-http-errors']
             backends:
@@ -3216,32 +3183,27 @@ lma_collector:
                 - 'swift-api-backends-majority-down'
                 - 'swift-api-backends-one-down'
     swift-api-check:
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             vip: ['swift-api-check-failed']
     swift-api-endpoint:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             endpoint: ['swift-api-local-endpoint']
     swift-s3-api-check:
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             vip: ['swift-s3-api-check-failed']
     swift-logs:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             error: ['swift-logs-error']
 <% end -%>
     cinder-api:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             http_errors: ['cinder-api-http-errors']
             backends:
@@ -3249,31 +3211,26 @@ lma_collector:
                 - 'cinder-api-backends-majority-down'
                 - 'cinder-api-backends-one-down'
     cinder-api-check:
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             vip: ['cinder-api-check-failed']
     cinder-v2-api-check:
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             vip: ['cinder-v2-api-check-failed']
     cinder-api-endpoint:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             endpoint: ['cinder-api-local-endpoint']
     cinder-logs:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             error: ['cinder-logs-error']
     cinder-scheduler:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             workers:
                 - 'cinder-scheduler-all-down'
@@ -3281,8 +3238,7 @@ lma_collector:
                 - 'cinder-scheduler-one-down'
     cinder-volume:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             workers:
                 - 'cinder-volume-all-down'
@@ -3291,15 +3247,13 @@ lma_collector:
 <% if not @storage_options["volumes_ceph"] then -%>
     cinder-volume-logs:
         apply_to_node: storage
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             error: ['cinder-logs-error']
 <% end -%>
     glance-api:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             http_errors: ['glance-api-http-errors']
             backends:
@@ -3308,34 +3262,29 @@ lma_collector:
                 - 'glance-api-backends-one-down'
     glance-registry-api:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             backends:
                 - 'glance-registry-api-backends-all-down'
                 - 'glance-registry-api-backends-majority-down'
                 - 'glance-registry-api-backends-one-down'
     glance-api-check:
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             vip: ['glance-api-check-failed']
     glance-api-endpoint:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             endpoint: ['glance-api-local-endpoint']
     glance-logs:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             error: ['glance-logs-error']
     neutron-api:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             http_errors: ['neutron-api-http-errors']
             backends:
@@ -3343,26 +3292,22 @@ lma_collector:
                 - 'neutron-api-backends-majority-down'
                 - 'neutron-api-backends-one-down'
     neutron-api-check:
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             vip: ['neutron-api-check-failed']
     neutron-api-endpoint:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             endpoint: ['neutron-api-local-endpoint']
     neutron-logs:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             error: ['neutron-logs-error']
     neutron-l3:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             workers:
                 - 'neutron-l3-all-down'
@@ -3370,8 +3315,7 @@ lma_collector:
                 - 'neutron-l3-one-down'
     neutron-dhcp:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             workers:
                 - 'neutron-dhcp-all-down'
@@ -3379,8 +3323,7 @@ lma_collector:
                 - 'neutron-dhcp-one-down'
     neutron-metadata:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             workers:
                 - 'neutron-metadata-all-down'
@@ -3388,8 +3331,7 @@ lma_collector:
                 - 'neutron-metadata-one-down'
     neutron-openvswitch:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             workers:
                 - 'neutron-openvswitch-all-down'
@@ -3397,20 +3339,17 @@ lma_collector:
                 - 'neutron-openvswitch-one-down'
     neutron-logs-compute:
         apply_to_node: compute
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             error: ['neutron-logs-error']
     keystone-response-time:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             duration: ['keystone-response-time-duration']
     keystone-public-api:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             http_errors: ['keystone-public-api-http-errors']
             backends:
@@ -3418,26 +3357,22 @@ lma_collector:
                 - 'keystone-public-api-backends-majority-down'
                 - 'keystone-public-api-backends-one-down'
     keystone-public-api-check:
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             vip: ['keystone-public-api-check-failed']
     keystone-public-api-endpoint:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             endpoint: ['keystone-public-api-local-endpoint']
     keystone-logs:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             error: ['keystone-logs-error']
     keystone-admin-api:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             http_errors: ['keystone-admin-api-http-errors']
             backends:
@@ -3450,8 +3385,7 @@ lma_collector:
     horizon-web:
 <% end -%>
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             http_errors: ['horizon-web-http-errors']
             backends:
@@ -3461,97 +3395,81 @@ lma_collector:
     nova-instances:
         #TODO(scroiset): apply on compute nodes
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             creation-time: ['instance-creation-time-warning']
     nova-free-vcpu:
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             nova-free-vcpu: ['total-nova-free-vcpu-warning']
     nova-free-memory:
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             nova-free-memory: ['total-nova-free-memory-warning']
     ceph-mon-cluster:
         apply_to_node: ceph-mon
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             health: ['ceph-health-critical', 'ceph-health-warning']
             capacity: ['ceph-capacity-critical', 'ceph-capacity-warning']
     ceph-mon-service:
         apply_to_node: ceph-mon
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             check: ['ceph-mon-check']
 <% if @storage_options["volumes_ceph"] then -%>
     ceph-osd-service:
         apply_to_node: storage
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             check: ['ceph-osd-check']
 <% end -%>
     elasticsearch-cluster:
         apply_to_node: elasticsearch-nodes
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             health: ['elasticsearch-health-critical', 'elasticsearch-health-warning']
     elasticsearch-service:
         apply_to_node: elasticsearch-nodes
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             check: ['elasticsearch-check']
     influxdb-service:
         apply_to_node: influxdb-nodes
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             check: ['influxdb-check']
     influxdb-api-check:
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             vip: ['influxdb-api-check-failed']
     haproxy-openstack:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             check: ['haproxy-check']
     pacemaker-service:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             check: ['pacemaker-check']
     libvirt-service:
         apply_to_node: compute
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             check: ['libvirt-check']
     memcached-service:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             check: ['memcached-check']
     ceilometer-api-check:
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             vip: ['ceilometer-api-check-failed']
     mysqld-tcp:
         apply_to_node: controller
-        enable_notification: false
-        activate_alerting: true
+        alerting: enabled
         alarms:
             backends:
                 - 'mysqld-tcp-api-backends-all-down'
