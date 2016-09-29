@@ -104,16 +104,14 @@ describe 'get_afd_filters' do
     afds_nodes = {
         "controller" => {
             "apply_to_node" => "controller",
-            "enable_notification" => true,
-            "activate_alerting" => true,
+            "alerting" => 'enabled_with_notification',
             "alarms" => {
                 "system" => ["cpu-critical-controller", "cpu-warning-controller"],
             },
         },
         "compute" => {
             "apply_to_node" => "compute",
-            "enable_notification" => true,
-            "activate_alerting" => true,
+            "alerting" => 'enabled_with_notification',
             "alarms" => {
                 "system" => ["cpu-critical-compute", "cpu-warning-compute"],
                 "fs" => ["fs-critical"],
@@ -236,19 +234,14 @@ describe 'get_afd_filters' do
     afds_services = {
         "rabbitmq" => {
             "apply_to_node" => "controller",
-            "enable_notification" => false,
-            "activate_alerting" => true,
-            "enable_notification" => false,
+            "alerting" => 'enabled',
             "alarms" => {
-#                "pacemaker" => ['rabbitmq-pacemaker-down', 'rabbitmq-pacemaker-critical'],
                 "queue" => ["rabbitmq-queue-warning"]
             },
         },
         "apache" => {
             "apply_to_node" => "controller",
-            "enable_notification" => false,
-            "activate_alerting" => true,
-            "enable_notification" => false,
+            "alerting" => 'enabled',
             "alarms" => {
                 "worker" => ['apache-warning'],
             },
@@ -312,24 +305,55 @@ describe 'get_afd_filters' do
                   "periods"=>0,
                   "function"=>"min"},
                   ]}},
+            {"name"=>"cpu-critical-controller",
+             "description"=>"The CPU usage is high (critical node)",
+             "severity"=>"critical",
+             "trigger"=>
+              {"logical_operator"=>"or",
+               "rules"=>
+                [
+                    {"metric"=>"cpu_idle",
+                     "relational_operator"=>"<=",
+                     "threshold"=>30,
+                     "window"=>120,
+                     "periods"=>0,
+                     "function"=>"avg"},
+                ]}},
+            {"name"=>"cpu-warning-controller",
+             "description"=>"The CPU usage is high (controller node)",
+             "severity"=>"warning",
+             "trigger"=>
+              {"logical_operator"=>"or",
+               "rules"=>
+                [
+                    {"metric"=>"cpu_idle",
+                     "relational_operator"=>"<=",
+                     "threshold"=>20,
+                     "window"=>120,
+                     "periods"=>0,
+                     "function"=>"avg"},
+                ]}},
 
         ]
         afds_services_overriden = {
             "nova-free-resources" => {
                 "apply_to_node" => "compute",
-                "enable_notification" => false,
-                "activate_alerting" => true,
-                "enable_notification" => false,
+                "alerting" => 'enabled',
                 "alarms" => {
                     "free-vcpu" => ['free_vcpu_warning'],
                 },
             },
             "nova-total-free-resources" => {
-                "enable_notification" => false,
-                "activate_alerting" => true,
-                "enable_notification" => false,
+                "alerting" => 'enabled',
                 "alarms" => {
                     "total-free-vcpu" => ['total_free_vcpu_warning'],
+                },
+            },
+            "controller" => {
+                "apply_to_node" => "controller",
+                "alerting" => 'enabled_with_notification',
+                "alarms" => {
+                    "system" => ["cpu-critical-controller", "cpu-warning-controller"],
                 },
             },
         }
@@ -366,9 +390,20 @@ describe 'get_afd_filters' do
                          "activate_alerting" => true,
                          "enable_notification" => false,
                      },
+                     "controller_system"=>
+                     {
+                         "type"=>"service",
+                         "cluster_name"=>"controller",
+                         "logical_name"=>"system",
+                         "alarms"=>["cpu-critical-controller", "cpu-warning-controller"],
+                         "alarms_definitions"=> alarms_services_o,
+                         "message_matcher"=>"Fields[name] == 'cpu_idle'",
+                         "enable_notification" => true,
+                         "activate_alerting" => true,
+                     }
                 }
              )
-             }
+         }
     end
 end
 
