@@ -68,8 +68,13 @@ class { 'lma_collector':
 
 if $is_controller {
   $install_heka_init_script = false
+  # On controller nodes the increase of the AFD filters puts too much load on
+  # the heka pipeline which can block heka (idle packs).
+  # It was observed that a poolsize set to 200 solves the issue.
+  $poolsize = 200
 } else {
   $install_heka_init_script = true
+  $poolsize = 100
 }
 
 lma_collector::heka { 'log_collector':
@@ -85,6 +90,7 @@ lma_collector::heka { 'metric_collector':
   groups              => $additional_groups,
   install_init_script => $install_heka_init_script,
   version             => $heka_version,
+  poolsize            => $poolsize,
   require             => Class['lma_collector'],
 }
 
