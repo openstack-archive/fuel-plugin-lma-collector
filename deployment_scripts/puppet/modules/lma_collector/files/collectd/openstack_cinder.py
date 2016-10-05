@@ -55,7 +55,14 @@ class CinderStatsPlugin(openstack.CollectdPlugin):
                                  'state': state})
 
         for service in aggregated_workers:
+            totalw = sum(aggregated_workers[service].values())
+
             for state in self.states:
+                prct = (100.0 * aggregated_workers[service][state]) / totalw
+                self.dispatch_value('cinder_services_percent', '',
+                                    prct,
+                                    {'state': state, 'service': service})
+
                 self.dispatch_value('cinder_services', '',
                                     aggregated_workers[service][state],
                                     {'state': state, 'service': service})
