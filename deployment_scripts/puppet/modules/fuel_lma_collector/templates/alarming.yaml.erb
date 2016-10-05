@@ -1664,6 +1664,12 @@ lma_collector:
         activate_alerting: true
         alarms:
             vip: ['heat-cfn-api-check-failed']
+    heat-api-endpoint:
+        apply_to_node: controller
+        enable_notification: false
+        activate_alerting: true
+        alarms:
+            endpoint: ['heat-api-local-endpoint']
     heat-cfn-api-endpoint:
         apply_to_node: controller
         enable_notification: false
