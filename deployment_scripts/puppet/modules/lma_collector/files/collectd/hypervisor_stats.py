@@ -42,18 +42,16 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
         if 'cpu_ratio' not in self.extra_config:
             self.logger.warning('CpuAllocationRatio parameter not set')
 
-    def dispatch_value(self, name, value, host=None):
+    def dispatch_value(self, name, value, meta=None):
         v = collectd.Values(
             plugin=PLUGIN_NAME,
             type='gauge',
             type_instance=name,
             interval=INTERVAL,
             # w/a for https://github.com/collectd/collectd/issues/716
-            meta={'0': True},
+            meta=meta or {'0': True},
             values=[value]
         )
-        if host:
-            v.host = host
         v.dispatch()
 
     def collect(self):
@@ -69,12 +67,12 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
             # remove domain name and keep only the hostname portion
             host = stats['hypervisor_hostname'].split('.')[0]
             for k, v in self.VALUE_MAP.iteritems():
-                self.dispatch_value(v, stats.get(k, 0), host)
+                self.dispatch_value(v, stats.get(k, 0), {'host': host})
                 total_stats[v] += stats.get(k, 0)
             if 'cpu_ratio' in self.extra_config:
                 free = (int(self.extra_config['cpu_ratio'] *
                         stats.get('vcpus', 0))) - stats.get('vcpus_used', 0)
-                self.dispatch_value('free_vcpus', free, host)
+                self.dispatch_value('free_vcpus', free, {'host': host})
                 total_stats['free_vcpus'] += free
 
         # Dispatch the global metrics
