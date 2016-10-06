@@ -21,8 +21,7 @@ define lma_collector::gse_cluster_filter (
   $cluster_field = undef,
   $clusters = {},
   $warm_up_period = undef,
-  $enable_notification = true,
-  $activate_alerting = true,
+  $alerting = 'enabled_with_notification',
   $ensure = present,
 ) {
   include lma_collector::params
@@ -51,6 +50,23 @@ define lma_collector::gse_cluster_filter (
     inline_template('<%= @input_message_types.collect{|x| "Type =~ /#{x}$/"}.join(" || ") %>'),
     '))',
   ], '')
+
+  if $alerting and $alerting != 'disabled' and $alerting != 'enabled' and
+    $alerting != 'enabled_with_notification' {
+
+    fail("alerting parameter must be either 'disabled', 'enabled' or 'enabled_with_notification' instead of ${alerting}")
+  }
+
+  if $alerting != 'disabled' {
+    $activate_alerting = true
+  } else {
+    $activate_alerting = false
+  }
+  if $alerting != 'enabled_with_notification' {
+    $enable_notification = true
+  } else {
+    $enable_notification = false
+  }
 
   heka::filter::sandbox { "gse_${title}":
     config_dir       => $lma_collector::params::metric_config_dir,

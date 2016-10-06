@@ -1088,10 +1088,10 @@ in Heka.
 * `warm_up_period`: *Optional*. Number of seconds after a (re)start that the
   GSE plugin will wait before emitting its metric messages. Valid options: an
   integer. Default: undef.
-* `enable_notification`: *Optional*. Whether or not enable notifications in the
-  alerting system. Valid options: a boolean. Default: true.
-* `activate_alerting`: *Optional*. Whether or not configure alerting system
-  for all clusters. Valid options: a boolean. Default: true.
+* `alerting`: *Optional*. Whether or not the alerting is disabled or enabled
+  with or without notifications.
+  Valid options: one of the string 'disabled', 'enabled' or 'enabled_with_notification'.
+  Default: 'enabled_with_notification'.
 
 #### Define `lma_collector::gse_nagios`
 
