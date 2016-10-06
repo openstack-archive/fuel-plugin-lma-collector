@@ -143,7 +143,7 @@ class lma_collector::params {
   $openstack_url = 'http://127.0.0.1:5000/v2.0/'
   $openstack_client_timeout = 5
   $nova_cpu_allocation_ratio = 16.0
-  $fstypes = ['ext2', 'ext3', 'ext4', 'xfs']
+  $fstypes = ['ext2', 'ext3', 'ext4', 'xfs', 'tmpfs']
   $collectd_types = [ 'ceph', 'ceph_perf' ]
   $libvirt_connection = 'qemu:///system'
 
