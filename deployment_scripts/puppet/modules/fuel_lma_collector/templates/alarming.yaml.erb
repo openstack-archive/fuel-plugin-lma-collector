@@ -3085,7 +3085,6 @@ lma_collector:
         alarms:
             error: ['nova-logs-error']
     nova-cert:
-        apply_to_node: controller
         alerting: enabled
         alarms:
             workers:
@@ -3093,7 +3092,6 @@ lma_collector:
                 - 'nova-cert-majority-down'
                 - 'nova-cert-one-down'
     nova-consoleauth:
-        apply_to_node: controller
         alerting: enabled
         alarms:
             workers:
@@ -3101,7 +3099,6 @@ lma_collector:
                 - 'nova-consoleauth-majority-down'
                 - 'nova-consoleauth-one-down'
     nova-compute:
-        apply_to_node: controller
         alerting: enabled
         alarms:
             workers:
@@ -3109,7 +3106,6 @@ lma_collector:
                 - 'nova-compute-majority-down'
                 - 'nova-compute-one-down'
     nova-conductor:
-        apply_to_node: controller
         alerting: enabled
         alarms:
             workers:
@@ -3117,7 +3113,6 @@ lma_collector:
                 - 'nova-conductor-majority-down'
                 - 'nova-conductor-one-down'
     nova-scheduler:
-        apply_to_node: controller
         alerting: enabled
         alarms:
             workers:
@@ -3229,7 +3224,6 @@ lma_collector:
         alarms:
             error: ['cinder-logs-error']
     cinder-scheduler:
-        apply_to_node: controller
         alerting: enabled
         alarms:
             workers:
@@ -3237,7 +3231,6 @@ lma_collector:
                 - 'cinder-scheduler-majority-down'
                 - 'cinder-scheduler-one-down'
     cinder-volume:
-        apply_to_node: controller
         alerting: enabled
         alarms:
             workers:
@@ -3306,7 +3299,6 @@ lma_collector:
         alarms:
             error: ['neutron-logs-error']
     neutron-l3:
-        apply_to_node: controller
         alerting: enabled
         alarms:
             workers:
@@ -3314,7 +3306,6 @@ lma_collector:
                 - 'neutron-l3-majority-down'
                 - 'neutron-l3-one-down'
     neutron-dhcp:
-        apply_to_node: controller
         alerting: enabled
         alarms:
             workers:
@@ -3322,7 +3313,6 @@ lma_collector:
                 - 'neutron-dhcp-majority-down'
                 - 'neutron-dhcp-one-down'
     neutron-metadata:
-        apply_to_node: controller
         alerting: enabled
         alarms:
             workers:
@@ -3330,7 +3320,6 @@ lma_collector:
                 - 'neutron-metadata-majority-down'
                 - 'neutron-metadata-one-down'
     neutron-openvswitch:
-        apply_to_node: controller
         alerting: enabled
         alarms:
             workers:
