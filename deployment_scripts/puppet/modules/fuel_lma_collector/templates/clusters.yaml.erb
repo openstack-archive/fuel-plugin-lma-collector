@@ -115,8 +115,7 @@ lma_collector:
     output_metric_name: cluster_service_status
     interval: 10
     warm_up_period: 20
-    enable_notification: false
-    activate_alerting: true
+    alerting: enabled
     clusters:
       nova-logs:
         policy: highest_severity
@@ -515,15 +514,11 @@ lma_collector:
         members:
           - check
       nova-free-vcpu:
-        enable_notification: false
-        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
           - nova-free-vcpu
       nova-free-memory:
-        enable_notification: false
-        activate_alerting: true
         policy: highest_severity
         group_by: member
         members:
@@ -541,8 +536,7 @@ lma_collector:
     output_metric_name: cluster_node_status
     interval: 10
     warm_up_period: 80
-    enable_notification: false
-    activate_alerting: true
+    alerting: enabled
     clusters:
       controller:
         policy: majority_of_members
@@ -647,8 +641,7 @@ lma_collector:
     output_metric_name: cluster_status
     interval: 10
     warm_up_period: 30
-    enable_notification: true
-    activate_alerting: true
+    alerting: enabled_with_notification
     clusters:
       mysql:
         policy: highest_severity
