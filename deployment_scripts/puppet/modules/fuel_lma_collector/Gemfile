@@ -22,7 +22,4 @@ group :development, :test do
   # Newer puppetlabs_spec_helper depends on rubocop-rspec that requires ruby >= 2.2.0
   gem 'puppetlabs_spec_helper', '~> 1.1.1'
   gem 'metadata-json-lint'
-  # Need to use master branch of puppet-lint because of
-  # https://github.com/rodjek/puppet-lint/issues/472
-  gem 'puppet-lint', :git => 'https://github.com/rodjek/puppet-lint.git'
 end
