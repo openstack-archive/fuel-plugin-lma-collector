@@ -24,10 +24,10 @@
 # Ex:
 #
 # ARG0:
-#  {"rabbitmq"=>{"apply_to_node" => "controller", "alarms" => {"queue"=>["rabbitmq-queue-warning"]}},
-#   "apache"=>{"apply_to_node" => "controller", "alarms" => {"worker"=>["apache-warning"]}},
-#   "memcached"=>{"apply_to_node"=>"controller", "alarms" => {"all"=>["memcached-warning"]}},
-#   "haproxy"=>{"apply_to_node" => "controller", "alarms" => {"alive"=>["haproxy-warning"]}}}
+#  {"rabbitmq"=>{"apply_to_node" => "controller", "members" => {"queue"=> {"alarms" => ["rabbitmq-queue-warning"]}}},
+#   "apache"=>{"apply_to_node" => "controller", "members" => {"worker"=> {"alarms" => ["apache-warning"]}}},
+#   "memcached"=>{"apply_to_node"=>"controller", "members" => {"all"=> {"alarms" => ["memcached-warning"]}}},
+#   "haproxy"=>{"apply_to_node" => "controller", "members" => {"alive"=> {"alarms" => ["haproxy-warning"]}}}}
 #
 # ARG1:
 #
@@ -114,28 +114,30 @@ module Puppet::Parser::Functions
             default_profile = false
         end
 
-        activate_alerting=true
-        enable_notification=false
+        default_activate_alerting=true
+        default_enable_notification=false
         if afds.has_key?('alerting')
             if afds['alerting'] == 'disabled'
-                activate_alerting=false
+                default_activate_alerting=false
             elsif afds['alerting'] == 'enabled_with_notification'
-                enable_notification = true
+                default_enable_notification = true
             end
         end
-        afds['alarms'].each do |afd_name, alarms|
+        afds['members'].each do |afd_name, alarms|
             metrics = Set.new([])
             matches = false
-            alarms.each do |a_name|
+            activate_alerting = default_activate_alerting
+            enable_notification = default_enable_notification
+            if alarms.has_key?('alerting')
+                if alarms['alerting'] == 'disabled'
+                    activate_alerting=false
+                elsif alarms['alerting'] == 'enabled_with_notification'
+                    enable_notification = true
+                end
+            end
+            alarms['alarms'].each do |a_name|
                 afd = alarm_definitions.select {|defi| defi['name'] == a_name}
                 next if afd.empty? # user mention an unknown alarm for this AFD
-                #if afd[0].has_key('alerting')
-                #    if afd[0]['alerting'] == 'disabled'
-                #        activate_alerting=false
-                #    elsif afd[0]['alerting'] == 'enabled_with_notification'
-                #        enable_notification = true
-                #    end
-                #end
 
                 afd[0]['trigger']['rules'].each do |r|
                     if metric_defs.has_key?(r['metric']) and metric_defs[r['metric']].has_key?('collected_on') and afd_profiles.include? metric_defs[r['metric']]['collected_on']
@@ -154,7 +156,7 @@ module Puppet::Parser::Functions
                     'type' => type,
                     'cluster_name' => cluster_name,
                     'logical_name' => afd_name,
-                    'alarms' => alarms,
+                    'alarms' => alarms['alarms'],
                     'alarms_definitions' => alarm_definitions,
                     'message_matcher' => message_matcher,
                     'activate_alerting' => activate_alerting,
