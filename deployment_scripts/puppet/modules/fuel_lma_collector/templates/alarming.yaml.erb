@@ -2915,459 +2915,589 @@ lma_collector:
     controller:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            cpu: ['cpu-critical-controller', 'cpu-warning-controller']
-            network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
-            network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
-            root-fs: ['root-fs-critical', 'root-fs-warning']
-            log-fs: ['log-fs-critical', 'log-fs-warning']
-            other-fs: ['other-fs-critical', 'other-fs-warning']
-            swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
-            hdd-errors: ['hdd-errors-critical']
+        members:
+            cpu:
+                alarms: ['cpu-critical-controller', 'cpu-warning-controller']
+            network-rx:
+               alarms: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
+            network-tx:
+                alarms: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
+            root-fs:
+                alarms: ['root-fs-critical', 'root-fs-warning']
+            log-fs:
+                alarms: ['log-fs-critical', 'log-fs-warning']
+            other-fs:
+                alarms: ['other-fs-critical', 'other-fs-warning']
+            swap:
+                alarms: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+            hdd-errors:
+                alarms: ['hdd-errors-critical']
 <% if @detach_rabbitmq_enabled -%>
     rabbitmq-nodes:
         apply_to_node: rabbitmq-nodes
         alerting: enabled
-        alarms:
-            cpu: ['cpu-critical-rabbitmq', 'cpu-warning-rabbitmq']
-            network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
-            network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
-            root-fs: ['root-fs-critical', 'root-fs-warning']
-            other-fs: ['other-fs-critical', 'other-fs-warning']
-            swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
-            hdd-errors: ['hdd-errors-critical']
+        members:
+            cpu:
+                alarms: ['cpu-critical-rabbitmq', 'cpu-warning-rabbitmq']
+            network-rx:
+                alarms: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
+            network-tx:
+                alarms: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
+            root-fs:
+                alarms: ['root-fs-critical', 'root-fs-warning']
+            other-fs:
+                alarms: ['other-fs-critical', 'other-fs-warning']
+            swap:
+                alarms: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+            hdd-errors:
+                alarms: ['hdd-errors-critical']
 <% end -%>
     mysql-nodes:
         apply_to_node: mysql-nodes
         alerting: enabled
-        alarms:
+        members:
 <% if @detach_database_enabled -%>
-            cpu: ['cpu-critical-mysql', 'cpu-warning-mysql']
-            network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
-            network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
-            root-fs: ['root-fs-critical', 'root-fs-warning']
-            other-fs: ['other-fs-critical', 'other-fs-warning']
-            swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
-            hdd-errors: ['hdd-errors-critical']
+            cpu:
+                alarms: ['cpu-critical-mysql', 'cpu-warning-mysql']
+            network-rx:
+                alarms: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
+            network-tx:
+                alarms: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
+            root-fs:
+                alarms: ['root-fs-critical', 'root-fs-warning']
+            other-fs:
+                alarms: ['other-fs-critical', 'other-fs-warning']
+            swap:
+                alarms: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+            hdd-errors:
+                alarms: ['hdd-errors-critical']
 <% end -%>
-            mysql-fs: ['mysql-fs-critical', 'mysql-fs-warning']
+            mysql-fs:
+                alarms: ['mysql-fs-critical', 'mysql-fs-warning']
     compute:
         apply_to_node: compute
         alerting: enabled
-        alarms:
-            cpu: ['cpu-critical-compute', 'cpu-warning-compute']
-            network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
-            network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
-            root-fs: ['root-fs-critical', 'root-fs-warning']
-            nova-fs: ['nova-fs-critical', 'nova-fs-warning']
-            other-fs: ['other-fs-critical', 'other-fs-warning']
-            swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
-            hdd-errors: ['hdd-errors-critical']
+        members:
+            cpu:
+                alarms: ['cpu-critical-compute', 'cpu-warning-compute']
+            network-rx:
+                alarms: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
+            network-tx:
+                alarms: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
+            root-fs:
+                alarms: ['root-fs-critical', 'root-fs-warning']
+            nova-fs:
+                alarms: ['nova-fs-critical', 'nova-fs-warning']
+            other-fs:
+                alarms: ['other-fs-critical', 'other-fs-warning']
+            swap:
+                alarms: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+            hdd-errors:
+                alarms: ['hdd-errors-critical']
     storage:
         apply_to_node: storage
         alerting: enabled
-        alarms:
-            cpu: ['cpu-critical-storage', 'cpu-warning-storage']
-            network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
-            network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
-            root-fs: ['root-fs-critical', 'root-fs-warning']
-            other-fs: ['other-fs-critical', 'other-fs-warning']
-            swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
-            hdd-errors: ['hdd-errors-critical']
+        members:
+            cpu:
+                alarms: ['cpu-critical-storage', 'cpu-warning-storage']
+            network-rx:
+                alarms: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
+            network-tx:
+                alarms: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
+            root-fs:
+                alarms: ['root-fs-critical', 'root-fs-warning']
+            other-fs:
+                alarms: ['other-fs-critical', 'other-fs-warning']
+            swap:
+                alarms: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+            hdd-errors:
+                alarms: ['hdd-errors-critical']
 <% if @storage_options["volumes_ceph"] then -%>
-            osd-disk: ['osd-disk-critical']
+            osd-disk:
+                alarms: ['osd-disk-critical']
 <% end -%>
     elasticsearch-nodes:
         apply_to_node: elasticsearch-nodes
         alerting: enabled
-        alarms:
-            cpu: ['cpu-critical-default']
-            network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
-            network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
-            root-fs: ['root-fs-critical', 'root-fs-warning']
-            data-fs: ['elasticsearch-fs-critical', 'elasticsearch-fs-warning']
-            swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
-            hdd-errors: ['hdd-errors-critical']
+        members:
+            cpu:
+                alarms: ['cpu-critical-default']
+            network-rx:
+                alarms: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
+            network-tx:
+                alarms: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
+            root-fs:
+                alarms: ['root-fs-critical', 'root-fs-warning']
+            data-fs:
+                alarms: ['elasticsearch-fs-critical', 'elasticsearch-fs-warning']
+            swap:
+                alarms: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+            hdd-errors:
+                alarms: ['hdd-errors-critical']
     influxdb-nodes:
         apply_to_node: influxdb-nodes
         alerting: enabled
-        alarms:
-            cpu: ['cpu-critical-default']
-            network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
-            network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
-            root-fs: ['root-fs-critical', 'root-fs-warning']
-            data-fs: ['influxdb-fs-critical', 'influxdb-fs-warning']
-            swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
-            hdd-errors: ['hdd-errors-critical']
-    # This is the default alarms configured for all nodes with unknown roles
+        members:
+            cpu:
+                alarms: ['cpu-critical-default']
+            network-rx:
+                alarms: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
+            network-tx:
+                alarms: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
+            root-fs:
+                alarms: ['root-fs-critical', 'root-fs-warning']
+            data-fs:
+                alarms: ['influxdb-fs-critical', 'influxdb-fs-warning']
+            swap:
+                alarms: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+            hdd-errors:
+                alarms: ['hdd-errors-critical']
+    # This is the default members configured for all nodes with unknown roles
     default:
         apply_to_node: default
         # Operator wants to receive alert notification for individual nodes
         alerting: enabled_with_notification
-        alarms:
-            cpu: ['cpu-critical-default']
-            network-rx: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
-            network-tx: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
-            root-fs: ['root-fs-critical', 'root-fs-warning']
-            other-fs: ['other-fs-critical', 'other-fs-warning']
-            swap: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
-            hdd-errors: ['hdd-errors-critical']
+        members:
+            cpu:
+                alarms: ['cpu-critical-default']
+            network-rx:
+                alarms: ['network-critical-dropped-rx', 'network-warning-dropped-rx']
+            network-tx:
+                alarms: ['network-critical-dropped-tx', 'network-warning-dropped-tx']
+            root-fs:
+                alarms: ['root-fs-critical', 'root-fs-warning']
+            other-fs:
+                alarms: ['other-fs-critical', 'other-fs-warning']
+            swap:
+                alarms: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
+            hdd-errors:
+                alarms: ['hdd-errors-critical']
 
   # Definition of the AFD service filters
   service_cluster_alarms:
     rabbitmq-cluster:
         apply_to_node: rabbitmq-nodes
         alerting: enabled
-        alarms:
-            pacemaker: ['rabbitmq-pacemaker-down', 'rabbitmq-pacemaker-critical', 'rabbitmq-pacemaker-warning']
-            queue: ['rabbitmq-queue-warning']
-            memory: ['rabbitmq-memory-limit-critical', 'rabbitmq-memory-limit-warning']
-            disk: ['rabbitmq-disk-limit-critical', 'rabbitmq-disk-limit-warning']
+        members:
+            pacemaker:
+                alarms: ['rabbitmq-pacemaker-down', 'rabbitmq-pacemaker-critical', 'rabbitmq-pacemaker-warning']
+            queue:
+                alarms: ['rabbitmq-queue-warning']
+            memory:
+                alarms: ['rabbitmq-memory-limit-critical', 'rabbitmq-memory-limit-warning']
+            disk:
+                alarms: ['rabbitmq-disk-limit-critical', 'rabbitmq-disk-limit-warning']
     rabbitmq-service:
         apply_to_node: rabbitmq-nodes
         alerting: enabled
-        alarms:
-            check: ['rabbitmq-check']
+        members:
+            check:
+                alarms: ['rabbitmq-check']
     mysql:
         apply_to_node: mysql-nodes
         alerting: enabled
-        alarms:
-            node-status: ['mysql-node-connected', 'mysql-node-ready']
-            check: ['mysql-check']
+        members:
+            node-status:
+                alarms: ['mysql-node-connected', 'mysql-node-ready']
+            check:
+                alarms: ['mysql-check']
     apache:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            worker: ['apache-warning']
-            check: ['apache-check']
+        members:
+            worker:
+                alarms: ['apache-warning']
+            check:
+                alarms: ['apache-check']
     nova-api:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            http_errors: ['nova-api-http-errors']
+        members:
+            http_errors:
+                alarms: ['nova-api-http-errors']
             backends:
-                - 'nova-api-backends-all-down'
-                - 'nova-api-backends-majority-down'
-                - 'nova-api-backends-one-down'
+                alarms:
+                    - 'nova-api-backends-all-down'
+                    - 'nova-api-backends-majority-down'
+                    - 'nova-api-backends-one-down'
     nova-api-check:
         alerting: enabled
-        alarms:
-            vip: ['nova-api-check-failed']
+        members:
+            vip:
+                alarms: ['nova-api-check-failed']
     nova-metadata-api:
         apply_to_node: controller
         alerting: enabled
-        alarms:
+        members:
             backends:
-                - 'nova-metadata-api-backends-all-down'
-                - 'nova-metadata-api-backends-majority-down'
-                - 'nova-metadata-api-backends-one-down'
+                alarms:
+                    - 'nova-metadata-api-backends-all-down'
+                    - 'nova-metadata-api-backends-majority-down'
+                    - 'nova-metadata-api-backends-one-down'
     nova-novncproxy-websocket:
         apply_to_node: controller
         alerting: enabled
-        alarms:
+        members:
             backends:
-                - 'nova-novncproxy-websocket-api-backends-all-down'
-                - 'nova-novncproxy-websocket-api-backends-majority-down'
-                - 'nova-novncproxy-websocket-api-backends-one-down'
+                alarms:
+                    - 'nova-novncproxy-websocket-api-backends-all-down'
+                    - 'nova-novncproxy-websocket-api-backends-majority-down'
+                    - 'nova-novncproxy-websocket-api-backends-one-down'
     nova-api-endpoint:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            endpoint: ['nova-api-local-endpoint']
+        members:
+            endpoint:
+                alarms: ['nova-api-local-endpoint']
     nova-logs:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            error: ['nova-logs-error']
+        members:
+            error:
+                alarms: ['nova-logs-error']
     nova-logs-compute:
         apply_to_node: compute
         alerting: enabled
-        alarms:
-            error: ['nova-logs-error']
+        members:
+            error:
+                alarms: ['nova-logs-error']
     nova-cert:
         alerting: enabled
-        alarms:
+        members:
             workers:
-                - 'nova-cert-all-down'
-                - 'nova-cert-majority-down'
-                - 'nova-cert-one-down'
+                alarms:
+                    - 'nova-cert-all-down'
+                    - 'nova-cert-majority-down'
+                    - 'nova-cert-one-down'
     nova-consoleauth:
         alerting: enabled
-        alarms:
+        members:
             workers:
-                - 'nova-consoleauth-all-down'
-                - 'nova-consoleauth-majority-down'
-                - 'nova-consoleauth-one-down'
+                alarms:
+                    - 'nova-consoleauth-all-down'
+                    - 'nova-consoleauth-majority-down'
+                    - 'nova-consoleauth-one-down'
     nova-compute:
         alerting: enabled
-        alarms:
+        members:
             workers:
-                - 'nova-compute-all-down'
-                - 'nova-compute-majority-down'
-                - 'nova-compute-one-down'
+                alarms:
+                    - 'nova-compute-all-down'
+                    - 'nova-compute-majority-down'
+                    - 'nova-compute-one-down'
     nova-conductor:
         alerting: enabled
-        alarms:
+        members:
             workers:
-                - 'nova-conductor-all-down'
-                - 'nova-conductor-majority-down'
-                - 'nova-conductor-one-down'
+                alarms:
+                    - 'nova-conductor-all-down'
+                    - 'nova-conductor-majority-down'
+                    - 'nova-conductor-one-down'
     nova-scheduler:
         alerting: enabled
-        alarms:
+        members:
             workers:
-                - 'nova-scheduler-all-down'
-                - 'nova-scheduler-majority-down'
-                - 'nova-scheduler-one-down'
+                alarms:
+                    - 'nova-scheduler-all-down'
+                    - 'nova-scheduler-majority-down'
+                    - 'nova-scheduler-one-down'
     heat-api:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            http_errors: ['heat-api-http-errors']
+        members:
+            http_errors:
+                alarms: ['heat-api-http-errors']
             backends:
-                - 'heat-api-backends-all-down'
-                - 'heat-api-backends-majority-down'
-                - 'heat-api-backends-one-down'
+                alarms:
+                    - 'heat-api-backends-all-down'
+                    - 'heat-api-backends-majority-down'
+                    - 'heat-api-backends-one-down'
     heat-cfn-api:
         apply_to_node: controller
         alerting: enabled
-        alarms:
+        members:
             backends:
-                - 'heat-cfn-api-backends-all-down'
-                - 'heat-cfn-api-backends-majority-down'
-                - 'heat-cfn-api-backends-one-down'
+                alarms:
+                    - 'heat-cfn-api-backends-all-down'
+                    - 'heat-cfn-api-backends-majority-down'
+                    - 'heat-cfn-api-backends-one-down'
     heat-cloudwatch-api:
         apply_to_node: controller
         alerting: enabled
-        alarms:
+        members:
             backends:
-                - 'heat-cloudwatch-api-backends-all-down'
-                - 'heat-cloudwatch-api-backends-majority-down'
-                - 'heat-cloudwatch-api-backends-one-down'
+                alarms:
+                    - 'heat-cloudwatch-api-backends-all-down'
+                    - 'heat-cloudwatch-api-backends-majority-down'
+                    - 'heat-cloudwatch-api-backends-one-down'
     heat-api-check:
         alerting: enabled
-        alarms:
-            vip: ['heat-api-check-failed']
+        members:
+            vip:
+                alarms: ['heat-api-check-failed']
     heat-cfn-api-check:
         alerting: enabled
-        alarms:
-            vip: ['heat-cfn-api-check-failed']
+        members:
+            vip:
+                alarms: ['heat-cfn-api-check-failed']
     heat-api-endpoint:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            endpoint: ['heat-api-local-endpoint']
+        members:
+            endpoint:
+                alarms: ['heat-api-local-endpoint']
     heat-cfn-api-endpoint:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            endpoint: ['heat-cfn-api-local-endpoint']
+        members:
+            endpoint:
+                alarms: ['heat-cfn-api-local-endpoint']
     heat-logs:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            error: ['heat-logs-error']
+        members:
+            error:
+                alarms: ['heat-logs-error']
 <% if not @storage_options["objects_ceph"] then -%>
     swift-api:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            http_errors: ['swift-api-http-errors']
+        members:
+            http_errors:
+                alarms: ['swift-api-http-errors']
             backends:
-                - 'swift-api-backends-all-down'
-                - 'swift-api-backends-majority-down'
-                - 'swift-api-backends-one-down'
+                alarms:
+                    - 'swift-api-backends-all-down'
+                    - 'swift-api-backends-majority-down'
+                    - 'swift-api-backends-one-down'
     swift-api-check:
         alerting: enabled
-        alarms:
-            vip: ['swift-api-check-failed']
+        members:
+            vip:
+                alarms: ['swift-api-check-failed']
     swift-api-endpoint:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            endpoint: ['swift-api-local-endpoint']
+        members:
+            endpoint:
+                alarms: ['swift-api-local-endpoint']
     swift-s3-api-check:
         alerting: enabled
-        alarms:
-            vip: ['swift-s3-api-check-failed']
+        members:
+            vip:
+                alarms: ['swift-s3-api-check-failed']
     swift-logs:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            error: ['swift-logs-error']
+        members:
+            error:
+                alarms: ['swift-logs-error']
 <% end -%>
     cinder-api:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            http_errors: ['cinder-api-http-errors']
+        members:
+            http_errors:
+                alarms: ['cinder-api-http-errors']
             backends:
-                - 'cinder-api-backends-all-down'
-                - 'cinder-api-backends-majority-down'
-                - 'cinder-api-backends-one-down'
+                alarms:
+                    - 'cinder-api-backends-all-down'
+                    - 'cinder-api-backends-majority-down'
+                    - 'cinder-api-backends-one-down'
     cinder-api-check:
         alerting: enabled
-        alarms:
-            vip: ['cinder-api-check-failed']
+        members:
+            vip:
+                alarms: ['cinder-api-check-failed']
     cinder-v2-api-check:
         alerting: enabled
-        alarms:
-            vip: ['cinder-v2-api-check-failed']
+        members:
+            vip:
+                alarms: ['cinder-v2-api-check-failed']
     cinder-api-endpoint:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            endpoint: ['cinder-api-local-endpoint']
+        members:
+            endpoint:
+                alarms: ['cinder-api-local-endpoint']
     cinder-logs:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            error: ['cinder-logs-error']
+        members:
+            error:
+                alarms: ['cinder-logs-error']
     cinder-scheduler:
         alerting: enabled
-        alarms:
+        members:
             workers:
-                - 'cinder-scheduler-all-down'
-                - 'cinder-scheduler-majority-down'
-                - 'cinder-scheduler-one-down'
+                alarms:
+                    - 'cinder-scheduler-all-down'
+                    - 'cinder-scheduler-majority-down'
+                    - 'cinder-scheduler-one-down'
     cinder-volume:
         alerting: enabled
-        alarms:
+        members:
             workers:
-                - 'cinder-volume-all-down'
-                - 'cinder-volume-majority-down'
-                - 'cinder-volume-one-down'
+                alarms:
+                    - 'cinder-volume-all-down'
+                    - 'cinder-volume-majority-down'
+                    - 'cinder-volume-one-down'
 <% if not @storage_options["volumes_ceph"] then -%>
     cinder-volume-logs:
         apply_to_node: storage
         alerting: enabled
-        alarms:
-            error: ['cinder-logs-error']
+        members:
+            error:
+                alarms: ['cinder-logs-error']
 <% end -%>
     glance-api:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            http_errors: ['glance-api-http-errors']
+        members:
+            http_errors:
+                alarms: ['glance-api-http-errors']
             backends:
-                - 'glance-api-backends-all-down'
-                - 'glance-api-backends-majority-down'
-                - 'glance-api-backends-one-down'
+                alarms:
+                    - 'glance-api-backends-all-down'
+                    - 'glance-api-backends-majority-down'
+                    - 'glance-api-backends-one-down'
     glance-registry-api:
         apply_to_node: controller
         alerting: enabled
-        alarms:
+        members:
             backends:
-                - 'glance-registry-api-backends-all-down'
-                - 'glance-registry-api-backends-majority-down'
-                - 'glance-registry-api-backends-one-down'
+                alarms:
+                    - 'glance-registry-api-backends-all-down'
+                    - 'glance-registry-api-backends-majority-down'
+                    - 'glance-registry-api-backends-one-down'
     glance-api-check:
         alerting: enabled
-        alarms:
-            vip: ['glance-api-check-failed']
+        members:
+            vip:
+                alarms: ['glance-api-check-failed']
     glance-api-endpoint:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            endpoint: ['glance-api-local-endpoint']
+        members:
+            endpoint:
+                alarms: ['glance-api-local-endpoint']
     glance-logs:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            error: ['glance-logs-error']
+        members:
+            error:
+                alarms: ['glance-logs-error']
     neutron-api:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            http_errors: ['neutron-api-http-errors']
+        members:
+            http_errors:
+                alarms: ['neutron-api-http-errors']
             backends:
-                - 'neutron-api-backends-all-down'
-                - 'neutron-api-backends-majority-down'
-                - 'neutron-api-backends-one-down'
+                alarms:
+                    - 'neutron-api-backends-all-down'
+                    - 'neutron-api-backends-majority-down'
+                    - 'neutron-api-backends-one-down'
     neutron-api-check:
         alerting: enabled
-        alarms:
-            vip: ['neutron-api-check-failed']
+        members:
+            vip:
+                alarms: ['neutron-api-check-failed']
     neutron-api-endpoint:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            endpoint: ['neutron-api-local-endpoint']
+        members:
+            endpoint:
+                alarms: ['neutron-api-local-endpoint']
     neutron-logs:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            error: ['neutron-logs-error']
+        members:
+            error:
+                alarms: ['neutron-logs-error']
     neutron-l3:
         alerting: enabled
-        alarms:
+        members:
             workers:
-                - 'neutron-l3-all-down'
-                - 'neutron-l3-majority-down'
-                - 'neutron-l3-one-down'
+                alarms:
+                    - 'neutron-l3-all-down'
+                    - 'neutron-l3-majority-down'
+                    - 'neutron-l3-one-down'
     neutron-dhcp:
         alerting: enabled
-        alarms:
+        members:
             workers:
-                - 'neutron-dhcp-all-down'
-                - 'neutron-dhcp-majority-down'
-                - 'neutron-dhcp-one-down'
+                alarms:
+                    - 'neutron-dhcp-all-down'
+                    - 'neutron-dhcp-majority-down'
+                    - 'neutron-dhcp-one-down'
     neutron-metadata:
         alerting: enabled
-        alarms:
+        members:
             workers:
-                - 'neutron-metadata-all-down'
-                - 'neutron-metadata-majority-down'
-                - 'neutron-metadata-one-down'
+                alarms:
+                    - 'neutron-metadata-all-down'
+                    - 'neutron-metadata-majority-down'
+                    - 'neutron-metadata-one-down'
     neutron-openvswitch:
         alerting: enabled
-        alarms:
+        members:
             workers:
-                - 'neutron-openvswitch-all-down'
-                - 'neutron-openvswitch-majority-down'
-                - 'neutron-openvswitch-one-down'
+                alarms:
+                    - 'neutron-openvswitch-all-down'
+                    - 'neutron-openvswitch-majority-down'
+                    - 'neutron-openvswitch-one-down'
     neutron-logs-compute:
         apply_to_node: compute
         alerting: enabled
-        alarms:
-            error: ['neutron-logs-error']
+        members:
+            error:
+                alarms: ['neutron-logs-error']
     keystone-response-time:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            duration: ['keystone-response-time-duration']
+        members:
+            duration:
+                alarms: ['keystone-response-time-duration']
     keystone-public-api:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            http_errors: ['keystone-public-api-http-errors']
+        members:
+            http_errors:
+                alarms: ['keystone-public-api-http-errors']
             backends:
-                - 'keystone-public-api-backends-all-down'
-                - 'keystone-public-api-backends-majority-down'
-                - 'keystone-public-api-backends-one-down'
+                alarms:
+                    - 'keystone-public-api-backends-all-down'
+                    - 'keystone-public-api-backends-majority-down'
+                    - 'keystone-public-api-backends-one-down'
     keystone-public-api-check:
         alerting: enabled
-        alarms:
-            vip: ['keystone-public-api-check-failed']
+        members:
+            vip:
+                alarms: ['keystone-public-api-check-failed']
     keystone-public-api-endpoint:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            endpoint: ['keystone-public-api-local-endpoint']
+        members:
+            endpoint:
+                alarms: ['keystone-public-api-local-endpoint']
     keystone-logs:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            error: ['keystone-logs-error']
+        members:
+            error:
+                alarms: ['keystone-logs-error']
     keystone-admin-api:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            http_errors: ['keystone-admin-api-http-errors']
+        members:
+            http_errors:
+                alarms: ['keystone-admin-api-http-errors']
             backends:
-                - 'keystone-admin-api-backends-all-down'
-                - 'keystone-admin-api-backends-majority-down'
-                - 'keystone-admin-api-backends-one-down'
+                alarms:
+                    - 'keystone-admin-api-backends-all-down'
+                    - 'keystone-admin-api-backends-majority-down'
+                    - 'keystone-admin-api-backends-one-down'
 <% if @tls_enabled then -%>
     horizon-https:
 <% else -%>
@@ -3375,92 +3505,111 @@ lma_collector:
 <% end -%>
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            http_errors: ['horizon-web-http-errors']
+        members:
+            http_errors:
+                alarms: ['horizon-web-http-errors']
             backends:
-                - 'horizon-web-api-backends-all-down'
-                - 'horizon-web-api-backends-majority-down'
-                - 'horizon-web-api-backends-one-down'
+                alarms:
+                    - 'horizon-web-api-backends-all-down'
+                    - 'horizon-web-api-backends-majority-down'
+                    - 'horizon-web-api-backends-one-down'
     nova-instances:
         #TODO(scroiset): apply on compute nodes
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            creation-time: ['instance-creation-time-warning']
+        members:
+            creation-time:
+                alarms: ['instance-creation-time-warning']
     nova-free-vcpu:
         alerting: enabled
-        alarms:
-            nova-free-vcpu: ['total-nova-free-vcpu-warning']
+        members:
+            nova-free-vcpu:
+                alarms: ['total-nova-free-vcpu-warning']
     nova-free-memory:
         alerting: enabled
-        alarms:
-            nova-free-memory: ['total-nova-free-memory-warning']
+        members:
+            nova-free-memory:
+                alarms: ['total-nova-free-memory-warning']
     ceph-mon-cluster:
         apply_to_node: ceph-mon
         alerting: enabled
-        alarms:
-            health: ['ceph-health-critical', 'ceph-health-warning']
-            capacity: ['ceph-capacity-critical', 'ceph-capacity-warning']
+        members:
+            health:
+                alarms: ['ceph-health-critical', 'ceph-health-warning']
+            capacity:
+                alarms: ['ceph-capacity-critical', 'ceph-capacity-warning']
     ceph-mon-service:
         apply_to_node: ceph-mon
         alerting: enabled
-        alarms:
-            check: ['ceph-mon-check']
+        members:
+            check:
+                alarms: ['ceph-mon-check']
 <% if @storage_options["volumes_ceph"] then -%>
     ceph-osd-service:
         apply_to_node: storage
         alerting: enabled
-        alarms:
-            check: ['ceph-osd-check']
+        members:
+            check:
+                alarms: ['ceph-osd-check']
 <% end -%>
     elasticsearch-cluster:
         apply_to_node: elasticsearch-nodes
         alerting: enabled
-        alarms:
-            health: ['elasticsearch-health-critical', 'elasticsearch-health-warning']
+        members:
+            health:
+                alarms: ['elasticsearch-health-critical', 'elasticsearch-health-warning']
     elasticsearch-service:
         apply_to_node: elasticsearch-nodes
         alerting: enabled
-        alarms:
-            check: ['elasticsearch-check']
+        members:
+            check:
+                alarms: ['elasticsearch-check']
     influxdb-service:
         apply_to_node: influxdb-nodes
         alerting: enabled
-        alarms:
-            check: ['influxdb-check']
+        members:
+            check:
+                alarms: ['influxdb-check']
     influxdb-api-check:
         alerting: enabled
-        alarms:
-            vip: ['influxdb-api-check-failed']
+        members:
+            vip:
+                alarms: ['influxdb-api-check-failed']
     haproxy-openstack:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            check: ['haproxy-check']
+        members:
+            check:
+                alarms: ['haproxy-check']
     pacemaker-service:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            check: ['pacemaker-check']
+        members:
+            check:
+                alarms: ['pacemaker-check']
     libvirt-service:
         apply_to_node: compute
         alerting: enabled
-        alarms:
-            check: ['libvirt-check']
+        members:
+            check:
+                alarms: ['libvirt-check']
     memcached-service:
         apply_to_node: controller
         alerting: enabled
-        alarms:
-            check: ['memcached-check']
+        members:
+            check:
+                alarms: ['memcached-check']
     ceilometer-api-check:
         alerting: enabled
-        alarms:
-            vip: ['ceilometer-api-check-failed']
+        members:
+            vip:
+                alarms: ['ceilometer-api-check-failed']
     mysqld-tcp:
         apply_to_node: controller
         alerting: enabled
-        alarms:
+        members:
             backends:
-                - 'mysqld-tcp-api-backends-all-down'
-                - 'mysqld-tcp-api-backends-majority-down'
-                - 'mysqld-tcp-api-backends-one-down'
+                alarms:
+                    - 'mysqld-tcp-api-backends-all-down'
+                    - 'mysqld-tcp-api-backends-majority-down'
+                    - 'mysqld-tcp-api-backends-one-down'

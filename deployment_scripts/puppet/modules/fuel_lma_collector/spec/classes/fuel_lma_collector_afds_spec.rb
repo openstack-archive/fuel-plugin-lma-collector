@@ -27,16 +27,20 @@ describe 'fuel_lma_collector::afds' do
                  'controller' =>
                  {
                      'apply_to_node' => 'controller',
-                     'alarms' => {
-                        'cpu' => ['cpu_warning']
+                     'members' => {
+                        'cpu' => {
+                            "alarms" => ['cpu_warning']
+                        }
                      }
                  }
              },
-             :service_cluster_alarms => {
+             :service_cluster_alarms=> {
                  'mysql' => {
                      'apply_to_node' => 'controller',
-                     'alarms' => {
-                         'all' => ['db_warning']
+                     'members' => {
+                         'all' => {
+                             "alarms" => ['db_warning']
+                         }
                      }
                  }
              },
@@ -81,8 +85,10 @@ describe 'fuel_lma_collector::afds' do
              :node_cluster_alarms => {
                  'controller' => {
                      'apply_to_node' => 'controller',
-                     'alarms' => {
-                         'cpu' => ['cpu_warning']
+                     'members' => {
+                         'cpu' => {
+                             "alarms" => ['cpu_warning']
+                         }
                      }
                  }
              },
@@ -115,8 +121,10 @@ describe 'fuel_lma_collector::afds' do
                  'others' =>
                  {
                      'apply_to_node' => 'default',
-                     'alarms' => {
-                        'cpu' => ['cpu_warning']
+                     'members' => {
+                        'cpu' => {
+                            "alarms" => ['cpu_warning']
+                        }
                      }
                  }
              },
