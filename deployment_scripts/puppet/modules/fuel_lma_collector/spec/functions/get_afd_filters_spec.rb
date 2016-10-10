@@ -104,17 +104,24 @@ describe 'get_afd_filters' do
     afds_nodes = {
         "controller" => {
             "apply_to_node" => "controller",
-            "alerting" => 'enabled_with_notification',
-            "alarms" => {
-                "system" => ["cpu-critical-controller", "cpu-warning-controller"],
+            "alerting" => 'enabled',
+            "members" => {
+                "system" => {
+                    "alerting" => 'enabled_with_notification',
+                    "alarms" => ["cpu-critical-controller", "cpu-warning-controller"],
+                }
             },
         },
         "compute" => {
             "apply_to_node" => "compute",
             "alerting" => 'enabled_with_notification',
-            "alarms" => {
-                "system" => ["cpu-critical-compute", "cpu-warning-compute"],
-                "fs" => ["fs-critical"],
+            "members" => {
+                "system" => {
+                    "alarms" => ["cpu-critical-compute", "cpu-warning-compute"],
+                },
+                "fs" => {
+                    "alarms" => ["fs-critical"],
+                }
             },
         }
     }
@@ -235,15 +242,19 @@ describe 'get_afd_filters' do
         "rabbitmq" => {
             "apply_to_node" => "controller",
             "alerting" => 'enabled',
-            "alarms" => {
-                "queue" => ["rabbitmq-queue-warning"]
+            "members" => {
+                "queue" => {
+                    "alarms" => ["rabbitmq-queue-warning"]
+                }
             },
         },
         "apache" => {
             "apply_to_node" => "controller",
             "alerting" => 'enabled',
-            "alarms" => {
-                "worker" => ['apache-warning'],
+            "members" => {
+                "worker" => {
+                    "alarms" => ['apache-warning'],
+                }
             },
         },
     }
@@ -339,21 +350,28 @@ describe 'get_afd_filters' do
             "nova-free-resources" => {
                 "apply_to_node" => "compute",
                 "alerting" => 'enabled',
-                "alarms" => {
-                    "free-vcpu" => ['free_vcpu_warning'],
+                "members" => {
+                    "free-vcpu" => {
+                        "alerting" => 'disabled',
+                        "alarms" => ['free_vcpu_warning'],
+                    }
                 },
             },
             "nova-total-free-resources" => {
                 "alerting" => 'enabled',
-                "alarms" => {
-                    "total-free-vcpu" => ['total_free_vcpu_warning'],
+                "members" => {
+                    "total-free-vcpu" => {
+                        "alarms" => ['total_free_vcpu_warning'],
+                    }
                 },
             },
             "controller" => {
                 "apply_to_node" => "controller",
                 "alerting" => 'enabled_with_notification',
-                "alarms" => {
-                    "system" => ["cpu-critical-controller", "cpu-warning-controller"],
+                "members" => {
+                    "system" => {
+                        "alarms" => ["cpu-critical-controller", "cpu-warning-controller"],
+                    }
                 },
             },
         }
@@ -376,7 +394,7 @@ describe 'get_afd_filters' do
                          "alarms_definitions"=> alarms_services_o,
                          "alarms"=>["free_vcpu_warning"],
                          "message_matcher"=>"Fields[name] == 'free_vcpu'",
-                         "activate_alerting" => true,
+                         "activate_alerting" => false,
                          "enable_notification" => false,
                      },
                      "nova-total-free-resources_total-free-vcpu"=>
