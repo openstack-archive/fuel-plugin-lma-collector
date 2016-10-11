@@ -2432,6 +2432,7 @@ lma_collector:
     - name: 'nova-scheduler-all-down'
       description: 'All Nova schedulers are down'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2447,6 +2448,7 @@ lma_collector:
     - name: 'nova-cert-all-down'
       description: 'All Nova certs are down'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2462,6 +2464,7 @@ lma_collector:
     - name: 'nova-consoleauth-all-down'
       description: 'All Nova consoleauths are down'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2477,6 +2480,7 @@ lma_collector:
     - name: 'nova-compute-all-down'
       description: 'All Nova computes are down'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2492,6 +2496,7 @@ lma_collector:
     - name: 'nova-conductor-all-down'
       description: 'All Nova conductors are down'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2507,6 +2512,7 @@ lma_collector:
     - name: 'cinder-scheduler-all-down'
       description: 'All Cinder schedulers are down'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2522,6 +2528,7 @@ lma_collector:
     - name: 'cinder-volume-all-down'
       description: 'All Cinder volumes are down'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2537,6 +2544,7 @@ lma_collector:
     - name: 'neutron-l3-all-down'
       description: 'All Neutron L3 agents are down'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2552,6 +2560,7 @@ lma_collector:
     - name: 'neutron-dhcp-all-down'
       description: 'All Neutron DHCP agents are down'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2567,6 +2576,7 @@ lma_collector:
     - name: 'neutron-metadata-all-down'
       description: 'All Neutron metadata agents are down'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2582,6 +2592,7 @@ lma_collector:
     - name: 'neutron-openvswitch-all-down'
       description: 'All Neutron openvswitch agents are down'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2598,6 +2609,7 @@ lma_collector:
     - name: 'nova-scheduler-one-down'
       description: 'At least one Nova scheduler is down'
       severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2613,6 +2625,7 @@ lma_collector:
     - name: 'nova-cert-one-down'
       description: 'At least one Nova cert is down'
       severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2628,6 +2641,7 @@ lma_collector:
     - name: 'nova-consoleauth-one-down'
       description: 'At least one Nova consoleauth is down'
       severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2643,6 +2657,7 @@ lma_collector:
     - name: 'nova-compute-one-down'
       description: 'At least one Nova compute is down'
       severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2658,6 +2673,7 @@ lma_collector:
     - name: 'nova-conductor-one-down'
       description: 'At least one Nova conductor is down'
       severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2673,6 +2689,7 @@ lma_collector:
     - name: 'cinder-scheduler-one-down'
       description: 'At least one Cinder scheduler is down'
       severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2688,6 +2705,7 @@ lma_collector:
     - name: 'cinder-volume-one-down'
       description: 'At least one Cinder volume is down'
       severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2703,6 +2721,7 @@ lma_collector:
     - name: 'neutron-l3-one-down'
       description: 'At least one L3 agent is down'
       severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2718,6 +2737,7 @@ lma_collector:
     - name: 'neutron-dhcp-one-down'
       description: 'At least one DHCP agent is down'
       severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2733,6 +2753,7 @@ lma_collector:
     - name: 'neutron-metadata-one-down'
       description: 'At least one metadata agents is down'
       severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
@@ -2748,6 +2769,7 @@ lma_collector:
     - name: 'neutron-openvswitch-one-down'
       description: 'At least one openvswitch agents is down'
       severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         rules:
