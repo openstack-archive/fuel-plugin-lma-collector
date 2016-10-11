@@ -2931,6 +2931,7 @@ lma_collector:
             swap:
                 alarms: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
             hdd-errors:
+                alerting: enabled_with_notification
                 alarms: ['hdd-errors-critical']
 <% if @detach_rabbitmq_enabled -%>
     rabbitmq-nodes:
@@ -2950,6 +2951,7 @@ lma_collector:
             swap:
                 alarms: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
             hdd-errors:
+                alerting: enabled_with_notification
                 alarms: ['hdd-errors-critical']
 <% end -%>
     mysql-nodes:
@@ -2970,6 +2972,7 @@ lma_collector:
             swap:
                 alarms: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
             hdd-errors:
+                alerting: enabled_with_notification
                 alarms: ['hdd-errors-critical']
 <% end -%>
             mysql-fs:
@@ -2993,6 +2996,7 @@ lma_collector:
             swap:
                 alarms: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
             hdd-errors:
+                alerting: enabled_with_notification
                 alarms: ['hdd-errors-critical']
     storage:
         apply_to_node: storage
@@ -3011,6 +3015,7 @@ lma_collector:
             swap:
                 alarms: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
             hdd-errors:
+                alerting: enabled_with_notification
                 alarms: ['hdd-errors-critical']
 <% if @storage_options["volumes_ceph"] then -%>
             osd-disk:
@@ -3033,6 +3038,7 @@ lma_collector:
             swap:
                 alarms: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
             hdd-errors:
+                alerting: enabled_with_notification
                 alarms: ['hdd-errors-critical']
     influxdb-nodes:
         apply_to_node: influxdb-nodes
@@ -3051,6 +3057,7 @@ lma_collector:
             swap:
                 alarms: ['swap-usage-critical', 'swap-activity-warning', 'swap-usage-warning']
             hdd-errors:
+                alerting: enabled_with_notification
                 alarms: ['hdd-errors-critical']
     # This is the default members configured for all nodes with unknown roles
     default:
