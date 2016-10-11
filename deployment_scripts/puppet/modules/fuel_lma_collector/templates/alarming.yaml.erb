@@ -223,7 +223,7 @@ lma_collector:
       severity: 'critical'
       # If the local RabbitMQ instance is down, it will be caught by the
       # rabbitmq-check alarm
-      no_data_severity: okay
+      no_data_policy: 'okay'
       enabled: 'true'
       trigger:
         logical_operator: 'or'
@@ -239,7 +239,7 @@ lma_collector:
       severity: 'warning'
       # If the local RabbitMQ instance is down, it will be caught by the
       # rabbitmq-check alarm
-      no_data_severity: okay
+      no_data_policy: 'okay'
       enabled: 'true'
       trigger:
         logical_operator: 'or'
@@ -255,7 +255,7 @@ lma_collector:
       severity: 'critical'
       # If the local RabbitMQ instance is down, it will be caught by the
       # rabbitmq-check alarm
-      no_data_severity: okay
+      no_data_policy: 'okay'
       enabled: 'true'
       trigger:
         logical_operator: 'or'
@@ -271,7 +271,7 @@ lma_collector:
       severity: 'warning'
       # If the local RabbitMQ instance is down, it will be caught by the
       # rabbitmq-check alarm
-      no_data_severity: okay
+      no_data_policy: 'okay'
       enabled: 'true'
       trigger:
         logical_operator: 'or'
@@ -287,7 +287,7 @@ lma_collector:
       severity: 'warning'
       # If the local RabbitMQ instance is down, it will be caught by the
       # rabbitmq-check alarm
-      no_data_severity: okay
+      no_data_policy: 'okay'
       enabled: 'true'
       trigger:
         logical_operator: 'or'
@@ -301,6 +301,7 @@ lma_collector:
     - name: 'rabbitmq-pacemaker-down'
       description: 'The RabbitMQ cluster is down'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         logical_operator: 'and'
@@ -317,6 +318,7 @@ lma_collector:
     - name: 'rabbitmq-pacemaker-critical'
       description: 'The RabbitMQ cluster is critical because less than half of the nodes are up'
       severity: 'critical'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         logical_operator: 'and'
@@ -333,6 +335,7 @@ lma_collector:
     - name: 'rabbitmq-pacemaker-warning'
       description: 'The RabbitMQ cluster is degraded because some RabbitMQ nodes are missing'
       severity: 'warning'
+      no_data_policy: 'skip' # the metric is only collected from the DC node
       enabled: 'true'
       trigger:
         logical_operator: 'and'
@@ -487,7 +490,7 @@ lma_collector:
       description: "The filesystem's free space is low"
       severity: 'warning'
       enabled: 'true'
-      no_data_severity: okay
+      no_data_policy: 'okay'
       trigger:
         rules:
           - metric: fs_space_percent_free
@@ -503,7 +506,7 @@ lma_collector:
       description: "The filesystem's free space is too low"
       severity: 'critical'
       enabled: 'true'
-      no_data_severity: okay
+      no_data_policy: 'okay'
       trigger:
         rules:
           - metric: fs_space_percent_free
@@ -549,7 +552,7 @@ lma_collector:
     - name: 'nova-logs-error'
       description: 'Too many errors have been detected in Nova logs'
       severity: 'warning'
-      no_data_severity: okay
+      no_data_policy: 'okay'
       enabled: 'true'
       trigger:
         logical_operator: 'or'
@@ -581,7 +584,7 @@ lma_collector:
     - name: 'heat-logs-error'
       description: 'Too many errors have been detected in Heat logs'
       severity: 'warning'
-      no_data_severity: okay
+      no_data_policy: 'okay'
       enabled: 'true'
       trigger:
         logical_operator: 'or'
@@ -613,7 +616,7 @@ lma_collector:
     - name: 'swift-logs-error'
       description: 'Too many errors have been detected in Swift logs'
       severity: 'warning'
-      no_data_severity: okay
+      no_data_policy: 'okay'
       enabled: 'true'
       trigger:
         logical_operator: 'or'
@@ -645,7 +648,7 @@ lma_collector:
     - name: 'cinder-logs-error'
       description: 'Too many errors have been detected in Cinder logs'
       severity: 'warning'
-      no_data_severity: okay
+      no_data_policy: 'okay'
       enabled: 'true'
       trigger:
         logical_operator: 'or'
@@ -677,7 +680,7 @@ lma_collector:
     - name: 'glance-logs-error'
       description: 'Too many errors have been detected in Glance logs'
       severity: 'warning'
-      no_data_severity: okay
+      no_data_policy: 'okay'
       enabled: 'true'
       trigger:
         logical_operator: 'or'
@@ -709,7 +712,7 @@ lma_collector:
     - name: 'neutron-logs-error'
       description: 'Too many errors have been detected in Neutron logs'
       severity: 'warning'
-      no_data_severity: okay
+      no_data_policy: 'okay'
       enabled: 'true'
       trigger:
         logical_operator: 'or'
@@ -726,7 +729,7 @@ lma_collector:
     - name: 'keystone-response-time-duration'
       description: 'Keystone API is too slow'
       severity: 'warning'
-      no_data_severity: okay
+      no_data_policy: 'okay'
       enabled: 'true'
       trigger:
         logical_operator: 'or'
@@ -789,7 +792,7 @@ lma_collector:
     - name: 'keystone-logs-error'
       description: 'Too many errors have been detected in Keystone logs'
       severity: 'warning'
-      no_data_severity: okay
+      no_data_policy: 'okay'
       enabled: 'true'
       trigger:
         logical_operator: 'or'
@@ -1125,7 +1128,7 @@ lma_collector:
     - name: 'instance-creation-time-warning'
       description: "Instance creation takes too much time"
       severity: 'warning'
-      no_data_severity: okay # This is a sporadic metric
+      no_data_policy: 'okay' # This is a sporadic metric
       enabled: 'true'
       trigger:
         rules:
@@ -1139,7 +1142,7 @@ lma_collector:
       description: 'Errors on hard drive(s) have been detected'
       severity: 'critical'
       enabled: 'true'
-      no_data_severity: okay
+      no_data_policy: okay
       trigger:
         rules:
           - metric: hdd_errors_rate
@@ -1153,6 +1156,7 @@ lma_collector:
       description: 'There is none VCPU available for new instances'
       severity: 'warning'
       enabled: 'true'
+      no_data_policy: skip # the metric is only collected from the aggregator node
       trigger:
         rules:
           - metric: openstack_nova_total_free_vcpus
@@ -1165,6 +1169,7 @@ lma_collector:
       description: 'There is none memory available for new instances'
       severity: 'warning'
       enabled: 'true'
+      no_data_policy: skip  # the metric is only collected from the aggregator node
       trigger:
         rules:
           - metric: openstack_nova_total_free_ram
@@ -1293,6 +1298,7 @@ lma_collector:
     - name: 'influxdb-api-check-failed'
       description: 'Endpoint check for InfluxDB is failed'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1307,6 +1313,7 @@ lma_collector:
     - name: 'nova-api-check-failed'
       description: 'Endpoint check for nova-api is failed'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1321,6 +1328,7 @@ lma_collector:
     - name: 'neutron-api-check-failed'
       description: 'Endpoint check for neutron-api is failed'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1335,6 +1343,7 @@ lma_collector:
     - name: 'cinder-api-check-failed'
       description: 'Endpoint check for cinder-api is failed'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1349,6 +1358,7 @@ lma_collector:
     - name: 'cinder-v2-api-check-failed'
       description: 'Endpoint check for cinder-v2-api is failed'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1363,6 +1373,7 @@ lma_collector:
     - name: 'glance-api-check-failed'
       description: 'Endpoint check for glance-api is failed'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1377,6 +1388,7 @@ lma_collector:
     - name: 'heat-api-check-failed'
       description: 'Endpoint check for heat-api is failed'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1391,6 +1403,7 @@ lma_collector:
     - name: 'heat-cfn-api-check-failed'
       description: 'Endpoint check for heat-cfn-api is failed'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1405,6 +1418,7 @@ lma_collector:
     - name: 'swift-api-check-failed'
       description: 'Endpoint check for swift-api is failed'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1419,6 +1433,7 @@ lma_collector:
     - name: 'swift-s3-api-check-failed'
       description: 'Endpoint check for swift-s3-api is failed'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1433,6 +1448,7 @@ lma_collector:
     - name: 'keystone-public-api-check-failed'
       description: 'Endpoint check for keystone-public-api is failed'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
@@ -1447,6 +1463,7 @@ lma_collector:
     - name: 'ceilometer-api-check-failed'
       description: 'Endpoint check for ceilometer-api is failed'
       severity: 'down'
+      no_data_policy: 'skip' # the metric is only collected from the controller running the management VIP
       enabled: 'true'
       trigger:
         rules:
