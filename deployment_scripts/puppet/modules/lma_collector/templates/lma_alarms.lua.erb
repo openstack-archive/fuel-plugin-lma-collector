@@ -10,8 +10,8 @@ local alarms = {
     ['name'] = '<%= alarm_name %>',
     ['description'] = '<%= alarm["description"].to_s().gsub("'"){"\\'"} %>',
     ['severity'] = '<%= alarm["severity"] %>',
-<%- if alarm.key?("no_data_severity") -%>
-    ['no_data_severity'] = '<%= alarm["no_data_severity"] %>',
+<%- if alarm.key?("no_data_policy") -%>
+    ['no_data_policy'] = '<%= alarm["no_data_policy"] %>',
 <%- end -%>
     ['trigger'] = {
       ['logical_operator'] = '<%= alarm["trigger"]["logical_operator"] || 'or' %>',
