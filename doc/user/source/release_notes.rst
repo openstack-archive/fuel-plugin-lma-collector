@@ -12,15 +12,15 @@ Version 0.10.2
 
 The StackLight Collector plugin 0.10.2 for Fuel contains the following updates:
 
-* Increased the Elasticsearch bulk size when required. See
-  `#1617211 <https://bugs.launchpad.net/lma-toolchain/+bug/1617211>`_.
+* Implemented the capability for the Elasticsearch bulk size to increase when
+  required. See `#1617211 <https://bugs.launchpad.net/lma-toolchain/+bug/1617211>`_.
 
-* Updated the documentation with new definitions for memcached_ps_cputime_syst
-  and memcached_ps_cputime_user. See
-  `#1576265 <https://bugs.launchpad.net/lma-toolchain/+bug/1576265>`_.
-
-* Fixed issue when installing the OCF script. See
+* Fixed the issue with the OCF script installation. See
   `#1575039 <https://bugs.launchpad.net/lma-toolchain/+bug/1575039>`_.
+
+* Updated the documentation with new definitions for
+  ``memcached_ps_cputime_syst`` and ``memcached_ps_cputime_user``. See
+  `#1576265 <https://bugs.launchpad.net/lma-toolchain/+bug/1576265>`_.
 
 Version 0.10.1
 ++++++++++++++
