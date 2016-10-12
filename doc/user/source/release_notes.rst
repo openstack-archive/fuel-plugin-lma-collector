@@ -10,6 +10,32 @@ Release notes
 Version 1.0.0
 +++++++++++++
 
+The StackLight Collector plugin 1.0.0 brings mainly new alarms and extends the
+alarming framework.
+
+New alarms:
+
+  * Monitor RabbitMQ based on Pacemaker point-of-view
+  * Monitor all partitions and OSD disk(s)
+  * Horizon HTTP 5xx errors
+  * Keystone slow response times
+  * HDD errors
+  * SWAP percent usage
+  * Network packet drops
+  * Local OpenStack API checks
+  * Local checks for services: Apache, Memcached, MySQL, RabbitMQ, Pacemaker
+
+Alarm enhancements:
+
+  * Add "group by" attribute support for alarm rules
+  * Add "pattern matching" support to fine filtering of metric dimensions
+
+Bug Fixes:
+
+ * Fixes the concurrent execution of logrotate #1455104
+ * Increase the Elasticsearch bulk size when required #1617211
+ * Use RabbitMQ management API in place of rabbitmqctl command
+
 Version 0.10.0
 ++++++++++++++
 
