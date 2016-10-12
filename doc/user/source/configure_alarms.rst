@@ -368,12 +368,21 @@ file. This file has the following sections:
    to that category of nodes. For example::
 
      node_cluster_alarms:
-        controller:
-         cpu: ['cpu-critical-controller', 'cpu-warning-controller']
-         root-fs: ['root-fs-critical', 'root-fs-warning']
-         log-fs: ['log-fs-critical', 'log-fs-warning']
+        controller-nodes:
+            apply_to_node: controller
+            alerting: enabled
+            members:
+                cpu:
+                    alarms: ['cpu-critical-controller', 'cpu-warning-controller']
+                root-fs:
+                    alarms: ['root-fs-critical', 'root-fs-warning']
+                log-fs:
+                    alarms: ['log-fs-critical', 'log-fs-warning']
+                hdd-errors:
+                    alerting: enabled_with_notification
+                    alarms: ['hdd-errors-critical']
 
-   Creates three alarm groups for the cluster of nodes called 'controller':
+   Creates four alarm groups for the cluster of controller nodes:
 
    * The *cpu* alarm group is mapped to two alarms defined in the ``alarms``
      section known as the 'cpu-critical-controller' and
@@ -388,6 +397,13 @@ file. This file has the following sections:
      section known as the 'log-fs-critical' and 'log-fs-warning' alarms. These
      alarms monitor the file system where the logs are created on the
      controller nodes.
+   * The *hdd-errors* alarm group is mapped to the 'hdd-errors-critical' alarm
+     defined in the ``alarms`` section. This alarm monitors the ``kern.log``
+     log entries containing critical IO errors detected by the kernel.
+     The *hdd-error* alarm obtains the *enabled_with_notification* alerting
+     attribute, meaning that the operator will be notified if any of the
+     controller nodes encounters a disk failure. Other alarms do not trigger
+     notification per node but at an aggregated cluster level.
 
    .. note:: An *alarm group* is a mere implementation artifact (although it
       has functional value) that is primarily used to distribute the alarms
@@ -425,7 +441,7 @@ structure of that file.
    important to keep exactly the same copy of
    ``/etc/hiera/override/gse_filters.yaml`` across all the nodes of the
    OpenStack environment including the node(s) where Nagios is installed.
-   
+
 The aggregation rules and correlation policies are defined in the ``/etc/hiera/override/gse_filters.yaml`` configuration file.
 
 This file has the following sections:
@@ -590,6 +606,7 @@ the service cluster aggregation rules::
     output_metric_name: cluster_service_status
     interval: 10
     warm_up_period: 20
+    alerting: enabled_with_notification
     clusters:
       nova-api:
         policy: highest_severity
@@ -637,6 +654,10 @@ Where
 |   Type: integer
 |   The number of seconds after a (re)start that the GSE plugin will wait
     before emitting its metric messages.
+
+| alerting
+|   Type: string (one of 'disabled', 'enabled' or 'enabled_with_notification').
+|   The alerting configuration of the service clusters.
 
 | clusters
 |   Type: list
@@ -720,6 +741,7 @@ cluster aggregation rules::
     output_metric_name: cluster_node_status
     interval: 10
     warm_up_period: 80
+    alerting: enabled_with_notification
     clusters:
       controller:
         policy: majority_of_members
@@ -767,6 +789,10 @@ Where
 |   Type: integer
 |   The number of seconds after a (re)start that the GSE plugin will wait
     before emitting its metric messages.
+
+| alerting
+|   Type: string (one of 'disabled', 'enabled' or 'enabled_with_notification').
+|   The alerting configuration of the node clusters.
 
 | clusters
 |   Type: list
