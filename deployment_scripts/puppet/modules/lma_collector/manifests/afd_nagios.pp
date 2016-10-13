@@ -44,7 +44,8 @@ define lma_collector::afd_nagios(
 
   $matcher = join(["Fields[${lma_collector::params::aggregator_flag}] == NIL",
                     "Type == 'heka.sandbox.${message_type}'",
-                    'Fields[no_alerting] == NIL'], ' && ')
+                    'Fields[no_alerting] == NIL'],
+                    'Fields[hostname] != NIL', '&& ')
 
   heka::output::http { "nagios_afd_${title}":
     ensure            => $ensure,
