@@ -10,6 +10,34 @@ Release notes
 Version 1.0.0
 +++++++++++++
 
+The StackLight Collector plugin 1.0.0 for Fuel contains the following updates:
+
+New alarms:
+
+  * Monitor RabbitMQ based on Pacemaker point-of-view
+  * Monitor all partitions and OSD disk(s)
+  * Horizon HTTP 5xx errors
+  * Keystone slow response times
+  * HDD errors
+  * SWAP percent usage
+  * Network packet drops
+  * Local OpenStack API checks
+  * Local checks for services: Apache, Memcached, MySQL, RabbitMQ, Pacemaker
+
+Alarm enhancements:
+
+  * Added the ``group by`` attribute support for alarm rules
+  * Added support for ``pattern matching`` to filter metric dimensions
+
+Bug fixes:
+
+ * Fixed the concurrent execution of logrotate.
+   See `#1455104 <https://bugs.launchpad.net/lma-toolchain/+bug/1455104>`_.
+ * Implemented the capability for the Elasticsearch bulk size to increase when
+   required. See `#1617211 <https://bugs.launchpad.net/lma-toolchain/+bug/1617211>`_.
+ * Implemented the capability to use RabbitMQ management API in place of the
+   :command:`rabbitmqctl` command.
+
 Version 0.10.0
 ++++++++++++++
 
