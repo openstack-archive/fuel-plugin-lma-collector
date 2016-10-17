@@ -135,9 +135,10 @@ An alarm rule is defined declaratively using the YAML syntax. For example::
     trigger:
       rules:
         - metric: fs_space_percent_free
-          fields:
-            fs: '*'
+          group_by: ['fs']
           relational_operator: '<'
+          fields:
+            fs: "=~ ceph/%d+$"
           threshold: 5
           window: 60
           periods: 0
@@ -181,18 +182,22 @@ An alarm rule is defined declaratively using the YAML syntax. For example::
 |   Type: unicode
 |   The value of the metric
 
+| group_by
+|   Type: list
+|   The list of fields to group by.
+    For example, the alarm definition sample given above would apply the rule
+    for each of the file system mount points associated with the
+    ``fs_space_percent_free`` metric.
+
 | fields
 |   Type: list
-|   List of field name / value pairs, also known as dimensions, used to select
+|   List of field name/value pairs, also known as dimensions, used to select
     a particular device for the metric, such as a network interface name or
-    file system mount point. If the value is specified as an empty string (""),
-    then the rule is applied to all the aggregated values for the specified
-    field name. For example, the file system mount point. If value is
-    specified as the '*' wildcard character, then the rule is applied to each
-    of the metrics matching the metric name and field name. For example, the
-    alarm definition sample given above would run the rule for each of the
-    file system mount points associated with the *fs_space_percent_free*
-    metric.
+    file system mount point. If the value is not provided, then the rule
+    applies to all the aggregated values for the specified field name.
+    In the example above, the rule applies to the metrics having an **fs**
+    dimension that matches the pattern **"=~ ceph/%d+$"**.
+    See :ref:`Dimension pattern matching <dim_pattern_matching>`.
 
 | window
 |   Type: integer
@@ -271,6 +276,85 @@ An alarm rule is defined declaratively using the YAML syntax. For example::
 | threshold
 |   Type: float
 |   The threshold of the alarm rule
+
+.. _dim_pattern_matching:
+
+Dimension pattern matching
+++++++++++++++++++++++++++
+
+The alarming framework allows specifying alarms against metrics with a
+filtering mechanism called **dimension pattern matching**. For details, see
+the `specification <https://blueprints.launchpad.net/lma-toolchain/+spec/afd-alarm-fields-matching>`_.
+
+The pattern matching is evaluated against the field/dimension specified by the
+alarm rule::
+
+  rules:
+    - metric: foo_metric
+      fields:
+        my_dimension: <PATTERN MATCHING EXPRESSION>
+
+where the pattern matching expression has the following format::
+
+  EXP ::=  “<relation operator> string”
+
+Expressions can be combined with logical operator(s)::
+
+  EXP (<logical_operator> EXP, ..)
+
+Where:
+
+* Logical operators:
+
+  * OR: **||**
+  * AND: **&&**
+
+* Relational operators:
+
+  * Strings and numbers:
+
+    * Equality: **==**
+    * Not equal: **!=**
+
+  * Strings only (for syntax, see `Lua pattern matching <http://www.lua.org/manual/5.1/manual.html#5.4.1>`_):
+
+    * Match: **=~**
+    * Negated match: **!~**
+
+  * Numbers only:
+
+    * Greater than: **>**
+    * Greater than equals: **>=**
+    * Less than: **<**
+    * Less than equals: **<=**
+
+Example:
+
++---------------+------------+----------+
+| Value         | Pattern    | Matching |
++===============+============+==========+
+| 10            | 10         | True     |
++---------------+------------+----------+
+| 10            | == 10      | True     |
++---------------+------------+----------+
+| 10            | != 42      | True     |
++---------------+------------+----------+
+| 10            | > 42       | False    |
++---------------+------------+----------+
+| 10            | >= 10      | True     |
++---------------+------------+----------+
+| foo           | == foo     | True     |
++---------------+------------+----------+
+| foo           | == bar     | False    |
++---------------+------------+----------+
+| /var/log      | =~ /log$   | True     |
++---------------+------------+----------+
+| /data         | !~ ^/data$ | False    |
++---------------+------------+----------+
+| /var/log/data | !~ /data$  | False    |
++---------------+------------+----------+
+| /var/log/data | !~ ^/data$ | True     |
++---------------+------------+----------+
 
 
 Modify or create an alarm
