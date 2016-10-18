@@ -96,9 +96,17 @@ that file later on.
 
 **To install the plugin:**
 
-Now that you have created the RPM file, install the plugin using the
-:command:`fuel plugins --install` command:
+#. Once you have created the RPM file, install the plugin:
 
-.. code-block:: console
+   .. code-block:: console
 
-   [root@fuel ~] fuel plugins --install ./fuel-plugin-lma-collector/*.noarch.rpm
+      [root@fuel ~] fuel plugins --install ./fuel-plugin-lma-collector/*.noarch.rpm
+
+#. Verify that the plugin is installed correctly:
+
+   .. code-block:: console
+
+      [root@fuel ~]# fuel plugins --list
+      id | name                 | version | package_version
+      ---|----------------------|---------|----------------
+      1  | lma_collector        | 1.0.0   | 4.0.0
