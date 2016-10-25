@@ -698,10 +698,10 @@ lma_collector:
           - nova-novncproxy-websocket # worker
           - controller        # node cluster
         hints:
-          - cinder
+          - cinder-control-plane
           - glance
           - keystone
-          - neutron
+          - neutron-control-plane
           - mysql
           - rabbitmq
       nova-data-plane:
@@ -810,11 +810,11 @@ lma_collector:
           - heat-cloudwatch-api
           - controller
         hints:
-          - cinder
+          - cinder-control-plane
           - glance
           - keystone
-          - neutron
-          - nova
+          - neutron-control-plane
+          - nova-control-plane
           - mysql
           - rabbitmq
       horizon:
