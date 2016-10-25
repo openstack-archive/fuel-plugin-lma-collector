@@ -103,6 +103,46 @@ lma_collector:
               function: percent
       - status: okay
 
+    # A policy which is typically used for stateless clusters
+    availability_of_members:
+      - status: down
+        trigger:
+          logical_operator: or
+          rules:
+            - function: count
+              arguments: [ okay ]
+              relational_operator: '=='
+              threshold: 0
+      - status: critical
+        trigger:
+          logical_operator: and
+          rules:
+            - function: count
+              arguments: [ okay ]
+              relational_operator: '=='
+              threshold: 1
+            - function: count
+              arguments: [ critical, down ]
+              relational_operator: '>'
+              threshold: 1
+      - status: warning
+        trigger:
+          logical_operator: or
+          rules:
+            - function: percent
+              arguments: [ okay ]
+              relational_operator: '<'
+              threshold: 100
+      - status: okay
+        trigger:
+          logical_operator: or
+          rules:
+            - function: percent
+              arguments: [ okay ]
+              relational_operator: '=='
+              threshold: 100
+      - status: unknown
+
   gse_cluster_service:
     input_message_types:
       - afd_service_metric
@@ -212,7 +252,7 @@ lma_collector:
         members:
           - vip
       nova-api-endpoint:
-        policy: majority_of_members
+        policy: availability_of_members
         group_by: hostname
         members:
           - endpoint
@@ -278,7 +318,7 @@ lma_collector:
           # Cinder V2 backends are in fact the same as the Cinder backends
           - vip
       cinder-api-endpoint:
-        policy: majority_of_members
+        policy: availability_of_members
         group_by: hostname
         members:
           - endpoint
@@ -304,7 +344,7 @@ lma_collector:
         members:
           - vip
       neutron-api-endpoint:
-        policy: majority_of_members
+        policy: availability_of_members
         group_by: hostname
         members:
           - endpoint
@@ -347,7 +387,7 @@ lma_collector:
         members:
           - vip
       keystone-public-api-endpoint:
-        policy: majority_of_members
+        policy: availability_of_members
         group_by: hostname
         members:
           - endpoint
@@ -370,7 +410,7 @@ lma_collector:
         members:
           - vip
       glance-api-endpoint:
-        policy: majority_of_members
+        policy: availability_of_members
         group_by: hostname
         members:
           - endpoint
@@ -391,7 +431,7 @@ lma_collector:
         members:
           - vip
       heat-api-endpoint:
-        policy: majority_of_members
+        policy: availability_of_members
         group_by: hostname
         members:
           - endpoint
@@ -406,7 +446,7 @@ lma_collector:
         members:
           - vip
       heat-cfn-api-endpoint:
-        policy: majority_of_members
+        policy: availability_of_members
         group_by: hostname
         members:
           - endpoint
@@ -444,7 +484,7 @@ lma_collector:
           # Swift S3 backends are in fact the same as the Swift backends
           - vip
       swift-api-endpoint:
-        policy: majority_of_members
+        policy: availability_of_members
         group_by: hostname
         members:
           - endpoint
