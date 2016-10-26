@@ -69,7 +69,7 @@ Plugin configuration
 
       .. code-block:: console
 
-         [root@nailgun ~]# fuel nodes --env <env_id> --node <node_id> --tasks hiera
+         [root@nailgun ~]# fuel nodes --env <env_id> --node <node_id> --tasks hiera install-ocf-script
 
       Once the task has completed for the node, run the following command:
 
