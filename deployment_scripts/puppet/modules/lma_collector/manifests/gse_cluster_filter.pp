@@ -96,5 +96,6 @@ define lma_collector::gse_cluster_filter (
     ensure  => present,
     path    => "${lua_modules_dir}/${topology_file}.lua",
     content => template('lma_collector/gse_topology.lua.erb'),
+    notify  => Class['lma_collector::service::metric']
   }
 }
