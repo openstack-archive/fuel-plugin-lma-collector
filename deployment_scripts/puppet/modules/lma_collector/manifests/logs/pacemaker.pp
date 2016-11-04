@@ -25,6 +25,7 @@ class lma_collector::logs::pacemaker {
     filename         => "${lma_collector::params::plugins_dir}/decoders/pacemaker_log.lua",
     config           => {
       syslog_pattern => $lma_collector::params::syslog_pattern,
+      tz             => $::canonical_timezone,
     },
     module_directory => $lua_modules_dir,
     notify           => Class['lma_collector::service::log'],

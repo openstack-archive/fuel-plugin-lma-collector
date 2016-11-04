@@ -28,6 +28,7 @@ class lma_collector::elasticsearch (
     config_dir              => $lma_collector::params::log_config_dir,
     index                   => '%{Type}-%{%Y.%m.%d}',
     es_index_from_timestamp => true,
+    timestamp               => '%Y-%m-%dT%H:%M:%S%z',
     fields                  => $lma_collector::params::elasticsearch_fields,
     notify                  => Class['lma_collector::service::log'],
   }
