@@ -24,6 +24,9 @@ class lma_collector::logs::rabbitmq {
     config_dir       => $config_dir,
     filename         => "${lma_collector::params::plugins_dir}/decoders/rabbitmq.lua" ,
     module_directory => $lua_modules_dir,
+    config           => {
+      tz => $::canonical_timezone,
+    },
     notify           => Class['lma_collector::service::log'],
   }
 

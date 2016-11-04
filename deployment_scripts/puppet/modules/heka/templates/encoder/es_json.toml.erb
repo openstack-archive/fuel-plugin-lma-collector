@@ -2,6 +2,7 @@
 type = "ESJsonEncoder"
 index = "<%= @index %>"
 es_index_from_timestamp = <%= @es_index_from_timestamp %>
+timestamp = "<%= @timestamp %>"
 <% if @fields -%>
 fields = [ <%= @fields.sort.collect{ |x| '"%s"' % x }.join(", ") %> ]
 <% end -%>
