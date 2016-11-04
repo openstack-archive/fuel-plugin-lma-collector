@@ -29,6 +29,9 @@ class lma_collector::logs::openstack_decoder_splitter {
     config_dir       => $lma_collector::params::log_config_dir,
     filename         => "${lma_collector::params::plugins_dir}/decoders/openstack_log.lua",
     module_directory => $lua_modules_dir,
+    config           => {
+      tz => $::canonical_timezone,
+    },
     notify           => Class['lma_collector::service::log'],
   }
 

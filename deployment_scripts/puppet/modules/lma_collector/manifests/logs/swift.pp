@@ -60,7 +60,8 @@ class lma_collector::logs::swift (
     filename         => "${lma_collector::params::plugins_dir}/decoders/generic_syslog.lua",
     config           => {
       syslog_pattern          => $lma_collector::params::syslog_pattern,
-      fallback_syslog_pattern => $lma_collector::params::fallback_syslog_pattern
+      fallback_syslog_pattern => $lma_collector::params::fallback_syslog_pattern,
+      tz                      => $::canonical_timezone,
     },
     module_directory => $lua_modules_dir,
     notify           => Class['lma_collector::service::log'],
