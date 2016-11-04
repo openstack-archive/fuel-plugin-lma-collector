@@ -28,6 +28,7 @@ class lma_collector::logs::keystone_wsgi (
     filename         => "${lma_collector::params::plugins_dir}/decoders/keystone_wsgi_log.lua",
     config           => {
       apache_log_pattern => $lma_collector::params::apache_log_pattern,
+      tz                 => $::full_timezone,
     },
     module_directory => $lua_modules_dir,
     notify           => Class['lma_collector::service::log'],

@@ -24,7 +24,8 @@ class lma_collector::logs::mysql {
     config_dir       => $config_dir,
     filename         => "${lma_collector::params::plugins_dir}/decoders/mysql_log.lua" ,
     config           => {
-      syslog_pattern => $lma_collector::params::syslog_pattern
+      syslog_pattern => $lma_collector::params::syslog_pattern,
+      tz             => $::full_timezone,
     },
     module_directory => $lua_modules_dir,
     notify           => Class['lma_collector::service::log'],
