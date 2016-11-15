@@ -37,6 +37,8 @@ Bug fixes:
    required. See `#1617211 <https://bugs.launchpad.net/lma-toolchain/+bug/1617211>`_.
  * Implemented the capability to use RabbitMQ management API in place of the
    :command:`rabbitmqctl` command.
+ * Enforce timezone setting in log processing.
+   See `#1633074 <https://bugs.launchpad.net/lma-toolchain/+bug/1633074>`_.
 
 Version 0.10.0
 ++++++++++++++
