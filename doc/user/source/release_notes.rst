@@ -7,6 +7,12 @@
 Release notes
 -------------
 
+Version 0.10.3
+++++++++++++++
+
+ * Enforce timezone setting in log processing.
+   See `#1633074 <https://bugs.launchpad.net/lma-toolchain/+bug/1633074>`_.
+
 Version 0.10.2
 ++++++++++++++
 

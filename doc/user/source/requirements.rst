@@ -7,7 +7,7 @@
 Requirements
 ------------
 
-The StackLight Collector plugin 0.10.2 has the following requirements:
+The StackLight Collector plugin 0.10.3 has the following requirements:
 
 +-------------------------------------------------------+-------------------------------------------------------------------+
 | Requirement                                           | Version/Comment                                                   |

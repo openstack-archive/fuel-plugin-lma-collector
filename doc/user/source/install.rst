@@ -15,7 +15,7 @@ plugins catalog:**
 
    .. code-block:: console
 
-      [root@home ~]# scp lma_collector-0.10-0.10.2-1.noarch.rpm \
+      [root@home ~]# scp lma_collector-0.10-0.10.3-1.noarch.rpm \
       root@<Fuel Master node IP address>:
 
 #. Install the plugin using the
@@ -23,7 +23,7 @@ plugins catalog:**
 
    .. code-block:: console
 
-      [root@fuel ~]# fuel plugins --install lma_collector-0.10-0.10.2-1.noarch.rpm
+      [root@fuel ~]# fuel plugins --install lma_collector-0.10-0.10.3-1.noarch.rpm
 
 #. Verify that the plugin is installed correctly:
 
@@ -32,7 +32,7 @@ plugins catalog:**
       [root@fuel ~]# fuel plugins --list
       id | name                 | version  | package_version
       ---|----------------------|----------|----------------
-      1  | lma_collector        | 0.10.2   | 4.0.0
+      1  | lma_collector        | 0.10.3   | 4.0.0
 
 
 Install from source
@@ -109,4 +109,4 @@ that file later on.
       [root@fuel ~]# fuel plugins --list
       id | name                 | version  | package_version
       ---|----------------------|----------|----------------
-      1  | lma_collector        | 0.10.2   | 4.0.0
+      1  | lma_collector        | 0.10.3   | 4.0.0

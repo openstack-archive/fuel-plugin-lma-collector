@@ -3,7 +3,7 @@
 Limitations
 -----------
 
-The StackLight Collector plugin 0.10.2 has the following limitations:
+The StackLight Collector plugin 0.10.3 has the following limitations:
 
 * The plugin is not compatible with an OpenStack environment deployed with
   nova-network.
