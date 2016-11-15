@@ -7,12 +7,12 @@
 Requirements
 ------------
 
-The StackLight Collector plugin 0.10.2 has the following requirements:
+The StackLight Collector plugin 0.10.3 has the following requirements:
 
 +-------------------------------------------------------+-------------------------------------------------------------------+
 | Requirement                                           | Version/Comment                                                   |
 +=======================================================+===================================================================+
-| Mirantis OpenStack                                    | 8.0 or 9.0                                                        |
+| Mirantis OpenStack                                    | 8.0 or 9.x                                                        |
 +-------------------------------------------------------+-------------------------------------------------------------------+
 | A running Elasticsearch server (for log analytics)    | 1.7.4 or higher, the RESTful API must be enabled over port 9200   |
 +-------------------------------------------------------+-------------------------------------------------------------------+

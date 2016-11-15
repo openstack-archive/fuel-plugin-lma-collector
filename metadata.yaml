@@ -3,7 +3,7 @@ name: lma_collector
 # Human-readable name for your plugin
 title: The StackLight Collector Plugin
 # Plugin version
-version: 0.10.2
+version: 0.10.3
 # Description
 description: The StackLight Collector is the advanced monitoring agent of the so called Logging, Monitoring and Alerting (LMA) Toolchain of Mirantis OpenStack. 
 # Required fuel version
