@@ -161,6 +161,9 @@ if ($plugin_data) {
       }
       $nagios_password = $lma_infra_alerting['nagios_password']
     }
+    'standalone': {
+        $nagios_server = undef
+    }
     default: {
       fail("'${alerting_mode}' mode not supported for Nagios")
     }
