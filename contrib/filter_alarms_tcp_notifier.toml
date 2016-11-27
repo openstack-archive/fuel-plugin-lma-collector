@@ -1,0 +1,24 @@
+[gse_afd_notification_filter]
+type = "SandboxFilter"
+filename = "/usr/share/lma_collector/filters/gse_afd_tcp_notifier.lua"
+message_matcher="(Type =~ /heka.sandbox.gse_.*metric$/ || Type =~ /heka.sandbox.afd_.*metric$/) && Fields[aggregator] == NIL"
+module_directory = "/usr/share/lma_collector_modules;/usr/share/heka/lua_modules"
+
+[gse_afd_notification_filter.config]
+    not_ok_mode = false
+    debug_mode = false
+
+[rst_encoder]
+type = "RstEncoder"
+
+[tcp_notifier_output]
+type = "TcpOutput"
+message_matcher = "Type == 'heka.sandbox.gse_afd_notification'"
+encoder = "rst_encoder"
+address = "127.0.0.1:40000"
+use_buffering = true
+
+[tcp_notifier_output.buffering]
+    full_action = "drop"
+    max_buffer_size = 268435456
+    max_file_size = 67108864
