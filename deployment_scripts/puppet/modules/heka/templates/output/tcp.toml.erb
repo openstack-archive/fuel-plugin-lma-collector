@@ -1,7 +1,7 @@
 [<%= @title %>_tcpoutput]
 type="TcpOutput"
 address = "<%= @address %>:<%= @port %>"
-encoder = "ProtobufEncoder"
+encoder = "<%= @encoder %>"
 message_matcher = "<%= @message_matcher %>"
 
 use_buffering = <%= @use_buffering %>

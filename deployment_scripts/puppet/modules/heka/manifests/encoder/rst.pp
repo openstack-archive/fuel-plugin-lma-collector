@@ -12,30 +12,18 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 #
-define heka::output::tcp (
+define heka::encoder::rst (
   $config_dir,
-  $address           = '127.0.0.1',
-  $port              = 5565,
-  $message_matcher   = 'FALSE',
-  $use_buffering     = true,
-  $max_buffer_size   = 1024 * 1024 * 1024, # 1GiB
-  $queue_full_action = 'drop',
-  $max_file_size     = undef,
-  $ensure            = present,
-  $encoder           = 'ProtobufEncoder',
 ) {
 
   include heka::params
 
-  if $use_buffering {
-    validate_buffering($max_buffer_size, $max_file_size, $queue_full_action)
-  }
-
-  file { "${config_dir}/output-${title}.toml":
+  file { "${config_dir}/encoder-${title}.toml":
     ensure  => $ensure,
-    content => template('heka/output/tcp.toml.erb'),
+    content => template('heka/encoder/rst.toml.erb'),
     mode    => '0600',
     owner   => $heka::params::user,
     group   => $heka::params::user,
   }
 }
+
