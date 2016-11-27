@@ -32,6 +32,10 @@ class lma_collector::params {
   $metric_input_address = '127.0.0.1'
   $metric_input_port = 5567
 
+  # Address and port of the AFD and GSE tcp notifications output
+  $tcp_notif_output_address = '127.0.0.1'
+  $tcp_notif_output_port = 40000
+
   $aggregator_address = '127.0.0.1'
   $aggregator_port    = 5565
   $aggregator_flag = 'aggregator'
