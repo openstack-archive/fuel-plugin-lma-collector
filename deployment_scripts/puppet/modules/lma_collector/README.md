@@ -451,7 +451,6 @@ Public Classes:
 * [`lma_collector::aggregator::server`](#class-lma_collectoraggregatorserver)
 * [`lma_collector::gse_policies`](#class-lma_collectorgse_policies)
 * [`lma_collector::metrics::heka_monitoring`](#class-lma_collectormetricsheka_monitoring)
-* [`lma_collector::smtp_alert`](#class-lma_collectorsmtp_alert)
 
 Private Classes:
 
@@ -893,26 +892,6 @@ Declare this class to collect metrics for the Heka services themselves.
 * `log_dashboard_port`: *Optional*. The port the Heka dashboard of
   log collector listens on.
   Valid options: a string. Default: `4352`.
-
-#### Class: `lma_collector::smtp_alert`
-
-Declare this class to send by email the alert notifications based on the GSE
-metrics.
-
-##### Parameters
-
-* `send_from`: *Required*. Sender email address. Valid options: a string.
-* `send_to`: *Required*. List of recipient email addresses. Valid options: an array.
-* `subject`: *Required*. Email subject. Valid options: a string. Default: `LMA
-  Alert Notification`.
-* `host`: *Optional*. SMTP server address and port. Valid options: a string.
-  Default: `127.0.0.1:25`.
-* `auth`: *Optional*. SMTP authentication method. Valid options: `none`,
-  `Plain` or `CRAMMD5`.  Default: `none`.
-* `user`: *Optional*. SMTP username. Valid options: a string. Default: `undef`.
-* `password`: *Optional*. SMTP Password. Valid options: a string. Default: `undef`.
-* `send_interval`: *Optional*. Minimum time interval in seconds between each
-  email. Valid options: an integer. Default: `0`.
 
 #### Define: `lma_collector::heka`
 
