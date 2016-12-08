@@ -12,3 +12,7 @@ The StackLight Collector plugin 0.10.3 has the following limitations:
   *collectd* processes will be restarted on these nodes during the
   post-deployment phase.
   See `bug #1570850 <https://bugs.launchpad.net/lma-toolchain/+bug/1570850>`_.
+
+* The deployment fails if you select "Sending alerts by email" in the Alerting
+  section.  See `bug #1643542
+  <https://bugs.launchpad.net/lma-toolchain/+bug/1643542>`_.
