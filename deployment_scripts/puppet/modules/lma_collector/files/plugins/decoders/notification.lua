@@ -112,7 +112,16 @@ function process_message ()
     local data = read_message("Payload")
     local ok, notif = pcall(cjson.decode, data)
     if not ok then
-        return -1
+        return -1, string.format("Failed to parse notification: %s: '%s'", notif, string.sub(data or 'N/A', 1, 64))
+    end
+
+    local oslo_version = notif['oslo.version']
+    if oslo_version then
+        -- messagingv2 notifications
+        ok, notif = pcall(cjson.decode, notif['oslo.message'])
+        if not ok then
+            return -1, string.format("Failed to parse v%s notification: %s: '%s'", oslo_version, notif, string.sub(data or 'N/A', 1, 64))
+        end
     end
 
     if include_full_notification then
