@@ -23,8 +23,8 @@ $is_controller   = $node_profiles['controller']
 $is_mysql_server = $node_profiles['mysql']
 $is_rabbitmq     = $node_profiles['rabbitmq']
 
-$network_metadata = hiera_hash('network_metadata')
-$controllers      = get_nodes_hash_by_roles($network_metadata, ['primary-controller', 'controller'])
+$net_metadata = hiera_hash('network_metadata')
+$controllers      = get_nodes_hash_by_roles($net_metadata, ['primary-controller', 'controller'])
 
 $aggregator_address = hiera('management_vip')
 $management_network = hiera('management_network_range')

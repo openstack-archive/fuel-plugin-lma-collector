@@ -18,15 +18,15 @@ prepare_network_config(hiera_hash('network_scheme', {}))
 $plugin_data = hiera_hash('lma_collector', undef)
 
 if ($plugin_data) {
-  $network_metadata = hiera_hash('network_metadata')
+  $net_metadata = hiera_hash('network_metadata')
   $is_controller_node = roles_include(['controller', 'primary-controller'])
   $is_base_os_node = roles_include('base-os')
   $is_compute = roles_include('compute')
   $is_ceph_osd = roles_include('ceph-osd')
-  $has_controller = count(get_nodes_hash_by_roles($network_metadata, ['primary-controller'])) > 0
+  $has_controller = count(get_nodes_hash_by_roles($net_metadata, ['primary-controller'])) > 0
   # The detached RabbitMQ plugin has no primary role in 8.0
-  $has_detached_rabbitmq = count(get_nodes_hash_by_roles($network_metadata, ['primary-standalone-rabbitmq', 'standalone-rabbitmq'])) > 0
-  $has_detached_database = count(get_nodes_hash_by_roles($network_metadata, ['primary-standalone-database'])) > 0
+  $has_detached_rabbitmq = count(get_nodes_hash_by_roles($net_metadata, ['primary-standalone-rabbitmq', 'standalone-rabbitmq'])) > 0
+  $has_detached_database = count(get_nodes_hash_by_roles($net_metadata, ['primary-standalone-database'])) > 0
 
   if roles_include(['standalone-database', 'primary-standalone-database']) {
     $is_mysql_node = true
@@ -44,7 +44,7 @@ if ($plugin_data) {
   $is_elasticsearch_node = roles_include(['elasticsearch_kibana', 'primary-elasticsearch_kibana'])
   $es_listen_address = get_network_role_property('elasticsearch', 'ipaddr')
   $elasticsearch_mode = $plugin_data['elasticsearch_mode']
-  $es_nodes = get_nodes_hash_by_roles($network_metadata, ['elasticsearch_kibana', 'primary-elasticsearch_kibana'])
+  $es_nodes = get_nodes_hash_by_roles($net_metadata, ['elasticsearch_kibana', 'primary-elasticsearch_kibana'])
   $es_nodes_count = count($es_nodes)
 
   case $elasticsearch_mode {
@@ -54,8 +54,8 @@ if ($plugin_data) {
     }
     'local': {
       $es_vip_name = 'es_vip_mgmt'
-      if $network_metadata['vips'][$es_vip_name] {
-        $es_server = $network_metadata['vips'][$es_vip_name]['ipaddr']
+      if $net_metadata['vips'][$es_vip_name] {
+        $es_server = $net_metadata['vips'][$es_vip_name]['ipaddr']
         $monitor_elasticsearch = true
       } elsif $es_nodes_count > 0 {
         $es_server = $es_nodes[0]['internal_address']
@@ -89,7 +89,7 @@ if ($plugin_data) {
   $is_influxdb_node = roles_include(['influxdb_grafana', 'primary-influxdb_grafana'])
   $influxdb_listen_address = get_network_role_property('influxdb_vip', 'ipaddr')
   $influxdb_mode = $plugin_data['influxdb_mode']
-  $influxdb_nodes = get_nodes_hash_by_roles($network_metadata, ['influxdb_grafana', 'primary-influxdb_grafana'])
+  $influxdb_nodes = get_nodes_hash_by_roles($net_metadata, ['influxdb_grafana', 'primary-influxdb_grafana'])
   $influxdb_nodes_count = count($influxdb_nodes)
   $influxdb_grafana = hiera_hash('influxdb_grafana', {})
 
@@ -103,8 +103,8 @@ if ($plugin_data) {
     }
     'local': {
       $influxdb_vip_name = 'influxdb'
-      if $network_metadata['vips'][$influxdb_vip_name] {
-        $influxdb_server = $network_metadata['vips'][$influxdb_vip_name]['ipaddr']
+      if $net_metadata['vips'][$influxdb_vip_name] {
+        $influxdb_server = $net_metadata['vips'][$influxdb_vip_name]['ipaddr']
         $monitor_influxdb = true
       } elsif $influxdb_nodes_count > 0 {
         $influxdb_server = $influxdb_nodes[0]['internal_address']
@@ -146,14 +146,14 @@ if ($plugin_data) {
   # Infrastructure Alerting
   $alerting_mode = $plugin_data['alerting_mode']
   $lma_infra_alerting = hiera('lma_infrastructure_alerting', {})
-  $infra_alerting_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting', 'primary-infrastructure_alerting'])
+  $infra_alerting_nodes = get_nodes_hash_by_roles($net_metadata, ['infrastructure_alerting', 'primary-infrastructure_alerting'])
   $infra_alerting_nodes_count = count($infra_alerting_nodes)
 
   case $alerting_mode {
     'local': {
       $infra_vip_name = 'infrastructure_alerting_mgmt_vip'
-      if $network_metadata['vips'][$infra_vip_name] {
-        $nagios_server = $network_metadata['vips'][$infra_vip_name]['ipaddr']
+      if $net_metadata['vips'][$infra_vip_name] {
+        $nagios_server = $net_metadata['vips'][$infra_vip_name]['ipaddr']
       } elsif $infra_alerting_nodes_count > 0 {
         $nagios_server = $infra_alerting_nodes[0]['internal_address']
       } else {
