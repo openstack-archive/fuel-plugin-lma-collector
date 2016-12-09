@@ -82,6 +82,7 @@ lma_collector::heka { 'log_collector':
   groups              => $additional_groups,
   install_init_script => $install_heka_init_script,
   version             => $heka_version,
+  heka_monitoring     => false,
   require             => Class['lma_collector'],
 }
 
@@ -91,6 +92,7 @@ lma_collector::heka { 'metric_collector':
   install_init_script => $install_heka_init_script,
   version             => $heka_version,
   poolsize            => $poolsize,
+  heka_monitoring     => false,
   require             => Class['lma_collector'],
 }
 
