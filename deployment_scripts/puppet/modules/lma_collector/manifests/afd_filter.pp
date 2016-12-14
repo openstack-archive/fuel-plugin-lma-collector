@@ -43,7 +43,8 @@ define lma_collector::afd_filter (
     heka::filter::sandbox { "afd_${type}_${cluster_name}_${logical_name}":
       config_dir       => $lma_collector::params::metric_config_dir,
       filename         => "${lma_collector::params::plugins_dir}/filters/afd.lua",
-      message_matcher  => "(Type == \'metric\' || Type == \'heka.sandbox.metric\') && (${message_matcher})",
+      message_matcher  => join(["(Type == \'metric\' || Type == \'heka.sandbox.metric\' ",
+                                "|| Type == \'heka.sandbox.multivalue_metric\') && (${message_matcher})"], ''),
       ticker_interval  => 10,
       config           => {
         hostname            => $::hostname,
