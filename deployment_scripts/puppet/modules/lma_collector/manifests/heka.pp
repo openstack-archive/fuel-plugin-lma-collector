@@ -65,7 +65,8 @@ define lma_collector::heka (
       config_dir       => $config_dir,
       filename         => "${lma_collector::params::plugins_dir}/decoders/metric.lua",
       module_directory => $lua_modules_dir,
-      config           => {'deserialize_bulk_metric_for_loggers' => 'aggregated_http_metrics_filter hdd_errors_counter_filter'},
+      config           => {
+        'deserialize_bulk_metric_for_loggers' => 'aggregated_http_metrics_filter hdd_errors_counter_filter log_counter_filter'},
       notify           => Class[$service_class],
     }
 
