@@ -31,19 +31,17 @@ end
 -- grace_interval parameter allows to take into account log messages that are
 -- received in the current interval but emitted before it.
 local grace_interval = (read_config('grace_interval') or 0) + 0
+local metric_logger = read_config('logger')
+local metric_source = read_config('source')
 
 local error_counters = {}
 local enter_at
 local start_time = os.time()
 
-local function convert_to_sec(ns)
-    return math.floor(ns/1e9)
-end
-
 function process_message ()
     -- timestamp values should be converted to seconds because log timestamps
     -- have a precision of one second (or millisecond sometimes)
-    if convert_to_sec(read_message('Timestamp')) + grace_interval < math.max(convert_to_sec(enter_at or 0), start_time) then
+    if utils.convert_to_sec(read_message('Timestamp')) + grace_interval < math.max(utils.convert_to_sec(enter_at or 0), start_time) then
         -- skip the log message if it doesn't fall into the current interval
         return 0
     end
@@ -78,18 +76,15 @@ function timer_event(ns)
 
     local delta_sec = (ns - (enter_at or 0)) / 1e9
     for dev, value in pairs(error_counters) do
-        -- Don`t send values at the first ticker interval
+        -- Don`t send values from first ticker interval
         if enter_at ~= nil then
-            utils.add_to_bulk_metric(
-                "hdd_errors_rate",
-                value / delta_sec,
-                {device=dev, hostname=hostname})
+            utils.add_to_bulk_metric("hdd_errors_rate", value / delta_sec, {device=dev})
         end
         error_counters[dev] = 0
     end
 
     enter_at = ns
-    utils.inject_bulk_metric(ns, hostname, 'hdd_errors_filter')
+    utils.inject_bulk_metric(ns, hostname, metric_logger, metric_source)
 
     return 0
 end

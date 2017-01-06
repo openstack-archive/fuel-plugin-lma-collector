@@ -91,6 +91,12 @@ TestLmaUtils = {}
         assertEquals(ret, 'foo<BR/>ba')
     end
 
+    function TestLmaUtils:test_convert_to_sec()
+        assertEquals(lma_utils.convert_to_sec(1000000001), 1)
+        assertEquals(lma_utils.convert_to_sec(1999999999), 1)
+        assertEquals(lma_utils.convert_to_sec(2000000001), 2)
+    end
+
 lu = LuaUnit
 lu:setVerbosity( 1 )
 os.exit( lu:run() )
