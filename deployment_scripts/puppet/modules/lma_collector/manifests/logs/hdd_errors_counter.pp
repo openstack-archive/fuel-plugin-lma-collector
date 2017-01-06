@@ -30,7 +30,9 @@ class lma_collector::logs::hdd_errors_counter (
     config           => {
       hostname       => $hostname,
       grace_interval => $grace_interval,
-      patterns       => '/error%s.+([sv]d[a-z][a-z]?)%d?/ /([sv]d[a-z][a-z]?)%d?.+%serror/'
+      patterns       => '/error%s.+([sv]d[a-z][a-z]?)%d?/ /([sv]d[a-z][a-z]?)%d?.+%serror/',
+      logger         => 'hdd_errors_counter_filter',
+      source         => 'log_collector',
     },
     module_directory => $lua_modules_dir,
     notify           => Class['lma_collector::service::log'],
