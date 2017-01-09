@@ -103,7 +103,8 @@ lma_collector:
               function: percent
       - status: okay
 
-    # A policy which is typically used for stateless clusters
+    # A policy that is used to derive a cluster status based
+    # on the status okay or down status for its members.
     availability_of_members:
       - status: down
         trigger:
@@ -279,18 +280,18 @@ lma_collector:
           - node-status
           - check
       haproxy-openstack:
-        policy: majority_of_members
+        policy: availability_of_members
         group_by: hostname
         members:
           - check
       apache:
-        policy: majority_of_members
+        policy: availability_of_members
         group_by: hostname
         members:
           - worker
           - check
       memcached-service:
-        policy: majority_of_members
+        policy: availability_of_members
         group_by: hostname
         members:
           - check
@@ -579,12 +580,12 @@ lma_collector:
           - health
           - capacity
       ceph-mon-service:
-        policy: majority_of_members
+        policy: availability_of_members
         group_by: hostname
         members:
           - check
       ceph-osd-service:
-        policy: majority_of_members
+        policy: availability_of_members
         group_by: hostname
         members:
           - check
@@ -596,7 +597,7 @@ lma_collector:
         members:
           - health
       elasticsearch-service:
-        policy: majority_of_members
+        policy: availability_of_members
         group_by: hostname
         members:
           - check
@@ -608,13 +609,13 @@ lma_collector:
         members:
           - vip
       influxdb-service:
-        policy: majority_of_members
+        policy: availability_of_members
         group_by: hostname
         members:
           - check
 <% end -%>
       pacemaker-service:
-        policy: majority_of_members
+        policy: availability_of_members
         group_by: hostname
         members:
           - check
