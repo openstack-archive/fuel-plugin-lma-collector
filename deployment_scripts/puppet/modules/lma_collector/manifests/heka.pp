@@ -113,7 +113,14 @@ define lma_collector::heka (
 
   # Heka self-monitoring
   if $heka_monitoring {
+    $heka_monitoring_ensure = present
+  } else {
+    $heka_monitoring_ensure = absent
+  }
+
+  if $heka_monitoring {
     heka::filter::sandbox { "heka_monitoring_${title}":
+      ensure           => $heka_monitoring_ensure,
       config_dir       => $config_dir,
       filename         => "${lma_collector::params::plugins_dir}/filters/heka_monitoring.lua",
       message_matcher  => "Type == 'heka.all-report'",
