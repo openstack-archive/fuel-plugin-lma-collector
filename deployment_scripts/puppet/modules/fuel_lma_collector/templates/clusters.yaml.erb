@@ -143,6 +143,76 @@ lma_collector:
               threshold: 100
       - status: unknown
 
+      # A policy that is used to derive a cluster status based
+      # on the health status of its members.
+      status_of_members:
+      - status: down
+        trigger:
+          logical_operator: or
+          rules:
+          - function: percent
+            arguments: [ down ]
+            relational_operator: '=='
+            threshold: 100
+      - status: critical
+        trigger:
+          logical_operator: and
+          rules:
+          - function: count
+            arguments: [ okay, warning ]
+            relational_operator: '<='
+            threshold: 1
+          - function: count
+            arguments: [ critical, down, unknown ]
+            relational_operator: '>'
+            threshold: 0
+      - status: warning
+        trigger:
+          logical_operator: or
+          rules:
+          - function: percent
+            arguments: [ okay ]
+            relational_operator: '!='
+            threshold: 100
+      - status: okay
+        trigger:
+          logical_operator: or
+          rules:
+          - function: percent
+            arguments: [ okay ]
+            relational_operator: '=='
+            threshold: 100
+      - status: unknown
+
+      # A policy that is typically used for storage or compute clusters
+      majority_of_node_members:
+      - status: down
+        trigger:
+          logical_operator: or
+          rules:
+          - function: percent
+            arguments: [ down ]
+            relational_operator: '=='
+            threshold: 100
+      - status: critical
+        trigger:
+          logical_operator: and
+          rules:
+          - function: percent
+            arguments: [ down, critical ]
+            relational_operator: '>='
+            threshold: 50
+      - status: warning
+        trigger:
+          logical_operator: or
+          rules:
+          - function: percent
+            arguments: [ down, critical, warning, unknown ]
+            relational_operator: '>'
+            threshold: 0
+            function: percent
+      - status: okay
+
   gse_cluster_service:
     input_message_types:
       - afd_service_metric
@@ -549,7 +619,7 @@ lma_collector:
         members:
           - check
       libvirt-service:
-        policy: majority_of_members
+        policy: majority_of_node_members
         group_by: hostname
         members:
           - check
@@ -579,7 +649,7 @@ lma_collector:
     alerting: enabled
     clusters:
       controller:
-        policy: majority_of_members
+        policy: status_of_members
         group_by: hostname
         members:
           - cpu
@@ -592,7 +662,7 @@ lma_collector:
           - hdd-errors
 <% if @detach_rabbitmq_enabled -%>
       rabbitmq-nodes:
-        policy: majority_of_members
+        policy: status_of_members
         group_by: hostname
         members:
           - cpu
@@ -604,7 +674,7 @@ lma_collector:
           - hdd-errors
 <% end -%>
       mysql-nodes:
-        policy: majority_of_members
+        policy: status_of_members
         group_by: hostname
         members:
 <% if @detach_database_enabled -%>
@@ -618,7 +688,7 @@ lma_collector:
 <% end -%>
           - mysql-fs
       compute:
-        policy: majority_of_members
+        policy: majority_of_node_members
         group_by: hostname
         members:
           - cpu
@@ -630,7 +700,7 @@ lma_collector:
           - swap
           - hdd-errors
       storage:
-        policy: majority_of_members
+        policy: majority_of_node_members
         group_by: hostname
         members:
           - cpu
@@ -645,7 +715,7 @@ lma_collector:
 <% end -%>
 <% if @monitor_elasticsearch -%>
       elasticsearch-nodes:
-        policy: majority_of_members
+        policy: status_of_members
         group_by: hostname
         members:
           - data-fs
@@ -658,7 +728,7 @@ lma_collector:
 <% end -%>
 <% if @monitor_influxdb -%>
       influxdb-nodes:
-        policy: majority_of_members
+        policy: status_of_members
         group_by: hostname
         members:
           - data-fs
