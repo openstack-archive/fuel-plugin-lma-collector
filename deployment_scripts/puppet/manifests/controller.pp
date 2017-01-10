@@ -261,23 +261,9 @@ if hiera('lma::collector::influxdb::server', false) {
   class { 'lma_collector::logs::aggregated_http_metrics': }
 }
 
-$alerting_mode = $lma_collector['alerting_mode']
-$deployment_id = hiera('deployment_id')
-
-if $alerting_mode == 'standalone' {
-  $subject = "LMA Alert Notification - environment ${deployment_id}"
-  class { 'lma_collector::smtp_alert':
-    send_from => $lma_collector['alerting_send_from'],
-    send_to   => [$lma_collector['alerting_send_to']],
-    subject   => $subject,
-    host      => $lma_collector['alerting_smtp_host'],
-    auth      => $lma_collector['alerting_smtp_auth'],
-    user      => $lma_collector['alerting_smtp_user'],
-    password  => $lma_collector['alerting_smtp_password'],
-  }
-}
-
 if hiera('lma::collector::infrastructure_alerting::server', false) {
+  $deployment_id = hiera('deployment_id')
+
   lma_collector::gse_nagios { 'global':
     openstack_deployment_name => $deployment_id,
     server                    => hiera('lma::collector::infrastructure_alerting::server'),
