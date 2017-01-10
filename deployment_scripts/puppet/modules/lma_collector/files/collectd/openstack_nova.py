@@ -52,11 +52,16 @@ class NovaStatsPlugin(openstack.CollectdPlugin):
                                  'service': service,
                                  'state': state})
 
-        for service in aggregated_workers:
-            totalw = sum(aggregated_workers[service].values())
+        for service in set(aggregated_workers.keys()).union(
+                ('compute', 'scheduler', 'conductor', 'cert', 'consoleauth')):
+
+            total = sum(aggregated_workers[service].values())
 
             for state in self.states:
-                prct = (100.0 * aggregated_workers[service][state]) / totalw
+                prct = 0
+                if total > 0:
+                    prct = (100.0 * aggregated_workers[service][state]) / total
+
                 self.dispatch_value('nova_services_percent', '',
                                     prct,
                                     {'state': state, 'service': service})
@@ -64,7 +69,6 @@ class NovaStatsPlugin(openstack.CollectdPlugin):
                 self.dispatch_value('nova_services', '',
                                     aggregated_workers[service][state],
                                     {'state': state, 'service': service})
-
         servers_details = self.get_objects_details('nova', 'servers')
 
         def groupby(d):
