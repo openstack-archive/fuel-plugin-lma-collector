@@ -345,5 +345,9 @@ class CollectdPlugin(base.Base):
         counts = defaultdict(int)
         for obj in list_object:
             s = group_by_func(obj)
-            counts[s] += count_func(obj) if count_func else 1
+            try:
+                counts[s] += count_func(obj) if count_func else 1
+            except TypeError:
+                # Ignore when count_func() doesn't return a number
+                pass
         return counts
