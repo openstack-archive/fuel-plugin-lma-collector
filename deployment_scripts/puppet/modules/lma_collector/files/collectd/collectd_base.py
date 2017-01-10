@@ -17,7 +17,6 @@ from functools import wraps
 import json
 import signal
 import subprocess
-import sys
 import time
 import traceback
 
@@ -224,18 +223,16 @@ class Base(object):
 
     @staticmethod
     def restore_sigchld():
-        """Restores the SIGCHLD handler for Python <= v2.6.
+        """Restores the SIGCHLD handler.
 
         This should be provided to collectd as the init callback by plugins
-        that execute external programs.
+        that execute external programs and want to check the return code.
 
         Note that it will BREAK the exec plugin!!!
 
-        See https://github.com/deniszh/collectd-iostat-python/issues/2 for
-        details.
+        See contrib/python/getsigchld.py in the collectd project for details.
         """
-        if sys.version_info[0] == 2 and sys.version_info[1] <= 6:
-            signal.signal(signal.SIGCHLD, signal.SIG_DFL)
+        signal.signal(signal.SIGCHLD, signal.SIG_DFL)
 
     def notification_callback(self, notification):
         if not self.depends_on_resource:
