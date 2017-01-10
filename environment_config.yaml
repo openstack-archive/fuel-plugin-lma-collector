@@ -87,9 +87,3 @@ attributes:
     type: "password"
     regex: *not_empty_parameter
     restrictions: *disable_influxdb_parameters
-
-  alerting_mode:
-    type: "checkbox"
-    weight: 90
-    value: true
-    label: "Alerts sent to the StackLight Infrastructure Alerting plugin (Nagios) if deployed."

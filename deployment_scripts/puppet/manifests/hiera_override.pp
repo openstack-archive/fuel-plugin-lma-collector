@@ -143,25 +143,21 @@ if ($plugin_data) {
       }
   }
 
-  if $plugin_data['alerting_mode'] {
-    # Infrastructure Alerting
-    $lma_infra_alerting = hiera('lma_infrastructure_alerting', {})
-    $infra_alerting_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting', 'primary-infrastructure_alerting'])
-    $infra_alerting_nodes_count = count($infra_alerting_nodes)
-    $infra_vip_name = 'infrastructure_alerting_mgmt_vip'
-    if $network_metadata['vips'][$infra_vip_name] {
-      $nagios_server = $network_metadata['vips'][$infra_vip_name]['ipaddr']
-    } else {
-      $nagios_server = undef
-    }
+  # Infrastructure Alerting
+  $lma_infra_alerting = hiera('lma_infrastructure_alerting', {})
+  $infra_alerting_nodes = get_nodes_hash_by_roles($network_metadata, ['infrastructure_alerting', 'primary-infrastructure_alerting'])
+  $infra_alerting_nodes_count = count($infra_alerting_nodes)
+  $infra_vip_name = 'infrastructure_alerting_mgmt_vip'
+  if $network_metadata['vips'][$infra_vip_name] {
+    $nagios_server = $network_metadata['vips'][$infra_vip_name]['ipaddr']
     $nagios_password = $lma_infra_alerting['nagios_password']
-    if $infra_alerting_nodes_count > 0 or $nagios_server {
-      $nagios_is_deployed = true
-    } else {
-      $nagios_is_deployed = false
-    }
   } else {
-      $nagios_is_deployed = false
+    $nagios_server = undef
+  }
+  if $infra_alerting_nodes_count > 0 and $nagios_server {
+    $nagios_is_deployed = true
+  } else {
+    $nagios_is_deployed = false
   }
 
   $hiera_file = '/etc/hiera/plugins/lma_collector.yaml'
