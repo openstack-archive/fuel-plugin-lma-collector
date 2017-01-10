@@ -73,9 +73,9 @@ class CrmMonitorPlugin(base.Base):
                 return 1
             return 0
 
-        out, err = self.execute([self.crm_mon_binary, '--as-xml', '-r', '-f'],
-                                shell=False)
-        if not out:
+        retcode, out, err = self.execute(
+            [self.crm_mon_binary, '--as-xml', '-r', '-f'], shell=False)
+        if retcode != 0:
             raise base.CheckException(
                 "Failed to execute crm_mon '{}'".format(err))
 
