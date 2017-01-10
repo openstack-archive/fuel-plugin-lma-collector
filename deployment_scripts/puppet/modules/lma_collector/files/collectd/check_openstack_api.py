@@ -69,6 +69,7 @@ class APICheckPlugin(openstack.CollectdPlugin):
                 self.logger.notice(
                     "No check found for service '%s', skipping it" % name)
                 status = self.UNKNOWN
+                check = {}
             else:
                 check = self.CHECK_MAP[name]
                 url = self._service_url(service['url'], check['path'])
