@@ -79,14 +79,14 @@ class RabbitMqPlugin(base.Base):
                 self.api_overview_url, r.status_code)
             raise base.CheckException(msg)
 
-        objects = overview['object_totals']
-        stats['queues'] = objects['queues']
-        stats['consumers'] = objects['consumers']
-        stats['connections'] = objects['connections']
-        stats['exchanges'] = objects['exchanges']
-        stats['channels'] = objects['channels']
-        stats['messages'] = overview['queue_totals']['messages']
-        stats['running_nodes'] = len(overview['contexts'])
+        objects = overview.get('object_totals', {})
+        stats['queues'] = objects.get('queues', 0)
+        stats['consumers'] = objects.get('consumers', 0)
+        stats['connections'] = objects.get('connections', 0)
+        stats['exchanges'] = objects.get('exchanges', 0)
+        stats['channels'] = objects.get('channels', 0)
+        stats['messages'] = overview.get('queue_totals', {}).get('messages', 0)
+        stats['running_nodes'] = len(overview.get('contexts', []))
 
         for k, v in stats.iteritems():
             yield {'type_instance': k, 'values': v}
