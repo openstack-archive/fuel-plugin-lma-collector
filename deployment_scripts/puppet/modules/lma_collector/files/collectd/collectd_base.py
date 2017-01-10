@@ -153,7 +153,7 @@ class Base(object):
         )
         v.dispatch()
 
-    def execute(self, cmd, shell=True, cwd=None):
+    def execute(self, cmd, shell=True, cwd=None, log_error=True):
         """Executes a program with arguments.
 
         Args:
@@ -163,15 +163,16 @@ class Base(object):
             True).
             cwd: the directory to change to before running the program
             (default=None).
+            log_error: whether to log an error when the command returned a
+            non-zero status code (default=True).
 
         Returns:
-            A tuple containing the standard output and error strings if the
-            program execution has been successful.
+            A tuple containing the return code, the standard output and the
+            standard error if the program has been executed.
 
-            ("foobar\n", "")
+            (0, "foobar\n", "")
 
-            None if the command couldn't be executed or returned a non-zero
-            status code
+            (-1, None, None) if the program couldn't be executed at all.
         """
         start_time = time.time()
         try:
@@ -187,23 +188,19 @@ class Base(object):
         except Exception as e:
             self.logger.error("Cannot execute command '%s': %s : %s" %
                               (cmd, str(e), traceback.format_exc()))
-            return None
+            return (-1, None, None)
 
         returncode = proc.returncode
 
-        if returncode != 0:
+        if returncode != 0 and log_error:
             self.logger.error("Command '%s' failed (return code %d): %s" %
                               (cmd, returncode, stderr))
-            return None
         if self.debug:
             elapsedtime = time.time() - start_time
             self.logger.info("Command '%s' returned %s in %0.3fs" %
                              (cmd, returncode, elapsedtime))
 
-        if not stdout and self.debug:
-            self.logger.info("Command '%s' returned no output!", cmd)
-
-        return (stdout, stderr)
+        return (returncode, stdout, stderr)
 
     def execute_to_json(self, *args, **kwargs):
         """Executes a program and decodes the output as a JSON string.
@@ -214,12 +211,12 @@ class Base(object):
             A Python object or
             None if the execution of the program or JSON decoding fails.
         """
-        outputs = self.execute(*args, **kwargs)
-        if outputs:
+        (retcode, out, err) = self.execute(*args, **kwargs)
+        if retcode == 0:
             try:
-                return json.loads(outputs[0])
+                return json.loads(out)
             except ValueError as e:
-                self.logger.error("{}: document: '{}'".format(e, outputs[0]))
+                self.logger.error("{}: document: '{}'".format(e, out))
 
     @staticmethod
     def restore_sigchld():
