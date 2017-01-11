@@ -760,39 +760,27 @@ lma_collector:
         members:
           - mysqld-tcp
           - mysql
-          - mysql-nodes
-<% if not @detach_database_enabled -%>
-          - controller
-<% end -%>
       haproxy-openstack:
         policy: highest_severity
         group_by: member
         members:
           - haproxy-openstack
-          - controller
       apache:
         policy: highest_severity
         group_by: member
         members:
           - apache
-          - controller
       memcached:
         policy: highest_severity
         group_by: member
         members:
           - memcached-service
-          - controller
       rabbitmq:
         policy: highest_severity
         group_by: member
         members:
           - rabbitmq-cluster
           - rabbitmq-service
-<% if @detach_rabbitmq_enabled -%>
-          - rabbitmq-nodes
-<% else -%>
-          - controller
-<% end -%>
       nova-control-plane:
         policy: highest_severity
         group_by: member
@@ -807,7 +795,6 @@ lma_collector:
           - nova-cert         # worker
           - nova-consoleauth  # worker
           - nova-novncproxy-websocket # worker
-          - controller        # node cluster
         hints:
           - cinder-control-plane
           - glance
@@ -822,7 +809,6 @@ lma_collector:
           - nova-logs-compute
           - nova-compute
           - nova-instances
-          - compute
           - libvirt-service
           - nova-free-vcpu
           - nova-free-memory
@@ -838,7 +824,6 @@ lma_collector:
           - cinder-v2-api-check
           - cinder-api-endpoint
           - cinder-scheduler
-          - controller
         hints:
           - keystone
           - mysql
@@ -850,7 +835,6 @@ lma_collector:
         members:
           - cinder-volume-logs
           - cinder-volume
-          - storage
 <% end -%>
       neutron-control-plane:
         policy: highest_severity
@@ -866,7 +850,6 @@ lma_collector:
           - neutron-metadata
           - neutron-openvswitch
 <% end -%>
-          - controller
         hints:
           - keystone
           - mysql
@@ -879,7 +862,6 @@ lma_collector:
 <% if not @contrail_plugin then -%>
           - neutron-openvswitch
 <% end -%>
-          - compute
       keystone:
         policy: highest_severity
         group_by: member
@@ -890,7 +872,6 @@ lma_collector:
           - keystone-public-api-check
           - keystone-public-api-endpoint
           - keystone-admin-api
-          - controller
         hints:
           - mysql
           - apache
@@ -903,7 +884,6 @@ lma_collector:
           - glance-api-check
           - glance-api-endpoint
           - glance-registry-api
-          - controller
         hints:
           - keystone
           - mysql
@@ -919,7 +899,6 @@ lma_collector:
           - heat-cfn-api-check
           - heat-cfn-api-endpoint
           - heat-cloudwatch-api
-          - controller
         hints:
           - cinder-control-plane
           - glance
@@ -937,7 +916,6 @@ lma_collector:
 <% else -%>
           - horizon-web
 <% end -%>
-          - controller
         hints:
           - keystone
           - apache
@@ -950,7 +928,6 @@ lma_collector:
           - swift-api-check
           - swift-s3-api-check
           - swift-api-endpoint
-          - controller
         hints:
           - keystone
 <% end -%>
@@ -961,7 +938,6 @@ lma_collector:
         members:
           - ceilometer-api
           - ceilometer-api-check
-          - controller
         hints:
           - keystone
           - rabbitmq
@@ -974,8 +950,6 @@ lma_collector:
           - ceph-mon-cluster
           - ceph-mon-service
           - ceph-osd-service
-          - controller
-          - storage
 <% end -%>
 <% if @monitor_elasticsearch -%>
       elasticsearch:
@@ -984,7 +958,6 @@ lma_collector:
         members:
           - elasticsearch-cluster
           - elasticsearch-service
-          - elasticsearch-nodes
 <% end -%>
 <% if @monitor_influxdb -%>
       influxdb:
@@ -993,11 +966,9 @@ lma_collector:
         members:
           - influxdb-api-check
           - influxdb-service
-          - influxdb-nodes
 <% end -%>
       pacemaker:
         policy: highest_severity
         group_by: member
         members:
           - pacemaker-service
-          - controller
