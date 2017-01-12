@@ -35,7 +35,6 @@ class ElasticsearchClusterHealthPlugin(base.Base):
         self.plugin = NAME
         self.address = '127.0.0.1'
         self.port = 9200
-        self._node_id = None
         self.session = requests.Session()
         self.url = None
         self.session.mount(
@@ -52,41 +51,25 @@ class ElasticsearchClusterHealthPlugin(base.Base):
             if node.key == 'Port':
                 self.port = node.values[0]
 
-        self.url = "http://{address}:{port}/".format(
+        self.url = "http://{address}:{port}/_cluster/health".format(
             **{
                 'address': self.address,
                 'port': int(self.port),
             })
 
-    def query_api(self, resource):
-        url = "{}{}".format(self.url, resource)
+    def itermetrics(self):
         try:
-            r = self.session.get(url)
+            r = self.session.get(self.url)
         except Exception as e:
-            msg = "Got exception for '{}': {}".format(url, e)
+            msg = "Got exception for '{}': {}".format(self.url, e)
             raise base.CheckException(msg)
 
         if r.status_code != 200:
-            msg = "{} responded with code {}".format(url, r.status_code)
+            msg = "{} responded with code {}".format(
+                self.url, r.status_code)
             raise base.CheckException(msg)
 
-        return r.json()
-
-    @property
-    def node_id(self):
-        if self._node_id is None:
-            local_node = self.query_api('_nodes/_local')
-            self._node_id = local_node.get('nodes', {}).keys()[0]
-
-        return self._node_id
-
-    def itermetrics(self):
-        # Collect cluster metrics only from the elected master
-        master_node = self.query_api('_cluster/state/master_node')
-        if master_node.get('master_node', '') != self.node_id:
-            return
-
-        data = self.query_api('_cluster/health')
+        data = r.json()
         self.logger.debug("Got response from Elasticsearch: '%s'" % data)
 
         yield {
@@ -109,10 +92,6 @@ class ElasticsearchClusterHealthPlugin(base.Base):
 plugin = ElasticsearchClusterHealthPlugin(collectd, 'elasticsearch')
 
 
-def init_callback():
-    plugin.restore_sigchld()
-
-
 def config_callback(conf):
     plugin.config_callback(conf)
 
@@ -120,6 +99,5 @@ def config_callback(conf):
 def read_callback():
     plugin.read_callback()
 
-collectd.register_init(init_callback)
 collectd.register_config(config_callback)
 collectd.register_read(read_callback)
