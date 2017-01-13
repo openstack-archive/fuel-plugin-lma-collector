@@ -102,7 +102,7 @@ class CrmMonitorPlugin(base.Base):
                 'type_instance': 'local_resource_active',
                 'values': same_hostname(node),
                 'meta': {'resource': self.notify_resource,
-                         'host': self.hostname}
+                         'host': shorten_hostname(self.hostname)}
             }
 
         summary = root.find('summary')
@@ -112,7 +112,7 @@ class CrmMonitorPlugin(base.Base):
         yield {
             'type_instance': 'local_dc_active',
             'values': same_hostname(current_dc),
-            'meta': {'host': self.hostname}
+            'meta': {'host': shorten_hostname(self.hostname)}
         }
 
         if current_dc.get('name') != self.hostname:
