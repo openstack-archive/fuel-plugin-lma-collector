@@ -52,6 +52,28 @@ The following metrics are emitted per compute node:
 * ``openstack_nova_used_vcpus``, the number of virtual CPU used by the
   instances.
 
+If Nova aggregates are defined then the following metrics are emitted per
+aggregate. These metrics contain a ``aggregate``
+field containing the aggregate name and a ``aggregate_id`` field containing the
+ID (integer) of the aggregate.
+
+* ``openstack_nova_aggregate_free_disk``, the total amount of disk space in GB
+  available in given aggregate for new instances.
+* ``openstack_nova_aggregate_free_ram``, the total amount of memory in MB available
+  in given aggregate for new instances.
+* ``openstack_nova_aggregate_free_vcpus``, the total number of virtual CPU
+  available in given aggregate for new instances.
+* ``openstack_nova_aggregate_running_instances``, the total number of running
+  instances in given aggregate.
+* ``openstack_nova_aggregate_running_tasks``, the total number of tasks currently
+  executed in given aggregate.
+* ``openstack_nova_aggregate_used_disk``, the total amount of disk space in GB
+  used by the instances in given aggregate.
+* ``openstack_nova_aggregate_used_ram``, the total amount of memory in MB used by
+  the instances in given aggregate.
+* ``openstack_nova_aggregate_used_vcpus``, the total number of virtual CPU used by
+  the instances in given aggregate.
+
 The following metrics are retrieved from the Nova API and represent the
 aggregated values across all compute nodes.
 
