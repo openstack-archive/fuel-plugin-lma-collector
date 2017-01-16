@@ -13,6 +13,7 @@
 -- limitations under the License.
 require "string"
 require "cjson"
+require 'table'
 
 local utils = require 'lma_utils'
 
@@ -192,6 +193,25 @@ function process_message ()
                     msg.Fields['value'] = {value = msg.Fields['value'], representation = unit}
                 else
                     msg['Fields']['name'] = msg['Fields']['name'] .. sample['type_instance']
+                end
+                if sample['meta'] and sample['meta']['host'] then
+                    msg['Fields']['hostname'] = sample['meta']['host']
+                end
+                if sample['meta'] and sample['meta']['aggregate'] then
+                    msg['Fields']['aggregate'] = sample['meta']['aggregate']
+                    if msg['Fields']['tag_fields'] then
+                        table.insert(msg['Fields']['tag_fields'], 'aggregate')
+                    else
+                        msg['Fields']['tag_fields'] = { 'aggregate' }
+                    end
+                end
+                if sample['meta'] and sample['meta']['aggregate_id'] then
+                    msg['Fields']['aggregate_id'] = sample['meta']['aggregate_id']
+                    if msg['Fields']['tag_fields'] then
+                        table.insert(msg['Fields']['tag_fields'], 'aggregate_id')
+                    else
+                        msg['Fields']['tag_fields'] = { 'aggregate_id' }
+                    end
                 end
             elseif metric_source == 'rabbitmq_info' then
                 if sample['type_instance'] ~= 'consumers' and
