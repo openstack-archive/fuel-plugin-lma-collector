@@ -32,7 +32,18 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
         'memory_mb_used': 'used_ram_MB',
         'free_ram_mb': 'free_ram_MB',
         'vcpus_used': 'used_vcpus',
+        'vcpus': 'total_vcpus',
     }
+    AGGREGATE_FIELDS = (
+        'current_workload',
+        'running_vms',
+        'local_gb_used',
+        'free_disk_gb',
+        'memory_mb_used',
+        'free_ram_mb',
+        'vcpus',
+        'vcpus_used',
+    )
 
     def config_callback(self, config):
         super(HypervisorStatsPlugin, self).config_callback(config)
@@ -55,6 +66,21 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
         v.dispatch()
 
     def collect(self):
+        nova_aggregates = {}
+        r = self.get('nova', 'os-aggregates')
+        if not r:
+            self.logger.warning("Could not get nova aggregates")
+        else:
+            aggregates_list = r.json().get('aggregates', [])
+            for agg in aggregates_list:
+                nova_aggregates[agg['name']] = {
+                    'id': agg['id'],
+                    'hosts': agg['hosts'],
+                }
+                for f in self.AGGREGATE_FIELDS:
+                    nf = self.VALUE_MAP.get(f, f)
+                    nova_aggregates[agg['name']][nf] = 0
+
         r = self.get('nova', 'os-hypervisors/detail')
         if not r:
             self.logger.warning("Could not get hypervisor statistics")
@@ -74,7 +100,26 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
                         stats.get('vcpus', 0))) - stats.get('vcpus_used', 0)
                 self.dispatch_value('free_vcpus', free, {'host': host})
                 total_stats['free_vcpus'] += free
+            for agg in nova_aggregates.keys():
+                agg_hosts = nova_aggregates[agg]['hosts']
+                if stats['hypervisor_hostname'] in agg_hosts:
+                    for f in self.AGGREGATE_FIELDS:
+                        nf = self.VALUE_MAP.get(f, f)
+                        nova_aggregates[agg][nf] += stats.get(f, 0)
 
+        # Dispatch the aggregate metrics
+        for agg in nova_aggregates.keys():
+            nova_aggregates[agg].pop('hosts')
+            agg_id = nova_aggregates[agg].pop('id')
+            nova_aggregates[agg]['free_ram_percent'] = round(
+                (100.0 * nova_aggregates[agg]['free_ram_MB']) /
+                (nova_aggregates[agg]['free_ram_MB'] +
+                 nova_aggregates[agg]['used_ram_MB']),
+                2)
+            for k, v in nova_aggregates[agg].iteritems():
+                self.dispatch_value('aggregate_{}'.format(k), v,
+                                    {'aggregate': agg,
+                                     'aggregate_id': agg_id})
         # Dispatch the global metrics
         for k, v in total_stats.iteritems():
             self.dispatch_value('total_{}'.format(k), v)
