@@ -1187,6 +1187,34 @@ The following is a list of StackLight built-in alarms::
             window: 60
             periods: 0
             function: max
+    - name: 'nova-aggregates-free-memory-warning'
+      description: "The nova aggregates free memory percent is low"
+      severity: 'warning'
+      enabled: 'true'
+      no_data_policy: 'okay'
+      trigger:
+        rules:
+          - metric: openstack_nova_aggregate_free_ram_percent
+            group_by: [aggregate]
+            relational_operator: '<'
+            threshold: 10.0
+            window: 60
+            periods: 0
+            function: min
+    - name: 'nova-aggregates-free-memory-critical'
+      description: "The nova aggregates free memory percent is too low"
+      severity: 'critical'
+      enabled: 'true'
+      no_data_policy: 'okay'
+      trigger:
+        rules:
+          - metric: openstack_nova_aggregate_free_ram_percent
+            group_by: [aggregate]
+            relational_operator: '<'
+            threshold: 1.0
+            window: 60
+            periods: 0
+            function: min
 
     # Adds alarm on local check for OpenStack services endpoint
     - name: 'cinder-api-local-endpoint'
