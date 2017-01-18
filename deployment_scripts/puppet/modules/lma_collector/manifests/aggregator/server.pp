@@ -26,11 +26,12 @@ class lma_collector::aggregator::server (
 
   $config_dir = $lma_collector::params::metric_config_dir
 
+  $scribbler_config = {
+    "${lma_collector::params::aggregator_flag}" => 'present'
+  }
   heka::decoder::scribbler { 'aggregator_flag':
     config_dir => $config_dir,
-    config     => {
-      "${lma_collector::params::aggregator_flag}" => 'present',
-    },
+    config     => $scribbler_config,
     notify     => Class['lma_collector::service::metric'],
   }
 

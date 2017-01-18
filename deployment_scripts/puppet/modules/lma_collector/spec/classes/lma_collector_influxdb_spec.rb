@@ -36,7 +36,7 @@ describe 'lma_collector::influxdb' do
         it { is_expected.to contain_heka__encoder__payload('influxdb') }
         it { is_expected.to contain_heka__filter__sandbox('influxdb_accumulator').with_config({
             "tag_fields" => "foo zzz", "flush_interval"=> 5,
-            "flush_count"=> 500, "time_precision" => "ms"}) }
+            "flush_count"=> 400, "time_precision" => "ms"}) }
         it { is_expected.to contain_heka__filter__sandbox('influxdb_annotation') }
     end
 
