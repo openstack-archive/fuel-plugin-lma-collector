@@ -609,7 +609,7 @@ lma_collector:
         members:
           - vip
       influxdb-service:
-        policy: availability_of_members
+        policy: status_of_members
         group_by: hostname
         members:
           - check
