@@ -343,6 +343,34 @@ lma_collector:
             window: 70
             periods: 0
             function: max
+    - name: 'nova-aggregates-free-memory-warning'
+      description: 'The nova aggregates free memory percent is low'
+      severity: 'warning'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: openstack_nova_aggregate_free_ram_percent
+            relational_operator: '<'
+            group_by: [aggregate]
+            threshold: 10.0
+            window: 70
+            periods: 0
+            function: min
+    - name: 'nova-aggregates-free-memory-critical'
+      description: 'The nova aggregates free memory percent is too low'
+      severity: 'critical'
+      enabled: 'true'
+      trigger:
+        logical_operator: 'or'
+        rules:
+          - metric: openstack_nova_aggregate_free_ram_percent
+            relational_operator: '<'
+            group_by: [aggregate]
+            threshold: 1.0
+            window: 70
+            periods: 0
+            function: min
     - name: 'heat-api-http-errors'
       description: 'Some 5xx HTTP errors have been detected on heat-api'
       severity: 'warning'
@@ -702,6 +730,7 @@ lma_collector:
     rabbitmq: ['primary-controller', 'controller']
     mysql: ['primary-controller', 'controller']
     apache: ['primary-controller', 'controller']
+    nova-aggregates-free-memory: ['primary-controller', 'controller']
     nova-api: ['primary-controller', 'controller']
     nova-logs: ['primary-controller', 'controller', 'compute']
     heat-api: ['primary-controller', 'controller']
@@ -764,6 +793,8 @@ lma_collector:
       node-status: ['mysql-node-connected', 'mysql-node-ready']
     apache:
       worker: ['apache-warning']
+    nova-aggregates-free-memory:
+      aggregates: ['nova-aggregates-free-memory-critical', 'nova-aggregates-free-memory-warning']
     nova-api:
       http_errors: ['nova-api-http-errors']
     nova-logs:

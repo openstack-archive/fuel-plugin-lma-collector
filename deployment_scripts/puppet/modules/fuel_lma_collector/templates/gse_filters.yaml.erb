@@ -178,6 +178,11 @@ lma_collector:
           - memory
           - disk
           - queue
+      nova-aggregates-free-memory:
+        policy: highest_severity
+        group_by: member
+        members:
+          - aggregates
       nova-api:
         policy: highest_severity
         group_by: member
@@ -483,6 +488,7 @@ lma_collector:
         group_by: member
         members:
           - nova-logs
+          - nova-aggregates-free-memory
           - nova-api
           - nova-ec2-api
           - nova-metadata-api
