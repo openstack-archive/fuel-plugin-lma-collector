@@ -119,8 +119,14 @@ if hiera('lma::collector::influxdb::server', false) {
   }
   # Deal with detach-* plugins
   if $is_mysql_server {
+    $fuel_version = 0 + hiera('fuel_version')
+    if $fuel_version < 9.0 {
+      $mysql_resource_name = 'p_mysql'
+    } else {
+      $mysql_resource_name = 'p_mysqld'
+    }
     $mysql_resource = {
-      'p_mysqld' => 'mysqld',
+      "${mysql_resource_name}" => 'mysqld',
     }
   }
   else {
