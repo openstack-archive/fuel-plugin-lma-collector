@@ -17,6 +17,7 @@ notice('fuel-plugin-lma-collector: collectd.pp')
 if hiera('lma::collector::influxdb::server', false) {
   prepare_network_config(hiera_hash('network_scheme', {}))
 
+  $fuel_version = 0 + hiera('fuel_version')
   $management_vip  = hiera('management_vip')
   $mgmt_address    = get_network_role_property('management', 'ipaddr')
   $lma_collector   = hiera_hash('lma_collector')
@@ -119,7 +120,6 @@ if hiera('lma::collector::influxdb::server', false) {
   }
   # Deal with detach-* plugins
   if $is_mysql_server {
-    $fuel_version = 0 + hiera('fuel_version')
     if $fuel_version < 9.0 {
       $mysql_resource_name = 'p_mysql'
     } else {
@@ -251,6 +251,12 @@ if hiera('lma::collector::influxdb::server', false) {
     $neutron_api    = get_network_role_property('neutron/api', 'ipaddr')
     $nova_api       = get_network_role_property('nova/api', 'ipaddr')
     $swift_api      = get_network_role_property('swift/api', 'ipaddr')
+    if $fuel_version < 9.0 {
+      $cinder_expected_code = 200
+    } else {
+      # Since Mitaka, Cinder returns 300 instead of 200 in previous releases
+      $cinder_expected_code = 300
+    }
     class { 'lma_collector::collectd::check_local_endpoint':
       urls           => {
         'cinder-api'          => "http://${cinder_api}:8776",
@@ -263,7 +269,7 @@ if hiera('lma::collector::influxdb::server', false) {
         'swift-api'           => "http://${swift_api}:8080/info",
       },
       expected_codes => {
-        'cinder-api'          => 300,
+        'cinder-api'          => $cinder_expected_code,
         'glance-api'          => 300,
         'heat-api'            => 300,
         'heat-cfn-api'        => 300,
