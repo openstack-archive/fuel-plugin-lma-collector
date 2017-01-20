@@ -23,6 +23,7 @@ New alarms:
   * Network packet drops
   * Local OpenStack API checks
   * Local checks for services: Apache, Memcached, MySQL, RabbitMQ, Pacemaker
+  * Monitor Nova resource utilization per aggregate (virtual CPUs, memory and disk)
 
 Alarm enhancements:
 
@@ -39,6 +40,11 @@ Bug fixes:
    :command:`rabbitmqctl` command.
  * Enforce timezone setting in log processing.
    See `#1633074 <https://bugs.launchpad.net/lma-toolchain/+bug/1633074>`_.
+ * Improve the resilience of the log_collector.
+   See `#1643280 <https://bugs.launchpad.net/lma-toolchain/+bug/1643280>`_.
+ * Support Oslo messaging v2 notifications
+   See `#1648479 <https://bugs.launchpad.net/lma-toolchain/+bug/1648479>`_.
+
 
 Version 0.10.0
 ++++++++++++++
