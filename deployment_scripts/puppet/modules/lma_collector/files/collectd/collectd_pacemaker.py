@@ -246,7 +246,12 @@ class CrmMonitorPlugin(base.Base):
         # value because crm_mon doesn't provide the exact number. To estimate
         # the number of operations applied to a resource, the plugin keeps a
         # copy of call_ids and compares it with the current value.
-        for node in root.find('node_history').iter('node'):
+
+        history = root.find('node_history')
+        if history is None:
+            return
+
+        for node in history.iter('node'):
             hostname = shorten_hostname(node.get('name'))
             if hostname not in self.history:
                 self.history[hostname] = {}
