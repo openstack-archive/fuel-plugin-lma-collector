@@ -3604,9 +3604,6 @@ lma_collector:
         members:
             nova-free-memory:
                 alarms: ['total-nova-free-memory-warning']
-    nova-aggregates-free-memory:
-        alerting: enabled
-        members:
             nova-aggregates-free-memory:
                 alarms: ['nova-aggregates-free-memory-critical', 'nova-aggregates-free-memory-warning']
     ceph-mon-cluster:
