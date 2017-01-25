@@ -67,8 +67,12 @@ describe 'lma_collector::heka' do
             )
             should contain_heka__input__tcp('metric')
             should contain_heka__decoder__sandbox('metric' )
-            is_expected.to_not contain_heka__filter__sandbox('heka_monitoring_metric_collector')
-            is_expected.to_not contain_heka__output__dashboard('dashboard_metric_collector' )
+            should contain_heka__filter__sandbox('heka_monitoring_metric_collector').with(
+              'ensure' => 'absent'
+            )
+            should contain_heka__output__dashboard('dashboard_metric_collector' ).with(
+              'ensure' => 'absent'
+            )
         }
     end
 end
