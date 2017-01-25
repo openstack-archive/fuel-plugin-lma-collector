@@ -288,6 +288,23 @@ if hiera('lma::collector::infrastructure_alerting::server', false) {
     virtual_hostname          => '00-node-clusters',
   }
 
+  # Purge remaining files from previous 0.10.x version
+  $toml_metric_collector_to_purge = prefix([
+    'filter-afd_api_backends.toml', 'filter-afd_api_endpoints.toml',
+    'filter-afd_service_rabbitmq_disk.toml',
+    'filter-afd_service_rabbitmq_memory.toml',
+    'filter-afd_service_rabbitmq_queue.toml',
+    'filter-afd_workers.toml',
+    'filter-service_heartbeat.toml',
+    'encoder-nagios_gse_global_clusters.toml',
+    'encoder-nagios_gse_node_clusters.toml',
+    'output-nagios_gse_global_clusters.toml',
+    'output-nagios_gse_node_clusters.toml',
+  ], '/etc/metric_collector/')
+
+  file { $toml_metric_collector_to_purge:
+    ensure => absent,
+  } ->
   lma_collector::gse_nagios { 'services':
     openstack_deployment_name => $deployment_id,
     server                    => hiera('lma::collector::infrastructure_alerting::server'),
