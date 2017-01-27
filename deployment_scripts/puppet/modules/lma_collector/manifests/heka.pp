@@ -118,24 +118,23 @@ define lma_collector::heka (
     $heka_monitoring_ensure = absent
   }
 
-  if $heka_monitoring {
-    heka::filter::sandbox { "heka_monitoring_${title}":
-      ensure           => $heka_monitoring_ensure,
-      config_dir       => $config_dir,
-      filename         => "${lma_collector::params::plugins_dir}/filters/heka_monitoring.lua",
-      message_matcher  => "Type == 'heka.all-report'",
-      require          => ::Heka[$title],
-      module_directory => $lua_modules_dir,
-      notify           => Class[$service_class],
-    }
+  heka::filter::sandbox { "heka_monitoring_${title}":
+    ensure           => $heka_monitoring_ensure,
+    config_dir       => $config_dir,
+    filename         => "${lma_collector::params::plugins_dir}/filters/heka_monitoring.lua",
+    message_matcher  => "Type == 'heka.all-report'",
+    require          => ::Heka[$title],
+    module_directory => $lua_modules_dir,
+    notify           => Class[$service_class],
+  }
 
-    # Dashboard is required to enable monitoring messages
-    heka::output::dashboard { "dashboard_${title}":
-      config_dir        => $config_dir,
-      dashboard_address => $lma_collector::params::dashboard_address,
-      dashboard_port    => $dashboard_port,
-      require           => ::Heka[$title],
-      notify            => Class[$service_class],
-    }
+  # Dashboard is required to enable monitoring messages
+  heka::output::dashboard { "dashboard_${title}":
+    ensure            => $heka_monitoring_ensure,
+    config_dir        => $config_dir,
+    dashboard_address => $lma_collector::params::dashboard_address,
+    dashboard_port    => $dashboard_port,
+    require           => ::Heka[$title],
+    notify            => Class[$service_class],
   }
 }
