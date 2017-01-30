@@ -15,9 +15,6 @@
 #
 # Collectd plugin for getting resource statistics from Neutron
 import collectd
-from collections import Counter
-from collections import defaultdict
-import re
 
 import collectd_openstack as openstack
 
@@ -26,9 +23,8 @@ INTERVAL = openstack.INTERVAL
 
 
 class NeutronStatsPlugin(openstack.CollectdPlugin):
-    """ Class to report the statistics on Neutron service.
+    """ Class to report the statistics on Neutron objects.
 
-        state of agents
         number of networks broken down by status
         number of subnets
         number of ports broken down by owner and status
@@ -36,11 +32,12 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
         number of floating IP addresses broken down by free/associated
     """
 
-    neutron_re = re.compile('^neutron-')
-    agent_re = re.compile('-agent$')
-    states = {'up': 0, 'down': 1, 'disabled': 2}
+    def __init__(self, *args, **kwargs):
+        super(NeutronStatsPlugin, self).__init__(*args, **kwargs)
+        self.plugin = PLUGIN_NAME
+        self.interval = INTERVAL
 
-    def collect(self):
+    def itermetrics(self):
 
         def groupby_network(x):
             return "networks.%s" % x.get('status', 'unknown').lower()
@@ -67,63 +64,33 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
                 status = 'free'
             return "floatingips.%s" % status
 
-        # Get information of the state per agent
-        # State can be up or down
-        aggregated_agents = defaultdict(Counter)
-
-        for agent in self.iter_workers('neutron'):
-            host = agent['host'].split('.')[0]
-            service = self.agent_re.sub(
-                '', self.neutron_re.sub('', agent['service']))
-            state = agent['state']
-
-            aggregated_agents[service][state] += 1
-            self.dispatch_value('neutron_agent',
-                                self.states[state],
-                                {'host': host,
-                                 'service': service,
-                                 'state': state})
-
-        for service in aggregated_agents:
-            totala = sum(aggregated_agents[service].values())
-
-            for state in self.states:
-                prct = (100.0 * aggregated_agents[service][state]) / totala
-                self.dispatch_value('neutron_agents_percent',
-                                    prct,
-                                    {'service': service, 'state': state})
-
-                self.dispatch_value('neutron_agents',
-                                    aggregated_agents[service][state],
-                                    {'service': service, 'state': state})
-
         # Networks
         networks = self.get_objects('neutron', 'networks', api_version='v2.0')
         status = self.count_objects_group_by(networks,
                                              group_by_func=groupby_network)
         for s, nb in status.iteritems():
-            self.dispatch_value(s, nb)
-        self.dispatch_value('networks', len(networks))
+            yield {'type_instance': s, 'values': nb}
+        yield {'type_instance': 'networks', 'values': len(networks)}
 
         # Subnets
         subnets = self.get_objects('neutron', 'subnets', api_version='v2.0')
-        self.dispatch_value('subnets', len(subnets))
+        yield {'type_instance': 'subnets', 'values': len(subnets)}
 
         # Ports
         ports = self.get_objects('neutron', 'ports', api_version='v2.0')
         status = self.count_objects_group_by(ports,
                                              group_by_func=groupby_port)
         for s, nb in status.iteritems():
-            self.dispatch_value(s, nb)
-        self.dispatch_value('ports', len(ports))
+            yield {'type_instance': s, 'values': nb}
+        yield {'type_instance': 'ports', 'values': len(ports)}
 
         # Routers
         routers = self.get_objects('neutron', 'routers', api_version='v2.0')
         status = self.count_objects_group_by(routers,
                                              group_by_func=groupby_router)
         for s, nb in status.iteritems():
-            self.dispatch_value(s, nb)
-        self.dispatch_value('routers', len(routers))
+            yield {'type_instance': s, 'values': nb}
+        yield {'type_instance': 'routers', 'values': len(routers)}
 
         # Floating IP addresses
         floatingips = self.get_objects('neutron', 'floatingips',
@@ -131,20 +98,9 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
         status = self.count_objects_group_by(floatingips,
                                              group_by_func=groupby_floating)
         for s, nb in status.iteritems():
-            self.dispatch_value(s, nb)
-        self.dispatch_value('floatingips', len(floatingips))
+            yield {'type_instance': s, 'values': nb}
+        yield {'type_instance': 'floatingips', 'values': len(routers)}
 
-    def dispatch_value(self, name, value, meta=None):
-        v = collectd.Values(
-            plugin=PLUGIN_NAME,  # metric source
-            type='gauge',
-            type_instance=name,
-            interval=INTERVAL,
-            # w/a for https://github.com/collectd/collectd/issues/716
-            meta=meta or {'0': True},
-            values=[value]
-        )
-        v.dispatch()
 
 plugin = NeutronStatsPlugin(collectd, PLUGIN_NAME)
 
