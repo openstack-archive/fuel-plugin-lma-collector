@@ -15,9 +15,6 @@
 #
 # Collectd plugin for getting statistics from Cinder
 import collectd
-from collections import Counter
-from collections import defaultdict
-import re
 
 import collectd_openstack as openstack
 
@@ -26,46 +23,18 @@ INTERVAL = openstack.INTERVAL
 
 
 class CinderStatsPlugin(openstack.CollectdPlugin):
-    """ Class to report the statistics on Cinder service.
+    """ Class to report the statistics on Cinder objects.
 
-        state of agents
         number of volumes broken down by state
         total size of volumes usable and in error state
     """
 
-    states = {'up': 0, 'down': 1, 'disabled': 2}
-    cinder_re = re.compile('^cinder-')
+    def __init__(self, *args, **kwargs):
+        super(CinderStatsPlugin, self).__init__(*args, **kwargs)
+        self.plugin = PLUGIN_NAME
+        self.interval = INTERVAL
 
-    def collect(self):
-
-        # Get information of the state per service
-        # State can be: 'up', 'down' or 'disabled'
-        aggregated_workers = defaultdict(Counter)
-
-        for worker in self.iter_workers('cinder'):
-            host = worker['host'].split('.')[0]
-            service = self.cinder_re.sub('', worker['service'])
-            state = worker['state']
-
-            aggregated_workers[service][state] += 1
-            self.dispatch_value('cinder_service', '',
-                                self.states[state],
-                                {'host': host,
-                                 'service': service,
-                                 'state': state})
-
-        for service in aggregated_workers:
-            totalw = sum(aggregated_workers[service].values())
-
-            for state in self.states:
-                prct = (100.0 * aggregated_workers[service][state]) / totalw
-                self.dispatch_value('cinder_services_percent', '',
-                                    prct,
-                                    {'state': state, 'service': service})
-
-                self.dispatch_value('cinder_services', '',
-                                    aggregated_workers[service][state],
-                                    {'state': state, 'service': service})
+    def itermetrics(self):
 
         volumes_details = self.get_objects_details('cinder', 'volumes')
 
@@ -78,38 +47,43 @@ class CinderStatsPlugin(openstack.CollectdPlugin):
         status = self.count_objects_group_by(volumes_details,
                                              group_by_func=groupby)
         for s, nb in status.iteritems():
-            self.dispatch_value('volumes', s, nb)
+            yield {
+                'plugin_instance': 'volumes',
+                'type_instance': s,
+                'values': nb
+            }
 
         sizes = self.count_objects_group_by(volumes_details,
                                             group_by_func=groupby,
                                             count_func=count_size_bytes)
         for n, size in sizes.iteritems():
-            self.dispatch_value('volumes_size', n, size)
+            yield {
+                'plugin_instance': 'volumes_size',
+                'type_instance': n,
+                'values': size
+            }
 
         snaps_details = self.get_objects_details('cinder', 'snapshots')
         status_snaps = self.count_objects_group_by(snaps_details,
                                                    group_by_func=groupby)
         for s, nb in status_snaps.iteritems():
-            self.dispatch_value('snapshots', s, nb)
+            yield {
+                'plugin_instance': 'snapshots',
+                'type_instance': s,
+                'values': nb
+            }
 
         sizes = self.count_objects_group_by(snaps_details,
                                             group_by_func=groupby,
                                             count_func=count_size_bytes)
         for n, size in sizes.iteritems():
             self.dispatch_value('snapshots_size', n, size)
+            yield {
+                'plugin_instance': 'snapshots_size',
+                'type_instance': n,
+                'values': size
+            }
 
-    def dispatch_value(self, plugin_instance, name, value, meta=None):
-        v = collectd.Values(
-            plugin=PLUGIN_NAME,  # metric source
-            plugin_instance=plugin_instance,
-            type='gauge',
-            type_instance=name,
-            interval=INTERVAL,
-            # w/a for https://github.com/collectd/collectd/issues/716
-            meta=meta or {'0': True},
-            values=[value]
-        )
-        v.dispatch()
 
 plugin = CinderStatsPlugin(collectd, PLUGIN_NAME)
 

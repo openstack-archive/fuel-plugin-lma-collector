@@ -29,7 +29,12 @@ class GlanceStatsPlugin(openstack.CollectdPlugin):
         total size of images usable and in error state
     """
 
-    def collect(self):
+    def __init__(self, *args, **kwargs):
+        super(GlanceStatsPlugin, self).__init__(*args, **kwargs)
+        self.plugin = PLUGIN_NAME
+        self.interval = INTERVAL
+
+    def itermetrics(self):
 
         def is_snap(d):
             return d.get('properties', {}).get('image_type') == 'snapshot'
@@ -48,8 +53,11 @@ class GlanceStatsPlugin(openstack.CollectdPlugin):
                                              group_by_func=groupby)
         for s, nb in status.iteritems():
             (name, visibility, status) = s.split('.')
-            self.dispatch_value(name, nb, meta={'visibility': visibility,
-                                                'status': status})
+            yield {
+                'type_instance': name,
+                'values': nb,
+                'meta': {'visibility': visibility, 'status': status}
+            }
 
         # sizes
         def count_size_bytes(d):
@@ -67,20 +75,11 @@ class GlanceStatsPlugin(openstack.CollectdPlugin):
                                             count_func=count_size_bytes)
         for s, nb in sizes.iteritems():
             (name, visibility, status) = s.split('.')
-            self.dispatch_value(name, nb, meta={'visibility': visibility,
-                                                'status': status})
-
-    def dispatch_value(self, name, value, meta=None):
-        v = collectd.Values(
-            plugin=PLUGIN_NAME,  # metric source
-            type='gauge',
-            type_instance=name,
-            interval=INTERVAL,
-            # w/a for https://github.com/collectd/collectd/issues/716
-            meta=meta or {'0': True},
-            values=[value]
-        )
-        v.dispatch()
+            yield {
+                'type_instance': name,
+                'values': nb,
+                'meta': {'visibility': visibility, 'status': status},
+            }
 
 plugin = GlanceStatsPlugin(collectd, PLUGIN_NAME)
 
