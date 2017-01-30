@@ -28,7 +28,9 @@ define lma_collector::collectd::openstack (
 
   $service = $title
 
-  $supported_services = ['nova', 'cinder', 'glance', 'keystone', 'neutron']
+  $supported_services = ['nova', 'nova_services',
+    'cinder', 'cinder_services', 'glance', 'keystone',
+    'neutron', 'neutron_agents']
   if ! member($supported_services, $service) {
     fail("service '${service}' is not supported")
   }

@@ -18,7 +18,6 @@ import dateutil.parser
 import dateutil.tz
 import requests
 import simplejson as json
-import traceback
 
 import collectd_base as base
 
@@ -275,28 +274,6 @@ class CollectdPlugin(base.Base):
         self.os_client = OSClient(username, password, tenant_name,
                                   keystone_url, self.timeout, self.logger,
                                   self.max_retries)
-
-    def read_callback(self):
-        """ Wrapper method
-
-            This method calls the actual method which performs
-            collection.
-        """
-
-        try:
-            self.collect()
-        except Exception as e:
-            msg = '{}: fail to get metrics: {}: {}'.format(
-                self.service_name or self.plugin, e, traceback.format_exc())
-            self.logger.error(msg)
-
-    def collect(self):
-        """ Read metrics and dispatch values
-
-            This method should be overriden by the derived classes.
-        """
-
-        raise 'collect() method needs to be overriden!'
 
     def get_objects(self, project, object_name, api_version='',
                     params='all_tenants=1'):

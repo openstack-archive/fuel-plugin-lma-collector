@@ -141,11 +141,12 @@ class Base(object):
                 (self.plugin, type_instance[:24], len(type_instance),
                  self.MAX_IDENTIFIER_LENGTH))
 
+        plugin_instance = metric.get('plugin_instance', self.plugin_instance)
         v = self.collectd.Values(
             plugin=self.plugin,
             host=metric.get('hostname', ''),
             type=metric.get('type', 'gauge'),
-            plugin_instance=self.plugin_instance,
+            plugin_instance=plugin_instance,
             type_instance=type_instance,
             values=values,
             # w/a for https://github.com/collectd/collectd/issues/716
