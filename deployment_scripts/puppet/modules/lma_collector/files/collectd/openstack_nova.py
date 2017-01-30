@@ -15,9 +15,6 @@
 #
 # Collectd plugin for getting statistics from Nova
 import collectd
-from collections import Counter
-from collections import defaultdict
-import re
 
 import collectd_openstack as openstack
 
@@ -25,73 +22,33 @@ PLUGIN_NAME = 'nova'
 INTERVAL = openstack.INTERVAL
 
 
-class NovaStatsPlugin(openstack.CollectdPlugin):
-    """ Class to report the statistics on Nova service.
+class NovaInstanceStatsPlugin(openstack.CollectdPlugin):
+    """ Class to report the statistics on Nova instances.
 
-        status per service and number of instances broken down by state
+        Number of instances broken down by state
     """
+    def __init__(self, *args, **kwargs):
+        super(NovaInstanceStatsPlugin, self).__init__(*args, **kwargs)
+        self.plugin = PLUGIN_NAME
+        self.interval = INTERVAL
 
-    states = {'up': 0, 'down': 1, 'disabled': 2}
-    nova_re = re.compile('^nova-')
-
-    def collect(self):
-
-        # Get information of the state per service
-        # State can be: 'up', 'down' or 'disabled'
-        aggregated_workers = defaultdict(Counter)
-
-        for worker in self.iter_workers('nova'):
-            host = worker['host'].split('.')[0]
-            service = self.nova_re.sub('', worker['service'])
-            state = worker['state']
-
-            aggregated_workers[service][state] += 1
-            self.dispatch_value('nova_service', '',
-                                self.states[state],
-                                {'host': host,
-                                 'service': service,
-                                 'state': state})
-
-        for service in set(aggregated_workers.keys()).union(
-                ('compute', 'scheduler', 'conductor', 'cert', 'consoleauth')):
-
-            total = sum(aggregated_workers[service].values())
-
-            for state in self.states:
-                prct = 0
-                if total > 0:
-                    prct = (100.0 * aggregated_workers[service][state]) / total
-
-                self.dispatch_value('nova_services_percent', '',
-                                    prct,
-                                    {'state': state, 'service': service})
-
-                self.dispatch_value('nova_services', '',
-                                    aggregated_workers[service][state],
-                                    {'state': state, 'service': service})
+    def itermetrics(self):
         servers_details = self.get_objects_details('nova', 'servers')
 
         def groupby(d):
             return d.get('status', 'unknown').lower()
+
         status = self.count_objects_group_by(servers_details,
                                              group_by_func=groupby)
         for s, nb in status.iteritems():
-            self.dispatch_value('instances', s, nb)
+            yield {
+                'plugin_instance': 'instances',
+                'values': nb,
+                'type_instance': s,
+            }
 
-    def dispatch_value(self, plugin_instance, name, value, meta=None):
-        v = collectd.Values(
-            plugin=PLUGIN_NAME,  # metric source
-            plugin_instance=plugin_instance,
-            type='gauge',
-            type_instance=name,
-            interval=INTERVAL,
-            # w/a for https://github.com/collectd/collectd/issues/716
-            meta=meta or {'0': True},
-            values=[value]
-        )
-        v.dispatch()
 
-plugin = NovaStatsPlugin(collectd, PLUGIN_NAME)
+plugin = NovaInstanceStatsPlugin(collectd, PLUGIN_NAME)
 
 
 def config_callback(conf):
