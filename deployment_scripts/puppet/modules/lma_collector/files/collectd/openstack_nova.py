@@ -31,9 +31,12 @@ class NovaInstanceStatsPlugin(openstack.CollectdPlugin):
         super(NovaInstanceStatsPlugin, self).__init__(*args, **kwargs)
         self.plugin = PLUGIN_NAME
         self.interval = INTERVAL
+        self.pagination_limit = 500
 
     def itermetrics(self):
-        servers_details = self.get_objects_details('nova', 'servers')
+        servers_details = self.get_objects('nova', 'servers',
+                                           params={'all_tenants': 1},
+                                           detail=True)
 
         def groupby(d):
             return d.get('status', 'unknown').lower()
