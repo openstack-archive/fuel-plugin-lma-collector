@@ -33,6 +33,7 @@ class GlanceStatsPlugin(openstack.CollectdPlugin):
         super(GlanceStatsPlugin, self).__init__(*args, **kwargs)
         self.plugin = PLUGIN_NAME
         self.interval = INTERVAL
+        self.pagination_limit = 25
 
     def itermetrics(self):
 
@@ -48,7 +49,9 @@ class GlanceStatsPlugin(openstack.CollectdPlugin):
 
         images_details = self.get_objects_details('glance', 'images',
                                                   api_version='v1',
-                                                  params='is_public=None')
+                                                  params={},
+                                                  detail=True)
+
         status = self.count_objects_group_by(images_details,
                                              group_by_func=groupby)
         for s, nb in status.iteritems():
