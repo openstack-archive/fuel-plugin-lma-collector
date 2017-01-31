@@ -38,20 +38,19 @@ class GlanceStatsPlugin(openstack.CollectdPlugin):
     def itermetrics(self):
 
         def is_snap(d):
-            return d.get('properties', {}).get('image_type') == 'snapshot'
+            return d.get('image_type') == 'snapshot'
 
         def groupby(d):
-            p = 'public' if d.get('is_public', True) else 'private'
+            p = d['visibility']
             status = d.get('status', 'unknown').lower()
             if is_snap(d):
                 return 'snapshots.%s.%s' % (p, status)
             return 'images.%s.%s' % (p, status)
 
-        images_details = self.get_objects_details('glance', 'images',
-                                                  api_version='v1',
-                                                  params={},
-                                                  detail=True)
-
+        images_details = self.get_objects('glance', 'images',
+                                          api_version='v2',
+                                          params={},
+                                          detail=False)
         status = self.count_objects_group_by(images_details,
                                              group_by_func=groupby)
         for s, nb in status.iteritems():
