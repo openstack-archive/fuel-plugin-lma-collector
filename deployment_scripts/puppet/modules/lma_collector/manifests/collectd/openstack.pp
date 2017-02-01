@@ -21,6 +21,8 @@ define lma_collector::collectd::openstack (
   $timeout = 20,
   $max_retries = 2,
   $pacemaker_master_resource = undef,
+  $polling_interval = undef,
+  $pagination_limit = undef,
 ) {
 
   include lma_collector::params
@@ -46,12 +48,29 @@ define lma_collector::collectd::openstack (
     'Timeout'     => "\"${timeout}\"",
     'MaxRetries'  => "\"${max_retries}\"",
   }
+  if $polling_interval {
+    validate_integer($polling_interval)
+    $polling_config = {
+      'PollingInterval' => "\"${polling_interval}\""
+    }
+  } else {
+    $polling_config = {}
+  }
+  if $pagination_limit {
+    validate_integer($pagination_limit)
+    $limit_config = {
+      'PaginationLimit' => "\"${pagination_limit}\""
+    }
+  } else {
+    $limit_config = {}
+  }
 
   if $pacemaker_master_resource {
-    $real_config = merge($config, {'DependsOnResource' => "\"${pacemaker_master_resource}\""})
+    $pacemaker_config = {'DependsOnResource' => "\"${pacemaker_master_resource}\""}
   } else {
-    $real_config = $config
+    $pacemaker_config = {}
   }
+  $real_config = merge($config, $pacemaker_config, $polling_config, $limit_config)
 
   lma_collector::collectd::python { "openstack_${title}":
     config => $real_config,
