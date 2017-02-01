@@ -176,10 +176,12 @@ the `lma_collector::collectd::openstack` define:
 
 ```puppet
 lma_collector::collectd::openstack { 'nova':
-  user         => 'user',
-  password     => 'password',
-  tenant       => 'tenant',
-  keystone_url => 'http://example.com/keystone',
+  user             => 'user',
+  password         => 'password',
+  tenant           => 'tenant',
+  keystone_url     => 'http://example.com/keystone',
+  polling_interval => 60,
+  pagination_limit => 500,
 }
 ```
 
@@ -965,6 +967,8 @@ The resource title should be set to the service name (e.g. `'nova'`).
   [`lma_collector::collectd::pacemaker`](#class-lma_collectorcollectdpacemaker)
   class should be declared, with its `master_resource` parameter set to the
   same value as this parameter. Valid options: a string. Default: `undef`.
+* `polling_interval`: *Optional*. The interval used to poll the resources.
+* `pagination_limit`: *Optional*. The number of resource returned by request.
 
 #### Define `lma_collector::collectd::dbi_services`
 
