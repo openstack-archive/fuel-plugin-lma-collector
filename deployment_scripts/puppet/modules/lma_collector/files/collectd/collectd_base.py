@@ -13,10 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import collectd
+
 from functools import wraps
 import json
 import signal
 import subprocess
+import threading
 import time
 import traceback
 
@@ -271,3 +274,47 @@ class CephBase(Base):
             if node.key == "Cluster":
                 self.cluster = node.values[0]
         self.plugin_instance = self.cluster
+
+
+class AsyncPoller(threading.Thread):
+    """Execute an independant thread to execute a function periodically
+
+       Args:
+           collectd: used for logging
+           polling_function: a function to execute periodically
+           interval: the interval in second
+           name: (optinal) the name of the thread
+    """
+
+    def __init__(self, collectd, fct, interval, name=None):
+        super(AsyncPoller, self).__init__(name=name)
+        self.collectd = collectd
+        self.polling_function = fct
+        self.interval = interval
+        self._results = None
+
+    def run(self):
+        self.collectd.info('Starting thread {}'.format(self.name))
+        while True:
+            try:
+                started_at = time.time()
+
+                self._results = self.polling_function()
+
+                tosleep = self.interval - (time.time() - started_at)
+                if tosleep > 0:
+                    time.sleep(tosleep)
+                else:
+                    self.collectd.warning(
+                        'Polling took more than {}s for {}'.format(
+                            self.interval, self.name
+                        )
+                    )
+
+            except Exception as e:
+                self._results = None
+                self.collectd.error('{} fails: {}'.format(self.name, e))
+                time.sleep(10)
+
+    def get_results(self):
+        return self._results
