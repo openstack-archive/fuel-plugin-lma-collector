@@ -143,6 +143,16 @@ if hiera('lma::collector::elasticsearch::server', false) or hiera('lma::collecto
     notify => Service[$::neutron::params::server_service],
   }
 
+  # Enable pagination for Neutron
+  neutron_config { 'DEFAULT/allow_pagination':
+    value  => true,
+    notify => Service[$::neutron::params::server_service],
+  }
+  neutron_config { 'DEFAULT/pagination_max_limit':
+    value  => '100',
+    notify => Service[$::neutron::params::server_service],
+  }
+
   service { $::neutron::params::server_service:
     hasstatus  => true,
     hasrestart => true,
