@@ -162,16 +162,36 @@ if hiera('lma::collector::influxdb::server', false) {
       require                   => Class['lma_collector::collectd::base'],
     }
     $openstack_services = {
-      'nova'            => $openstack_service_config,
       'nova_services'   => $openstack_service_config,
-      'cinder'          => $openstack_service_config,
       'cinder_services' => $openstack_service_config,
-      'glance'          => $openstack_service_config,
       'keystone'        => $openstack_service_config,
-      'neutron'         => $openstack_service_config,
       'neutron_agents'  => $openstack_service_config,
     }
+
+    $nova_polling = {
+      'polling_interval' => 60,
+      'pagination_limit' => 500,
+    }
+    $cinder_polling = {
+      'polling_interval' => 60,
+      'pagination_limit' => 500,
+    }
+    $glance_polling = {
+      'polling_interval' => 60,
+      'pagination_limit' => 25,
+    }
+    $neutron_polling = {
+      'polling_interval' => 60,
+      'pagination_limit' => 100,
+    }
+    $openstack_resources = {
+      'nova'            => merge($openstack_service_config, $nova_polling),
+      'cinder'          => merge($openstack_service_config, $cinder_polling),
+      'glance'          => merge($openstack_service_config, $glance_polling),
+      'neutron'         => merge($openstack_service_config, $neutron_polling),
+    }
     create_resources(lma_collector::collectd::openstack, $openstack_services)
+    create_resources(lma_collector::collectd::openstack, $openstack_resources)
 
     # FIXME(elemoine) use the special attribute * when Fuel uses a Puppet version
     # that supports it.
