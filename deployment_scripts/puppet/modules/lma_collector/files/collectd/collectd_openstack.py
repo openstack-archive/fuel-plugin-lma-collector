@@ -18,7 +18,10 @@ import dateutil.parser
 import dateutil.tz
 import requests
 import simplejson as json
+import threading
+import time
 
+import collectd
 import collectd_base as base
 
 from collections import defaultdict
@@ -153,6 +156,96 @@ class OSClient(object):
         return r
 
 
+class OpenstackApiPoller(threading.Thread):
+    def __init__(self, os_client, object_name, url,
+                 pagination_limit, interval=60,
+                 params=None):
+        super(OpenstackApiPoller, self).__init__()
+        self.os_client = os_client
+        self.object_name = object_name
+        self.url = url
+        self.pagination_limit = pagination_limit
+        self.interval = interval
+        if params is None:
+            params = {}
+        self.params = params
+        self._objects = []
+        self.myid = '{} {} limit:{} interval:{}'.format(
+            self.name, self.object_name,
+            self.pagination_limit,
+            self.interval)
+
+    def run(self):
+        collectd.debug('Starting thread for {}'.format(self.myid))
+        while True:
+            objs = []
+            opts = {}
+            opts.update(self.params)
+            collectd.info('{}'.format(self.myid))
+            try:
+                started_at = time.time()
+                while True:
+                    r = self.os_client.make_request('get',
+                                                    self.url,
+                                                    params=opts)
+                    if not r or self.object_name not in r.json():
+                        if r is None:
+                            err = ''
+                        else:
+                            err = r.text
+                        collectd.warning('Could not find {}: {} {}'.format(
+                            self.object_name,
+                            self.url,
+                            err
+                        ))
+                        # Avoid to provide incomplete data by reseting current
+                        # set.
+                        self._objects = []
+                        break
+
+                    resp = r.json()
+                    bulk_objs = resp.get(self.object_name)
+                    if not bulk_objs:
+                        # emtpy list
+                        break
+
+                    objs.extend(bulk_objs)
+
+                    links = resp.get('{}_links'.format(self.object_name))
+                    if links is None or self.pagination_limit is None:
+                        # Either the pagination is not supported or there is
+                        # no more data
+                        # In both cases, we got at this stage all the data we
+                        # can have.
+                        break
+
+                    # if there is no 'next' link in the response, all data has
+                    # been read.
+                    if len([i for i in links if i.get('rel') == 'next']) == 0:
+                        break
+
+                    opts['marker'] = bulk_objs[-1]['id']
+
+                tosleep = self.interval - (time.time() - started_at)
+                if tosleep > 0:
+                    time.sleep(tosleep)
+                else:
+                    collectd.warning(
+                        'Polling {} objects took more than {}s ({})'.format(
+                            len(objs), self.interval, self.myid
+                        )
+                    )
+
+            except Exception as e:
+                collectd.error(e)
+                self._objects = []
+
+            self._objects = objs
+
+    def get_objects(self):
+        return self._objects
+
+
 class CollectdPlugin(base.Base):
 
     def __init__(self, *args, **kwargs):
@@ -163,7 +256,9 @@ class CollectdPlugin(base.Base):
         self.max_retries = 2
         self.os_client = None
         self.extra_config = {}
+        self._threads = {}
         self.pagination_limit = None
+        self.polling_interval = 60
 
     def _build_url(self, service, resource):
         s = (self.get_service(service) or {})
@@ -278,6 +373,9 @@ class CollectdPlugin(base.Base):
                 keystone_url = node.values[0]
             elif node.key == 'PaginationLimit':
                 self.pagination_limit = int(node.values[0])
+            elif node.key == 'PollingInterval':
+                self.polling_interval = int(node.values[0])
+
         self.os_client = OSClient(username, password, tenant_name,
                                   keystone_url, self.timeout, self.logger,
                                   self.max_retries)
@@ -304,44 +402,28 @@ class CollectdPlugin(base.Base):
 
         url = self._build_url(project, resource)
         if not url:
-            return
+            return []
 
         opts = {}
         if self.pagination_limit:
             opts['limit'] = self.pagination_limit
 
         opts.update(params)
-        objs = []
+        if url not in self._threads:
+            t = OpenstackApiPoller(self.os_client,
+                                   object_name, url,
+                                   self.pagination_limit,
+                                   self.polling_interval,
+                                   params=opts)
+            t.start()
+            self._threads[url] = t
+        else:
+            t = self._threads[url]
+            if not t.is_alive():
+                del self._threads[url]
+                return []
 
-        while True:
-            r = self.os_client.make_request('get', url, params=opts)
-            if not r or object_name not in r.json():
-                self.logger.warning('Could not find %s %s' % (project,
-                                                              object_name))
-                return objs
-
-            resp = r.json()
-            bulk_objs = resp.get(object_name)
-
-            if not bulk_objs:
-                break
-
-            objs.extend(bulk_objs)
-
-            links = resp.get('{}_links'.format(object_name))
-            if links is None or self.pagination_limit is None:
-                # Either the pagination is not supported or there is no more
-                # data
-                break
-
-            # if there is no 'next' link in the response, all data has been
-            # read.
-            if len([i for i in links if i.get('rel') == 'next']) == 0:
-                break
-
-            opts['marker'] = bulk_objs[-1]['id']
-
-        return objs
+        return t.get_objects()
 
     def count_objects_group_by(self,
                                list_object,
