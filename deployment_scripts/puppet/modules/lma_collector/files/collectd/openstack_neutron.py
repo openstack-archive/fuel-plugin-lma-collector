@@ -66,7 +66,8 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
             return "floatingips.%s" % status
 
         # Networks
-        networks = self.get_objects('neutron', 'networks', api_version='v2.0')
+        networks = self.get_objects('neutron', 'networks', api_version='v2.0',
+                                    params={'fields': ['id', 'status']})
         status = self.count_objects_group_by(networks,
                                              group_by_func=groupby_network)
         for s, nb in status.iteritems():
@@ -74,11 +75,14 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
         yield {'type_instance': 'networks', 'values': len(networks)}
 
         # Subnets
-        subnets = self.get_objects('neutron', 'subnets', api_version='v2.0')
+        subnets = self.get_objects('neutron', 'subnets', api_version='v2.0',
+                                   params={'fields': ['id', 'status']})
         yield {'type_instance': 'subnets', 'values': len(subnets)}
 
         # Ports
-        ports = self.get_objects('neutron', 'ports', api_version='v2.0')
+        ports = self.get_objects('neutron', 'ports', api_version='v2.0',
+                                 params={'fields': ['id', 'status',
+                                                    'device_owner']})
         status = self.count_objects_group_by(ports,
                                              group_by_func=groupby_port)
         for s, nb in status.iteritems():
@@ -86,7 +90,8 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
         yield {'type_instance': 'ports', 'values': len(ports)}
 
         # Routers
-        routers = self.get_objects('neutron', 'routers', api_version='v2.0')
+        routers = self.get_objects('neutron', 'routers', api_version='v2.0',
+                                   params={'fields': ['id', 'status']})
         status = self.count_objects_group_by(routers,
                                              group_by_func=groupby_router)
         for s, nb in status.iteritems():
@@ -95,7 +100,9 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
 
         # Floating IP addresses
         floatingips = self.get_objects('neutron', 'floatingips',
-                                       api_version='v2.0')
+                                       api_version='v2.0',
+                                       params={'fields': ['id', 'status',
+                                                          'port_id']})
         status = self.count_objects_group_by(floatingips,
                                              group_by_func=groupby_floating)
         for s, nb in status.iteritems():
