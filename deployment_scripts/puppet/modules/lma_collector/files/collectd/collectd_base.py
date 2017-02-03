@@ -61,7 +61,7 @@ class Base(object):
         self.do_collect_data = True
 
         self.service_name = service_name
-        self.local_check = True
+        self.local_check = local_check
 
     def config_callback(self, conf):
         for node in conf.children:
