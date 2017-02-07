@@ -29,7 +29,12 @@ class KeystoneStatsPlugin(openstack.CollectdPlugin):
         number of roles
     """
 
-    def collect(self):
+    def __init__(self, *args, **kwargs):
+        super(KeystoneStatsPlugin, self).__init__(*args, **kwargs)
+        self.plugin = PLUGIN_NAME
+        self.interval = INTERVAL
+
+    def itermetrics(self):
 
         def groupby(d):
             return 'enabled' if d.get('enabled') else 'disabled'
@@ -43,7 +48,11 @@ class KeystoneStatsPlugin(openstack.CollectdPlugin):
         status = self.count_objects_group_by(tenants_details,
                                              group_by_func=groupby)
         for s, nb in status.iteritems():
-            self.dispatch_value('tenants', nb, meta={'state': s})
+            yield {
+                'type_instance': 'tenants',
+                'values': nb,
+                'meta': {'state': s},
+            }
 
         # users
         r = self.get('keystone', 'users')
@@ -54,7 +63,11 @@ class KeystoneStatsPlugin(openstack.CollectdPlugin):
         status = self.count_objects_group_by(users_details,
                                              group_by_func=groupby)
         for s, nb in status.iteritems():
-            self.dispatch_value('users', nb, meta={'state': s})
+            yield {
+                'type_instance': 'users',
+                'values': nb,
+                'meta': {'state': s},
+            }
 
         # roles
         r = self.get('keystone', 'OS-KSADM/roles')
@@ -62,19 +75,10 @@ class KeystoneStatsPlugin(openstack.CollectdPlugin):
             self.logger.warning('Could not find Keystone roles')
             return
         roles = r.json().get('roles', [])
-        self.dispatch_value('roles', len(roles))
-
-    def dispatch_value(self, name, value, meta=None):
-        v = collectd.Values(
-            plugin=PLUGIN_NAME,  # metric source
-            type='gauge',
-            type_instance=name,
-            interval=INTERVAL,
-            # w/a for https://github.com/collectd/collectd/issues/716
-            meta=meta or {'0': True},
-            values=[value]
-        )
-        v.dispatch()
+        yield {
+            'type_instance': 'roles',
+            'values': len(roles),
+        }
 
 plugin = KeystoneStatsPlugin(collectd, PLUGIN_NAME)
 

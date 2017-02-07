@@ -34,6 +34,11 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
         'vcpus_used': 'used_vcpus',
     }
 
+    def __init__(self, *args, **kwargs):
+        super(HypervisorStatsPlugin, self).__init__(*args, **kwargs)
+        self.plugin = PLUGIN_NAME
+        self.interval = INTERVAL
+
     def config_callback(self, config):
         super(HypervisorStatsPlugin, self).config_callback(config)
         for node in config.children:
@@ -42,19 +47,7 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
         if 'cpu_ratio' not in self.extra_config:
             self.logger.warning('CpuAllocationRatio parameter not set')
 
-    def dispatch_value(self, name, value, meta=None):
-        v = collectd.Values(
-            plugin=PLUGIN_NAME,
-            type='gauge',
-            type_instance=name,
-            interval=INTERVAL,
-            # w/a for https://github.com/collectd/collectd/issues/716
-            meta=meta or {'0': True},
-            values=[value]
-        )
-        v.dispatch()
-
-    def collect(self):
+    def itermetrics(self):
         nova_aggregates = {}
         r = self.get('nova', 'os-aggregates')
         if not r:
@@ -84,7 +77,11 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
             host = stats['hypervisor_hostname'].split('.')[0]
             for k, v in self.VALUE_MAP.iteritems():
                 m_val = stats.get(k, 0)
-                self.dispatch_value(v, m_val, {'host': host})
+                yield {
+                    'type_instance': v,
+                    'values': m_val,
+                    'meta': {'host': host},
+                }
                 total_stats[v] += m_val
                 for agg in nova_aggregates.keys():
                     agg_hosts = nova_aggregates[agg]['hosts']
@@ -95,7 +92,11 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
                 m_vcpus_used = stats.get('vcpus_used', 0)
                 free = (int(self.extra_config['cpu_ratio'] *
                         m_vcpus)) - m_vcpus_used
-                self.dispatch_value('free_vcpus', free, {'host': host})
+                yield {
+                    'type_instance': 'free_vcpus',
+                    'values': free,
+                    'meta': {'host': host},
+                }
                 total_stats['free_vcpus'] += free
                 for agg in nova_aggregates.keys():
                     agg_hosts = nova_aggregates[agg]['hosts']
@@ -122,12 +123,20 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
                     agg_total_free_ram,
                     2)
             for k, v in nova_aggregates[agg]['metrics'].iteritems():
-                self.dispatch_value('aggregate_{}'.format(k), v,
-                                    {'aggregate': agg,
-                                     'aggregate_id': agg_id})
+                yield {
+                    'type_instance': 'aggregate_{}'.format(k),
+                    'values': v,
+                    'meta': {
+                        'aggregate': agg,
+                        'aggregate_id': agg_id,
+                    }
+                }
         # Dispatch the global metrics
         for k, v in total_stats.iteritems():
-            self.dispatch_value('total_{}'.format(k), v)
+            yield {
+                'type_instance': 'total_{}'.format(k),
+                'values': v,
+            }
 
 plugin = HypervisorStatsPlugin(collectd, PLUGIN_NAME)
 

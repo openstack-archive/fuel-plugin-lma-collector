@@ -162,11 +162,14 @@ if hiera('lma::collector::influxdb::server', false) {
       require                   => Class['lma_collector::collectd::base'],
     }
     $openstack_services = {
-      'nova'     => $openstack_service_config,
-      'cinder'   => $openstack_service_config,
-      'glance'   => $openstack_service_config,
-      'keystone' => $openstack_service_config,
-      'neutron'  => $openstack_service_config,
+      'nova'            => $openstack_service_config,
+      'nova_services'   => $openstack_service_config,
+      'cinder'          => $openstack_service_config,
+      'cinder_services' => $openstack_service_config,
+      'glance'          => $openstack_service_config,
+      'keystone'        => $openstack_service_config,
+      'neutron'         => $openstack_service_config,
+      'neutron_agents'  => $openstack_service_config,
     }
     create_resources(lma_collector::collectd::openstack, $openstack_services)
 
