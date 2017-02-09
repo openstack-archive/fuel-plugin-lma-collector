@@ -170,11 +170,10 @@ class CollectdPlugin(base.Base):
     def _build_url(self, service, resource):
         s = (self.get_service(service) or {})
         # the adminURL must be used to access resources with Keystone API v2
+        # v3 API must be used in order to obtain tenants in multi-domain envs
         if service == 'keystone' and \
-                (resource in ['tenants', 'users'] or 'OS-KS' in resource):
-            url = s.get('admin_url')
-        else:
-            url = s.get('url')
+                (resource in ['projects', 'users'] or 'OS-KS' in resource):
+            url = s.get('admin_url').replace('v2.0', 'v3')
 
         if url:
             if url[-1] != '/':
