@@ -34,7 +34,6 @@ local percentile_thresh = (read_config('percentile') or 90) + 0
 -- and also to compensate the delay introduced by log parsing/decoding
 -- which leads to arrive too late in its interval.
 local grace_time = (read_config('grace_time') or 0) + 0
-local metric_logger = read_config('logger')
 local metric_source = read_config('source')
 
 local inject_reached_error = 'too many metrics to aggregate, adjust bulk_size and/or max_timer_inject parameters'
@@ -167,7 +166,7 @@ function timer_event(ns)
                 num_metrics = num_metrics - 1
                 if num >= bulk_size then
                     if msg_injected < max_timer_inject then
-                        utils.inject_bulk_metric(ns, hostname, metric_logger, metric_source)
+                        utils.inject_bulk_metric(ns, hostname, metric_source)
                         msg_injected = msg_injected + 1
                         num = 0
                         num_metrics = 0
@@ -179,7 +178,7 @@ function timer_event(ns)
         all_times[service] = nil
     end
     if num > 0 then
-        utils.inject_bulk_metric(ns, hostname, metric_logger, metric_source)
+        utils.inject_bulk_metric(ns, hostname, metric_source)
         num = 0
         num_metrics = 0
     end

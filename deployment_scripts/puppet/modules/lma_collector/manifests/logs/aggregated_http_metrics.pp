@@ -37,7 +37,6 @@ class lma_collector::logs::aggregated_http_metrics (
       bulk_size        => $bulk_size,
       percentile       => $percentile,
       grace_time       => $grace_time,
-      logger           => 'aggregated_http_metrics_filter',
       source           => 'log_collector',
     },
     module_directory => $lua_modules_dir,
