@@ -37,11 +37,11 @@ class KeystoneStatsPlugin(openstack.CollectdPlugin):
             return 'enabled' if d.get('enabled') else 'disabled'
 
         # tenants
-        r = self.get('keystone', 'tenants')
+        r = self.get('keystone', 'projects')
         if not r:
             self.logger.warning('Could not find Keystone tenants')
             return
-        tenants_details = r.json().get('tenants', [])
+        tenants_details = r.json().get('projects', [])
         status = self.count_objects_group_by(tenants_details,
                                              group_by_func=groupby)
         for s, nb in status.iteritems():
@@ -59,7 +59,7 @@ class KeystoneStatsPlugin(openstack.CollectdPlugin):
             self.dispatch_value('users.' + s, nb)
 
         # roles
-        r = self.get('keystone', 'OS-KSADM/roles')
+        r = self.get('keystone', 'roles')
         if not r:
             self.logger.warning('Could not find Keystone roles')
             return
