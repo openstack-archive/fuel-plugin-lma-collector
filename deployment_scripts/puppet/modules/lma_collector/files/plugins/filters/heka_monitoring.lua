@@ -80,6 +80,6 @@ function process_message ()
         end
     end
 
-    utils.inject_bulk_metric(ts, hostname, 'heka_monitoring', 'internal')
+    utils.inject_bulk_metric(ts, hostname, 'internal')
     return 0
 end

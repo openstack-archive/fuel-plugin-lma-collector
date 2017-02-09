@@ -33,7 +33,6 @@ class lma_collector::logs::counter (
       hostname       => $hostname,
       grace_interval => $grace_interval,
       logger_matcher => '^openstack%.(%a+)$',
-      logger         => 'log_counter_filter',
       source         => 'log_collector',
     },
     module_directory => $lua_modules_dir,

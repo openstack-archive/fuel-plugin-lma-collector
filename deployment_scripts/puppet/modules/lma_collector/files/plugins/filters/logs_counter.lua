@@ -26,7 +26,6 @@ local hostname = read_config('hostname') or error('hostname must be specified')
 -- older than the current time.
 local grace_interval = (read_config('grace_interval') or 0) + 0
 local logger_matcher = read_config('logger_matcher') or '.*'
-local metric_logger = read_config('logger')
 local metric_source = read_config('source')
 
 local discovered_services = {}
@@ -79,7 +78,7 @@ function timer_event(ns)
 
     last_timer_event = ns
 
-    ok, err = utils.inject_bulk_metric(ns, hostname, metric_logger, metric_source, utils.metric_type['DERIVE'])
+    ok, err = utils.inject_bulk_metric(ns, hostname, metric_source, utils.metric_type['DERIVE'])
     if ok ~= 0 then
         return -1, err
     end
