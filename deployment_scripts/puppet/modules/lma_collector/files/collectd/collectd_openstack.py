@@ -115,7 +115,8 @@ class OSClient(object):
         self.logger.debug("Got token '%s'" % self.token)
         return self.token
 
-    def make_request(self, verb, url, data=None, token_required=True):
+    def make_request(self, verb, url, data=None, token_required=True,
+                     params=None):
         kwargs = {
             'url': url,
             'timeout': self.timeout,
@@ -130,6 +131,9 @@ class OSClient(object):
 
         if data is not None:
             kwargs['data'] = data
+
+        if params is not None:
+            kwargs['params'] = params
 
         func = getattr(self.session, verb.lower())
 
@@ -159,6 +163,7 @@ class CollectdPlugin(base.Base):
         self.max_retries = 2
         self.os_client = None
         self.extra_config = {}
+        self.pagination_limit = None
 
     def _build_url(self, service, resource):
         s = (self.get_service(service) or {})
@@ -241,12 +246,12 @@ class CollectdPlugin(base.Base):
 
                     yield data
 
-    def get(self, service, resource):
+    def get(self, service, resource, params=None):
         url = self._build_url(service, resource)
         if not url:
             return
         self.logger.info("GET '%s'" % url)
-        return self.os_client.make_request('get', url)
+        return self.os_client.make_request('get', url, params=params)
 
     @property
     def service_catalog(self):
@@ -271,46 +276,72 @@ class CollectdPlugin(base.Base):
                 tenant_name = node.values[0]
             elif node.key == 'KeystoneUrl':
                 keystone_url = node.values[0]
+            elif node.key == 'PaginationLimit':
+                self.pagination_limit = int(node.values[0])
         self.os_client = OSClient(username, password, tenant_name,
                                   keystone_url, self.timeout, self.logger,
                                   self.max_retries)
 
     def get_objects(self, project, object_name, api_version='',
-                    params='all_tenants=1'):
+                    params=None, detail=False):
         """ Return a list of OpenStack objects
-
-            See get_objects_details()
-        """
-        return self._get_objects(project, object_name, api_version, params,
-                                 False)
-
-    def get_objects_details(self, project, object_name, api_version='',
-                            params='all_tenants=1'):
-        """ Return a list of details about OpenStack objects
 
             The API version is not always included in the URL endpoint
             registered in Keystone (eg Glance). In this case, use the
             api_version parameter to specify which version should be used.
-        """
-        return self._get_objects(project, object_name, api_version, params,
-                                 True)
 
-    def _get_objects(self, project, object_name, api_version, params, detail):
+        """
+        if params is None:
+            params = {}
+
         if api_version:
             resource = '%s/%s' % (api_version, object_name)
         else:
             resource = '%s' % (object_name)
+
         if detail:
-            resource = '%s/detail' % (resource)
-        if params:
-            resource = '%s?%s' % (resource, params)
-        # TODO(scroiset): use pagination to handle large collection
-        r = self.get(project, resource)
-        if not r or object_name not in r.json():
-            self.logger.warning('Could not find %s %s' % (project,
-                                                          object_name))
-            return []
-        return r.json().get(object_name)
+            resource = '{}/detail'.format(resource)
+
+        url = self._build_url(project, resource)
+        if not url:
+            return
+
+        opts = {}
+        if self.pagination_limit:
+            opts['limit'] = self.pagination_limit
+
+        opts.update(params)
+        objs = []
+
+        while True:
+            r = self.os_client.make_request('get', url, params=opts)
+            if not r or object_name not in r.json():
+                self.logger.warning('Could not find %s %s' % (project,
+                                                              object_name))
+                return objs
+
+            resp = r.json()
+            bulk_objs = resp.get(object_name)
+
+            if not bulk_objs:
+                break
+
+            objs.extend(bulk_objs)
+
+            links = resp.get('{}_links'.format(object_name))
+            if links is None or self.pagination_limit is None:
+                # Either the pagination is not supported or there is no more
+                # data
+                break
+
+            # if there is no 'next' link in the response, all data has been
+            # read.
+            if len([i for i in links if i.get('rel') == 'next']) == 0:
+                break
+
+            opts['marker'] = bulk_objs[-1]['id']
+
+        return objs
 
     def count_objects_group_by(self,
                                list_object,

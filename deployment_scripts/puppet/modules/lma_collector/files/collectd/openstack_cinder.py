@@ -33,10 +33,13 @@ class CinderStatsPlugin(openstack.CollectdPlugin):
         super(CinderStatsPlugin, self).__init__(*args, **kwargs)
         self.plugin = PLUGIN_NAME
         self.interval = INTERVAL
+        self.pagination_limit = 500
 
     def itermetrics(self):
 
-        volumes_details = self.get_objects_details('cinder', 'volumes')
+        volumes_details = self.get_objects('cinder', 'volumes',
+                                           params={'all_tenants': 1},
+                                           detail=True)
 
         def groupby(d):
             return d.get('status', 'unknown').lower()
@@ -63,7 +66,8 @@ class CinderStatsPlugin(openstack.CollectdPlugin):
                 'values': size
             }
 
-        snaps_details = self.get_objects_details('cinder', 'snapshots')
+        snaps_details = self.get_objects('cinder', 'snapshots',
+                                         params={'all_tenants': 1})
         status_snaps = self.count_objects_group_by(snaps_details,
                                                    group_by_func=groupby)
         for s, nb in status_snaps.iteritems():
