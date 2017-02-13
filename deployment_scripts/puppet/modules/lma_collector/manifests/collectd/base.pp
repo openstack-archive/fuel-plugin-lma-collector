@@ -19,6 +19,7 @@ class lma_collector::collectd::base (
   $read_threads = $lma_collector::params::collectd_read_threads,
   $hostname = undef,
   $purge = false,
+  $package_provider = 'apt_fuel',
 ) inherits lma_collector::params {
 
   include lma_collector::service::metric
@@ -49,6 +50,7 @@ class lma_collector::collectd::base (
   class { '::collectd':
     purge                  => $purge,
     recurse                => true,
+    package_provider       => $package_provider,
     purge_config           => true,
     fqdnlookup             => false,
     interval               => $lma_collector::params::collectd_interval,
