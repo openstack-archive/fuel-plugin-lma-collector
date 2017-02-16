@@ -282,14 +282,18 @@ class AsyncPoller(threading.Thread):
            polling_function: a function to execute periodically
            interval: the interval in second
            name: (optional) the name of the thread
+           tracking: (default False) if True, all results returned by the
+                    polling_function() are accumulated until they are read.
     """
 
-    def __init__(self, collectd, polling_function, interval, name=None):
+    def __init__(self, collectd, polling_function, interval, name=None,
+                 tracking=False):
         super(AsyncPoller, self).__init__(name=name)
         self.collectd = collectd
         self.polling_function = polling_function
         self.interval = interval
-        self._results = None
+        self._results = []
+        self._tracking = tracking
 
     def run(self):
         self.collectd.info('Starting thread {}'.format(self.name))
@@ -297,7 +301,11 @@ class AsyncPoller(threading.Thread):
             try:
                 started_at = time.time()
 
-                self._results = self.polling_function()
+                r = self.polling_function()
+                if self._tracking:
+                    self._results.extend(r)
+                else:
+                    self._results = r
 
                 tosleep = self.interval - (time.time() - started_at)
                 if tosleep > 0:
@@ -310,9 +318,12 @@ class AsyncPoller(threading.Thread):
                     )
 
             except Exception as e:
-                self._results = None
+                self._results = []
                 self.collectd.error('{} fails: {}'.format(self.name, e))
                 time.sleep(10)
 
     def get_results(self):
-        return self._results
+        r = self._results
+        if self._tracking:
+            self._results = []
+        return r

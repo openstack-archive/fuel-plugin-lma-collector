@@ -166,6 +166,8 @@ class CollectdPlugin(base.Base):
         self._threads = {}
         self.pagination_limit = None
         self.polling_interval = 60
+        self._last_run = None
+        self.changes_since = False
 
     def _build_url(self, service, resource):
         s = (self.get_service(service) or {})
@@ -251,7 +253,7 @@ class CollectdPlugin(base.Base):
         url = self._build_url(service, resource)
         if not url:
             return
-        self.logger.info("GET '%s'" % url)
+        self.logger.info('GET({}) {}'.format(url, params))
         return self.os_client.make_request('get', url, params=params)
 
     @property
@@ -287,7 +289,7 @@ class CollectdPlugin(base.Base):
                                   self.max_retries)
 
     def get_objects(self, project, object_name, api_version='',
-                    params=None, detail=False):
+                    params=None, detail=False, since=False):
         """ Return a list of OpenStack objects
 
             The API version is not always included in the URL endpoint
@@ -295,6 +297,7 @@ class CollectdPlugin(base.Base):
             api_version parameter to specify which version should be used.
 
         """
+        self.changes_since = since
         if params is None:
             params = {}
 
@@ -316,6 +319,13 @@ class CollectdPlugin(base.Base):
             _objects = []
             _opts = {}
             _opts.update(opts)
+
+            if self._last_run is not None:
+                _opts['changes-since'] = self._last_run.isoformat()
+
+            # Keep track of the initial request time
+            last_run = datetime.datetime.now(tz=dateutil.tz.tzutc())
+
             while True:
                 r = self.get(project, resource, params=_opts)
                 if not r or object_name not in r.json():
@@ -354,6 +364,11 @@ class CollectdPlugin(base.Base):
 
                 _opts['marker'] = bulk_objs[-1]['id']
 
+            if self.changes_since:
+                self._last_run = last_run
+            else:
+                self._last_run = None
+
             return _objects
 
         poller_id = '{}:{}'.format(project, resource)
@@ -361,7 +376,7 @@ class CollectdPlugin(base.Base):
             t = base.AsyncPoller(self.collectd,
                                  openstack_api_poller,
                                  self.polling_interval,
-                                 poller_id)
+                                 poller_id, self.changes_since)
             t.start()
             self._threads[poller_id] = t
 
