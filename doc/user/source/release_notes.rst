@@ -7,6 +7,17 @@
 Release notes
 -------------
 
+Version 1.0.1
++++++++++++++
+
+Bug fixes:
+
+  * Decrease the load on the OpenStack API services when collecting metrics.
+  * Report accurate Nova metrics with large number of instances. See `#1554502
+    <https://bugs.launchpad.net/lma-toolchain/+bug/1554502>`
+  * Fix alarms monitoring errors in the logs. See `#1662879
+    <https://bugs.launchpad.net/lma-toolchain/+bug/1662879>`
+
 Version 1.0.0
 +++++++++++++
 
