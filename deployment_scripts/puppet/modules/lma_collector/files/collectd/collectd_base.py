@@ -282,14 +282,19 @@ class AsyncPoller(threading.Thread):
            polling_function: a function to execute periodically
            interval: the interval in second
            name: (optional) the name of the thread
+           reset_on_read: (default False) if True, all results returned by the
+                          polling_function() are accumulated until they are
+                          read.
     """
 
-    def __init__(self, collectd, polling_function, interval, name=None):
+    def __init__(self, collectd, polling_function, interval, name=None,
+                 reset_on_read=False):
         super(AsyncPoller, self).__init__(name=name)
         self.collectd = collectd
         self.polling_function = polling_function
         self.interval = interval
-        self._results = None
+        self._results = []
+        self._reset_on_read = reset_on_read
 
     def run(self):
         self.collectd.info('Starting thread {}'.format(self.name))
@@ -297,8 +302,7 @@ class AsyncPoller(threading.Thread):
             try:
                 started_at = time.time()
 
-                self._results = self.polling_function()
-
+                self.results = self.polling_function()
                 tosleep = self.interval - (time.time() - started_at)
                 if tosleep > 0:
                     time.sleep(tosleep)
@@ -310,9 +314,21 @@ class AsyncPoller(threading.Thread):
                     )
 
             except Exception as e:
-                self._results = None
+                if not self._reset_on_read:
+                    self._results = []
                 self.collectd.error('{} fails: {}'.format(self.name, e))
                 time.sleep(10)
 
-    def get_results(self):
-        return self._results
+    @property
+    def results(self):
+        r = self._results
+        if self._reset_on_read:
+            self._results = []
+        return r
+
+    @results.setter
+    def results(self, value):
+        if self._reset_on_read:
+            self._results.extend(value)
+        else:
+            self._results = value

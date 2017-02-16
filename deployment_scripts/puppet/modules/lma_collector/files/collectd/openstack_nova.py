@@ -17,6 +17,8 @@
 import collectd
 
 import collectd_openstack as openstack
+from itertools import groupby
+
 
 PLUGIN_NAME = 'nova'
 INTERVAL = openstack.INTERVAL
@@ -32,22 +34,33 @@ class NovaInstanceStatsPlugin(openstack.CollectdPlugin):
         self.plugin = PLUGIN_NAME
         self.interval = INTERVAL
         self.pagination_limit = 500
+        self._cache = {}
 
     def itermetrics(self):
-        servers_details = self.get_objects('nova', 'servers',
-                                           params={'all_tenants': 1},
-                                           detail=True)
+        server_details = self.get_objects('nova', 'servers',
+                                          params={'all_tenants': 1},
+                                          detail=True, since=True)
 
-        def groupby(d):
-            return d.get('status', 'unknown').lower()
+        for server in server_details:
+            _id = server.get('id')
+            status = server.get('status', 'unknown').lower()
+            if status == 'deleted':
+                try:
+                    self.logger.notice(
+                        'remove deleted instance {} from cache'.format(_id))
+                    del self._cache[_id]
+                except KeyError:
+                    self.logger.warning(
+                        'cannot find instance in cache {}'.format(_id))
+            else:
+                self._cache[_id] = status
 
-        status = self.count_objects_group_by(servers_details,
-                                             group_by_func=groupby)
-        for s, nb in status.iteritems():
+        servers = sorted(self._cache.values())
+        for status, g in groupby(servers):
             yield {
                 'plugin_instance': 'instances',
-                'values': nb,
-                'type_instance': s,
+                'values': len(map(lambda x: x, g)),
+                'type_instance': status,
             }
 
 
