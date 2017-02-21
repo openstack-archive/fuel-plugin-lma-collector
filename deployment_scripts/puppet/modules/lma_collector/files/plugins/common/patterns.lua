@@ -121,7 +121,7 @@ http_request = http_method * sp * url * sp * l.P'HTTP/' * http_version
 -- TODO(pasquier-s): build the LPEG grammar based on the log_format parameter
 -- passed to eventlet.wsgi.server similar to what the build_rsyslog_grammar
 -- function does for RSyslog.
-local openstack_http_status = l.P"status: "^-1 * l.Cg(l.digit^3, "http_status")
+local openstack_http_status = l.P"status: "^-1 * l.Cg(l.digit^3 / tonumber, "http_status")
 local openstack_response_size = l.P"len: "^-1 * l.Cg(l.digit^1 / tonumber, "http_response_size")
 local openstack_response_time = l.P"time: "^-1 * l.Cg(l.digit^1 * dot^0 * l.digit^0 / tonumber, "http_response_time")
 
