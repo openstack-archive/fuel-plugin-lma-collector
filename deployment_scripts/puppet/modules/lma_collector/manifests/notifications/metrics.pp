@@ -28,13 +28,4 @@ class lma_collector::notifications::metrics {
     module_directory => $lua_modules_dir,
     notify           => Class['lma_collector::service::log'],
   }
-
-  # Filter to compute the instance state change metric
-  heka::filter::sandbox { 'instance_state':
-    config_dir       => $config_dir,
-    filename         => "${lma_collector::params::plugins_dir}/filters/instance_state.lua",
-    message_matcher  => 'Type == \'notification\' && Fields[event_type] == \'compute.instance.update\' && Fields[state] != NIL',
-    module_directory => $lua_modules_dir,
-    notify           => Class['lma_collector::service::log'],
-  }
 }
