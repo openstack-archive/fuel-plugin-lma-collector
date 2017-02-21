@@ -66,7 +66,7 @@ class GlanceStatsPlugin(openstack.CollectdPlugin):
             return d.get('size', 0)
 
         def groupby_size(d):
-            p = 'public' if d.get('is_public', True) else 'private'
+            p = d['visibility']
             status = d.get('status', 'unknown').lower()
             if is_snap(d):
                 return 'snapshots_size.%s.%s' % (p, status)
