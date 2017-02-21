@@ -42,9 +42,6 @@ The following metrics are emitted per compute node:
   instances.
 * ``openstack_nova_instance_creation_time``, the time in seconds it took to
   launch a new instance.
-* ``openstack_nova_instance_state``, the number of instances which entered a
-  given state (the value is always ``1``).
-  The metric contains a ``state`` field.
 * ``openstack_nova_running_instances``, the number of running instances.
 * ``openstack_nova_running_tasks``, the number of tasks currently executed.
 * ``openstack_nova_used_disk``, the disk space in GB used by the instances.
