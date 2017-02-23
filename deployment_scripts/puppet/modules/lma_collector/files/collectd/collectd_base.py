@@ -49,7 +49,8 @@ class Base(object):
 
     MAX_IDENTIFIER_LENGTH = 63
 
-    def __init__(self, collectd, service_name=None, local_check=True):
+    def __init__(self, collectd, service_name=None, local_check=True,
+                 disable_check_metric=False):
         self.debug = False
         self.timeout = 5
         self.max_retries = 3
@@ -63,6 +64,7 @@ class Base(object):
 
         self.service_name = service_name
         self.local_check = local_check
+        self.disable_check_metric = disable_check_metric
 
     def config_callback(self, conf):
         for node in conf.children:
@@ -75,6 +77,9 @@ class Base(object):
                 self.max_retries = int(node.values[0])
             elif node.key == 'DependsOnResource':
                 self.depends_on_resource = node.values[0]
+            elif node.key == 'DisableCheckMetric':
+                if node.values[0].lower() == 'true':
+                    self.disable_check_metric = True
 
     @read_callback_wrapper
     def conditional_read_callback(self):
@@ -95,11 +100,17 @@ class Base(object):
         else:
             self.dispatch_check_metric(self.OK)
 
-    def dispatch_check_metric(self, check, failure=None):
+    def dispatch_check_metric(self, value, failure=None):
+        """Send a check metric reporting whether or not the plugin succeeded
+
+        """
+        if self.disable_check_metric:
+            return
+
         metric = {
             'meta': {'service_check': self.service_name or self.plugin,
                      'local_check': self.local_check},
-            'values': check,
+            'values': value,
         }
 
         if failure is not None:

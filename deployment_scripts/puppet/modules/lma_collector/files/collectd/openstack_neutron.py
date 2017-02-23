@@ -110,7 +110,7 @@ class NeutronStatsPlugin(openstack.CollectdPlugin):
         yield {'type_instance': 'floatingips', 'values': len(routers)}
 
 
-plugin = NeutronStatsPlugin(collectd, PLUGIN_NAME)
+plugin = NeutronStatsPlugin(collectd, PLUGIN_NAME, disable_check_metric=True)
 
 
 def config_callback(conf):

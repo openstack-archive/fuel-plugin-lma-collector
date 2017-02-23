@@ -68,10 +68,10 @@ class HTTPCheckPlugin(base.Base):
                     yield {'type_instance': name, 'values': self.FAIL}
                 else:
                     self.logger.debug(
-                        "Got response from {}: '{}'".format(url, r.text))
+                        "Got response from {}: '{}'".format(url, r.content))
                     yield {'type_instance': name, 'values': self.OK}
 
-plugin = HTTPCheckPlugin(collectd)
+plugin = HTTPCheckPlugin(collectd, disable_check_metric=True)
 
 
 def config_callback(conf):
