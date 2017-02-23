@@ -80,7 +80,8 @@ class KeystoneStatsPlugin(openstack.CollectdPlugin):
             'values': len(roles),
         }
 
-plugin = KeystoneStatsPlugin(collectd, PLUGIN_NAME)
+plugin = KeystoneStatsPlugin(collectd, PLUGIN_NAME,
+                            disable_check_metric=True)
 
 
 def config_callback(conf):
