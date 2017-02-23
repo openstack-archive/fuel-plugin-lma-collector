@@ -51,7 +51,8 @@ class NovaInstanceStatsPlugin(openstack.CollectdPlugin):
             }
 
 
-plugin = NovaInstanceStatsPlugin(collectd, PLUGIN_NAME)
+plugin = NovaInstanceStatsPlugin(collectd, PLUGIN_NAME,
+                                 disable_check_metric=True)
 
 
 def config_callback(conf):

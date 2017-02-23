@@ -77,7 +77,8 @@ class NeutronAgentStatsPlugin(openstack.CollectdPlugin):
                 }
 
 
-plugin = NeutronAgentStatsPlugin(collectd, PLUGIN_NAME)
+plugin = NeutronAgentStatsPlugin(collectd, PLUGIN_NAME,
+                                 disable_check_metric=True)
 
 
 def config_callback(conf):
