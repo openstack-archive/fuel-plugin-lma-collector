@@ -74,7 +74,8 @@ class CinderServiceStatsPlugin(openstack.CollectdPlugin):
                 }
 
 
-plugin = CinderServiceStatsPlugin(collectd, PLUGIN_NAME)
+plugin = CinderServiceStatsPlugin(collectd, PLUGIN_NAME,
+                                  disable_check_metric=True)
 
 
 def config_callback(conf):

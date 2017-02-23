@@ -83,7 +83,7 @@ class GlanceStatsPlugin(openstack.CollectdPlugin):
                 'meta': {'visibility': visibility, 'status': status},
             }
 
-plugin = GlanceStatsPlugin(collectd, PLUGIN_NAME)
+plugin = GlanceStatsPlugin(collectd, PLUGIN_NAME, disable_check_metric=True)
 
 
 def config_callback(conf):
