@@ -79,7 +79,8 @@ class NovaServiceStatsPlugin(openstack.CollectdPlugin):
                 }
 
 
-plugin = NovaServiceStatsPlugin(collectd, PLUGIN_NAME)
+plugin = NovaServiceStatsPlugin(collectd, PLUGIN_NAME,
+                                disable_check_metric=True)
 
 
 def config_callback(conf):
