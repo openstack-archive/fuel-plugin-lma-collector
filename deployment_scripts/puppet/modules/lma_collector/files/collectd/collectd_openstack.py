@@ -16,6 +16,7 @@
 import datetime
 import dateutil.parser
 import dateutil.tz
+import re
 import requests
 import simplejson as json
 
@@ -27,6 +28,8 @@ from collections import defaultdict
 # less than the default group by interval (which is 60 seconds) to avoid gaps
 # in the Grafana graphs.
 INTERVAL = 50
+
+MARKER_RE = re.compile('.*marker=([^&]+)')
 
 
 class KeystoneException(Exception):
@@ -351,20 +354,28 @@ class CollectdPlugin(base.Base):
 
                 _objects.extend(bulk_objs)
 
-                links = resp.get('{}_links'.format(object_name))
-                if links is None or self.pagination_limit is None:
+                if self.pagination_limit is None:
                     # Either the pagination is not supported or there is
                     # no more data
                     # In both cases, we got at this stage all the data we
                     # can have.
                     break
 
-                # if there is no 'next' link in the response, all data has
-                # been read.
-                if len([i for i in links if i.get('rel') == 'next']) == 0:
-                    break
+                links = resp.get('{}_links'.format(object_name))
+                if links is not None:
+                    # if there is no 'next' link in the response, all data has
+                    # been read.
+                    if len([i for i in links if i.get('rel') == 'next']) == 0:
+                        break
+                    _opts['marker'] = bulk_objs[-1]['id']
 
-                _opts['marker'] = bulk_objs[-1]['id']
+                elif resp.get('next'):
+                    m = MARKER_RE.match(resp.get('next'))
+                    if not m:
+                        break
+                    _opts['marker'] = m.group(1)
+                else:
+                    break
 
             if not has_failure:
                 self._last_run = last_run
