@@ -37,7 +37,7 @@ class lma_collector::elasticsearch (
     config_dir        => $lma_collector::params::log_config_dir,
     server            => $server,
     port              => $port,
-    message_matcher   => 'Type == \'log\' || Type  == \'notification\'',
+    message_matcher   => 'Type == \'log\' || Type  == \'notification\' || Type == \'audit\'',
     use_buffering     => $lma_collector::params::buffering_enabled,
     max_buffer_size   => $lma_collector::params::buffering_max_buffer_size_for_log,
     max_file_size     => $lma_collector::params::buffering_max_file_size_for_log,
