@@ -351,20 +351,17 @@ class CollectdPlugin(base.Base):
 
                 _objects.extend(bulk_objs)
 
-                links = resp.get('{}_links'.format(object_name))
-                if links is None or self.pagination_limit is None:
-                    # Either the pagination is not supported or there is
-                    # no more data
-                    # In both cases, we got at this stage all the data we
-                    # can have.
+                if self.pagination_limit is None:
                     break
 
-                # if there is no 'next' link in the response, all data has
-                # been read.
-                if len([i for i in links if i.get('rel') == 'next']) == 0:
+                links = resp.get('{}_links'.format(object_name), [])
+                has_next = len(
+                    [i for i in links if i.get('rel') == 'next']) > 0 or \
+                    resp.get('next')
+                if has_next:
+                    _opts['marker'] = bulk_objs[-1]['id']
+                else:
                     break
-
-                _opts['marker'] = bulk_objs[-1]['id']
 
             if not has_failure:
                 self._last_run = last_run
