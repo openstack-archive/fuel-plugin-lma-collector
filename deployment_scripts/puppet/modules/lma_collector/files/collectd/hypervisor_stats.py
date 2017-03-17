@@ -85,7 +85,7 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
                 total_stats[v] += m_val
                 for agg in nova_aggregates.keys():
                     agg_hosts = nova_aggregates[agg]['hosts']
-                    if stats['hypervisor_hostname'] in agg_hosts:
+                    if host in agg_hosts:
                         nova_aggregates[agg]['metrics'][v] += m_val
             if 'cpu_ratio' in self.extra_config:
                 m_vcpus = stats.get('vcpus', 0)
@@ -100,7 +100,7 @@ class HypervisorStatsPlugin(openstack.CollectdPlugin):
                 total_stats['free_vcpus'] += free
                 for agg in nova_aggregates.keys():
                     agg_hosts = nova_aggregates[agg]['hosts']
-                    if stats['hypervisor_hostname'] in agg_hosts:
+                    if host in agg_hosts:
                         free = ((int(self.extra_config['cpu_ratio'] *
                                      m_vcpus)) -
                                 m_vcpus_used)
