@@ -14,8 +14,7 @@
         }
     ],
     "requirements": [
-        {"name": "puppet", "version_requirement": "3.x"},
-        {"name": "pe", "version_requirement": "3.x"}
+        {"name": "puppet", "version_requirement": "3.x"}
     ],
     "description": "Puppet module for configuring Heka",
     "dependencies": [
