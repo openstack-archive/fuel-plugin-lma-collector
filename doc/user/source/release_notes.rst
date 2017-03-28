@@ -17,6 +17,9 @@ Bug fixes:
     <https://bugs.launchpad.net/lma-toolchain/+bug/1554502>`
   * Fix alarms monitoring errors in the logs. See `#1662879
     <https://bugs.launchpad.net/lma-toolchain/+bug/1662879>`
+  * Collect Keystone metrics for all domains. See `#1662142
+    <https://bugs.launchpad.net/lma-toolchain/+bug/1662142>`
+  * Support for CADF notifications.
 
 Version 1.0.0
 +++++++++++++
