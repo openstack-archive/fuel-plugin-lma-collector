@@ -104,11 +104,17 @@ class OSClient(object):
         self.service_catalog = []
         for item in data['access']['serviceCatalog']:
             endpoint = item['endpoints'][0]
+            if 'internalURL' not in endpoint and 'publicURL' not in endpoint:
+                self.logger.warning(
+                    "Service '{}' skipped because no URL can be found".format(
+                        item['name']
+                ))
+                continue
             self.service_catalog.append({
                 'name': item['name'],
                 'region': endpoint['region'],
                 'service_type': item['type'],
-                'url': endpoint['internalURL'],
+                'url': endpoint.get('internalURL', endpoint.get('publicURL')),
                 'admin_url': endpoint['adminURL'],
             })
 
