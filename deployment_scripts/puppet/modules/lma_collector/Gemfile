@@ -21,5 +21,7 @@ group :development, :test do
   gem 'rspec-puppet-facts'
   # Newer puppetlabs_spec_helper depends on rubocop-rspec that requires ruby >= 2.2.0
   gem 'puppetlabs_spec_helper', '~> 1.1.1'
+  # puppet-lint >= 2.2.0 don't support Puppet 3.x anymore
+  gem 'puppet-lint', '~> 2.1.0'
   gem 'metadata-json-lint'
 end
