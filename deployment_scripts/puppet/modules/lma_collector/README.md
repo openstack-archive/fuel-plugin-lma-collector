@@ -920,7 +920,7 @@ OpenStack service.
 It works for "standard" OpenStack services that write their logs into log files
 located in `/var/log/{service}`, where `{service}` is the service name.
 
-For example it works for Nova, Neutron, Cinder, Glance, Heat, Keysone, Horizon
+For example it works for Nova, Neutron, Cinder, Glance, Heat, Keystone, Horizon
 and Murano.
 
 The define doesn't work for Swift, as Swift only writes its logs to Syslog.
