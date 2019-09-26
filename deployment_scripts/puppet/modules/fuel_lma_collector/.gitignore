@@ -1,8 +1,0 @@
-spec/fixtures/modules/*
-spec/fixtures/manifests/*
-Gemfile.lock
-tests/lua/mocks/date_time.lua
-.bundle
-tests/lua/mocks/inspect.lua
-tests/lua/mocks/anomaly.lua
-tests/lua/mocks/annotation.lua

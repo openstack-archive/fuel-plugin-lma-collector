@@ -1,9 +1,0 @@
-fixtures:
-  repositories:
-    stdlib:
-      repo: "git://github.com/puppetlabs/puppetlabs-stdlib"
-      ref: "4.7.0"
-  symlinks:
-    fuel_lma_collector: "#{source_dir}"
-    lma_collector: "#{source_dir}/../lma_collector"
-    heka: "#{source_dir}/../heka"

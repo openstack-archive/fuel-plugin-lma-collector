@@ -1,4 +1,0 @@
--e git+https://github.com/openstack/fuel-plugins.git#egg=fuel-plugin-builder
-Sphinx
-# Hacking already pins down pep8, pyflakes and flake8
-hacking<0.11,>=0.10.0

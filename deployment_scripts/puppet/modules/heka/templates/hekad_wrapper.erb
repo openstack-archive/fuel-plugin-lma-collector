@@ -1,9 +1,0 @@
-#!/bin/sh
-
-HEKAD="/usr/bin/hekad"
-
-<% if @pre_script -%>
-<%= @pre_script %>
-<% end -%>
-
-exec $HEKAD -config=<%= @config_dir %>
